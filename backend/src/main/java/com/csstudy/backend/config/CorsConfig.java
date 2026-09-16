@@ -17,6 +17,7 @@ public class CorsConfig {
         config.setAllowedOriginPatterns(List.of(
                 "http://localhost:*",
                 "https://cs-study-platform.vercel.app",
+                "https://cs-study-frontend.onrender.com",
                 "https://cs-study-platform-*-anchanungs-projects.vercel.app"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
