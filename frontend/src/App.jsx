@@ -7,7 +7,10 @@ import QuestionPage from './pages/QuestionPage';
 import StatsPage from './pages/StatsPage';
 import InterviewPracticePage from './pages/InterviewPracticePage';
 import MajorExamPage from './pages/MajorExamPage';
+import ExamListPage from './pages/ExamListPage';
+import ExamCompanyPage from './pages/ExamCompanyPage';
 import './App.css';
+import './exam.css';
 
 function App() {
   return (
@@ -21,6 +24,8 @@ function App() {
             <Route path="stats" element={<StatsPage />} />
             <Route path="interview" element={<InterviewPracticePage />} />
             <Route path="major-exam" element={<MajorExamPage />} />
+            <Route path="exam" element={<ExamListPage />} />
+            <Route path="exam/:company" element={<ExamCompanyPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

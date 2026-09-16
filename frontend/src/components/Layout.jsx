@@ -56,6 +56,9 @@ export default function Layout() {
               <Link to="/interview" className={location.pathname === '/interview' ? 'active' : ''}>
                 면접연습
               </Link>
+              <Link to="/exam" className={location.pathname.startsWith('/exam') ? 'active' : ''}>
+                기출문제
+              </Link>
             </nav>
             {user ? (
               <div className="user-info">

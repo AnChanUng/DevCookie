@@ -143,6 +143,11 @@ export default function Home() {
               <h3>전공필기</h3>
               <p>금융공기업(코스콤, 금융결제원) 대비</p>
             </Link>
+            <Link to="/exam" className="category-card major-exam-card">
+              <div className="category-icon">📚</div>
+              <h3>기출문제</h3>
+              <p>HF · 코스콤 · 기업은행 전공필기 모의고사</p>
+            </Link>
             <Link to="/interview" className="category-card interview-card">
               <div className="category-icon">🎤</div>
               <h3>공통면접질문</h3>
