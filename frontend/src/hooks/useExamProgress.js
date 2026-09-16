@@ -25,7 +25,7 @@ function writeLocal(company, data) {
 export function useExamProgress(company) {
   const { user } = useAuth();
   const [data, setData] = useState(() => readLocal(company));
-  const [sync, setSync] = useState('local');
+  const [sync, setSync] = useState('syncing');
   const pushTimer = useRef(null);
   const latest = useRef(data);
   useEffect(() => { latest.current = data; }, [data]);
@@ -45,12 +45,8 @@ export function useExamProgress(company) {
   }, [company, user]);
 
   useEffect(() => {
-    if (!user) {
-      setSync('local');
-      return;
-    }
+    if (!user) return;
     let cancelled = false;
-    setSync('syncing');
     api.get(`/exam/progress/${company}`, { params: { userId: user.id } })
       .then(res => {
         if (cancelled) return;
@@ -79,7 +75,7 @@ export function useExamProgress(company) {
     });
   }, [company, push]);
 
-  return { data, save, sync, loggedIn: !!user };
+  return { data, save, sync: user ? sync : 'local', loggedIn: !!user };
 }
 
 export function recordAnswer(stats, qid, correct) {
