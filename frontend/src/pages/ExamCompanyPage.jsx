@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { COMPANIES, SECTIONS } from '../data/examQuestions';
+import { COMPANIES } from '../data/examQuestions';
 import { useExamProgress, recordAnswer } from '../hooks/useExamProgress';
 
 const CIRC = ['①', '②', '③', '④', '⑤'];
-const EXAM_SECONDS = 80 * 60;
 
 const shuffle = (arr) => {
   const a = arr.slice();
@@ -20,8 +19,8 @@ const fmtDate = (ts) => {
   const p = (n) => String(n).padStart(2, '0');
   return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 };
-const modeLabel = (mode, sec) =>
-  mode === 'exam' ? '실전 모의고사' : mode === 'wrong' ? '오답 다시 풀기' : `영역별 연습 · ${SECTIONS[sec]?.name || ''}`;
+const modeLabel = (sections, mode, sec) =>
+  mode === 'exam' ? '실전 모의고사' : mode === 'wrong' ? '오답 다시 풀기' : `영역별 연습 · ${sections[sec]?.name || ''}`;
 
 export default function ExamCompanyPage() {
   const { company: key } = useParams();
@@ -32,6 +31,9 @@ export default function ExamCompanyPage() {
 
 function CompanyExam({ company }) {
   const Q = company.questions;
+  const SECTIONS = company.sections;
+  const secKeys = Object.keys(SECTIONS);
+  const label = (mode, sec) => modeLabel(SECTIONS, mode, sec);
   const byId = useMemo(() => Object.fromEntries(Q.map(q => [q.id, q])), [Q]);
   const { data, save, sync, loggedIn } = useExamProgress(company.key);
   const [view, setView] = useState({ name: 'home' });
@@ -48,7 +50,7 @@ function CompanyExam({ company }) {
   const finish = (quiz, answers, aborted) => {
     const isExam = quiz.mode === 'exam';
     let score = 0;
-    const secScore = { cs: 0, dbn: 0, pl: 0 };
+    const secScore = Object.fromEntries(secKeys.map(k => [k, 0]));
     const items = [];
     let stats = data.stats;
     quiz.ids.forEach(id => {
@@ -88,6 +90,8 @@ function CompanyExam({ company }) {
         stats={data.stats}
         mode={view.mode}
         sec={view.sec}
+        sections={SECTIONS}
+        minutes={company.minutes}
         ids={view.ids}
         onPractice={recordPractice}
         onFinish={finish}
@@ -102,20 +106,18 @@ function CompanyExam({ company }) {
     return (
       <div className="fade-in">
         {header('채점 결과')}
-        <p className="exam-eyebrow">{modeLabel(r.mode, r.sec)} · 소요 {fmtT(r.elapsed)}</p>
+        <p className="exam-eyebrow">{label(r.mode, r.sec)} · 소요 {fmtT(r.elapsed)}</p>
         <div className="exam-score"><span className="big">{r.score}</span><span className="of">/ {r.total}문제 · {r.total ? Math.round(r.score / r.total * 100) : 0}%</span></div>
         {r.mode === 'exam' && (
           <div className="exam-stats">
-            <StatTile k="전산학일반" v={r.secScore.cs} of={36} />
-            <StatTile k="DB · 네트워크" v={r.secScore.dbn} of={12} />
-            <StatTile k="프로그래밍" v={r.secScore.pl} of={12} />
+            {secKeys.map(k => <StatTile key={k} k={SECTIONS[k].name} v={r.secScore[k]} of={Q.filter(q => q.sec === k).length} />)}
           </div>
         )}
         <div className="exam-actions">
           {wrongs.length > 0 && <button className="exam-btn primary" onClick={() => start('wrong', shuffle(wrongs.map(x => x.q.id)))}>틀린 {wrongs.length}문제 바로 다시 풀기</button>}
           <button className="exam-btn" onClick={() => setView({ name: 'home' })}>{company.abbr} 메인으로</button>
         </div>
-        <ReviewList items={r.items} defaultFilter={wrongs.length ? 'wrong' : 'all'} />
+        <ReviewList items={r.items} sections={SECTIONS} defaultFilter={wrongs.length ? 'wrong' : 'all'} />
       </div>
     );
   }
@@ -129,7 +131,7 @@ function CompanyExam({ company }) {
           {wrongIds.length > 0 && <button className="exam-btn primary" onClick={() => start('wrong', shuffle(wrongIds))}>미해결 {wrongIds.length}문제 다시 풀기</button>}
           <button className="exam-btn" onClick={() => setView({ name: 'home' })}>{company.abbr} 메인으로</button>
         </div>
-        <WrongBook Q={Q} ids={everWrongIds} stats={data.stats} />
+        <WrongBook Q={Q} ids={everWrongIds} stats={data.stats} sections={SECTIONS} />
       </div>
     );
   }
@@ -141,19 +143,19 @@ function CompanyExam({ company }) {
   return (
     <div className="fade-in">
       {header(company.name)}
-      <p className="exam-lede">전산학일반(정보보호 포함) 36문제, 데이터베이스·네트워크 12문제, 프로그래밍(C++ · Java · Python) 12문제. 총 60문제, 80분, 5지선다. 코딩테스트 이후 치르는 전공필기 범위만 다룹니다.</p>
+      <p className="exam-lede">{company.lede}</p>
 
       <div className="exam-stats">
         <StatTile k="모의고사 응시" v={exams.length} unit="회" />
-        <StatTile k="최고 점수" v={best ?? '–'} of={60} />
-        <StatTile k="최근 점수" v={last ?? '–'} of={60} />
+        <StatTile k="최고 점수" v={best ?? '–'} of={Q.length} />
+        <StatTile k="최근 점수" v={last ?? '–'} of={Q.length} />
         <StatTile k="현재 오답" v={wrongIds.length} unit="문제" />
       </div>
 
       <div className="exam-modes">
         <button className="exam-mode primary" onClick={() => start('exam', Q.map(q => q.id))}>
-          <span><span className="t">실전 모의고사</span><span className="d">60문제 · 80분 타이머 · 실제 영역 순서로 출제, 제출 후 채점과 해설</span></span>
-          <span className="n">60문항</span>
+          <span><span className="t">실전 모의고사</span><span className="d">{Q.length}문제 · {company.minutes}분 타이머 · 실제 영역 순서로 출제, 제출 후 채점과 해설</span></span>
+          <span className="n">{Q.length}문항</span>
         </button>
         <button className="exam-mode" disabled={!wrongIds.length} onClick={() => start('wrong', shuffle(wrongIds))}>
           <span><span className="t">오답 다시 풀기</span><span className="d">마지막에 틀린 문제만 모아서 즉시 채점 · 맞히면 오답에서 빠집니다</span></span>
@@ -187,14 +189,14 @@ function CompanyExam({ company }) {
           <div className="section-title">응시 기록</div>
           <div className="exam-table-wrap">
             <table className="exam-table">
-              <thead><tr><th>일시</th><th>유형</th><th>점수</th><th>전산 · DB/NW · PL</th></tr></thead>
+              <thead><tr><th>일시</th><th>유형</th><th>점수</th><th>{secKeys.map(k => SECTIONS[k].short).join(' · ')}</th></tr></thead>
               <tbody>
                 {data.history.slice().reverse().slice(0, 15).map((h, i) => (
                   <tr key={i}>
                     <td>{fmtDate(h.at)}</td>
-                    <td>{modeLabel(h.mode, h.sec)}</td>
+                    <td>{label(h.mode, h.sec)}</td>
                     <td className="num">{h.score} / {h.total}</td>
-                    <td className="num">{h.sections ? `${h.sections.cs}·${h.sections.dbn}·${h.sections.pl}` : '–'}</td>
+                    <td className="num">{h.sections ? secKeys.map(k => h.sections[k] ?? 0).join('·') : '–'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -215,7 +217,8 @@ function StatTile({ k, v, of, unit }) {
   );
 }
 
-function Quiz({ byId, stats, mode, sec, ids, onPractice, onFinish, header }) {
+function Quiz({ byId, stats, mode, sec, ids, sections, minutes, onPractice, onFinish, header }) {
+  const EXAM_SECONDS = minutes * 60;
   const isExam = mode === 'exam';
   const [idx, setIdx] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -233,7 +236,7 @@ function Quiz({ byId, stats, mode, sec, ids, onPractice, onFinish, header }) {
       setLeft(remain);
       if (remain <= 0) {
         clearInterval(t);
-        alert('80분이 종료되었습니다. 자동으로 채점합니다.');
+        alert(`${minutes}분이 종료되었습니다. 자동으로 채점합니다.`);
         onFinish(quiz, answersRef.current, false);
       }
     }, 1000);
@@ -258,7 +261,7 @@ function Quiz({ byId, stats, mode, sec, ids, onPractice, onFinish, header }) {
 
   return (
     <div className="fade-in">
-      {header(modeLabel(mode, sec))}
+      {header(modeLabel(sections, mode, sec))}
       <div className="exam-qhead">
         <span className="prog">{idx + 1} / {total}</span>
         <span className="prog">답변 {answered}</span>
@@ -269,12 +272,11 @@ function Quiz({ byId, stats, mode, sec, ids, onPractice, onFinish, header }) {
       <div className="exam-qcard">
         <div className="exam-qtop">
           <span className="qnum">Q{String(idx + 1).padStart(2, '0')}</span>
-          <span className="exam-chip sec">{SECTIONS[q.sec].name}</span>
+          <span className="exam-chip sec">{sections[q.sec].name}</span>
           <span className="exam-chip">{q.topic}</span>
           {wstat?.w > 0 && <span className="exam-chip wrong">누적 오답 {wstat.w}회</span>}
         </div>
-        <p className="exam-qtext">{q.q}</p>
-        {q.code && <pre className="exam-code">{q.code}</pre>}
+        <QuestionBody q={q} />
         <ul className="exam-opts">
           {q.o.map((opt, i) => {
             let cls = 'exam-opt';
@@ -317,18 +319,27 @@ function Quiz({ byId, stats, mode, sec, ids, onPractice, onFinish, header }) {
   );
 }
 
-function ReviewCard({ q, a, extra }) {
+function QuestionBody({ q, className = 'exam-qtext' }) {
+  return (
+    <>
+      {q.ctx && <div className="exam-ctx">{q.ctx}</div>}
+      {q.code && <pre className="exam-code">{q.code}</pre>}
+      <p className={className}>{q.q}</p>
+    </>
+  );
+}
+
+function ReviewCard({ q, a, extra, sections }) {
   const ok = a === q.a;
   return (
     <div className="exam-rv">
       <div className="h">
         <span className="qnum">{q.id.toUpperCase()}</span>
-        <span className="exam-chip sec">{SECTIONS[q.sec].name}</span>
+        <span className="exam-chip sec">{sections[q.sec].name}</span>
         <span className="exam-chip">{q.topic}</span>
         {extra ?? <span className={`exam-chip ${ok ? '' : 'wrong'}`}>{ok ? '정답' : '오답'}</span>}
       </div>
-      <p className="q">{q.q}</p>
-      {q.code && <pre className="exam-code">{q.code}</pre>}
+      <QuestionBody q={q} className="q" />
       <div className="a">
         {a === undefined
           ? (extra ? null : <span className="w">미답변</span>)
@@ -340,7 +351,7 @@ function ReviewCard({ q, a, extra }) {
   );
 }
 
-function ReviewList({ items, defaultFilter }) {
+function ReviewList({ items, sections, defaultFilter }) {
   const [filter, setFilter] = useState(defaultFilter);
   const wrongs = items.filter(x => !x.ok);
   const list = filter === 'wrong' ? wrongs : items;
@@ -352,15 +363,15 @@ function ReviewList({ items, defaultFilter }) {
       </div>
       {list.length === 0
         ? <div className="empty"><div className="empty-icon">🎉</div>틀린 문제가 없습니다. 전부 정답입니다.</div>
-        : <div className="exam-review">{list.map(it => <ReviewCard key={it.q.id} q={it.q} a={it.a} />)}</div>}
+        : <div className="exam-review">{list.map(it => <ReviewCard key={it.q.id} q={it.q} a={it.a} sections={sections} />)}</div>}
     </>
   );
 }
 
-function WrongBook({ Q, ids, stats }) {
+function WrongBook({ Q, ids, stats, sections }) {
   const [filter, setFilter] = useState('all');
   if (!ids.length) return <div className="empty"><div className="empty-icon">📋</div>아직 틀린 문제가 없습니다. 모의고사나 영역별 연습을 먼저 풀어보세요.</div>;
-  const tabs = [['all', '전체'], ['cs', '전산학일반'], ['dbn', 'DB·네트워크'], ['pl', '프로그래밍']];
+  const tabs = [['all', '전체'], ...Object.entries(sections).map(([k, v]) => [k, v.name])];
   const qs = Q.filter(q => ids.includes(q.id) && (filter === 'all' || q.sec === filter))
     .sort((x, y) => stats[y.id].w - stats[x.id].w);
   return (
@@ -376,6 +387,7 @@ function WrongBook({ Q, ids, stats }) {
           <ReviewCard
             key={q.id}
             q={q}
+            sections={sections}
             extra={<><span className="exam-chip wrong">오답 {stats[q.id].w}회</span><span className="exam-chip">{stats[q.id].last === 'r' ? '해결' : '미해결'}</span></>}
           />
         ))}
