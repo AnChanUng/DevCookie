@@ -9,8 +9,9 @@ import lombok.Getter;
 public class UserResponse {
     private Long id;
     private String nickname;
+    private String token;
 
-    public static UserResponse from(User user) {
-        return new UserResponse(user.getId(), user.getNickname());
+    public static UserResponse from(User user, String token) {
+        return new UserResponse(user.getId(), user.getNickname(), token);
     }
 }

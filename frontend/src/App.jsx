@@ -1,17 +1,19 @@
+import { lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import Home from './pages/Home';
-import CategoryPage from './pages/CategoryPage';
-import QuestionPage from './pages/QuestionPage';
-import StatsPage from './pages/StatsPage';
-import InterviewPracticePage from './pages/InterviewPracticePage';
-import MajorPage from './pages/MajorPage';
-import MajorExamPage from './pages/MajorExamPage';
-import ExamListPage from './pages/ExamListPage';
-import ExamCompanyPage from './pages/ExamCompanyPage';
 import './App.css';
 import './exam.css';
+
+const CategoryPage = lazy(() => import('./pages/CategoryPage'));
+const QuestionPage = lazy(() => import('./pages/QuestionPage'));
+const StatsPage = lazy(() => import('./pages/StatsPage'));
+const InterviewPracticePage = lazy(() => import('./pages/InterviewPracticePage'));
+const MajorPage = lazy(() => import('./pages/MajorPage'));
+const MajorExamPage = lazy(() => import('./pages/MajorExamPage'));
+const ExamListPage = lazy(() => import('./pages/ExamListPage'));
+const ExamCompanyPage = lazy(() => import('./pages/ExamCompanyPage'));
 
 function App() {
   return (

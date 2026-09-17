@@ -4,6 +4,7 @@ import com.csstudy.backend.dto.GradeResponse;
 import com.csstudy.backend.dto.GradingStatsResponse;
 import com.csstudy.backend.entity.Answer;
 import com.csstudy.backend.entity.Question;
+import com.csstudy.backend.entity.User;
 import com.csstudy.backend.repository.AnswerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class GradingService {
     private final QuestionService questionService;
 
     @Transactional
-    public GradeResponse gradeAnswer(Long questionId, String userAnswer) {
+    public GradeResponse gradeAnswer(Long questionId, String userAnswer, User user) {
         Question question = questionService.findById(questionId);
         String modelAnswer = question.getAnswer();
 
@@ -56,6 +57,7 @@ public class GradingService {
         // Answer 엔티티 저장
         Answer answer = Answer.builder()
                 .question(question)
+                .user(user)
                 .userAnswer(userAnswer)
                 .score(totalScore)
                 .feedback(feedback)
@@ -68,36 +70,39 @@ public class GradingService {
         return GradeResponse.from(answer, modelAnswer);
     }
 
-    public List<GradeResponse> getAnswersForQuestion(Long questionId) {
+    public List<GradeResponse> getAnswersForQuestion(Long questionId, User user) {
         Question question = questionService.findById(questionId);
-        List<Answer> answers = answerRepository.findByQuestionIdOrderByCreatedAtDesc(questionId);
+        List<Answer> answers = answerRepository.findByQuestionIdAndUserIdOrderByCreatedAtDesc(questionId, user.getId());
         return answers.stream()
                 .map(a -> GradeResponse.from(a, question.getAnswer()))
                 .collect(Collectors.toList());
     }
 
-    public GradingStatsResponse getStats() {
-        long totalAnswered = answerRepository.count();
-        Double avgScore = answerRepository.findOverallAverageScore();
-        double averageScore = avgScore != null ? Math.round(avgScore * 10.0) / 10.0 : 0.0;
+    public GradingStatsResponse emptyStats() {
+        return GradingStatsResponse.builder()
+                .totalAnswered(0)
+                .averageScore(0.0)
+                .gradeDistribution(new LinkedHashMap<>())
+                .recentScores(List.of())
+                .build();
+    }
+
+    public GradingStatsResponse getStats(User user) {
+        List<Integer> scores = answerRepository.findByUserIdOrderByCreatedAtDesc(user.getId()).stream()
+                .map(Answer::getScore)
+                .toList();
+        double averageScore = Math.round(scores.stream().mapToInt(Integer::intValue).average().orElse(0.0) * 10.0) / 10.0;
 
         Map<String, Long> gradeDistribution = new LinkedHashMap<>();
-        gradeDistribution.put("A", answerRepository.countByScoreGreaterThanEqual(90));
-        gradeDistribution.put("B", answerRepository.countByScoreBetween(70, 89));
-        gradeDistribution.put("C", answerRepository.countByScoreBetween(50, 69));
-        gradeDistribution.put("D", answerRepository.countByScoreBetween(30, 49));
-        gradeDistribution.put("F", answerRepository.countByScoreLessThan(30));
-
-        List<Integer> recentScores = answerRepository.findRecentScores();
-        if (recentScores.size() > 20) {
-            recentScores = recentScores.subList(0, 20);
+        for (String grade : List.of("A", "B", "C", "D", "F")) {
+            gradeDistribution.put(grade, scores.stream().filter(sc -> GradeResponse.calculateGrade(sc).equals(grade)).count());
         }
 
         return GradingStatsResponse.builder()
-                .totalAnswered(totalAnswered)
+                .totalAnswered(scores.size())
                 .averageScore(averageScore)
                 .gradeDistribution(gradeDistribution)
-                .recentScores(recentScores)
+                .recentScores(scores.stream().limit(20).toList())
                 .build();
     }
 
