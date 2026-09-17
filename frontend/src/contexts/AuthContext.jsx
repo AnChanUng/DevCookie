@@ -1,7 +1,7 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import api, { AUTH_EXPIRED_EVENT, USER_KEY, readSavedUser } from '../api';
+import { AuthContext } from './useAuth';
 
-const AuthContext = createContext(null);
 // 잠들어 있던 백엔드(Render)가 깨어나는 시간을 기다린다
 const AUTH_TIMEOUT = 60000;
 
@@ -36,8 +36,4 @@ export function AuthProvider({ children }) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  return useContext(AuthContext);
 }

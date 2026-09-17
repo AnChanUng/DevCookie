@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import api from '../api';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 
 const EMPTY = { stats: {}, history: [], updatedAt: 0 };
 // 백엔드(Render)가 잠들어 있다 깨어나는 시간을 감안한 타임아웃

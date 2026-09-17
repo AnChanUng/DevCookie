@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { COMPANIES } from '../data/examQuestions';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 
 function summary(company, userId) {
   try {

@@ -13,11 +13,11 @@ export default function CategoryPage() {
   const { slug } = useParams();
   const [questions, setQuestions] = useState([]);
   const [category, setCategory] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loadedSlug, setLoadedSlug] = useState(null);
+  const loading = loadedSlug !== slug;
   const [filter, setFilter] = useState('ALL');
 
   useEffect(() => {
-    setLoading(true);
     Promise.all([
       api.get(`/categories/${slug}`),
       api.get(`/questions/category/${slug}`),
@@ -30,7 +30,7 @@ export default function CategoryPage() {
         setCategory(hardcodedCategories.find(c => c.slug === slug) || null);
         setQuestions(hardcodedQuestions.filter(q => q.categorySlug === slug));
       })
-      .finally(() => setLoading(false));
+      .finally(() => setLoadedSlug(slug));
   }, [slug]);
 
   if (loading) {
