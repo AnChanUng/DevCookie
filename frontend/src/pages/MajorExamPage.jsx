@@ -59,7 +59,7 @@ export default function MajorExamPage() {
   return (
     <div className="fade-in">
       <div className="page-header">
-        <Link to="/" className="back-link">← 홈으로</Link>
+        <Link to="/major" className="back-link">← 전공필기</Link>
         <h1>📝 전공필기 요약노트</h1>
         <p>금융공기업(코스콤, 금융결제원) 대비</p>
       </div>

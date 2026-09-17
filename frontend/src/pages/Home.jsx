@@ -1,27 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import api from '../api';
-import { hardcodedCategories, hardcodedQuestions } from '../hardcodedData';
+import { hardcodedQuestions } from '../hardcodedData';
 
 export default function Home() {
-  const [categories, setCategories] = useState([]);
   const [stats, setStats] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    Promise.all([
-      api.get('/categories'),
-      api.get('/stats'),
-    ])
-      .then(([catRes, statsRes]) => {
-        setCategories(catRes.data?.length ? catRes.data : hardcodedCategories);
+    api.get('/stats')
+      .then(statsRes => {
         setStats(statsRes.data);
       })
       .catch(() => {
-        setCategories(hardcodedCategories);
         setStats({ totalQuestions: hardcodedQuestions.length, studiedQuestions: 0 });
       })
       .finally(() => setLoading(false));
@@ -129,24 +122,17 @@ export default function Home() {
         </>
       ) : (
         <>
-          <div className="section-title">카테고리</div>
+          <div className="section-title">학습 메뉴</div>
           <div className="categories-grid">
-            {categories.filter(cat => cat.slug !== 'cicd' && cat.slug !== 'major-exam').map(cat => (
-              <Link to={`/category/${cat.slug}`} key={cat.id} className="category-card">
-                <div className="category-icon">{cat.iconEmoji}</div>
-                <h3>{cat.name}</h3>
-                <p>{cat.description}</p>
-              </Link>
-            ))}
-            <Link to="/major-exam" className="category-card major-exam-card">
-              <div className="category-icon">📝</div>
-              <h3>전공필기</h3>
-              <p>금융공기업(코스콤, 금융결제원) 대비</p>
-            </Link>
             <Link to="/exam" className="category-card major-exam-card">
               <div className="category-icon">📚</div>
-              <h3>기출문제</h3>
+              <h3>1. 기출문제</h3>
               <p>HF · 코스콤 · 기업은행 전공필기 모의고사</p>
+            </Link>
+            <Link to="/major" className="category-card major-exam-card">
+              <div className="category-icon">📝</div>
+              <h3>2. 전공필기</h3>
+              <p>데이터베이스 · 자료구조 · 운영체제 · 네트워크 · 도커 등</p>
             </Link>
             <Link to="/interview" className="category-card interview-card">
               <div className="category-icon">🎤</div>
