@@ -1,11 +1,16 @@
 // HF(한국주택금융공사) IT직무 전공필기 대비 자체 제작 문제 60문항 (5지선다)
 // 2021~2026 응시 후기에서 반복 언급된 주제를 기준으로 구성. 실제 시험 문항의 복제가 아님.
 import { IBK_SECTIONS, IBK_QUESTIONS } from './ibkQuestions';
+import { KFSB_SECTIONS, KFSB_QUESTIONS } from './kfsbQuestions';
+import { HF_CPP_QUESTIONS } from './hfCppQuestions';
+export { HF_CPP_QUESTIONS, CPP_GROUPS } from './hfCppQuestions';
 
 export const SECTIONS = {
   cs:  {name:'전산학일반', short:'전산', sub:'OS · 컴퓨터구조 · 정보보호 · SW공학 · 자료구조', count:36},
   dbn: {name:'데이터베이스·네트워크', short:'DB/NW', sub:'SQL · 정규화 · 트랜잭션 · OSI · TCP/IP · 라우팅', count:12},
   pl:  {name:'프로그래밍', short:'PL', sub:'C++ · Java · Python 실행결과 및 개념', count:12},
+  // 모의고사(60문제)에는 포함되지 않는 별도 집중 문제집
+  cpp: {name:'C++ 집중', short:'C++', sub:'C++ 코드 실행 결과 · 개념 집중 대비', count:0, extra:true},
 };
 export const HF_QUESTIONS = [
 /* ===== 전산학일반 36 ===== */
@@ -75,14 +80,19 @@ export const HF_QUESTIONS = [
 
 export const COMPANIES = [
   {
-    key: "hf", abbr: "HF", name: "한국주택금융공사", meta: "전공필기 60문제 · 80분 · 5지선다", ready: true,
-    questions: HF_QUESTIONS, sections: SECTIONS, minutes: 80,
-    lede: "전산학일반(정보보호 포함) 36문제, 데이터베이스·네트워크 12문제, 프로그래밍(C++ · Java · Python) 12문제. 총 60문제, 80분, 5지선다. 코딩테스트 이후 치르는 전공필기 범위만 다룹니다.",
+    key: "hf", abbr: "HF", name: "한국주택금융공사", meta: "전공필기 60문제 · 80분 · 5지선다 · C++ 집중 48문제", ready: true,
+    questions: HF_QUESTIONS, sections: SECTIONS, minutes: 80, extra: HF_CPP_QUESTIONS,
+    lede: "전산학일반(정보보호 포함) 36문제, 데이터베이스·네트워크 12문제, 프로그래밍(C++ · Java · Python) 12문제. 총 60문제, 80분, 5지선다. 코딩테스트 이후 치르는 전공필기 범위만 다룹니다. 프로그래밍 영역은 C++ 코드 실행 결과 문제 비중이 높아 아래에 C++ 집중 문제집을 따로 두었습니다.",
   },
   { key: "koscom", abbr: "KOSCOM", name: "코스콤", meta: "문제은행 준비 중", ready: false, questions: [] },
   {
     key: "ibk", abbr: "IBK", name: "IBK 기업은행", meta: "NCS 40 + 전공 35 · 120분 · 4지선다", ready: true,
     questions: IBK_QUESTIONS, sections: IBK_SECTIONS, minutes: 120,
     lede: "NCS 직업기초능력(의사소통·수리·문제해결·자료해석·명제논리) 40문제, 직무수행능력 35문제(경제학 12 · 재무관리 8 · 회계 8 · 경영·금융상식 7). 총 75문제, 120분, 4지선다. 출제 구성만 참고해 새로 만든 문제입니다.",
+  },
+  {
+    key: "kfsb", abbr: "KFSB", name: "저축은행중앙회", meta: "IT직무 전공 50문제 · 60분 · 4지선다", ready: true,
+    questions: KFSB_QUESTIONS, sections: KFSB_SECTIONS, minutes: 60,
+    lede: "데이터베이스 11문제, 운영체제·인프라 10문제, 네트워크·분산통신 8문제, 정보보호 11문제, 자료구조·설계·아키텍처 10문제. 총 50문제, 60분, 4지선다. 계좌·입출금·결제 같은 실무 상황을 제시하고 '왜 이 기술을 택하는가'를 묻는 응시 후기 경향을 따라 새로 만든 문제입니다.",
   },
 ];

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { COMPANIES } from '../data/examQuestions';
+import { COMPANIES, CPP_GROUPS } from '../data/examQuestions';
 import { useExamProgress, recordAnswer } from '../hooks/useExamProgress';
 
 const CIRC = ['①', '②', '③', '④', '⑤'];
@@ -20,7 +20,10 @@ const fmtDate = (ts) => {
   return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 };
 const modeLabel = (sections, mode, sec) =>
-  mode === 'exam' ? '실전 모의고사' : mode === 'wrong' ? '오답 다시 풀기' : `영역별 연습 · ${sections[sec]?.name || ''}`;
+  mode === 'exam' ? '실전 모의고사'
+    : mode === 'wrong' ? '오답 다시 풀기'
+    : mode === 'cpp' ? `C++ 집중 문제집 · ${sec === 'all' ? '전체' : CPP_GROUPS[sec]?.name || ''}`
+    : `영역별 연습 · ${sections[sec]?.name || ''}`;
 
 export default function ExamCompanyPage() {
   const { company: key } = useParams();
@@ -32,14 +35,16 @@ export default function ExamCompanyPage() {
 function CompanyExam({ company }) {
   const Q = company.questions;
   const SECTIONS = company.sections;
-  const secKeys = Object.keys(SECTIONS);
+  const secKeys = Object.keys(SECTIONS).filter(k => !SECTIONS[k].extra); // 모의고사 채점 영역
   const label = (mode, sec) => modeLabel(SECTIONS, mode, sec);
-  const byId = useMemo(() => Object.fromEntries(Q.map(q => [q.id, q])), [Q]);
+  const CPP = useMemo(() => company.extra || [], [company]); // C++ 집중 문제집 (모의고사 미포함)
+  const ALL = useMemo(() => [...Q, ...CPP], [Q, CPP]);       // 오답노트·오답 다시 풀기 범위
+  const byId = useMemo(() => Object.fromEntries(ALL.map(q => [q.id, q])), [ALL]);
   const { data, save, sync, loggedIn } = useExamProgress(company.key);
   const [view, setView] = useState({ name: 'home' });
 
-  const wrongIds = Q.filter(q => data.stats[q.id]?.last === 'w').map(q => q.id);
-  const everWrongIds = Q.filter(q => (data.stats[q.id]?.w || 0) > 0).map(q => q.id);
+  const wrongIds = ALL.filter(q => data.stats[q.id]?.last === 'w').map(q => q.id);
+  const everWrongIds = ALL.filter(q => (data.stats[q.id]?.w || 0) > 0).map(q => q.id);
 
   const start = (mode, ids, sec) => {
     if (!ids.length) return;
@@ -59,7 +64,7 @@ function CompanyExam({ company }) {
       if (a === undefined && aborted) return;
       const ok = a === q.a;
       if (isExam) stats = recordAnswer(stats, id, ok);
-      if (ok) { score++; secScore[q.sec]++; }
+      if (ok) { score++; if (q.sec in secScore) secScore[q.sec]++; }
       items.push({ q, a, ok });
     });
     if (items.length) {
@@ -131,7 +136,7 @@ function CompanyExam({ company }) {
           {wrongIds.length > 0 && <button className="exam-btn primary" onClick={() => start('wrong', shuffle(wrongIds))}>미해결 {wrongIds.length}문제 다시 풀기</button>}
           <button className="exam-btn" onClick={() => setView({ name: 'home' })}>{company.abbr} 메인으로</button>
         </div>
-        <WrongBook Q={Q} ids={everWrongIds} stats={data.stats} sections={SECTIONS} />
+        <WrongBook Q={ALL} ids={everWrongIds} stats={data.stats} sections={SECTIONS} />
       </div>
     );
   }
@@ -169,7 +174,7 @@ function CompanyExam({ company }) {
 
       <div className="section-title">영역별 연습</div>
       <div className="exam-sections">
-        {Object.entries(SECTIONS).map(([k, s]) => {
+        {Object.entries(SECTIONS).filter(([, s]) => !s.extra).map(([k, s]) => {
           const qs = Q.filter(q => q.sec === k);
           const done = qs.filter(q => data.stats[q.id]).length;
           const right = qs.filter(q => data.stats[q.id]?.last === 'r').length;
@@ -183,6 +188,34 @@ function CompanyExam({ company }) {
           );
         })}
       </div>
+
+      {CPP.length > 0 && (
+        <>
+          <div className="section-title">C++ 집중 문제집</div>
+          <p className="exam-lede">HF 프로그래밍 영역에서 자주 나오는 C++ 실행 결과·개념 문제 {CPP.length}문항. 모의고사 60문제와는 별도이며, 한 문제씩 즉시 채점되고 틀린 문제는 오답노트에 함께 쌓입니다.</p>
+          <div className="exam-sections">
+            <button className="exam-section cpp" onClick={() => start('cpp', shuffle(CPP.map(q => q.id)), 'all')}>
+              <span className="t">전체 문제 풀기</span>
+              <span className="d">세 분야를 섞어서 무작위 순서로 출제</span>
+              <span className="d">{CPP.length}문제 · 최근 정답 {CPP.filter(q => data.stats[q.id]?.last === 'r').length}/{CPP.filter(q => data.stats[q.id]).length}</span>
+              <span className="bar"><i style={{ width: `${Math.round(CPP.filter(q => data.stats[q.id]?.last === 'r').length / CPP.length * 100)}%` }} /></span>
+            </button>
+            {Object.entries(CPP_GROUPS).map(([k, g]) => {
+              const qs = CPP.filter(q => q.grp === k);
+              const done = qs.filter(q => data.stats[q.id]).length;
+              const right = qs.filter(q => data.stats[q.id]?.last === 'r').length;
+              return (
+                <button key={k} className="exam-section cpp" onClick={() => start('cpp', shuffle(qs.map(q => q.id)), k)}>
+                  <span className="t">{g.name}</span>
+                  <span className="d">{g.sub}</span>
+                  <span className="d">{qs.length}문제 · 최근 정답 {right}/{done}</span>
+                  <span className="bar"><i style={{ width: `${qs.length ? Math.round(right / qs.length * 100) : 0}%` }} /></span>
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       {data.history.length > 0 && (
         <>
