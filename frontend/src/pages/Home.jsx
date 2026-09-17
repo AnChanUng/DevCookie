@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 
 // 학습 완료 수는 계정마다 다르므로 계정별로 캐시한다
 const statsCacheKey = (userId) => `home-stats:${userId ?? 'guest'}`;

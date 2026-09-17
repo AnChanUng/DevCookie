@@ -139,10 +139,6 @@ export default function InterviewPracticePage() {
     });
   };
 
-  useEffect(() => {
-    setCurrentIndex(0);
-  }, [selectedCategory]);
-
   return (
     <div className="interview-page">
       <div className="interview-header">
@@ -155,7 +151,7 @@ export default function InterviewPracticePage() {
           <button
             key={cat}
             className={`interview-cat-btn ${selectedCategory === cat ? 'active' : ''}`}
-            onClick={() => setSelectedCategory(cat)}
+            onClick={() => { setSelectedCategory(cat); setCurrentIndex(0); }}
           >
             {cat}
           </button>
