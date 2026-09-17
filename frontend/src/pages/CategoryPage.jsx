@@ -54,7 +54,7 @@ export default function CategoryPage() {
   return (
     <div className="fade-in">
       <div className="page-header">
-        <Link to="/" className="back-link">← 홈으로</Link>
+        <Link to="/major" className="back-link">← 전공필기</Link>
         {category && (
           <>
             <h1>{category.iconEmoji} {category.name}</h1>
