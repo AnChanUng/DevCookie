@@ -1,9 +1,11 @@
 // HF(한국주택금융공사) IT직무 전공필기 대비 자체 제작 문제 60문항 (5지선다)
 // 2021~2026 응시 후기에서 반복 언급된 주제를 기준으로 구성. 실제 시험 문항의 복제가 아님.
+import { IBK_SECTIONS, IBK_QUESTIONS } from './ibkQuestions';
+
 export const SECTIONS = {
-  cs:  {name:'전산학일반', sub:'OS · 컴퓨터구조 · 정보보호 · SW공학 · 자료구조', count:36},
-  dbn: {name:'데이터베이스·네트워크', sub:'SQL · 정규화 · 트랜잭션 · OSI · TCP/IP · 라우팅', count:12},
-  pl:  {name:'프로그래밍', sub:'C++ · Java · Python 실행결과 및 개념', count:12},
+  cs:  {name:'전산학일반', short:'전산', sub:'OS · 컴퓨터구조 · 정보보호 · SW공학 · 자료구조', count:36},
+  dbn: {name:'데이터베이스·네트워크', short:'DB/NW', sub:'SQL · 정규화 · 트랜잭션 · OSI · TCP/IP · 라우팅', count:12},
+  pl:  {name:'프로그래밍', short:'PL', sub:'C++ · Java · Python 실행결과 및 개념', count:12},
 };
 export const HF_QUESTIONS = [
 /* ===== 전산학일반 36 ===== */
@@ -72,7 +74,15 @@ export const HF_QUESTIONS = [
 ];
 
 export const COMPANIES = [
-  { key: "hf", abbr: "HF", name: "한국주택금융공사", meta: "전공필기 60문제 · 80분 · 5지선다", ready: true, questions: HF_QUESTIONS },
+  {
+    key: "hf", abbr: "HF", name: "한국주택금융공사", meta: "전공필기 60문제 · 80분 · 5지선다", ready: true,
+    questions: HF_QUESTIONS, sections: SECTIONS, minutes: 80,
+    lede: "전산학일반(정보보호 포함) 36문제, 데이터베이스·네트워크 12문제, 프로그래밍(C++ · Java · Python) 12문제. 총 60문제, 80분, 5지선다. 코딩테스트 이후 치르는 전공필기 범위만 다룹니다.",
+  },
   { key: "koscom", abbr: "KOSCOM", name: "코스콤", meta: "문제은행 준비 중", ready: false, questions: [] },
-  { key: "ibk", abbr: "IBK", name: "IBK 기업은행", meta: "문제은행 준비 중", ready: false, questions: [] },
+  {
+    key: "ibk", abbr: "IBK", name: "IBK 기업은행", meta: "NCS 40 + 전공 35 · 120분 · 4지선다", ready: true,
+    questions: IBK_QUESTIONS, sections: IBK_SECTIONS, minutes: 120,
+    lede: "NCS 직업기초능력(의사소통·수리·문제해결·자료해석·명제논리) 40문제, 직무수행능력 35문제(경제학 12 · 재무관리 8 · 회계 8 · 경영·금융상식 7). 총 75문제, 120분, 4지선다. 출제 구성만 참고해 새로 만든 문제입니다.",
+  },
 ];
