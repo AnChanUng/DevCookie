@@ -139,7 +139,7 @@ export default function Home() {
             <Link to="/exam" className="category-card major-exam-card">
               <div className="category-icon">📚</div>
               <h3>1. 기출문제</h3>
-              <p>HF · 코스콤 · 기업은행 전공필기 모의고사</p>
+              <p>HF · 코스콤 · 기업은행 · 저축은행중앙회 전공필기 모의고사</p>
             </Link>
             <Link to="/major" className="category-card major-exam-card">
               <div className="category-icon">📝</div>

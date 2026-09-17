@@ -611,3 +611,10 @@
   .exam-qcard { padding: 18px 16px; }
   .exam-score .big { font-size: 2.6rem; }
 }
+
+/* C++ 집중 문제집 카드 */
+.exam-section.cpp {
+  border-color: var(--accent-blue-glow);
+  background: var(--accent-blue-light);
+}
+.exam-section.cpp .bar i { background: var(--accent-blue); }

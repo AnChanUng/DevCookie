@@ -7,7 +7,7 @@ function summary(company, userId) {
     const raw = localStorage.getItem(userId ? `exam-progress:${company.key}:${userId}` : `exam-progress:${company.key}`);
     if (!raw) return null;
     const d = JSON.parse(raw);
-    const wrong = company.questions.filter(q => d.stats?.[q.id]?.last === 'w').length;
+    const wrong = [...company.questions, ...(company.extra || [])].filter(q => d.stats?.[q.id]?.last === 'w').length;
     return { attempts: (d.history || []).length, wrong };
   } catch {
     return null;
