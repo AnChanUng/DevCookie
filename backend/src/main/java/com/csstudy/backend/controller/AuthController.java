@@ -3,8 +3,11 @@ package com.csstudy.backend.controller;
 import com.csstudy.backend.dto.UserResponse;
 import com.csstudy.backend.entity.User;
 import com.csstudy.backend.repository.UserRepository;
+import com.csstudy.backend.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -16,6 +19,8 @@ import java.util.Optional;
 public class AuthController {
 
     private final UserRepository userRepository;
+    private final AuthService authService;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, String> body) {
@@ -31,9 +36,9 @@ public class AuthController {
         }
 
         User user = userRepository.save(
-                User.builder().nickname(nickname).password(password).build()
+                User.builder().nickname(nickname).password(passwordEncoder.encode(password)).build()
         );
-        return ResponseEntity.ok(UserResponse.from(user));
+        return ResponseEntity.ok(UserResponse.from(user, authService.issueToken(user)));
     }
 
     @PostMapping("/login")
@@ -51,10 +56,29 @@ public class AuthController {
         }
 
         User user = userOpt.get();
-        if (!user.getPassword().equals(password)) {
-            return ResponseEntity.badRequest().body(Map.of("error", "비밀번호가 틀렸습니다."));
+        if (isHashed(user.getPassword())) {
+            if (!passwordEncoder.matches(password, user.getPassword())) {
+                return ResponseEntity.badRequest().body(Map.of("error", "비밀번호가 틀렸습니다."));
+            }
+        } else {
+            // 암호화 도입 전에 가입한 계정: 평문 비교 후 해시로 교체
+            if (!user.getPassword().equals(password)) {
+                return ResponseEntity.badRequest().body(Map.of("error", "비밀번호가 틀렸습니다."));
+            }
+            user.setPassword(passwordEncoder.encode(password));
+            userRepository.save(user);
         }
 
-        return ResponseEntity.ok(UserResponse.from(user));
+        return ResponseEntity.ok(UserResponse.from(user, authService.issueToken(user)));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        authService.revoke(request);
+        return ResponseEntity.ok(Map.of("ok", true));
+    }
+
+    private static boolean isHashed(String stored) {
+        return stored != null && stored.matches("^\\$2[aby]\\$\\d{2}\\$.{53}$");
     }
 }

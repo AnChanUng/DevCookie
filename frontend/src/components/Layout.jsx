@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import ChaosChat from './ChaosChat';
@@ -111,7 +111,9 @@ export default function Layout() {
       )}
 
       <main className="container">
-        <Outlet />
+        <Suspense fallback={<div className="loading"><div className="loading-spinner" />불러오는 중...</div>}>
+          <Outlet />
+        </Suspense>
       </main>
 
       <ChaosChat />

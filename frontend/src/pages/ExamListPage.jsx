@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
 import { COMPANIES } from '../data/examQuestions';
+import { useAuth } from '../contexts/AuthContext';
 
-function summary(company) {
+function summary(company, userId) {
   try {
-    const raw = localStorage.getItem(`exam-progress:${company.key}`);
+    const raw = localStorage.getItem(userId ? `exam-progress:${company.key}:${userId}` : `exam-progress:${company.key}`);
     if (!raw) return null;
     const d = JSON.parse(raw);
     const wrong = company.questions.filter(q => d.stats?.[q.id]?.last === 'w').length;
@@ -14,6 +15,7 @@ function summary(company) {
 }
 
 export default function ExamListPage() {
+  const { user } = useAuth();
   return (
     <div className="fade-in">
       <div className="page-header">
@@ -24,7 +26,7 @@ export default function ExamListPage() {
 
       <div className="exam-company-grid">
         {COMPANIES.map(c => {
-          const s = c.ready ? summary(c) : null;
+          const s = c.ready ? summary(c, user?.id) : null;
           const inner = (
             <>
               <span className="exam-company-abbr">{c.abbr}</span>

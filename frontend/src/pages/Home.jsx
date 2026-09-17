@@ -1,24 +1,46 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
-import { hardcodedQuestions } from '../hardcodedData';
+import { useAuth } from '../contexts/AuthContext';
+
+// 학습 완료 수는 계정마다 다르므로 계정별로 캐시한다
+const statsCacheKey = (userId) => `home-stats:${userId ?? 'guest'}`;
+
+function readCachedStats(userId) {
+  try {
+    const raw = localStorage.getItem(statsCacheKey(userId));
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
 
 export default function Home() {
-  const [stats, setStats] = useState(null);
+  const { user } = useAuth();
+  const userId = user?.id ?? null;
+  const [loaded, setLoaded] = useState({ userId, stats: readCachedStats(userId) });
+  if (loaded.userId !== userId) setLoaded({ userId, stats: readCachedStats(userId) });
+  const stats = loaded.stats;
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/stats')
+    // 백엔드(Render)가 잠들어 있으면 응답이 늦으므로 화면은 먼저 그리고 통계만 나중에 채운다
+    api.get('/stats', { timeout: 60000 })
       .then(statsRes => {
-        setStats(statsRes.data);
+        setLoaded(prev => (prev.userId === userId ? { userId, stats: statsRes.data } : prev));
+        try {
+          localStorage.setItem(statsCacheKey(userId), JSON.stringify(statsRes.data));
+        } catch {
+          /* storage unavailable */
+        }
       })
-      .catch(() => {
-        setStats({ totalQuestions: hardcodedQuestions.length, studiedQuestions: 0 });
-      })
-      .finally(() => setLoading(false));
-  }, []);
+      .catch(async () => {
+        const { hardcodedQuestions } = await import('../hardcodedData');
+        const fallback = { totalQuestions: hardcodedQuestions.length, studiedQuestions: 0 };
+        setLoaded(prev => (prev.userId === userId && !prev.stats ? { userId, stats: fallback } : prev));
+      });
+  }, [userId]);
 
   const handleSearch = useCallback((value) => {
     setSearchQuery(value);
@@ -29,7 +51,8 @@ export default function Home() {
     const timer = setTimeout(() => {
       api.get(`/questions/search?q=${encodeURIComponent(value.trim())}`)
         .then(res => setSearchResults(res.data))
-        .catch(() => {
+        .catch(async () => {
+          const { hardcodedQuestions } = await import('../hardcodedData');
           const q = value.trim().toLowerCase();
           const results = hardcodedQuestions.filter(
             item => item.title.toLowerCase().includes(q) || item.tags.toLowerCase().includes(q)
@@ -40,15 +63,6 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, []);
 
-  if (loading) {
-    return (
-      <div className="loading">
-        <div className="loading-spinner" />
-        불러오는 중...
-      </div>
-    );
-  }
-
   return (
     <div className="fade-in">
       <div className="hero">
@@ -56,26 +70,24 @@ export default function Home() {
         <p>카테고리별 학습으로 기술 면접을 완벽하게 대비하세요</p>
       </div>
 
-      {stats && (
-        <div className="stats-summary">
+      <div className="stats-summary">
           <div className="stats-summary-card">
-            <div className="stats-summary-value">{stats.totalQuestions || 0}</div>
+            <div className="stats-summary-value">{stats ? stats.totalQuestions || 0 : '–'}</div>
             <div className="stats-summary-label">전체 질문</div>
           </div>
           <div className="stats-summary-card">
-            <div className="stats-summary-value">{stats.studiedQuestions || 0}</div>
+            <div className="stats-summary-value">{stats ? stats.studiedQuestions || 0 : '–'}</div>
             <div className="stats-summary-label">학습 완료</div>
           </div>
           <div className="stats-summary-card">
-            <div className="stats-summary-value" style={{ color: stats.studiedQuestions && stats.totalQuestions ? undefined : 'var(--text-quaternary)' }}>
-              {stats.totalQuestions
+            <div className="stats-summary-value" style={{ color: stats?.studiedQuestions && stats?.totalQuestions ? undefined : 'var(--text-quaternary)' }}>
+              {stats?.totalQuestions
                 ? Math.round((stats.studiedQuestions / stats.totalQuestions) * 100)
                 : 0}%
             </div>
             <div className="stats-summary-label">진행률</div>
           </div>
         </div>
-      )}
 
       <div className="search-bar">
         <span className="search-icon">🔍</span>

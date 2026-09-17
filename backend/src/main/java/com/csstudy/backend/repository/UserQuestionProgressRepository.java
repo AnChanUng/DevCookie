@@ -15,6 +15,8 @@ public interface UserQuestionProgressRepository extends JpaRepository<UserQuesti
 
     Optional<UserQuestionProgress> findByUserIdAndQuestionId(Long userId, Long questionId);
 
+    List<UserQuestionProgress> findByUserId(Long userId);
+
     List<UserQuestionProgress> findByUserIdAndBookmarkedTrue(Long userId);
 
     long countByUserIdAndStudyCountGreaterThan(Long userId, int count);

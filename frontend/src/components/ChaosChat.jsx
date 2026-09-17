@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import api from '../api';
-import { hardcodedQuestions } from '../hardcodedData';
 
 export default function ChaosChat() {
   const [open, setOpen] = useState(false);
@@ -15,7 +14,8 @@ export default function ChaosChat() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const localFallback = (msg) => {
+  const localFallback = async (msg) => {
+    const { hardcodedQuestions } = await import('../hardcodedData');
     const lower = msg.toLowerCase();
     const keywords = lower.split(/\s+/);
     const matched = hardcodedQuestions.filter(q =>
@@ -58,7 +58,7 @@ export default function ChaosChat() {
       const res = await api.post('/chat', { message: msg, history });
       setMessages(prev => [...prev, { role: 'assistant', content: res.data.reply }]);
     } catch {
-      const fallbackReply = localFallback(msg);
+      const fallbackReply = await localFallback(msg);
       setMessages(prev => [...prev, { role: 'assistant', content: fallbackReply }]);
     } finally {
       setLoading(false);

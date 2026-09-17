@@ -13,6 +13,10 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
 
     List<Answer> findByQuestionIdOrderByCreatedAtDesc(Long questionId);
 
+    List<Answer> findByQuestionIdAndUserIdOrderByCreatedAtDesc(Long questionId, Long userId);
+
+    List<Answer> findByUserIdOrderByCreatedAtDesc(Long userId);
+
     @Query("SELECT AVG(a.score) FROM Answer a WHERE a.question.id = :questionId")
     Double findAverageScoreByQuestionId(@Param("questionId") Long questionId);
 
