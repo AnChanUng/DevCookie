@@ -6,6 +6,7 @@ const NOTES = [
   { file: 'ipe-pilgi-summary.pdf', title: '정보처리기사 필기 요약노트', desc: '필기 전 과목 핵심 정리 · 본편'},
   { file: 'ipe-silgi-theory.pdf', title: '정보처리기사 실기 요약노트 (이론편)', desc: '실기 이론 파트 · 서술형 대비'},
   { file: 'sqld-concepts.pdf', title: '2024 SQLD 개념 정리 노트', desc: '데이터 모델링의 이해 · SQL 기본 및 활용 · 개념 + 코드 예시 + 비교 테이블 · 22쪽'},
+  { file: 'bigdata-analyst-summary.pdf', title: '빅데이터분석기사 요약노트', desc: '2026.02.05 개정판 · 필기 전 과목 핵심 정리 · 69쪽'},
 ];
 
 export default function MajorPage() {
@@ -18,7 +19,7 @@ export default function MajorPage() {
       <div className="page-header">
         <Link to="/" className="back-link">← 홈으로</Link>
         <h1>📝 전공필기</h1>
-        <p>정보처리기사 · SQLD 요약노트 PDF · 화면에서 바로 읽는 열람 전용</p>
+        <p>정보처리기사 · SQLD · 빅데이터분석기사 요약노트 PDF · 화면에서 바로 읽는 열람 전용</p>
       </div>
 
       <div className="section-title">이론노트</div>
