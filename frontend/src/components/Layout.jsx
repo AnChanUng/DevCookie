@@ -1,4 +1,4 @@
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/useAuth';
 import ChaosChat from './ChaosChat';
@@ -14,11 +14,20 @@ export default function Layout() {
   // 'idle' | 'pending' | 'success'
   const [status, setStatus] = useState('idle');
   const [doneNickname, setDoneNickname] = useState('');
+  const [slow, setSlow] = useState(false);
+
+  // 5초 넘게 걸리면 서버가 깨어나는 중이라는 안내를 붙인다
+  useEffect(() => {
+    if (status !== 'pending') return undefined;
+    const t = setTimeout(() => setSlow(true), 5000);
+    return () => clearTimeout(t);
+  }, [status]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!nickname.trim() || !password.trim() || status === 'pending') return;
     setError('');
+    setSlow(false);
     setStatus('pending');
     try {
       const userData = isRegister
@@ -40,6 +49,7 @@ export default function Layout() {
     setNickname('');
     setPassword('');
     setStatus('idle');
+    setSlow(false);
     setDoneNickname('');
   };
 
@@ -115,7 +125,10 @@ export default function Layout() {
               {status === 'pending' && (
                 <div className="login-pending">
                   <span className="login-pending-spinner" />
-                  {pendingText}
+                  <span>
+                    {pendingText}
+                    {slow && <small className="login-pending-hint">서버가 잠들어 있어서 깨우는 중이에요. 최대 2분 정도 걸릴 수 있어요.</small>}
+                  </span>
                 </div>
               )}
               <button type="submit" className="submit-btn" disabled={status === 'pending'}>
