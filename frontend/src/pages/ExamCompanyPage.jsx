@@ -184,7 +184,7 @@ function CompanyExam({ company }) {
 
       <div className="exam-modes">
         <button className="exam-mode primary" onClick={() => start('exam', Q.map(q => q.id))}>
-          <span><span className="t">실전 모의고사</span><span className="d">{Q.length}문제 · {company.minutes}분 타이머 · 실제 영역 순서로 출제, 제출 후 채점과 해설</span></span>
+          <span><span className="t">실전 모의고사</span><span className="d">{Q.length}문제 · {company.minutes}분 타이머 · 실제 영역 순서로 출제, 고르면 바로 정답·해설</span></span>
           <span className="n">{Q.length}문항</span>
         </button>
         <button className="exam-mode" disabled={!wrongIds.length} onClick={() => start('wrong', shuffle(wrongIds))}>
@@ -306,15 +306,16 @@ function Quiz({ byId, stats, mode, sec, ids, sections, minutes, onPractice, onFi
   const total = ids.length;
   const answered = Object.keys(answers).length;
   const sel = answers[q.id];
-  const shown = !isExam && revealed[q.id];
+  const shown = !!revealed[q.id];
   const wstat = stats[q.id];
 
+  // 모든 모드에서 고르는 즉시 정답 여부와 해설을 보여준다.
+  // 모의고사는 통계를 제출 시점에 한꺼번에 기록하고, 나머지는 바로 기록한다.
   const choose = (i) => {
-    if (isExam) { setAnswers(a => ({ ...a, [q.id]: i })); return; }
     if (revealed[q.id]) return;
     setAnswers(a => ({ ...a, [q.id]: i }));
     setRevealed(r => ({ ...r, [q.id]: true }));
-    onPractice(q.id, i === q.a);
+    if (!isExam) onPractice(q.id, i === q.a);
   };
 
   return (
@@ -370,7 +371,7 @@ function Quiz({ byId, stats, mode, sec, ids, sections, minutes, onPractice, onFi
         {ids.map((id, i) => {
           let cls = 'gn';
           if (i === idx) cls += ' cur';
-          if (answers[id] !== undefined) cls += isExam ? ' done' : (answers[id] === byId[id].a ? ' r' : ' w');
+          if (answers[id] !== undefined) cls += answers[id] === byId[id].a ? ' r' : ' w';
           return <button key={id} className={cls} onClick={() => setIdx(i)}>{i + 1}</button>;
         })}
       </div>
