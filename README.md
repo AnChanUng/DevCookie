@@ -1,6 +1,6 @@
-# CS Study Platform
+# 전산학 전공필기 준비
 
-CS 공부를 웹 사이트, 카테고리별 학습, AI 채점, AI 챗봇, Slack 리마인드 봇을 제공합니다.
+공기업·금융권 IT직무 전공필기 대비 사이트입니다. 회사별 기출 경향 기반 모의고사(즉시 채점·해설·오답노트·북마크, 계정별 저장), 정보처리기사 요약노트, 과목별 CS 학습, AI 채점·챗봇, Slack 리마인드 봇을 제공합니다.
 <img width="500" height="400" alt="image" src="https://github.com/user-attachments/assets/bde6a38e-df84-4148-8c40-be3f9eb216f1" />
 
 ## 주요 기능
