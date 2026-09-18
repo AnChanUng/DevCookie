@@ -46,7 +46,6 @@ export default function ExamListPage() {
       </div>
 
       <p className="exam-note">
-        문제는 2021~2026년 응시 후기에서 반복 언급된 주제를 중심으로 자체 제작한 것으로, 실제 시험 문항을 복제한 것이 아닙니다.
         로그인하면 풀이 기록과 오답이 계정에 저장되어 어느 기기에서든 이어서 풀 수 있습니다.
       </p>
     </div>

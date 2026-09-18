@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import InterviewSearch from '../components/InterviewSearch';
 
 const QUESTIONS = [
   { id: 1, category: '인성', text: '자기소개를 해주세요.' },
@@ -268,6 +269,8 @@ export default function InterviewPracticePage() {
           ))}
         </div>
       </div>
+
+      <InterviewSearch />
     </div>
   );
 }
