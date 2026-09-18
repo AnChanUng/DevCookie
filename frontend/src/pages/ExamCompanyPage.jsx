@@ -82,9 +82,15 @@ function CompanyExam({ company }) {
 
   const syncLabel = { local: '이 브라우저에만 저장', syncing: '저장 중…', cloud: '계정에 저장됨', error: '서버 저장 실패 · 브라우저에 보관' }[sync];
 
-  const header = (title) => (
+  const header = (title, links = true) => (
     <div className="page-header exam-page-header">
       <Link to="/exam" className="back-link">← 기출문제</Link>
+      {links && (
+        <div className="exam-toplinks">
+          <button type="button" className={view.name === 'wrongbook' ? 'on' : ''} onClick={() => setView({ name: 'wrongbook' })}>틀린문제 모아보기 {everWrongIds.length}</button>
+          <button type="button" className={view.name === 'markbook' ? 'on' : ''} onClick={() => setView({ name: 'markbook' })}>북마크 모아보기 {markedIds.length}</button>
+        </div>
+      )}
       <h1>{title}</h1>
       <div className={`exam-sync ${sync}`}><i />{syncLabel}{!loggedIn && ' · 로그인하면 계정에 저장됩니다'}</div>
     </div>
@@ -103,7 +109,7 @@ function CompanyExam({ company }) {
         ids={view.ids}
         onPractice={recordPractice}
         onFinish={finish}
-        header={header}
+        header={(t) => header(t, false)}
         marks={data.marks}
         onMark={onMark}
       />
@@ -135,7 +141,7 @@ function CompanyExam({ company }) {
   if (view.name === 'wrongbook') {
     return (
       <div className="fade-in">
-        {header('오답노트')}
+        {header('틀린문제 모아보기')}
         <p className="exam-lede">한 번이라도 틀린 문제입니다. 마지막 풀이에서 맞힌 문제는 "해결"로 표시되고, 아직 틀린 상태인 문제만 "오답 다시 풀기"에 나옵니다.</p>
         <div className="exam-actions">
           {wrongIds.length > 0 && <button className="exam-btn primary" onClick={() => start('wrong', shuffle(wrongIds))}>미해결 {wrongIds.length}문제 다시 풀기</button>}
@@ -149,7 +155,7 @@ function CompanyExam({ company }) {
   if (view.name === 'markbook') {
     return (
       <div className="fade-in">
-        {header('북마크')}
+        {header('북마크 모아보기')}
         <p className="exam-lede">별표(★)로 표시해 둔 문제입니다. 오답 기록과는 따로 저장되므로, 틀린 문제 기록이 지워지더라도 여기서 다시 풀 수 있습니다. 별표를 다시 누르면 해제됩니다.</p>
         <div className="exam-actions">
           {markedIds.length > 0 && <button className="exam-btn primary" onClick={() => start('marked', shuffle(markedIds))}>북마크 {markedIds.length}문제 다시 풀기</button>}
@@ -185,16 +191,8 @@ function CompanyExam({ company }) {
           <span><span className="t">오답 다시 풀기</span><span className="d">마지막에 틀린 문제만 모아서 즉시 채점 · 맞히면 오답에서 빠집니다</span></span>
           <span className="n">{wrongIds.length}문항</span>
         </button>
-        <button className="exam-mode" onClick={() => setView({ name: 'wrongbook' })}>
-          <span><span className="t">오답노트 보기</span><span className="d">틀렸던 문제와 해설을 영역별로 확인 · 누적 오답 횟수</span></span>
-          <span className="n">{everWrongIds.length}문항</span>
-        </button>
         <button className="exam-mode" disabled={!markedIds.length} onClick={() => start('marked', shuffle(markedIds))}>
           <span><span className="t">북마크 다시 풀기</span><span className="d">풀다가 ★로 표시한 문제만 모아서 즉시 채점 · 오답 기록과 별도로 저장</span></span>
-          <span className="n">{markedIds.length}문항</span>
-        </button>
-        <button className="exam-mode" onClick={() => setView({ name: 'markbook' })}>
-          <span><span className="t">북마크 보기</span><span className="d">표시해 둔 문제와 해설 확인 · 별표를 눌러 해제</span></span>
           <span className="n">{markedIds.length}문항</span>
         </button>
       </div>
