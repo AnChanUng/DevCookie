@@ -14,7 +14,7 @@ export function readSavedUser() {
 }
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://cs-study-backend.onrender.com/api/v1',
+  baseURL: import.meta.env.VITE_API_URL || 'https://cs-study-backend-i0ln.onrender.com/api/v1',
   timeout: 5000,
 });
 
