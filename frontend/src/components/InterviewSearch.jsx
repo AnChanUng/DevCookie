@@ -67,7 +67,7 @@ export default function InterviewSearch() {
   return (
     <div className="interview-search">
       <div className="section-title">CS 면접 질문 검색</div>
-      <p className="exam-lede">과목별 CS 면접 질문과 모범 답안입니다. 키워드로 검색하거나, 전공필기 메뉴의 과목별 학습에서 차례로 볼 수 있습니다.</p>
+      <p className="exam-lede">과목별 CS 면접 질문과 모범 답안입니다. 키워드로 검색해 보세요.</p>
 
       <div className="stats-summary">
         <div className="stats-summary-card">
