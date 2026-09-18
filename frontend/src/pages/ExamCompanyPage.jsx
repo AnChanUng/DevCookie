@@ -41,7 +41,7 @@ function CompanyExam({ company }) {
   const CPP = useMemo(() => company.extra || [], [company]); // C++ 집중 문제집 (모의고사 미포함)
   const ALL = useMemo(() => [...Q, ...CPP], [Q, CPP]);       // 오답노트·오답 다시 풀기 범위
   const byId = useMemo(() => Object.fromEntries(ALL.map(q => [q.id, q])), [ALL]);
-  const { data, save, sync, loggedIn } = useExamProgress(company.key);
+  const { data, save } = useExamProgress(company.key);
   const [view, setView] = useState({ name: 'home' });
 
   const wrongIds = ALL.filter(q => data.stats[q.id]?.last === 'w').map(q => q.id);
@@ -80,8 +80,6 @@ function CompanyExam({ company }) {
 
   const recordPractice = (qid, correct) => save(prev => ({ ...prev, stats: recordAnswer(prev.stats, qid, correct) }));
 
-  const syncLabel = { local: '이 브라우저에만 저장', syncing: '저장 중…', cloud: '계정에 저장됨', error: '서버 저장 실패 · 브라우저에 보관' }[sync];
-
   const header = (title, links = true) => (
     <div className="page-header exam-page-header">
       <Link to="/exam" className="back-link">← 기출문제</Link>
@@ -92,7 +90,7 @@ function CompanyExam({ company }) {
         </div>
       )}
       <h1>{title}</h1>
-      <div className={`exam-sync ${sync}`}><i />{syncLabel}{!loggedIn && ' · 로그인하면 계정에 저장됩니다'}</div>
+      <div className="exam-sync local"><i />이 브라우저에 저장됨 · 기출문제 목록에서 JSON으로 백업할 수 있습니다</div>
     </div>
   );
 

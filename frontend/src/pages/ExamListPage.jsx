@@ -1,11 +1,10 @@
 import { Link } from 'react-router-dom';
 import { COMPANIES } from '../data/examQuestions';
-import { useAuth } from '../contexts/useAuth';
 import ProgressBackup from '../components/ProgressBackup';
 
-function summary(company, userId) {
+function summary(company) {
   try {
-    const raw = localStorage.getItem(userId ? `exam-progress:${company.key}:${userId}` : `exam-progress:${company.key}`);
+    const raw = localStorage.getItem(`exam-progress:${company.key}`);
     if (!raw) return null;
     const d = JSON.parse(raw);
     const wrong = [...company.questions, ...(company.extra || [])].filter(q => d.stats?.[q.id]?.last === 'w').length;
@@ -16,7 +15,6 @@ function summary(company, userId) {
 }
 
 export default function ExamListPage() {
-  const { user } = useAuth();
   return (
     <div className="fade-in">
       <div className="page-header">
@@ -27,7 +25,7 @@ export default function ExamListPage() {
 
       <div className="exam-company-grid">
         {COMPANIES.map(c => {
-          const s = c.ready ? summary(c, user?.id) : null;
+          const s = c.ready ? summary(c) : null;
           const inner = (
             <>
               <span className="exam-company-abbr">{c.abbr}</span>
@@ -49,7 +47,7 @@ export default function ExamListPage() {
       <ProgressBackup />
 
       <p className="exam-note">
-        로그인하면 풀이 기록과 오답이 계정에 저장되어 어느 기기에서든 이어서 풀 수 있습니다.
+        풀이 기록과 오답은 이 브라우저에 저장됩니다. 다른 기기로 옮기거나 브라우저 데이터를 지우기 전에는 위에서 JSON으로 내려받아 두세요.
       </p>
     </div>
   );

@@ -1,13 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import api from '../api';
-import { useAuth } from '../contexts/useAuth';
 
 // marks: 북마크. 오답 기록(stats)과 별도로 저장해 한쪽이 유실돼도 다시 풀 문제를 찾을 수 있게 한다
 const EMPTY = { stats: {}, history: [], marks: {}, updatedAt: 0 };
-// 백엔드(Render)가 잠들어 있다 깨어나는 시간을 감안한 타임아웃
-const SYNC_TIMEOUT = 60000;
-const RETRY_DELAY = 15000;
-// 비로그인 기록은 company 키에, 로그인 기록은 계정별 키에 따로 둔다 (같은 브라우저에서 계정이 바뀌어도 섞이지 않게)
+// 기록은 이 브라우저의 로컬 저장소에만 둔다. 예전 계정별 키(`:userId` 접미사)는 첫 로드 때 흡수한다
 const localKey = (company, userId) => (userId ? `exam-progress:${company}:${userId}` : `exam-progress:${company}`);
 
 function readLocal(company, userId) {
@@ -25,16 +20,6 @@ function writeLocal(company, userId, data) {
   } catch {
     /* storage unavailable */
   }
-}
-
-function takeGuest(company) {
-  const guest = readLocal(company, null);
-  try {
-    localStorage.removeItem(localKey(company, null));
-  } catch {
-    /* storage unavailable */
-  }
-  return guest;
 }
 
 // 두 기기의 기록을 합친다: 문제별로는 더 최근 풀이를, 응시 이력은 합집합을 남긴다
@@ -62,82 +47,40 @@ export function mergeProgress(a, b) {
   return { stats, history, marks, updatedAt: Math.max(a.updatedAt || 0, b.updatedAt || 0) };
 }
 
-const sameProgress = (a, b) => JSON.stringify([a.stats, a.history, a.marks || {}]) === JSON.stringify([b.stats, b.history, b.marks || {}]);
-
-// 로그인 직후에는 로그인 전에 풀었던 기록을 계정 쪽으로 옮겨서 읽는다
-function loadLocal(company, userId) {
-  const local = readLocal(company, userId);
-  if (!userId) return local;
-  const guest = takeGuest(company);
-  if (!guest.updatedAt) return local;
-  const merged = mergeProgress(local, guest);
-  writeLocal(company, userId, merged);
+// 예전에 로그인 상태로 저장된 계정별 기록이 남아 있으면 브라우저 기록과 합쳐서 가져온다
+function absorbAccountRecords(company) {
+  const prefix = `${localKey(company, null)}:`;
+  let merged = readLocal(company, null);
+  let found = false;
+  try {
+    for (const k of Object.keys(localStorage)) {
+      if (!k.startsWith(prefix)) continue;
+      try { merged = mergeProgress(merged, { ...EMPTY, ...JSON.parse(localStorage.getItem(k)) }); } catch { /* skip */ }
+      localStorage.removeItem(k);
+      found = true;
+    }
+  } catch {
+    /* storage unavailable */
+  }
+  if (found) writeLocal(company, null, merged);
   return merged;
 }
 
 export function useExamProgress(company) {
-  const { user } = useAuth();
-  const userId = user?.id ?? null;
-  const key = localKey(company, userId);
-  const [state, setState] = useState(() => ({ key, data: loadLocal(company, userId), sync: 'syncing' }));
-  if (state.key !== key) setState({ key, data: loadLocal(company, userId), sync: 'syncing' });
-  const data = state.key === key ? state.data : EMPTY;
-
-  const pushTimer = useRef(null);
-  const retry = useRef(null);
+  const [state, setState] = useState(() => ({ company, data: absorbAccountRecords(company) }));
+  if (state.company !== company) setState({ company, data: absorbAccountRecords(company) });
+  const data = state.company === company ? state.data : EMPTY;
   const latest = useRef(data);
   useEffect(() => { latest.current = data; }, [data]);
-
-  const setSync = useCallback((sync) => setState(prev => (prev.key === key ? { ...prev, sync } : prev)), [key]);
-
-  const push = useCallback((payload, delay = 400) => {
-    if (!userId) return;
-    clearTimeout(pushTimer.current);
-    pushTimer.current = setTimeout(async () => {
-      setSync('syncing');
-      try {
-        await api.put(`/exam/progress/${company}`, { data: JSON.stringify(payload) }, { timeout: SYNC_TIMEOUT });
-        setSync('cloud');
-      } catch {
-        setSync('error');
-        // 실패해도 기록은 브라우저에 남아 있으므로 최신 상태로 다시 시도한다
-        retry.current?.(latest.current, RETRY_DELAY);
-      }
-    }, delay);
-  }, [company, userId, setSync]);
-
-  useEffect(() => {
-    retry.current = push;
-    return () => clearTimeout(pushTimer.current);
-  }, [push]);
-
-  useEffect(() => {
-    if (!userId) return;
-    let cancelled = false;
-    api.get(`/exam/progress/${company}`, { timeout: SYNC_TIMEOUT })
-      .then(res => {
-        if (cancelled) return;
-        const remote = res.data?.data ? { ...EMPTY, ...JSON.parse(res.data.data) } : null;
-        const merged = mergeProgress(latest.current, remote);
-        const needsPush = remote ? !sameProgress(merged, remote) : !!merged.updatedAt;
-        latest.current = merged;
-        writeLocal(company, userId, merged);
-        setState(prev => (prev.key === key ? { ...prev, data: merged, sync: needsPush ? prev.sync : 'cloud' } : prev));
-        if (needsPush) push(merged, 0);
-      })
-      .catch(() => { if (!cancelled) setSync('error'); });
-    return () => { cancelled = true; };
-  }, [company, userId, key, push, setSync]);
 
   const save = useCallback((updater) => {
     const next = { ...(typeof updater === 'function' ? updater(latest.current) : updater), updatedAt: Date.now() };
     latest.current = next;
-    writeLocal(company, userId, next);
-    setState(prev => (prev.key === key ? { ...prev, data: next } : prev));
-    push(next);
-  }, [company, userId, key, push]);
+    writeLocal(company, null, next);
+    setState(prev => (prev.company === company ? { ...prev, data: next } : prev));
+  }, [company]);
 
-  return { data, save, sync: userId ? state.sync : 'local', loggedIn: !!userId };
+  return { data, save };
 }
 
 export const isMarked = (data, qid) => !!data.marks?.[qid]?.on;
