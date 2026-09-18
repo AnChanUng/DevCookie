@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
-import { useAuth } from '../contexts/useAuth';
 
-// 학습 완료 수는 계정마다 다르므로 계정별로 캐시한다
+// 통계 응답을 캐시해 두고 화면은 먼저 그린다
 const statsCacheKey = (userId) => `home-stats:${userId ?? 'guest'}`;
 
 function readCachedStats(userId) {
@@ -17,8 +16,7 @@ function readCachedStats(userId) {
 
 // CS 면접 질문 검색과 학습 통계. 홈에 있던 것을 면접연습 페이지로 옮겼다
 export default function InterviewSearch() {
-  const { user } = useAuth();
-  const userId = user?.id ?? null;
+  const userId = null;
   const [loaded, setLoaded] = useState({ userId, stats: readCachedStats(userId) });
   if (loaded.userId !== userId) setLoaded({ userId, stats: readCachedStats(userId) });
   const stats = loaded.stats;

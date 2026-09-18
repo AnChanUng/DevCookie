@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../api';
-import { useAuth } from '../contexts/useAuth';
 import { hardcodedQuestions } from '../hardcodedData';
 
 const difficultyLabel = {
@@ -12,7 +11,6 @@ const difficultyLabel = {
 
 export default function QuestionPage() {
   const { id } = useParams();
-  const { user } = useAuth();
   const [question, setQuestion] = useState(null);
   const [showAnswer, setShowAnswer] = useState(false);
   const [userAnswer, setUserAnswer] = useState('');
@@ -33,7 +31,7 @@ export default function QuestionPage() {
       })
       .finally(() => setLoading(false));
     api.post(`/questions/${id}/study`).catch(() => {});
-  }, [id, user?.id]);
+  }, [id]);
 
   const handleGrade = async () => {
     if (!userAnswer.trim()) return;
@@ -48,15 +46,6 @@ export default function QuestionPage() {
     }
   };
 
-  const handleBookmark = async () => {
-    if (!user) return;
-    try {
-      const res = await api.post(`/questions/${id}/bookmark`);
-      setQuestion(res.data);
-    } catch (e) {
-      console.error(e);
-    }
-  };
 
   if (loading) {
     return (
@@ -93,16 +82,7 @@ export default function QuestionPage() {
         </div>
       </div>
 
-      <div className="action-row">
-        <button
-          className={`action-btn ${question.bookmarked ? 'active' : ''}`}
-          onClick={handleBookmark}
-        disabled={!user}
-        title={user ? undefined : '로그인하면 북마크를 저장할 수 있습니다'}
-        >
-          {!user ? '☆ 북마크 (로그인 필요)' : question.bookmarked ? '★ 북마크됨' : '☆ 북마크'}
-        </button>
-      </div>
+
 
       {question.content && (
         <div className="question-content">{question.content}</div>
