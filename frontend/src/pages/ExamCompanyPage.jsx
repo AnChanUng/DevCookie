@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { COMPANIES, CPP_GROUPS } from '../data/examQuestions';
-import { useExamProgress, recordAnswer } from '../hooks/useExamProgress';
+import { useExamProgress, recordAnswer, isMarked, toggleMark } from '../hooks/useExamProgress';
 
 const CIRC = ['①', '②', '③', '④', '⑤'];
 
@@ -22,6 +22,7 @@ const fmtDate = (ts) => {
 const modeLabel = (sections, mode, sec) =>
   mode === 'exam' ? '실전 모의고사'
     : mode === 'wrong' ? '오답 다시 풀기'
+    : mode === 'marked' ? '북마크 다시 풀기'
     : mode === 'cpp' ? `C++ 집중 문제집 · ${sec === 'all' ? '전체' : CPP_GROUPS[sec]?.name || ''}`
     : `영역별 연습 · ${sections[sec]?.name || ''}`;
 
@@ -45,6 +46,8 @@ function CompanyExam({ company }) {
 
   const wrongIds = ALL.filter(q => data.stats[q.id]?.last === 'w').map(q => q.id);
   const everWrongIds = ALL.filter(q => (data.stats[q.id]?.w || 0) > 0).map(q => q.id);
+  const markedIds = ALL.filter(q => isMarked(data, q.id)).map(q => q.id);
+  const onMark = (qid) => save(prev => ({ ...prev, marks: toggleMark(prev.marks, qid) }));
 
   const start = (mode, ids, sec) => {
     if (!ids.length) return;
@@ -101,6 +104,8 @@ function CompanyExam({ company }) {
         onPractice={recordPractice}
         onFinish={finish}
         header={header}
+        marks={data.marks}
+        onMark={onMark}
       />
     );
   }
@@ -122,7 +127,7 @@ function CompanyExam({ company }) {
           {wrongs.length > 0 && <button className="exam-btn primary" onClick={() => start('wrong', shuffle(wrongs.map(x => x.q.id)))}>틀린 {wrongs.length}문제 바로 다시 풀기</button>}
           <button className="exam-btn" onClick={() => setView({ name: 'home' })}>{company.abbr} 메인으로</button>
         </div>
-        <ReviewList items={r.items} sections={SECTIONS} defaultFilter={wrongs.length ? 'wrong' : 'all'} />
+        <ReviewList items={r.items} sections={SECTIONS} defaultFilter={wrongs.length ? 'wrong' : 'all'} marks={data.marks} onMark={onMark} />
       </div>
     );
   }
@@ -136,7 +141,21 @@ function CompanyExam({ company }) {
           {wrongIds.length > 0 && <button className="exam-btn primary" onClick={() => start('wrong', shuffle(wrongIds))}>미해결 {wrongIds.length}문제 다시 풀기</button>}
           <button className="exam-btn" onClick={() => setView({ name: 'home' })}>{company.abbr} 메인으로</button>
         </div>
-        <WrongBook Q={ALL} ids={everWrongIds} stats={data.stats} sections={SECTIONS} />
+        <WrongBook Q={ALL} ids={everWrongIds} stats={data.stats} sections={SECTIONS} marks={data.marks} onMark={onMark} />
+      </div>
+    );
+  }
+
+  if (view.name === 'markbook') {
+    return (
+      <div className="fade-in">
+        {header('북마크')}
+        <p className="exam-lede">별표(★)로 표시해 둔 문제입니다. 오답 기록과는 따로 저장되므로, 틀린 문제 기록이 지워지더라도 여기서 다시 풀 수 있습니다. 별표를 다시 누르면 해제됩니다.</p>
+        <div className="exam-actions">
+          {markedIds.length > 0 && <button className="exam-btn primary" onClick={() => start('marked', shuffle(markedIds))}>북마크 {markedIds.length}문제 다시 풀기</button>}
+          <button className="exam-btn" onClick={() => setView({ name: 'home' })}>{company.abbr} 메인으로</button>
+        </div>
+        <MarkBook Q={ALL} ids={markedIds} stats={data.stats} sections={SECTIONS} marks={data.marks} onMark={onMark} />
       </div>
     );
   }
@@ -169,6 +188,14 @@ function CompanyExam({ company }) {
         <button className="exam-mode" onClick={() => setView({ name: 'wrongbook' })}>
           <span><span className="t">오답노트 보기</span><span className="d">틀렸던 문제와 해설을 영역별로 확인 · 누적 오답 횟수</span></span>
           <span className="n">{everWrongIds.length}문항</span>
+        </button>
+        <button className="exam-mode" disabled={!markedIds.length} onClick={() => start('marked', shuffle(markedIds))}>
+          <span><span className="t">북마크 다시 풀기</span><span className="d">풀다가 ★로 표시한 문제만 모아서 즉시 채점 · 오답 기록과 별도로 저장</span></span>
+          <span className="n">{markedIds.length}문항</span>
+        </button>
+        <button className="exam-mode" onClick={() => setView({ name: 'markbook' })}>
+          <span><span className="t">북마크 보기</span><span className="d">표시해 둔 문제와 해설 확인 · 별표를 눌러 해제</span></span>
+          <span className="n">{markedIds.length}문항</span>
         </button>
       </div>
 
@@ -250,7 +277,7 @@ function StatTile({ k, v, of, unit }) {
   );
 }
 
-function Quiz({ byId, stats, mode, sec, ids, sections, minutes, onPractice, onFinish, header }) {
+function Quiz({ byId, stats, mode, sec, ids, sections, minutes, onPractice, onFinish, header, marks, onMark }) {
   const EXAM_SECONDS = minutes * 60;
   const isExam = mode === 'exam';
   const [idx, setIdx] = useState(0);
@@ -308,6 +335,7 @@ function Quiz({ byId, stats, mode, sec, ids, sections, minutes, onPractice, onFi
           <span className="exam-chip sec">{sections[q.sec].name}</span>
           <span className="exam-chip">{q.topic}</span>
           {wstat?.w > 0 && <span className="exam-chip wrong">누적 오답 {wstat.w}회</span>}
+          <MarkButton on={!!marks?.[q.id]?.on} onClick={() => onMark(q.id)} />
         </div>
         <QuestionBody q={q} />
         <ul className="exam-opts">
@@ -362,7 +390,15 @@ function QuestionBody({ q, className = 'exam-qtext' }) {
   );
 }
 
-function ReviewCard({ q, a, extra, sections }) {
+function MarkButton({ on, onClick }) {
+  return (
+    <button type="button" className={`exam-mark ${on ? 'on' : ''}`} onClick={onClick} title={on ? '북마크 해제' : '북마크 (나중에 다시 풀기)'} aria-pressed={on}>
+      {on ? '★' : '☆'}<span>{on ? '북마크됨' : '북마크'}</span>
+    </button>
+  );
+}
+
+function ReviewCard({ q, a, extra, sections, marked, onMark }) {
   const ok = a === q.a;
   return (
     <div className="exam-rv">
@@ -371,6 +407,7 @@ function ReviewCard({ q, a, extra, sections }) {
         <span className="exam-chip sec">{sections[q.sec].name}</span>
         <span className="exam-chip">{q.topic}</span>
         {extra ?? <span className={`exam-chip ${ok ? '' : 'wrong'}`}>{ok ? '정답' : '오답'}</span>}
+        {onMark && <MarkButton on={!!marked} onClick={() => onMark(q.id)} />}
       </div>
       <QuestionBody q={q} className="q" />
       <div className="a">
@@ -384,7 +421,7 @@ function ReviewCard({ q, a, extra, sections }) {
   );
 }
 
-function ReviewList({ items, sections, defaultFilter }) {
+function ReviewList({ items, sections, defaultFilter, marks, onMark }) {
   const [filter, setFilter] = useState(defaultFilter);
   const wrongs = items.filter(x => !x.ok);
   const list = filter === 'wrong' ? wrongs : items;
@@ -396,12 +433,12 @@ function ReviewList({ items, sections, defaultFilter }) {
       </div>
       {list.length === 0
         ? <div className="empty"><div className="empty-icon">🎉</div>틀린 문제가 없습니다. 전부 정답입니다.</div>
-        : <div className="exam-review">{list.map(it => <ReviewCard key={it.q.id} q={it.q} a={it.a} sections={sections} />)}</div>}
+        : <div className="exam-review">{list.map(it => <ReviewCard key={it.q.id} q={it.q} a={it.a} sections={sections} marked={marks?.[it.q.id]?.on} onMark={onMark} />)}</div>}
     </>
   );
 }
 
-function WrongBook({ Q, ids, stats, sections }) {
+function WrongBook({ Q, ids, stats, sections, marks, onMark }) {
   const [filter, setFilter] = useState('all');
   if (!ids.length) return <div className="empty"><div className="empty-icon">📋</div>아직 틀린 문제가 없습니다. 모의고사나 영역별 연습을 먼저 풀어보세요.</div>;
   const tabs = [['all', '전체'], ...Object.entries(sections).map(([k, v]) => [k, v.name])];
@@ -421,9 +458,45 @@ function WrongBook({ Q, ids, stats, sections }) {
             key={q.id}
             q={q}
             sections={sections}
+            marked={marks?.[q.id]?.on}
+            onMark={onMark}
             extra={<><span className="exam-chip wrong">오답 {stats[q.id].w}회</span><span className="exam-chip">{stats[q.id].last === 'r' ? '해결' : '미해결'}</span></>}
           />
         ))}
+      </div>
+    </>
+  );
+}
+
+function MarkBook({ Q, ids, stats, sections, marks, onMark }) {
+  const [filter, setFilter] = useState('all');
+  if (!ids.length) return <div className="empty"><div className="empty-icon">☆</div>아직 북마크한 문제가 없습니다. 문제를 풀다가 ☆ 버튼을 눌러 표시해 두세요.</div>;
+  const tabs = [['all', '전체'], ...Object.entries(sections).map(([k, v]) => [k, v.name])];
+  const qs = Q.filter(q => ids.includes(q.id) && (filter === 'all' || q.sec === filter))
+    .sort((x, y) => (marks[y.id]?.at || 0) - (marks[x.id]?.at || 0));
+  return (
+    <>
+      <div className="exam-filters">
+        {tabs.map(([k, t]) => {
+          const cnt = k === 'all' ? ids.length : ids.filter(id => Q.find(q => q.id === id).sec === k).length;
+          if (k !== 'all' && !cnt) return null;
+          return <button key={k} className={`exam-btn sm ${filter === k ? 'on' : ''}`} onClick={() => setFilter(k)}>{t} {cnt}</button>;
+        })}
+      </div>
+      <div className="exam-review">
+        {qs.map(q => {
+          const s = stats[q.id];
+          return (
+            <ReviewCard
+              key={q.id}
+              q={q}
+              sections={sections}
+              marked
+              onMark={onMark}
+              extra={s ? <span className={`exam-chip ${s.last === 'w' ? 'wrong' : ''}`}>{s.last === 'w' ? `최근 오답 · 누적 ${s.w}회` : '최근 정답'}</span> : <span className="exam-chip">아직 안 푼 문제</span>}
+            />
+          );
+        })}
       </div>
     </>
   );

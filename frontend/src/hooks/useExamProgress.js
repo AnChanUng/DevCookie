@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import api from '../api';
 import { useAuth } from '../contexts/useAuth';
 
-const EMPTY = { stats: {}, history: [], updatedAt: 0 };
+// marks: 북마크. 오답 기록(stats)과 별도로 저장해 한쪽이 유실돼도 다시 풀 문제를 찾을 수 있게 한다
+const EMPTY = { stats: {}, history: [], marks: {}, updatedAt: 0 };
 // 백엔드(Render)가 잠들어 있다 깨어나는 시간을 감안한 타임아웃
 const SYNC_TIMEOUT = 60000;
 const RETRY_DELAY = 15000;
@@ -44,6 +45,10 @@ export function mergeProgress(a, b) {
   for (const [qid, s] of Object.entries(b.stats || {})) {
     if (!stats[qid] || (s.at || 0) > (stats[qid].at || 0)) stats[qid] = s;
   }
+  const marks = { ...(a.marks || {}) };
+  for (const [qid, m] of Object.entries(b.marks || {})) {
+    if (!marks[qid] || (m.at || 0) > (marks[qid].at || 0)) marks[qid] = m;
+  }
   const seen = new Set();
   const history = [...(a.history || []), ...(b.history || [])]
     .filter(h => {
@@ -54,10 +59,10 @@ export function mergeProgress(a, b) {
     })
     .sort((x, y) => x.at - y.at)
     .slice(-200);
-  return { stats, history, updatedAt: Math.max(a.updatedAt || 0, b.updatedAt || 0) };
+  return { stats, history, marks, updatedAt: Math.max(a.updatedAt || 0, b.updatedAt || 0) };
 }
 
-const sameProgress = (a, b) => JSON.stringify([a.stats, a.history]) === JSON.stringify([b.stats, b.history]);
+const sameProgress = (a, b) => JSON.stringify([a.stats, a.history, a.marks || {}]) === JSON.stringify([b.stats, b.history, b.marks || {}]);
 
 // 로그인 직후에는 로그인 전에 풀었던 기록을 계정 쪽으로 옮겨서 읽는다
 function loadLocal(company, userId) {
@@ -133,6 +138,13 @@ export function useExamProgress(company) {
   }, [company, userId, key, push]);
 
   return { data, save, sync: userId ? state.sync : 'local', loggedIn: !!userId };
+}
+
+export const isMarked = (data, qid) => !!data.marks?.[qid]?.on;
+
+// 해제도 시각과 함께 남겨서 다른 기기의 오래된 북마크가 되살아나지 않게 한다
+export function toggleMark(marks, qid) {
+  return { ...(marks || {}), [qid]: { on: !marks?.[qid]?.on, at: Date.now() } };
 }
 
 export function recordAnswer(stats, qid, correct) {
