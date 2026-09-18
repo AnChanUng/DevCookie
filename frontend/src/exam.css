@@ -76,8 +76,41 @@
   max-width: 70ch;
 }
 
+.exam-page-header {
+  position: relative;
+}
+
 .exam-page-header h1 {
   margin-bottom: 4px;
+}
+
+.exam-toplinks {
+  position: absolute;
+  top: 34px;
+  right: 0;
+  display: flex;
+  gap: 4px;
+}
+
+.exam-toplinks button {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font: inherit;
+  font-size: 0.74rem;
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+
+.exam-toplinks button:hover {
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+.exam-toplinks button.on {
+  color: var(--text-primary);
+  font-weight: 700;
 }
 
 .exam-sync {
@@ -626,6 +659,8 @@
 }
 
 @media (max-width: 640px) {
+  .exam-toplinks { position: static; margin: -4px 0 8px; flex-wrap: wrap; }
+
   .exam-qcard { padding: 18px 16px; }
   .exam-score .big { font-size: 2.6rem; }
 }
