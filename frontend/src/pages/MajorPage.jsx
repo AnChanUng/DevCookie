@@ -18,7 +18,7 @@ export default function MajorPage() {
     <div className="fade-in">
       <div className="page-header">
         <Link to="/" className="back-link">← 홈으로</Link>
-        <h1>📝 전공필기</h1>
+        <h1>📝 필기이론</h1>
         <p>정보처리기사 · SQLD · 빅데이터분석기사 요약노트 PDF · 화면에서 바로 읽는 열람 전용</p>
       </div>
 

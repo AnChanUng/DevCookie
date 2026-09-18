@@ -2193,3 +2193,141 @@
   padding-bottom: 12px;
   border-bottom: 1px solid var(--border-color);
 }
+
+/* ===== Home Menu (번호가 붙은 학습 메뉴 3종) ===== */
+.home-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 48px;
+}
+
+.home-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px 22px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+  transition: var(--transition);
+}
+
+.home-menu-item:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--card-shadow-glow);
+  border-color: rgba(99, 102, 241, 0.25);
+}
+
+.home-menu-item:active {
+  transform: translateY(-1px);
+}
+
+.home-menu-no {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  display: grid;
+  place-items: center;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--accent-blue);
+  background: var(--accent-blue-light);
+  transition: var(--transition);
+}
+
+.home-menu-item:hover .home-menu-no {
+  color: #fff;
+  background: var(--gradient-primary);
+}
+
+.home-menu-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.home-menu-title {
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+}
+
+.home-menu-desc {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.home-menu-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 3px;
+}
+
+.home-menu-tags span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+  background: var(--accent-blue-light);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+}
+
+.home-menu-arrow {
+  flex: none;
+  font-size: 1.1rem;
+  color: var(--text-quaternary);
+  transition: var(--transition);
+}
+
+.home-menu-item:hover .home-menu-arrow {
+  color: var(--accent-blue);
+  transform: translateX(4px);
+}
+
+@media (max-width: 640px) {
+  .home-menu-item {
+    gap: 14px;
+    padding: 16px;
+  }
+
+  .home-menu-no {
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
+  }
+
+  /* 메뉴가 늘어난 헤더: 로고 아래 줄에서 가로로 넘겨 본다 */
+  .header-inner {
+    height: auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    padding-top: 10px;
+    padding-bottom: 6px;
+  }
+
+  .nav-links {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .nav-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-links a {
+    flex: none;
+    padding: 7px 12px;
+    font-size: 0.82rem;
+  }
+}

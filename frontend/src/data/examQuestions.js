@@ -9,7 +9,9 @@ import { KDN_SECTIONS, KDN_QUESTIONS } from './kdnQuestions';
 import { KOSCOM_SECTIONS, KOSCOM_QUESTIONS } from './koscomQuestions';
 import { BNK_SECTIONS, BNK_QUESTIONS } from './bnkQuestions';
 import { HF_CPP_QUESTIONS } from './hfCppQuestions';
+import { COMIL } from './comilQuestions';
 export { HF_CPP_QUESTIONS, CPP_GROUPS } from './hfCppQuestions';
+export { COMIL };
 
 export const SECTIONS = {
   cs:  {name:'전산학일반', short:'전산', sub:'OS · 컴퓨터구조 · 정보보호 · SW공학 · 자료구조', count:36},
@@ -131,3 +133,6 @@ export const COMPANIES = [
     lede: "금융·경제·경영 기초상식 15문제, 직무기초소양(NCS) 15문제. 총 30문제, 40분, 4지선다. 2024 하반기 IT직무 응시 후기의 키워드 정리(예금자보호, CD, 롱숏펀드, 레그테크, 환헤지, 재정환율, 피셔 방정식, MR=MC, BCG 등)와 NCS 기록 유형을 바탕으로 새로 만든 문제입니다. 코딩테스트(SQL·알고리즘)는 포함하지 않습니다.",
   },
 ];
+
+// 풀이 기록을 남기는 모든 문제은행 (회사별 + 컴퓨터일반). 백업·복원 범위
+export const BANKS = [...COMPANIES, COMIL];
