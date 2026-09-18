@@ -11,21 +11,25 @@ export default function Layout() {
   const [showLogin, setShowLogin] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
   const [error, setError] = useState('');
+  // 'idle' | 'pending' | 'success'
+  const [status, setStatus] = useState('idle');
+  const [doneNickname, setDoneNickname] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!nickname.trim() || !password.trim()) return;
+    if (!nickname.trim() || !password.trim() || status === 'pending') return;
+    setError('');
+    setStatus('pending');
     try {
-      if (isRegister) {
-        await register(nickname.trim(), password.trim());
-      } else {
-        await login(nickname.trim(), password.trim());
-      }
-      setShowLogin(false);
+      const userData = isRegister
+        ? await register(nickname.trim(), password.trim())
+        : await login(nickname.trim(), password.trim());
+      setDoneNickname(userData?.nickname || nickname.trim());
+      setStatus('success');
       setNickname('');
       setPassword('');
-      setError('');
     } catch (err) {
+      setStatus('idle');
       setError(err.response?.data?.error || '요청에 실패했습니다.');
     }
   };
@@ -35,7 +39,12 @@ export default function Layout() {
     setError('');
     setNickname('');
     setPassword('');
+    setStatus('idle');
+    setDoneNickname('');
   };
+
+  const pendingText = isRegister ? '회원가입 진행 중입니다...' : '로그인 진행 중입니다...';
+  const successText = isRegister ? '회원가입에 성공했습니다!' : '로그인에 성공했습니다!';
 
   return (
     <>
@@ -76,6 +85,14 @@ export default function Layout() {
         <div className="login-overlay" onClick={closeModal}>
           <div className="login-modal" onClick={e => e.stopPropagation()}>
             <h2>{isRegister ? '회원가입' : '로그인'}</h2>
+            {status === 'success' ? (
+              <div className="login-success">
+                <div className="login-success-icon">✓</div>
+                <div className="login-success-title">{successText}</div>
+                <div className="login-success-id">아이디: <strong>{doneNickname}</strong></div>
+                <button type="button" onClick={closeModal} className="submit-btn">확인</button>
+              </div>
+            ) : (
             <form onSubmit={handleSubmit}>
               <input
                 type="text"
@@ -95,10 +112,18 @@ export default function Layout() {
                 maxLength={30}
               />
               {error && <div className="login-error">{error}</div>}
-              <button type="submit" className="submit-btn">
-                {isRegister ? '가입하기' : '로그인'}
+              {status === 'pending' && (
+                <div className="login-pending">
+                  <span className="login-pending-spinner" />
+                  {pendingText}
+                </div>
+              )}
+              <button type="submit" className="submit-btn" disabled={status === 'pending'}>
+                {status === 'pending' ? '처리 중...' : isRegister ? '가입하기' : '로그인'}
               </button>
             </form>
+            )}
+            {status !== 'success' && (
             <div className="login-switch">
               {isRegister ? (
                 <span>이미 계정이 있나요? <button onClick={() => { setIsRegister(false); setError(''); }} className="switch-btn">로그인</button></span>
@@ -106,6 +131,7 @@ export default function Layout() {
                 <span>처음이신가요? <button onClick={() => { setIsRegister(true); setError(''); }} className="switch-btn">회원가입</button></span>
               )}
             </div>
+            )}
           </div>
         </div>
       )}
