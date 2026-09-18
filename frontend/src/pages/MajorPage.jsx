@@ -1,7 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import api from '../api';
-import { hardcodedCategories } from '../hardcodedData';
 
 // 전공필기/ 폴더의 이론노트 PDF. public/notes/ 에 URL에 안전한 이름으로 복사해 둔다
 const NOTES = [
@@ -10,15 +8,7 @@ const NOTES = [
 ];
 
 export default function MajorPage() {
-  // 번들에 들어 있는 카테고리로 바로 그리고, API 응답이 오면 교체한다
-  const [categories, setCategories] = useState(hardcodedCategories);
   const [open, setOpen] = useState(null);
-
-  useEffect(() => {
-    api.get('/categories')
-      .then(res => { if (res.data?.length) setCategories(res.data); })
-      .catch(() => {});
-  }, []);
 
   const note = NOTES.find(n => n.file === open);
 
@@ -27,7 +17,7 @@ export default function MajorPage() {
       <div className="page-header">
         <Link to="/" className="back-link">← 홈으로</Link>
         <h1>📝 전공필기</h1>
-        <p>이론노트 PDF와 과목별 학습 · 데이터베이스 · 자료구조 · 운영체제 · 네트워크 · 도커</p>
+        <p>정보처리기사 요약노트 PDF · 화면에서 바로 읽는 열람 전용</p>
       </div>
 
       <div className="section-title">이론노트</div>
@@ -61,22 +51,6 @@ export default function MajorPage() {
           <p className="note-hint">화면에서 바로 읽는 열람 전용 자료입니다. 일부 모바일 브라우저에서는 PDF가 표시되지 않을 수 있습니다.</p>
         </div>
       )}
-
-      <div className="section-title">과목별 학습</div>
-      <div className="categories-grid">
-        {categories.filter(cat => cat.slug !== 'cicd' && cat.slug !== 'major-exam').map(cat => (
-          <Link to={`/category/${cat.slug}`} key={cat.id} className="category-card">
-            <div className="category-icon">{cat.iconEmoji}</div>
-            <h3>{cat.name}</h3>
-            <p>{cat.description}</p>
-          </Link>
-        ))}
-        <Link to="/major-exam" className="category-card major-exam-card">
-          <div className="category-icon">🗒️</div>
-          <h3>요약노트</h3>
-          <p>금융공기업(코스콤, 금융결제원) 대비</p>
-        </Link>
-      </div>
     </div>
   );
 }

@@ -47,7 +47,7 @@ export default function Home() {
         <Link to="/major" className="category-card major-exam-card">
           <div className="category-icon">📝</div>
           <h3>2. 전공필기</h3>
-          <p>정보처리기사 요약노트 PDF · 데이터베이스 · 자료구조 · 운영체제 · 네트워크 과목별 학습</p>
+          <p>정보처리기사 필기·실기 요약노트 PDF</p>
         </Link>
         <Link to="/interview" className="category-card interview-card">
           <div className="category-icon">🎤</div>
