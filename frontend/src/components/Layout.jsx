@@ -43,7 +43,7 @@ export default function Layout() {
         <div className="container header-inner">
           <Link to="/" className="logo">
             <span className="logo-dot" />
-            CS Study
+            전산학 전공필기 준비
           </Link>
           <div className="header-right">
             <nav className="nav-links">

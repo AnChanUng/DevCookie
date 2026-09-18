@@ -6,6 +6,8 @@ import { KORAIL_SECTIONS, KORAIL_QUESTIONS } from './korailQuestions';
 import { EX_SECTIONS, EX_QUESTIONS } from './exQuestions';
 import { KWATER_SECTIONS, KWATER_QUESTIONS } from './kwaterQuestions';
 import { KDN_SECTIONS, KDN_QUESTIONS } from './kdnQuestions';
+import { KOSCOM_SECTIONS, KOSCOM_QUESTIONS } from './koscomQuestions';
+import { BNK_SECTIONS, BNK_QUESTIONS } from './bnkQuestions';
 import { HF_CPP_QUESTIONS } from './hfCppQuestions';
 export { HF_CPP_QUESTIONS, CPP_GROUPS } from './hfCppQuestions';
 
@@ -88,7 +90,11 @@ export const COMPANIES = [
     questions: HF_QUESTIONS, sections: SECTIONS, minutes: 80, extra: HF_CPP_QUESTIONS,
     lede: "전산학일반(정보보호 포함) 36문제, 데이터베이스·네트워크 12문제, 프로그래밍(C++ · Java · Python) 12문제. 총 60문제, 80분, 5지선다. 코딩테스트 이후 치르는 전공필기 범위만 다룹니다. 프로그래밍 영역은 C++ 코드 실행 결과 문제 비중이 높아 아래에 C++ 집중 문제집을 따로 두었습니다.",
   },
-  { key: "koscom", abbr: "KOSCOM", name: "코스콤", meta: "문제은행 준비 중", ready: false, questions: [] },
+  {
+    key: "koscom", abbr: "KOSCOM", name: "코스콤", meta: "전산 전공 35문제 · 45분 · 4지선다", ready: true,
+    questions: KOSCOM_QUESTIONS, sections: KOSCOM_SECTIONS, minutes: 45,
+    lede: "소프트웨어공학 6문제, 운영체제 7문제, 데이터베이스 7문제, 네트워크·데이터통신 8문제, 자료구조 7문제. 총 35문제, 45분, 4지선다. 2026 상반기 응시 후기에 복원된 35문항(CMMI 순서, COCOMO II, 격리 수준, 2PL 변형, 포트 번호 등 명칭·순서·예외를 묻는 경향)을 바탕으로 새로 만든 문제입니다.",
+  },
   {
     key: "ibk", abbr: "IBK", name: "IBK 기업은행", meta: "NCS 40 + 전공 35 · 120분 · 4지선다", ready: true,
     questions: IBK_QUESTIONS, sections: IBK_SECTIONS, minutes: 120,
@@ -118,5 +124,10 @@ export const COMPANIES = [
     key: "kdn", abbr: "KDN", name: "한전KDN", meta: "전산 필기(1차) 50문제 · 60분 · 5지선다", ready: true,
     questions: KDN_QUESTIONS, sections: KDN_SECTIONS, minutes: 60,
     lede: "소프트웨어공학 7문제, 프로그래밍·자료구조 5문제, 운영체제 5문제, 데이터베이스 17문제, 네트워크 16문제. 총 50문제, 60분, 5지선다. 2026 1차 응시 후기에 복원된 50문항의 주제 순서를 따라 새로 만든 문제로, DB와 네트워크 비중이 높습니다.",
+  },
+  {
+    key: "bnk", abbr: "BNK", name: "BNK캐피탈", meta: "금융상식 15 + NCS 15 · 40분 · 4지선다", ready: true,
+    questions: BNK_QUESTIONS, sections: BNK_SECTIONS, minutes: 40,
+    lede: "금융·경제·경영 기초상식 15문제, 직무기초소양(NCS) 15문제. 총 30문제, 40분, 4지선다. 2024 하반기 IT직무 응시 후기의 키워드 정리(예금자보호, CD, 롱숏펀드, 레그테크, 환헤지, 재정환율, 피셔 방정식, MR=MC, BCG 등)와 NCS 기록 유형을 바탕으로 새로 만든 문제입니다. 코딩테스트(SQL·알고리즘)는 포함하지 않습니다.",
   },
 ];
