@@ -1,12 +1,12 @@
 import { useRef, useState } from 'react';
-import { COMPANIES } from '../data/examQuestions';
+import { BANKS } from '../data/examQuestions';
 import { mergeProgress } from '../hooks/useExamProgress';
 
 const localKey = (company) => `exam-progress:${company}`;
 
 function readAll() {
   const out = {};
-  for (const c of COMPANIES) {
+  for (const c of BANKS) {
     try {
       const raw = localStorage.getItem(localKey(c.key));
       if (raw) out[c.key] = JSON.parse(raw);
@@ -41,7 +41,7 @@ export default function ProgressBackup() {
     a.click();
     URL.revokeObjectURL(url);
     const wrong = companies.reduce((n, k) => n + Object.values(data[k].stats || {}).filter(s => s.last === 'w').length, 0);
-    setMsg(`${companies.length}개 회사 기록(현재 오답 ${wrong}문제)을 내려받았습니다.`);
+    setMsg(`${companies.length}개 문제은행 기록(현재 오답 ${wrong}문제)을 내려받았습니다.`);
   };
 
   const restore = async (file) => {
@@ -51,7 +51,7 @@ export default function ProgressBackup() {
       if (parsed?.app !== 'cs-exam-progress' || !parsed.progress) throw new Error('format');
       let merged = 0;
       for (const [key, incoming] of Object.entries(parsed.progress)) {
-        if (!COMPANIES.some(c => c.key === key)) continue;
+        if (!BANKS.some(c => c.key === key)) continue;
         const k = localKey(key);
         let current = null;
         try { current = JSON.parse(localStorage.getItem(k)); } catch { /* treat as empty */ }
@@ -60,7 +60,7 @@ export default function ProgressBackup() {
         localStorage.setItem(k, JSON.stringify({ ...next, updatedAt: Date.now() }));
         merged++;
       }
-      setMsg(`${merged}개 회사 기록을 합쳤습니다.`);
+      setMsg(`${merged}개 문제은행 기록을 합쳤습니다.`);
     } catch {
       setMsg('이 사이트에서 내려받은 백업 파일이 아닙니다.');
     } finally {

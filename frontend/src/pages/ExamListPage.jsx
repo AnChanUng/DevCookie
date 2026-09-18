@@ -19,7 +19,7 @@ export default function ExamListPage() {
     <div className="fade-in">
       <div className="page-header">
         <Link to="/" className="back-link">← 홈으로</Link>
-        <h1>📚 기출문제</h1>
+        <h1>📚 기업별 기출문제</h1>
         <p>공기업 IT직무 전공필기 · 응시 후기 기반 자체 제작 문제은행 · 즉시 채점 · 오답노트 · 북마크</p>
       </div>
 

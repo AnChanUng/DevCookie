@@ -22,11 +22,17 @@ export default function Layout() {
               <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
                 홈
               </Link>
+              <Link to="/exam" className={location.pathname.startsWith('/exam') ? 'active' : ''}>
+                기업별 기출
+              </Link>
+              <Link to="/computer-general" className={location.pathname === '/computer-general' ? 'active' : ''}>
+                컴퓨터일반
+              </Link>
+              <Link to="/major" className={location.pathname === '/major' ? 'active' : ''}>
+                필기이론
+              </Link>
               <Link to="/stats" className={location.pathname === '/stats' ? 'active' : ''}>
                 통계
-              </Link>
-              <Link to="/exam" className={location.pathname.startsWith('/exam') ? 'active' : ''}>
-                기출문제
               </Link>
             </nav>
           </div>

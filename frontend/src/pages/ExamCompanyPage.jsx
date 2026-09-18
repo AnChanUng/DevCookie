@@ -33,7 +33,8 @@ export default function ExamCompanyPage() {
   return <CompanyExam company={company} />;
 }
 
-function CompanyExam({ company }) {
+// back: 목록으로 돌아가는 링크. 회사별 문제은행이 아닌 곳(컴퓨터일반)에서도 같은 풀이 화면을 쓴다
+export function CompanyExam({ company, back = { to: '/exam', label: '← 기업별 기출문제' } }) {
   const Q = company.questions;
   const SECTIONS = company.sections;
   const secKeys = Object.keys(SECTIONS).filter(k => !SECTIONS[k].extra); // 모의고사 채점 영역
@@ -43,11 +44,21 @@ function CompanyExam({ company }) {
   const byId = useMemo(() => Object.fromEntries(ALL.map(q => [q.id, q])), [ALL]);
   const { data, save } = useExamProgress(company.key);
   const [view, setView] = useState({ name: 'home' });
+  // draw가 있으면 모의고사를 문제은행 전체가 아니라 영역별 출제 비율만큼 뽑아서 구성한다
+  const examCount = company.draw ? Object.values(company.draw).reduce((n, c) => n + c, 0) : Q.length;
 
   const wrongIds = ALL.filter(q => data.stats[q.id]?.last === 'w').map(q => q.id);
   const everWrongIds = ALL.filter(q => (data.stats[q.id]?.w || 0) > 0).map(q => q.id);
   const markedIds = ALL.filter(q => isMarked(data, q.id)).map(q => q.id);
   const onMark = (qid) => save(prev => ({ ...prev, marks: toggleMark(prev.marks, qid) }));
+
+  // 안 푼 문제 → 마지막에 틀린 문제 → 맞힌 문제 순으로 우선해서 뽑는다
+  const examIds = () => {
+    if (!company.draw) return Q.map(q => q.id);
+    const rank = (q) => { const s = data.stats[q.id]; return !s ? 0 : s.last === 'w' ? 1 : 2; };
+    return Object.entries(company.draw).flatMap(([sec, n]) =>
+      shuffle(Q.filter(q => q.sec === sec)).sort((x, y) => rank(x) - rank(y)).slice(0, n).map(q => q.id));
+  };
 
   const start = (mode, ids, sec) => {
     if (!ids.length) return;
@@ -82,7 +93,7 @@ function CompanyExam({ company }) {
 
   const header = (title, links = true) => (
     <div className="page-header exam-page-header">
-      <Link to="/exam" className="back-link">← 기출문제</Link>
+      <Link to={back.to} className="back-link">{back.label}</Link>
       {links && (
         <div className="exam-toplinks">
           <button type="button" className={view.name === 'wrongbook' ? 'on' : ''} onClick={() => setView({ name: 'wrongbook' })}>틀린문제 모아보기 {everWrongIds.length}</button>
@@ -90,7 +101,7 @@ function CompanyExam({ company }) {
         </div>
       )}
       <h1>{title}</h1>
-      <div className="exam-sync local"><i />이 브라우저에 저장됨 · 기출문제 목록에서 JSON으로 백업할 수 있습니다</div>
+      <div className="exam-sync local"><i />이 브라우저에 저장됨 · 기업별 기출문제 목록에서 JSON으로 백업할 수 있습니다</div>
     </div>
   );
 
@@ -124,7 +135,7 @@ function CompanyExam({ company }) {
         <div className="exam-score"><span className="big">{r.score}</span><span className="of">/ {r.total}문제 · {r.total ? Math.round(r.score / r.total * 100) : 0}%</span></div>
         {r.mode === 'exam' && (
           <div className="exam-stats">
-            {secKeys.map(k => <StatTile key={k} k={SECTIONS[k].name} v={r.secScore[k]} of={Q.filter(q => q.sec === k).length} />)}
+            {secKeys.map(k => <StatTile key={k} k={SECTIONS[k].name} v={r.secScore[k]} of={r.items.filter(x => x.q.sec === k).length} />)}
           </div>
         )}
         <div className="exam-actions">
@@ -175,15 +186,15 @@ function CompanyExam({ company }) {
 
       <div className="exam-stats">
         <StatTile k="모의고사 응시" v={exams.length} unit="회" />
-        <StatTile k="최고 점수" v={best ?? '–'} of={Q.length} />
-        <StatTile k="최근 점수" v={last ?? '–'} of={Q.length} />
+        <StatTile k="최고 점수" v={best ?? '–'} of={examCount} />
+        <StatTile k="최근 점수" v={last ?? '–'} of={examCount} />
         <StatTile k="현재 오답" v={wrongIds.length} unit="문제" />
       </div>
 
       <div className="exam-modes">
-        <button className="exam-mode primary" onClick={() => start('exam', Q.map(q => q.id))}>
-          <span><span className="t">실전 모의고사</span><span className="d">{Q.length}문제 · {company.minutes}분 타이머 · 실제 영역 순서로 출제, 고르면 바로 정답·해설</span></span>
-          <span className="n">{Q.length}문항</span>
+        <button className="exam-mode primary" onClick={() => start('exam', examIds())}>
+          <span><span className="t">실전 모의고사</span><span className="d">{examCount}문제 · {company.minutes}분 타이머 · {company.draw ? `문제은행 ${Q.length}문항에서 실제 출제 비율대로 추출` : '실제 영역 순서로 출제'}, 고르면 바로 정답·해설</span></span>
+          <span className="n">{examCount}문항</span>
         </button>
         <button className="exam-mode" disabled={!wrongIds.length} onClick={() => start('wrong', shuffle(wrongIds))}>
           <span><span className="t">오답 다시 풀기</span><span className="d">마지막에 틀린 문제만 모아서 즉시 채점 · 맞히면 오답에서 빠집니다</span></span>

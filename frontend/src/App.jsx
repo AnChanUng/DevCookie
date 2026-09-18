@@ -13,6 +13,7 @@ const MajorPage = lazy(() => import('./pages/MajorPage'));
 const MajorExamPage = lazy(() => import('./pages/MajorExamPage'));
 const ExamListPage = lazy(() => import('./pages/ExamListPage'));
 const ExamCompanyPage = lazy(() => import('./pages/ExamCompanyPage'));
+const ComputerGeneralPage = lazy(() => import('./pages/ComputerGeneralPage'));
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="major-exam" element={<MajorExamPage />} />
           <Route path="exam" element={<ExamListPage />} />
           <Route path="exam/:company" element={<ExamCompanyPage />} />
+          <Route path="computer-general" element={<ComputerGeneralPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
