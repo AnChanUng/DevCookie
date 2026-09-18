@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { COMPANIES } from '../data/examQuestions';
 import { useAuth } from '../contexts/useAuth';
+import ProgressBackup from '../components/ProgressBackup';
 
 function summary(company, userId) {
   try {
@@ -44,6 +45,8 @@ export default function ExamListPage() {
           );
         })}
       </div>
+
+      <ProgressBackup />
 
       <p className="exam-note">
         로그인하면 풀이 기록과 오답이 계정에 저장되어 어느 기기에서든 이어서 풀 수 있습니다.
