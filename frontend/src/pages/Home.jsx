@@ -49,11 +49,6 @@ export default function Home() {
           <h3>2. 전공필기</h3>
           <p>정보처리기사 · SQLD · 빅데이터분석기사 요약노트 PDF</p>
         </Link>
-        <Link to="/interview" className="category-card interview-card">
-          <div className="category-icon">🎤</div>
-          <h3>면접연습</h3>
-          <p>공통 면접 질문 카메라 연습 · CS 면접 질문 검색</p>
-        </Link>
       </div>
     </div>
   );
