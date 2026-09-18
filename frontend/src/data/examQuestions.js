@@ -2,6 +2,10 @@
 // 2021~2026 응시 후기에서 반복 언급된 주제를 기준으로 구성. 실제 시험 문항의 복제가 아님.
 import { IBK_SECTIONS, IBK_QUESTIONS } from './ibkQuestions';
 import { KFSB_SECTIONS, KFSB_QUESTIONS } from './kfsbQuestions';
+import { KORAIL_SECTIONS, KORAIL_QUESTIONS } from './korailQuestions';
+import { EX_SECTIONS, EX_QUESTIONS } from './exQuestions';
+import { KWATER_SECTIONS, KWATER_QUESTIONS } from './kwaterQuestions';
+import { KDN_SECTIONS, KDN_QUESTIONS } from './kdnQuestions';
 import { HF_CPP_QUESTIONS } from './hfCppQuestions';
 export { HF_CPP_QUESTIONS, CPP_GROUPS } from './hfCppQuestions';
 
@@ -94,5 +98,25 @@ export const COMPANIES = [
     key: "kfsb", abbr: "KFSB", name: "저축은행중앙회", meta: "IT직무 전공 50문제 · 60분 · 4지선다", ready: true,
     questions: KFSB_QUESTIONS, sections: KFSB_SECTIONS, minutes: 60,
     lede: "데이터베이스 11문제, 운영체제·인프라 10문제, 네트워크·분산통신 8문제, 정보보호 11문제, 자료구조·설계·아키텍처 10문제. 총 50문제, 60분, 4지선다. 계좌·입출금·결제 같은 실무 상황을 제시하고 '왜 이 기술을 택하는가'를 묻는 응시 후기 경향을 따라 새로 만든 문제입니다.",
+  },
+  {
+    key: "korail", abbr: "KORAIL", name: "코레일(한국철도공사)", meta: "전산 전공 40문제 · 50분 · 5지선다", ready: true,
+    questions: KORAIL_QUESTIONS, sections: KORAIL_SECTIONS, minutes: 50,
+    lede: "소프트웨어공학 9문제, 데이터베이스 9문제, 운영체제·컴퓨터구조 10문제, 네트워크 6문제, 정보보호 6문제. 총 40문제, 50분, 5지선다. 2026 상반기 응시 후기에 복원된 문항(포렌식, 블록 암호 모드, 파이프라인·AMAT 계산, 관계대수, 서브넷 등)을 바탕으로 새로 만든 문제입니다.",
+  },
+  {
+    key: "ex", abbr: "EX", name: "한국도로공사", meta: "전산 전공 40문제 · 50분 · 5지선다", ready: true,
+    questions: EX_QUESTIONS, sections: EX_SECTIONS, minutes: 50,
+    lede: "데이터베이스 8문제, 소프트웨어공학 8문제, 운영체제 9문제, 정보보호 7문제, 네트워크 8문제. 총 40문제, 50분, 5지선다. 2026 상반기 응시 후기에 복원된 40문항의 주제와 보기 구성을 따라 새로 만든 문제입니다.",
+  },
+  {
+    key: "kwater", abbr: "K-water", name: "한국수자원공사", meta: "전산 전공(2차) 30문제 · 40분 · 4지선다", ready: true,
+    questions: KWATER_QUESTIONS, sections: KWATER_SECTIONS, minutes: 40,
+    lede: "프로그래밍 실행 결과 6문제, 자료구조 3문제, 네트워크 3문제, 운영체제 8문제, 컴퓨터구조 10문제. 총 30문제, 40분, 4지선다. 2026 상반기 2차 응시 후기에 복원된 문항(C·Python·Java 코드, C-SCAN, LRU, 논리회로, RAID 등)을 바탕으로 새로 만든 문제입니다.",
+  },
+  {
+    key: "kdn", abbr: "KDN", name: "한전KDN", meta: "전산 필기(1차) 50문제 · 60분 · 5지선다", ready: true,
+    questions: KDN_QUESTIONS, sections: KDN_SECTIONS, minutes: 60,
+    lede: "소프트웨어공학 7문제, 프로그래밍·자료구조 5문제, 운영체제 5문제, 데이터베이스 17문제, 네트워크 16문제. 총 50문제, 60분, 5지선다. 2026 1차 응시 후기에 복원된 50문항의 주제 순서를 따라 새로 만든 문제로, DB와 네트워크 비중이 높습니다.",
   },
 ];
