@@ -16,6 +16,9 @@ import { KAMCO_SECTIONS, KAMCO_QUESTIONS } from './kamcoQuestions';
 import { KODIT_SECTIONS, KODIT_QUESTIONS } from './koditQuestions';
 import { KDB_SECTIONS, KDB_QUESTIONS } from './kdbQuestions';
 import { KEXIM_SECTIONS, KEXIM_QUESTIONS } from './keximQuestions';
+import { KEPCO_SECTIONS, KEPCO_QUESTIONS } from './kepcoQuestions';
+import { NHIS_SECTIONS, NHIS_QUESTIONS } from './nhisQuestions';
+import { LH_SECTIONS, LH_QUESTIONS } from './lhQuestions';
 import { HF_CPP_QUESTIONS } from './hfCppQuestions';
 import { COMIL } from './comilQuestions';
 import { NCS } from './ncsQuestions';
@@ -162,6 +165,21 @@ export const COMPANIES = [
     key: "kfsb", category: "finance", abbr: "KFSB", name: "저축은행중앙회", meta: "IT직무 전공 50문제 · 60분 · 4지선다", ready: true,
     questions: KFSB_QUESTIONS, sections: KFSB_SECTIONS, minutes: 60,
     lede: "데이터베이스 11문제, 운영체제·인프라 10문제, 네트워크·분산통신 8문제, 정보보호 11문제, 자료구조·설계·아키텍처 10문제. 총 50문제, 60분, 4지선다. 계좌·입출금·결제 같은 실무 상황을 제시하고 '왜 이 기술을 택하는가'를 묻는 응시 후기 경향을 따라 새로 만든 문제입니다.",
+  },
+  {
+    key: "kepco", category: "public", abbr: "KEPCO", name: "한국전력공사", meta: "전산 전공 30문제 · 45분 · 4지선다", ready: true,
+    questions: KEPCO_QUESTIONS, sections: KEPCO_SECTIONS, minutes: 45,
+    lede: "자료구조·알고리즘 6문제, 데이터베이스 6문제, 운영체제 5문제, 통신·네트워크 5문제, 컴퓨터구조·논리회로 5문제, 정보보호·신기술 3문제. 총 30문제, 45분, 4지선다. 전산 전공 범위에 전력 제어·IoT 주제를 더해 새로 만든 예상문제입니다.",
+  },
+  {
+    key: "nhis", category: "public", abbr: "NHIS", name: "국민건강보험공단", meta: "전산 전공 30문제 · 45분 · 4지선다", ready: true,
+    questions: NHIS_QUESTIONS, sections: NHIS_SECTIONS, minutes: 45,
+    lede: "데이터베이스 7문제, 프로그래밍 5문제, 자료구조·알고리즘 5문제, 운영체제 5문제, 네트워크 4문제, 정보보호·개인정보 4문제. 총 30문제, 45분, 4지선다. 대용량 자격·이력 데이터와 개인정보 보호 주제를 더해 새로 만든 예상문제입니다.",
+  },
+  {
+    key: "lh", category: "public", abbr: "LH", name: "한국토지주택공사", meta: "전산 전공 30문제 · 45분 · 4지선다", ready: true,
+    questions: LH_QUESTIONS, sections: LH_SECTIONS, minutes: 45,
+    lede: "데이터베이스 6문제, 자료구조·알고리즘 6문제, 소프트웨어공학 5문제, 운영체제 5문제, 네트워크 5문제, 정보보호·신기술 3문제. 총 30문제, 45분, 4지선다. 전산 전공 범위에 공간정보(GIS) 주제를 더해 새로 만든 예상문제입니다.",
   },
   {
     key: "korail", category: "public", abbr: "KORAIL", name: "코레일", meta: "전산 전공 40문제 · 50분 · 5지선다", ready: true,
