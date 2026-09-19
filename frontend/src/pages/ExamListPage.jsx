@@ -1,5 +1,5 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { COMPANIES, EXAM_CATEGORIES } from '../data/examQuestions';
+import { COMPANIES, EXAM_CATEGORIES, allQuestions } from '../data/examQuestions';
 import ProgressBackup from '../components/ProgressBackup';
 
 function summary(company) {
@@ -7,7 +7,7 @@ function summary(company) {
     const raw = localStorage.getItem(`exam-progress:${company.key}`);
     if (!raw) return null;
     const d = JSON.parse(raw);
-    const wrong = [...company.questions, ...(company.extra || [])].filter(q => d.stats?.[q.id]?.last === 'w').length;
+    const wrong = allQuestions(company).filter(q => d.stats?.[q.id]?.last === 'w').length;
     return { attempts: (d.history || []).length, wrong };
   } catch {
     return null;
@@ -42,7 +42,7 @@ function CategoryPicker() {
         {EXAM_CATEGORIES.map(cat => {
           const list = COMPANIES.filter(c => c.category === cat.key);
           const ready = list.filter(c => c.ready);
-          const total = ready.reduce((n, c) => n + c.questions.length + (c.extra?.length || 0), 0);
+          const total = ready.reduce((n, c) => n + allQuestions(c).length, 0);
           const sums = ready.map(summary).filter(Boolean);
           const attempts = sums.reduce((n, s) => n + s.attempts, 0);
           const wrong = sums.reduce((n, s) => n + s.wrong, 0);

@@ -5,7 +5,7 @@ import { COMPANIES, EXAM_CATEGORIES } from '../data/examQuestions';
 
 const KEY = 'admin-key';
 const RANGES = [7, 30, 90];
-const MODES = { exam: '모의고사', practice: '영역별 연습', wrong: '오답 다시 풀기', marked: '북마크 다시 풀기', cpp: 'C++ 문제집' };
+const MODES = { exam: '모의고사', practice: '영역별 연습', wrong: '오답 다시 풀기', marked: '북마크 다시 풀기', cpp: 'C++ 문제집', recall: '응시 후기 복원 문제' };
 
 const PAGE_NAMES = {
   '/': '홈', '/exam': '기업별 기출문제', '/computer-general': '컴퓨터일반', '/major': '필기이론',
