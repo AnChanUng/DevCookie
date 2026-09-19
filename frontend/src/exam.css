@@ -34,6 +34,30 @@
   box-shadow: none;
 }
 
+.exam-category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.exam-category-card {
+  padding: 30px 26px 24px;
+  gap: 10px;
+}
+
+.exam-category-name {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.exam-category-abbrs {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+}
+
 .exam-company-abbr {
   font-family: ui-monospace, Consolas, monospace;
   font-size: 0.72rem;
@@ -744,3 +768,57 @@
 .exam-backup-text strong { color: var(--text-primary); font-size: 0.9rem; }
 .exam-backup-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .exam-backup-msg { flex-basis: 100%; font-size: 0.8rem; color: var(--accent-blue); }
+
+/* ===== 관리자 (Admin) ===== */
+.admin-login {
+  display: flex;
+  gap: 8px;
+  max-width: 360px;
+}
+
+.admin-login input {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 12px;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.admin-error {
+  margin: 14px 0;
+  font-size: 0.85rem;
+  color: var(--accent-red);
+}
+
+.admin-sub {
+  margin-top: 2px;
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+}
+
+.admin-table .admin-barcol {
+  width: 40%;
+}
+
+.admin-bar {
+  display: block;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--bg-tertiary);
+  overflow: hidden;
+}
+
+.admin-bar i {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--accent-blue);
+}
+
+@media (max-width: 640px) {
+  .admin-table .admin-barcol { display: none; }
+}

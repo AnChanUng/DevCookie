@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { COMPANIES, CPP_GROUPS } from '../data/examQuestions';
+import { COMPANIES, CPP_GROUPS, EXAM_CATEGORIES } from '../data/examQuestions';
+import { track } from '../track';
 import { useExamProgress, recordAnswer, isMarked, toggleMark } from '../hooks/useExamProgress';
 
 const CIRC = ['①', '②', '③', '④', '⑤'];
@@ -30,7 +31,9 @@ export default function ExamCompanyPage() {
   const { company: key } = useParams();
   const company = COMPANIES.find(c => c.key === key);
   if (!company || !company.ready) return <Navigate to="/exam" replace />;
-  return <CompanyExam company={company} />;
+  const category = EXAM_CATEGORIES.find(c => c.key === company.category);
+  const back = category ? { to: `/exam/category/${category.key}`, label: `← ${category.name}` } : undefined;
+  return <CompanyExam company={company} back={back} />;
 }
 
 // back: 목록으로 돌아가는 링크. 회사별 문제은행이 아닌 곳(컴퓨터일반)에서도 같은 풀이 화면을 쓴다
@@ -84,6 +87,7 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
     if (items.length) {
       const entry = { at: Date.now(), mode: quiz.mode, sec: quiz.sec, score, total: items.length, sections: isExam ? secScore : undefined };
       save(prev => ({ ...prev, stats, history: [...prev.history, entry].slice(-200) }));
+      track('exam', window.location.pathname, quiz.mode);
     }
     setView({ name: 'result', result: { mode: quiz.mode, sec: quiz.sec, score, total: items.length, secScore, items, elapsed: Math.floor((Date.now() - quiz.startedAt) / 1000) } });
     window.scrollTo({ top: 0 });
