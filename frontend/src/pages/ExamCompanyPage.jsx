@@ -169,9 +169,8 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
     return (
       <div className="fade-in">
         {header('북마크 모아보기')}
-        <p className="exam-lede">별표(★)로 표시해 둔 문제입니다. 오답 기록과는 따로 저장되므로, 틀린 문제 기록이 지워지더라도 여기서 다시 풀 수 있습니다. 별표를 다시 누르면 해제됩니다.</p>
+        <p className="exam-lede">별표(★)로 표시해 둔 문제입니다. 오답 기록과는 따로 저장되므로, 틀린 문제 기록이 지워지더라도 여기서 다시 볼 수 있습니다. 별표를 다시 누르면 해제됩니다.</p>
         <div className="exam-actions">
-          {markedIds.length > 0 && <button className="exam-btn primary" onClick={() => start('marked', shuffle(markedIds))}>북마크 {markedIds.length}문제 다시 풀기</button>}
           <button className="exam-btn" onClick={() => setView({ name: 'home' })}>{company.abbr} 메인으로</button>
         </div>
         <MarkBook Q={ALL} ids={markedIds} stats={data.stats} sections={SECTIONS} marks={data.marks} onMark={onMark} />
@@ -203,10 +202,6 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
         <button className="exam-mode" disabled={!wrongIds.length} onClick={() => start('wrong', shuffle(wrongIds))}>
           <span><span className="t">오답 다시 풀기</span><span className="d">마지막에 틀린 문제만 모아서 즉시 채점 · 맞히면 오답에서 빠집니다</span></span>
           <span className="n">{wrongIds.length}문항</span>
-        </button>
-        <button className="exam-mode" disabled={!markedIds.length} onClick={() => start('marked', shuffle(markedIds))}>
-          <span><span className="t">북마크 다시 풀기</span><span className="d">풀다가 ★로 표시한 문제만 모아서 즉시 채점 · 오답 기록과 별도로 저장</span></span>
-          <span className="n">{markedIds.length}문항</span>
         </button>
       </div>
 
@@ -404,7 +399,7 @@ function QuestionBody({ q, className = 'exam-qtext' }) {
 
 function MarkButton({ on, onClick }) {
   return (
-    <button type="button" className={`exam-mark ${on ? 'on' : ''}`} onClick={onClick} title={on ? '북마크 해제' : '북마크 (나중에 다시 풀기)'} aria-pressed={on}>
+    <button type="button" className={`exam-mark ${on ? 'on' : ''}`} onClick={onClick} title={on ? '북마크 해제' : '북마크 (나중에 다시 보기)'} aria-pressed={on}>
       {on ? '★' : '☆'}<span>{on ? '북마크됨' : '북마크'}</span>
     </button>
   );
