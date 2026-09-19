@@ -2260,50 +2260,87 @@
   word-break: keep-all;
 }
 
-/* 시험 D-day · 하루 목표 */
-.goal-card {
+/* 첫 화면 상단: 왼쪽 소개, 오른쪽 시험 일정 · D-day */
+.home-top {
   display: flex;
   align-items: center;
-  gap: 26px;
-  margin-bottom: 14px;
-  padding: 18px 22px;
+  gap: 28px;
+  padding: 36px 0 22px;
+}
+
+.home-top .hero {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.home-top .hero p {
+  word-break: keep-all;
+}
+
+.goal-card {
+  flex: none;
+  width: 270px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 20px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--card-shadow);
 }
 
-.goal-title { font-weight: 800; font-size: 0.95rem; color: var(--text-primary); }
-.goal-sub { font-size: 0.8rem; color: var(--text-secondary); }
-
-.goal-dday {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: none;
+.goal-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
 }
 
-.goal-dday-value {
-  font-size: 1.7rem;
+.goal-exam {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.goal-exam > span:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.goal-exam:hover .goal-title { color: var(--accent-blue); }
+
+.goal-title { font-weight: 800; font-size: 0.98rem; color: var(--text-primary); }
+.goal-sub { font-size: 0.78rem; color: var(--text-secondary); }
+
+.goal-dday {
+  font-size: 1.45rem;
   font-weight: 900;
   letter-spacing: -0.03em;
   color: var(--accent-blue);
   font-variant-numeric: tabular-nums;
 }
 
-.goal-today { flex: 1; min-width: 0; }
+.goal-today {
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
 
 .goal-today-head {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
-  gap: 4px 12px;
+  gap: 8px;
   margin-bottom: 8px;
 }
 
 .goal-bar {
   display: block;
-  height: 8px;
+  height: 6px;
   border-radius: var(--radius-full);
   background: var(--bg-tertiary);
   overflow: hidden;
@@ -2321,9 +2358,9 @@
   background: none;
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  padding: 4px 10px;
+  padding: 2px 8px;
   font: inherit;
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   color: var(--text-tertiary);
   cursor: pointer;
 }
@@ -2332,15 +2369,14 @@
 
 .goal-form {
   display: flex;
-  flex: none;
-  gap: 6px;
+  gap: 4px;
 }
 
 .goal-form input {
-  width: 76px;
+  width: 62px;
   font: inherit;
-  font-size: 0.85rem;
-  padding: 4px 8px;
+  font-size: 0.8rem;
+  padding: 2px 6px;
   border: 1px solid var(--border-color);
   border-radius: 6px;
   background: var(--bg-primary);
@@ -2357,14 +2393,19 @@
     padding: 18px;
   }
 
-  .goal-card {
-    flex-wrap: wrap;
-    gap: 12px 22px;
-    padding: 16px;
+  .home-top {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+    padding-top: 28px;
   }
 
-  .goal-today {
-    flex-basis: 100%;
+  .home-top .hero {
+    text-align: center;
+  }
+
+  .goal-card {
+    width: auto;
   }
 
   /* 메뉴가 늘어난 헤더: 로고 아래 줄에서 가로로 넘겨 본다 */

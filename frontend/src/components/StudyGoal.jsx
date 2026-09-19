@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 const KEY = 'study-goal';
 const DEFAULT_DAILY = 30;
+const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
 // 필기 시험일. 지난 시험은 첫 화면에서 자동으로 빠진다
 const EXAMS = [
@@ -38,18 +39,23 @@ function solvedToday() {
   return n;
 }
 
-function daysLeft(date) {
+function daysLeft(day) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  return Math.round((new Date(`${date}T00:00:00`) - today) / 86400000);
+  return Math.round((day - today) / 86400000);
 }
 
-// 시험 D-day와 하루 목표. 계정이 없는 사이트라 목표는 이 브라우저에만 저장한다
+// 시험 일정 · D-day와 하루 목표. 계정이 없는 사이트라 목표는 이 브라우저에만 저장한다
 export default function StudyGoal() {
   const [daily, setDaily] = useState(readDaily);
   const [draft, setDraft] = useState(null);
   const [solved] = useState(solvedToday);
-  const exams = EXAMS.map(e => ({ ...e, left: daysLeft(e.date) })).filter(e => e.left >= 0);
+  const exams = EXAMS
+    .map(e => {
+      const day = new Date(`${e.date}T00:00:00`);
+      return { ...e, left: daysLeft(day), when: `${day.getMonth() + 1}.${day.getDate()} (${WEEKDAYS[day.getDay()]})` };
+    })
+    .filter(e => e.left >= 0);
 
   const save = (e) => {
     e.preventDefault();
@@ -60,30 +66,36 @@ export default function StudyGoal() {
   };
 
   return (
-    <div className="goal-card">
-      {exams.map(e => (
-        <Link key={e.name} to={e.to} className="goal-dday">
-          <span className="goal-dday-value">{e.left === 0 ? 'D-DAY' : `D-${e.left}`}</span>
-          <span className="goal-sub">{e.name} · {e.date.slice(5).replace('-', '.')}</span>
-        </Link>
-      ))}
+    <aside className="goal-card">
+      {exams.length > 0 && (
+        <>
+          <div className="goal-label">시험 일정</div>
+          {exams.map(e => (
+            <Link key={e.name} to={e.to} className="goal-exam">
+              <span>
+                <span className="goal-title">{e.name}</span>
+                <span className="goal-sub">{e.when}</span>
+              </span>
+              <span className="goal-dday">{e.left === 0 ? 'D-DAY' : `D-${e.left}`}</span>
+            </Link>
+          ))}
+        </>
+      )}
 
       <div className="goal-today">
         <div className="goal-today-head">
-          <span className="goal-title">오늘 {solved}문제 / 목표 {daily}문제</span>
-          <span className="goal-sub">{solved >= daily ? '오늘 목표 달성 🎉' : `${daily - solved}문제 남음`}</span>
+          <span className="goal-label">오늘 {solved} / {daily}문제</span>
+          {draft === null ? (
+            <button type="button" className="goal-edit" onClick={() => setDraft(String(daily))}>목표 수정</button>
+          ) : (
+            <form className="goal-form" onSubmit={save}>
+              <input type="number" min="1" max="500" value={draft} onChange={e => setDraft(e.target.value)} aria-label="하루 목표 문제 수" autoFocus />
+              <button type="submit" className="goal-edit">저장</button>
+            </form>
+          )}
         </div>
         <span className="goal-bar"><i style={{ width: `${Math.round(Math.min(solved, daily) / daily * 100)}%` }} /></span>
       </div>
-
-      {draft === null ? (
-        <button type="button" className="goal-edit" onClick={() => setDraft(String(daily))}>목표 수정</button>
-      ) : (
-        <form className="goal-form" onSubmit={save}>
-          <input type="number" min="1" max="500" value={draft} onChange={e => setDraft(e.target.value)} aria-label="하루 목표 문제 수" autoFocus />
-          <button type="submit" className="goal-edit">저장</button>
-        </form>
-      )}
-    </div>
+    </aside>
   );
 }
