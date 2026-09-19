@@ -62,6 +62,18 @@ class UsageTrackingTest {
     }
 
     @Test
+    void presenceCountsDistinctVisitors() throws Exception {
+        for (String visitor : new String[]{"here-1", "here-2", "here-1"}) {
+            mvc.perform(post("/api/v1/presence").contentType(MediaType.APPLICATION_JSON)
+                            .content(json.writeValueAsString(Map.of("visitorId", visitor))))
+                    .andExpect(status().isOk());
+        }
+        mvc.perform(post("/api/v1/presence").contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.count").value(2));
+    }
+
+    @Test
     void finishedQuizzesCarryTheirScore() throws Exception {
         Map<String, Object> body = new java.util.HashMap<>(Map.of(
                 "visitorId", "scorer01-browser", "type", "exam", "path", "/exam/koscom", "detail", "exam",

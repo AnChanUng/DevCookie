@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { COMPANIES, COMIL } from '../data/examQuestions';
+import { COMPANIES, COMIL, NCS } from '../data/examQuestions';
 import { ReviewCard } from './ExamCompanyPage';
 
 const LIMIT = 50;
@@ -9,6 +9,7 @@ const LIMIT = 50;
 const BANKS = [
   ...COMPANIES.filter(c => c.ready).map(c => ({ bank: c, to: `/exam/${c.key}` })),
   { bank: COMIL, to: '/computer-general' },
+  { bank: NCS, to: '/ncs' },
 ];
 const INDEX = BANKS.flatMap(({ bank, to }) =>
   [...bank.questions, ...(bank.extra || [])].map(q => ({

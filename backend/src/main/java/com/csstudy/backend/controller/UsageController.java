@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -29,6 +30,11 @@ public class UsageController {
     private static final int MAX_DAYS = 90;
     private static final int ACTIVE_MINUTES = 5;
     private static final Instant STARTED_AT = Instant.now();
+    private static final int PRESENCE_SECONDS = 150;
+    private static final int PRESENCE_MAX = 5000;
+
+    // 지금 공부 중인 사람 수. 화면에 잠깐 보여 주는 값이라 DB에 남기지 않고 메모리에만 둔다
+    private final Map<String, Instant> presence = new ConcurrentHashMap<>();
 
     private final UsageEventRepository usageEventRepository;
     private final UserRepository userRepository;
@@ -68,6 +74,18 @@ public class UsageController {
                 .createdAt(now)
                 .build());
         return ResponseEntity.noContent().build();
+    }
+
+    // 열어 둔 화면이 1분마다 호출한다. 최근에 신호를 보낸 방문자 수를 돌려준다
+    @PostMapping("/presence")
+    public Map<String, Object> presence(@RequestBody Map<String, Object> body) {
+        Instant now = Instant.now();
+        presence.values().removeIf(seen -> seen.isBefore(now.minusSeconds(PRESENCE_SECONDS)));
+        String visitorId = str(body.get("visitorId"), 40);
+        if (visitorId != null && (presence.size() < PRESENCE_MAX || presence.containsKey(visitorId))) {
+            presence.put(visitorId, now);
+        }
+        return Map.of("count", presence.size());
     }
 
     @GetMapping("/admin/usage")

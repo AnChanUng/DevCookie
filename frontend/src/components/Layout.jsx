@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { warmUpBackend } from '../api';
 import { track } from '../track';
 import ChaosChat from './ChaosChat';
+import StudyAmbience from './StudyAmbience';
 
 // 카오스 고양이 챗봇은 잠시 숨겨 둔다. true로 바꾸면 다시 나온다
 const SHOW_CHAOS_CHAT = false;
@@ -34,6 +35,9 @@ export default function Layout() {
               <Link to="/computer-general" className={location.pathname === '/computer-general' ? 'active' : ''}>
                 컴퓨터일반
               </Link>
+              <Link to="/ncs" className={location.pathname === '/ncs' ? 'active' : ''}>
+                NCS
+              </Link>
               <Link to="/search" className={location.pathname === '/search' ? 'active' : ''}>
                 문제 검색
               </Link>
@@ -54,6 +58,7 @@ export default function Layout() {
         </Suspense>
       </main>
 
+      <StudyAmbience />
       {SHOW_CHAOS_CHAT && <ChaosChat />}
     </>
   );

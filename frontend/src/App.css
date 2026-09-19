@@ -31,6 +31,8 @@
   align-items: center;
   gap: 10px;
   letter-spacing: -0.04em;
+  flex: none;
+  white-space: nowrap;
 }
 
 .logo-dot {
@@ -264,10 +266,11 @@
   color: var(--text-tertiary);
   font-weight: 600;
   font-size: 0.88rem;
-  padding: 8px 16px;
+  padding: 8px 11px;
   border-radius: var(--radius-full);
   transition: var(--transition);
   position: relative;
+  white-space: nowrap;
 }
 
 .nav-links a:hover {
@@ -2197,8 +2200,8 @@
 /* ===== Home Menu (번호가 붙은 학습 메뉴 3종) ===== */
 .home-menu {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
   padding-bottom: 48px;
 }
 
@@ -2206,8 +2209,8 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  min-height: 190px;
-  padding: 24px 22px;
+  min-height: 200px;
+  padding: 22px 18px;
   background: var(--glass-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -2432,4 +2435,84 @@
     padding: 7px 12px;
     font-size: 0.82rem;
   }
+}
+
+/* ===== 분위기 요소: 비 · 눈, 응원 문구, 지금 공부 중인 사람 수 ===== */
+.ambience-sky {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.ambience-sky i {
+  position: absolute;
+  top: -12vh;
+  display: block;
+  animation: ambience-fall linear infinite;
+}
+
+.ambience-sky.rain i {
+  width: 1px;
+  height: 56px;
+  background: linear-gradient(to bottom, transparent, rgba(99, 132, 241, 0.45));
+}
+
+.ambience-sky.snow i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 6px rgba(140, 160, 220, 0.7);
+  animation-name: ambience-drift;
+}
+
+@keyframes ambience-fall {
+  to { transform: translateY(125vh); }
+}
+
+@keyframes ambience-drift {
+  50% { transform: translate(22px, 60vh); }
+  100% { transform: translate(-12px, 125vh); }
+}
+
+.ambience-notes {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.ambience-note {
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--card-shadow);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.ambience-note.toast {
+  animation: ambience-pop 0.35s ease-out;
+}
+
+@keyframes ambience-pop {
+  from { opacity: 0; transform: translateY(10px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambience-sky { display: none; }
+  .ambience-note.toast { animation: none; }
 }

@@ -10,8 +10,9 @@ import { KOSCOM_SECTIONS, KOSCOM_QUESTIONS } from './koscomQuestions';
 import { BNK_SECTIONS, BNK_QUESTIONS } from './bnkQuestions';
 import { HF_CPP_QUESTIONS } from './hfCppQuestions';
 import { COMIL } from './comilQuestions';
+import { NCS } from './ncsQuestions';
 export { HF_CPP_QUESTIONS, CPP_GROUPS } from './hfCppQuestions';
-export { COMIL };
+export { COMIL, NCS };
 
 export const SECTIONS = {
   cs:  {name:'전산학일반', short:'전산', sub:'OS · 컴퓨터구조 · 정보보호 · SW공학 · 자료구조', count:36},
@@ -141,4 +142,4 @@ export const COMPANIES = [
 ];
 
 // 풀이 기록을 남기는 모든 문제은행 (회사별 + 컴퓨터일반). 백업·복원 범위
-export const BANKS = [...COMPANIES, COMIL];
+export const BANKS = [...COMPANIES, COMIL, NCS];

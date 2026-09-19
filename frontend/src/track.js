@@ -3,7 +3,7 @@ import api from './api';
 const KEY = 'visitor-id';
 
 // 로그인 없이 쓰는 사이트라 브라우저마다 익명 ID를 하나 만들어 방문자 수를 센다
-function visitorId() {
+export function visitorId() {
   try {
     let id = localStorage.getItem(KEY);
     if (!id) {
