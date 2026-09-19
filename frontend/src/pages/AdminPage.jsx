@@ -9,7 +9,7 @@ const MODES = { exam: '모의고사', practice: '영역별 연습', wrong: '오�
 
 const PAGE_NAMES = {
   '/': '홈', '/exam': '기업별 기출문제', '/computer-general': '컴퓨터일반', '/major': '필기이론',
-  '/major-exam': '필기이론 문제', '/stats': '통계', '/search': '문제 검색', '/interview': '면접 연습',
+  '/major-exam': '필기이론 문제', '/stats': '통계', '/search': '문제 검색', '/ncs': 'NCS', '/interview': '면접 연습',
   ...Object.fromEntries(EXAM_CATEGORIES.map(c => [`/exam/category/${c.key}`, `기업별 기출 · ${c.name}`])),
   ...Object.fromEntries(COMPANIES.map(c => [`/exam/${c.key}`, c.name])),
 };
