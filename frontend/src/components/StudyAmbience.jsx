@@ -3,8 +3,8 @@ import { useLocation } from 'react-router-dom';
 import api from '../api';
 import { visitorId } from '../track';
 
-// 서울 기준 현재 날씨. 키가 필요 없는 공개 API이고, 고정 좌표만 보낸다
-const WEATHER_URL = 'https://api.open-meteo.com/v1/forecast?latitude=37.57&longitude=126.98&current=weather_code';
+// 대전 기준 현재 날씨. 키가 필요 없는 공개 API이고, 고정 좌표만 보낸다
+const WEATHER_URL = 'https://api.open-meteo.com/v1/forecast?latitude=36.35&longitude=127.38&current=weather_code';
 const WEATHER_KEY = 'weather-now';
 const WEATHER_TTL = 30 * 60 * 1000;
 const PRESENCE_EVERY = 60 * 1000;
