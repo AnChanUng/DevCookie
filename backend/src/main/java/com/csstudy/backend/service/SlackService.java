@@ -1,6 +1,7 @@
 package com.csstudy.backend.service;
 
 import com.csstudy.backend.entity.Question;
+import com.csstudy.backend.entity.QuestionReport;
 import com.csstudy.backend.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -274,6 +275,33 @@ public class SlackService {
         payload.put("text", "📊 주간 CS 학습 리포트가 도착했습니다!");
         payload.put("blocks", blocks);
         return payload;
+    }
+
+    private static final Map<String, String> REPORT_KINDS = Map.of(
+            "answer", "정답 오류",
+            "typo", "오타",
+            "explain", "해설 문제",
+            "etc", "기타"
+    );
+
+    // 문제 오류 제보가 들어오면 바로 알린다
+    public void sendQuestionReport(QuestionReport report) {
+        if (!enabled) {
+            log.info("문제 제보 접수 (Slack 비활성): {} {}", report.getPath(), report.getQuestionId());
+            return;
+        }
+
+        StringBuilder text = new StringBuilder("🐞 문제 오류 제보\n");
+        text.append("*").append(REPORT_KINDS.getOrDefault(report.getKind(), report.getKind())).append("*");
+        text.append(" · ").append(report.getQuestionId()).append("\n");
+        text.append(baseUrl).append(report.getPath()).append("\n");
+        if (report.getQuestionText() != null) {
+            text.append("> ").append(report.getQuestionText()).append("\n");
+        }
+        if (report.getMessage() != null) {
+            text.append(report.getMessage());
+        }
+        sendMessage(webhookUrl, Map.of("text", text.toString()));
     }
 
     private void sendMessage(String webhookUrl, Object payload) {

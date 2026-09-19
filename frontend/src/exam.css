@@ -803,6 +803,9 @@
 
 .admin-health .exam-sync.off i { background: var(--text-tertiary); }
 
+.admin-table tr.admin-done td { opacity: 0.45; }
+.admin-table td.admin-msg { max-width: 320px; white-space: normal; }
+
 .admin-sub {
   margin-top: 2px;
   font-size: 0.72rem;
@@ -891,3 +894,69 @@
 .exam-search-count { margin: 14px 0 12px; }
 
 a.exam-search-bank:hover { color: var(--accent-blue); }
+
+/* ===== 문제 오류 제보 ===== */
+.exam-report-open {
+  margin-top: 10px;
+  padding: 3px 9px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-tertiary);
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.exam-report-open:hover { color: var(--text-primary); }
+
+.exam-report {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+}
+
+.exam-report-kinds { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.exam-report-kinds label {
+  padding: 4px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  background: var(--bg-primary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.exam-report-kinds label.on { border-color: var(--accent-blue); color: var(--accent-blue); }
+.exam-report-kinds input { display: none; }
+
+.exam-report textarea {
+  width: 100%;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  resize: vertical;
+}
+
+.exam-report-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.exam-report-error { font-size: 0.78rem; color: var(--accent-red); }
+
+.exam-report-done {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent-green);
+}

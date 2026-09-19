@@ -6,7 +6,8 @@ import { COMPANIES, EXAM_CATEGORIES } from '../data/examQuestions';
 const KEY = 'admin-key';
 const RANGES = [7, 30, 90];
 const AUTO_SECONDS = 60;
-const TABS = [['overview', '개요'], ['solves', '풀이'], ['visitors', '방문자'], ['accounts', '계정 · 채점'], ['system', '시스템']];
+const TABS = [['overview', '개요'], ['solves', '풀이'], ['visitors', '방문자'], ['reports', '제보'], ['accounts', '계정 · 채점'], ['system', '시스템']];
+const REPORT_KINDS = { answer: '정답 오류', typo: '오타', explain: '해설 문제', etc: '기타' };
 const MODES = { exam: '모의고사', practice: '영역별 연습', wrong: '오답 다시 풀기', marked: '북마크 다시 풀기', cpp: 'C++ 문제집', recall: '응시 후기 복원 문제' };
 
 const PAGE_NAMES = {
@@ -45,6 +46,7 @@ export default function AdminPage() {
   const [tick, setTick] = useState(0);
   const [data, setData] = useState(null);
   const [sys, setSys] = useState(null);
+  const [reports, setReports] = useState(null);
   const [updatedAt, setUpdatedAt] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(() => !!savedKey());
@@ -58,6 +60,9 @@ export default function AdminPage() {
     api.get('/admin/system', options)
       .then(res => { if (!stale) setSys(res.data); })
       .catch(() => { if (!stale) setSys(null); });
+    api.get('/admin/reports', options)
+      .then(res => { if (!stale) setReports(res.data); })
+      .catch(() => { if (!stale) setReports(null); });
     api.get('/admin/usage', { ...options, params: { days } })
       .then(res => { if (!stale) { setData(res.data); setUpdatedAt(new Date()); setError(''); } })
       .catch(err => {
@@ -68,6 +73,7 @@ export default function AdminPage() {
           setKey('');
           setData(null);
           setSys(null);
+          setReports(null);
           setError('관리자 키가 올바르지 않습니다.');
         } else if (status === 503) {
           setError('서버에 ADMIN_KEY 환경변수가 설정되지 않았습니다.');
@@ -102,6 +108,7 @@ export default function AdminPage() {
     setKey('');
     setData(null);
     setSys(null);
+    setReports(null);
     setAuto(false);
   };
 
@@ -147,13 +154,18 @@ export default function AdminPage() {
         <>
           <div className="major-tabs">
             {TABS.map(([k, name]) => (
-              <button key={k} type="button" className={`major-tab${tab === k ? ' active' : ''}`} onClick={() => setTab(k)}>{name}</button>
+              <button key={k} type="button" className={`major-tab${tab === k ? ' active' : ''}`} onClick={() => setTab(k)}>
+                {name}{k === 'reports' && reports?.open ? ` ${reports.open}` : ''}
+              </button>
             ))}
           </div>
           <Health sys={sys} />
           {tab === 'overview' && <Overview data={data} sys={sys} />}
           {tab === 'solves' && <Solves data={data} />}
           {tab === 'visitors' && <Visitors data={data} />}
+          {tab === 'reports' && (reports
+            ? <Reports reports={reports} adminKey={key} onChange={setReports} />
+            : <p className="exam-note">제보 정보를 불러오지 못했습니다. 백엔드 배포가 끝난 뒤 새로고침해 주세요.</p>)}
           {tab === 'accounts' && (sys ? <Accounts sys={sys} /> : <SysMissing />)}
           {tab === 'system' && (sys ? <System sys={sys} events={data.server.events} /> : <SysMissing />)}
         </>
@@ -354,6 +366,78 @@ function Visitors({ data }) {
           </tbody>
         </table>
       </div>
+    </>
+  );
+}
+
+function Reports({ reports, adminKey, onChange }) {
+  const [busy, setBusy] = useState(0);
+
+  const mark = (item) => {
+    setBusy(item.id);
+    api.post(`/admin/reports/${item.id}`, { handled: !item.handled }, { headers: { 'X-Admin-Key': adminKey }, timeout: 60000 })
+      .then(res => onChange({
+        ...reports,
+        open: reports.open + (res.data.handled ? -1 : 1),
+        items: reports.items.map(r => (r.id === item.id ? res.data : r)),
+      }))
+      .catch(() => {})
+      .finally(() => setBusy(0));
+  };
+
+  return (
+    <>
+      <div className="exam-stats">
+        <Tile k="처리할 제보" v={reports.open} unit=" 건" sub="아직 확인하지 않은 제보" />
+        <Tile k="최근 7일" v={reports.last7d} unit=" 건" sub="이 기간에 들어온 제보" />
+        <Tile k="전체 제보" v={reports.total} unit=" 건" sub="처리한 것까지 모두" />
+      </div>
+
+      <div className="section-title">제보 목록</div>
+      {reports.items.length ? (
+        <div className="exam-table-wrap">
+          <table className="exam-table admin-table">
+            <thead><tr><th>시각</th><th>문제은행</th><th>문제</th><th>종류</th><th>내용</th><th>처리</th></tr></thead>
+            <tbody>
+              {reports.items.map(r => (
+                <tr key={r.id} className={r.handled ? 'admin-done' : ''}>
+                  <td>{fmtAt(r.at)}</td>
+                  <td>{pageName(r.path)}</td>
+                  <td className="num" title={r.questionText || ''}>{r.questionId}</td>
+                  <td>{REPORT_KINDS[r.kind] || r.kind}</td>
+                  <td className="admin-msg">{r.message || '–'}</td>
+                  <td>
+                    <button type="button" className="exam-btn sm" disabled={busy === r.id} onClick={() => mark(r)}>
+                      {r.handled ? '되돌리기' : '처리함'}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : <p className="exam-note">아직 들어온 제보가 없습니다.</p>}
+      <p className="exam-note">문제 ID에 마우스를 올리면 지문 앞부분이 보입니다. 같은 문제에 처리 안 된 제보가 있으면 중복 제보는 쌓이지 않습니다.</p>
+
+      {reports.top.length > 0 && (
+        <>
+          <div className="section-title">제보가 많은 문제</div>
+          <div className="exam-table-wrap">
+            <table className="exam-table admin-table">
+              <thead><tr><th>문제</th><th>문제은행</th><th>제보</th></tr></thead>
+              <tbody>
+                {reports.top.map(r => (
+                  <tr key={`${r.path}:${r.questionId}`}>
+                    <td className="num">{r.questionId}</td>
+                    <td>{pageName(r.path)}</td>
+                    <td className="num">{r.count}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </>
   );
 }

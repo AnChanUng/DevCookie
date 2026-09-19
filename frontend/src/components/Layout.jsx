@@ -45,6 +45,9 @@ export default function Layout() {
               <Link to="/major" className={location.pathname === '/major' ? 'active' : ''}>
                 필기이론
               </Link>
+              <Link to="/weak" className={location.pathname === '/weak' ? 'active' : ''}>
+                약점 분석
+              </Link>
               <Link to="/stats" className={location.pathname === '/stats' ? 'active' : ''}>
                 통계
               </Link>
