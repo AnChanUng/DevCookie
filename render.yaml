@@ -13,7 +13,7 @@ services:
       # dashboard; Render's own free Postgres is deleted after 90 days.
       - key: DATABASE_URL
         sync: false
-      # 관리자 페이지(/admin) 접속 키. Render 대시보드에서 직접 설정한다
+      # 관리자 페이지(/admin/cu) 접속 키. Render 대시보드에서 직접 설정한다
       - key: ADMIN_KEY
         sync: false
 

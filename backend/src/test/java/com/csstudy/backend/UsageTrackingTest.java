@@ -60,4 +60,31 @@ class UsageTrackingTest {
                 .andExpect(jsonPath("$.exams[0].count").value(1))
                 .andExpect(jsonPath("$.recent[0].detail").value("exam"));
     }
+
+    @Test
+    void finishedQuizzesCarryTheirScore() throws Exception {
+        Map<String, Object> body = new java.util.HashMap<>(Map.of(
+                "visitorId", "scorer01-browser", "type", "exam", "path", "/exam/koscom", "detail", "exam",
+                "score", 28, "total", 35, "seconds", 1500, "device", "mobile"));
+        mvc.perform(post("/api/v1/track").contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(body)))
+                .andExpect(status().isNoContent());
+        // 맞힌 수가 문제 수보다 많으면 점수는 버리고 풀이 기록만 남긴다
+        body.put("score", 99);
+        mvc.perform(post("/api/v1/track").contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(body)))
+                .andExpect(status().isNoContent());
+
+        mvc.perform(get("/api/v1/admin/usage").header("X-Admin-Key", "test-admin-key"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.scores[?(@.path == '/exam/koscom')].count").value(1))
+                .andExpect(jsonPath("$.scores[?(@.path == '/exam/koscom')].avgPercent").value(80))
+                .andExpect(jsonPath("$.solves[1].score").value(28))
+                .andExpect(jsonPath("$.solves[1].total").value(35))
+                .andExpect(jsonPath("$.solves[0].score").doesNotExist())
+                .andExpect(jsonPath("$.visitors[?(@.visitor == 'scorer01')].exams").value(2))
+                .andExpect(jsonPath("$.visitors[?(@.visitor == 'scorer01')].avgPercent").value(80))
+                .andExpect(jsonPath("$.devices[?(@.device == 'mobile')].count").value(1))
+                .andExpect(jsonPath("$.hours.length()").value(24))
+                .andExpect(jsonPath("$.active").isNumber())
+                .andExpect(jsonPath("$.server.events").isNumber());
+    }
 }

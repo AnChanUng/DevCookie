@@ -32,7 +32,7 @@ function App() {
           <Route path="exam/category/:category" element={<ExamListPage />} />
           <Route path="exam/:company" element={<ExamCompanyPage />} />
           <Route path="computer-general" element={<ComputerGeneralPage />} />
-          <Route path="admin" element={<AdminPage />} />
+          <Route path="admin/cu" element={<AdminPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -819,6 +819,45 @@
   background: var(--accent-blue);
 }
 
+.admin-hours {
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  gap: 3px;
+  align-items: end;
+}
+
+.admin-hour {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.admin-hour-bar {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  height: 72px;
+  border-radius: 4px;
+  background: var(--bg-tertiary);
+  overflow: hidden;
+}
+
+.admin-hour-bar i {
+  display: block;
+  width: 100%;
+  background: var(--accent-blue);
+}
+
+.admin-hour-label {
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+}
+
+@media (max-width: 640px) {
+  .admin-hour:nth-child(odd) .admin-hour-label { visibility: hidden; }
+}
+
 @media (max-width: 640px) {
   .admin-table .admin-barcol { display: none; }
 }

@@ -84,12 +84,13 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
       if (ok) { score++; if (q.sec in secScore) secScore[q.sec]++; }
       items.push({ q, a, ok });
     });
+    const elapsed = Math.floor((Date.now() - quiz.startedAt) / 1000);
     if (items.length) {
       const entry = { at: Date.now(), mode: quiz.mode, sec: quiz.sec, score, total: items.length, sections: isExam ? secScore : undefined };
       save(prev => ({ ...prev, stats, history: [...prev.history, entry].slice(-200) }));
-      track('exam', window.location.pathname, quiz.mode);
+      track('exam', window.location.pathname, quiz.mode, { score, total: items.length, seconds: elapsed });
     }
-    setView({ name: 'result', result: { mode: quiz.mode, sec: quiz.sec, score, total: items.length, secScore, items, elapsed: Math.floor((Date.now() - quiz.startedAt) / 1000) } });
+    setView({ name: 'result', result: { mode: quiz.mode, sec: quiz.sec, score, total: items.length, secScore, items, elapsed } });
     window.scrollTo({ top: 0 });
   };
 

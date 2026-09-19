@@ -25,7 +25,10 @@ public class UsageController {
 
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
     private static final Set<String> TYPES = Set.of("view", "exam");
+    private static final Set<String> DEVICES = Set.of("mobile", "desktop");
     private static final int MAX_DAYS = 90;
+    private static final int ACTIVE_MINUTES = 5;
+    private static final Instant STARTED_AT = Instant.now();
 
     private final UsageEventRepository usageEventRepository;
     private final UserRepository userRepository;
@@ -42,12 +45,25 @@ public class UsageController {
         if (visitorId == null || path == null || !path.startsWith("/") || !TYPES.contains(type)) {
             return ResponseEntity.noContent().build();
         }
+        // 점수는 맞힌 수가 문제 수를 넘지 않을 때만 받는다
+        Integer total = num(body.get("total"), 1000);
+        Integer score = num(body.get("score"), 1000);
+        if (!"exam".equals(type) || total == null || score == null || total == 0 || score > total) {
+            total = null;
+            score = null;
+        }
+        String device = str(body.get("device"), 10);
         Instant now = Instant.now();
         usageEventRepository.save(UsageEvent.builder()
                 .visitorId(visitorId)
                 .type(type)
                 .path(path)
                 .detail(str(body.get("detail"), 60))
+                .score(score)
+                .total(total)
+                .seconds(num(body.get("seconds"), 86400))
+                .device(device != null && DEVICES.contains(device) ? device : null)
+                .referrer(str(body.get("referrer"), 100))
                 .day(now.atZone(KST).toLocalDate())
                 .createdAt(now)
                 .build());
@@ -86,19 +102,100 @@ public class UsageController {
         body.put("range", summary(from));
         body.put("all", summary(LocalDate.of(2000, 1, 1)));
         body.put("users", userRepository.count());
+        body.put("active", usageEventRepository.activeSince(Instant.now().minusSeconds(ACTIVE_MINUTES * 60L)));
+        body.put("newToday", usageEventRepository.newVisitorsOn(today));
         body.put("daily", daily);
         body.put("pages", paths("view", from, 20));
         body.put("exams", paths("exam", from, 30));
-        body.put("recent", usageEventRepository.findByOrderByIdDesc(PageRequest.of(0, 30)).stream().map(e -> {
-            Map<String, Object> row = new LinkedHashMap<>();
-            row.put("at", e.getCreatedAt().toString());
-            row.put("visitor", e.getVisitorId().substring(0, Math.min(8, e.getVisitorId().length())));
-            row.put("type", e.getType());
-            row.put("path", e.getPath());
-            row.put("detail", e.getDetail());
-            return row;
-        }).toList());
+        body.put("scores", scores(from));
+        body.put("solves", usageEventRepository.findByTypeOrderByIdDesc("exam", PageRequest.of(0, 100)).stream()
+                .map(UsageController::eventRow).toList());
+        body.put("visitors", visitors(from));
+        body.put("hours", hours(from));
+        body.put("devices", pairs(usageEventRepository.devicesSince(from), "device"));
+        body.put("referrers", pairs(usageEventRepository.referrersSince(from, PageRequest.of(0, 15)), "referrer"));
+        body.put("server", server());
+        body.put("recent", usageEventRepository.findByOrderByIdDesc(PageRequest.of(0, 50)).stream()
+                .map(UsageController::eventRow).toList());
         return ResponseEntity.ok(body);
+    }
+
+    private static Map<String, Object> eventRow(UsageEvent e) {
+        Map<String, Object> row = new LinkedHashMap<>();
+        row.put("at", e.getCreatedAt().toString());
+        row.put("visitor", shortId(e.getVisitorId()));
+        row.put("type", e.getType());
+        row.put("path", e.getPath());
+        row.put("detail", e.getDetail());
+        row.put("score", e.getScore());
+        row.put("total", e.getTotal());
+        row.put("seconds", e.getSeconds());
+        row.put("device", e.getDevice());
+        return row;
+    }
+
+    private List<Map<String, Object>> scores(LocalDate from) {
+        return usageEventRepository.scoresByPathSince(from).stream().map(r -> {
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("path", r[0]);
+            row.put("detail", r[1]);
+            row.put("count", r[2]);
+            row.put("visitors", r[3]);
+            row.put("avgPercent", round(r[4]));
+            row.put("avgSeconds", round(r[5]));
+            return row;
+        }).toList();
+    }
+
+    private List<Map<String, Object>> visitors(LocalDate from) {
+        Map<Object, Object[]> solved = new HashMap<>();
+        usageEventRepository.visitorScoresSince(from).forEach(r -> solved.put(r[0], r));
+        return usageEventRepository.visitorsSince(from, PageRequest.of(0, 50)).stream().map(r -> {
+            Object[] s = solved.get(r[0]);
+            long exams = s == null ? 0 : ((Number) s[1]).longValue();
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("visitor", shortId((String) r[0]));
+            row.put("views", ((Number) r[1]).longValue() - exams);
+            row.put("exams", exams);
+            row.put("avgPercent", s == null ? null : round(s[2]));
+            row.put("firstAt", r[2].toString());
+            row.put("lastAt", r[3].toString());
+            return row;
+        }).toList();
+    }
+
+    // 한국 시간 0~23시별 열람 수
+    private int[] hours(LocalDate from) {
+        int[] hours = new int[24];
+        usageEventRepository.viewTimesSince(from).forEach(t -> hours[t.atZone(KST).getHour()]++);
+        return hours;
+    }
+
+    private static List<Map<String, Object>> pairs(List<Object[]> rows, String name) {
+        return rows.stream().map(r -> {
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put(name, r[0]);
+            row.put("count", r[1]);
+            return row;
+        }).toList();
+    }
+
+    private Map<String, Object> server() {
+        Runtime rt = Runtime.getRuntime();
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("uptimeSeconds", Instant.now().getEpochSecond() - STARTED_AT.getEpochSecond());
+        m.put("events", usageEventRepository.count());
+        m.put("memoryUsedMb", (rt.totalMemory() - rt.freeMemory()) / (1024 * 1024));
+        m.put("memoryMaxMb", rt.maxMemory() / (1024 * 1024));
+        return m;
+    }
+
+    private static String shortId(String id) {
+        return id.substring(0, Math.min(8, id.length()));
+    }
+
+    private static Long round(Object value) {
+        return value == null ? null : Math.round(((Number) value).doubleValue());
     }
 
     private Map<String, Object> summary(LocalDate from) {
@@ -130,6 +227,12 @@ public class UsageController {
                 key.getBytes(StandardCharsets.UTF_8), adminKey.getBytes(StandardCharsets.UTF_8))) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "관리자 키가 올바르지 않습니다.");
         }
+    }
+
+    private static Integer num(Object value, int max) {
+        if (!(value instanceof Number n)) return null;
+        int v = n.intValue();
+        return v < 0 || v > max ? null : v;
     }
 
     private static String str(Object value, int max) {
