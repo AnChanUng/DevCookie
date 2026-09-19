@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 
 // 전공필기/ 폴더의 이론노트 PDF. public/notes/ 에 URL에 안전한 이름으로 복사해 둔다
 const NOTES = [
-  { file: 'ipe-pilgi-summary.pdf', title: '정보처리기사 필기', desc: '필기 전 과목 핵심 요약노트 · 18쪽'},
   { file: 'ipe-silgi-theory.pdf', title: '정보처리기사 실기', desc: '실기 이론편 요약노트 · 서술형 대비'},
   { file: 'sqld-concepts.pdf', title: 'SQLD', desc: '2024 개념 정리 노트 · 데이터 모델링 · SQL 기본 및 활용 · 22쪽'},
   { file: 'bigdata-analyst-summary.pdf', title: '빅데이터분석기사', desc: '2026.02.05 개정판 요약노트 · 필기 전 과목 · 69쪽'},
