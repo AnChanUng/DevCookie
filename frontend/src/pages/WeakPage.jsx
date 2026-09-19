@@ -85,7 +85,7 @@ const fmtDay = (ts) => {
 };
 
 export default function WeakPage() {
-  const s = useMemo(collect, []);
+  const s = useMemo(() => collect(), []);
 
   if (!s.seen) {
     return (
