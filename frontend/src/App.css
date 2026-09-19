@@ -61,6 +61,21 @@
   gap: 4px;
 }
 
+/* 헤더 오른쪽의 "지금 공부 중" 표시 */
+.study-count {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
 .user-info {
   display: flex;
   align-items: center;
@@ -2413,12 +2428,26 @@
 
   /* 메뉴가 늘어난 헤더: 로고 아래 줄에서 가로로 넘겨 본다 */
   .header-inner {
+    position: relative;
     height: auto;
     flex-direction: column;
     align-items: stretch;
     gap: 2px;
     padding-top: 10px;
     padding-bottom: 6px;
+  }
+
+  /* 좁은 화면에서는 메뉴 줄에 끼지 않게 로고 옆으로 올린다 */
+  .study-count {
+    position: absolute;
+    top: 10px;
+    right: 16px;
+    padding: 5px 10px;
+    font-size: 0.75rem;
+  }
+
+  .study-count-tail {
+    display: none;
   }
 
   .nav-links {
