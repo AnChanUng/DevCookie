@@ -104,7 +104,7 @@ export const COMPANIES = [
     lede: "소프트웨어공학 6문제, 운영체제 7문제, 데이터베이스 7문제, 네트워크·데이터통신 8문제, 자료구조 7문제. 총 35문제, 45분, 4지선다. 2026 상반기 응시 후기에 복원된 35문항(CMMI 순서, COCOMO II, 격리 수준, 2PL 변형, 포트 번호 등 명칭·순서·예외를 묻는 경향)을 바탕으로 새로 만든 문제입니다.",
   },
   {
-    key: "ibk", category: "finance", abbr: "IBK", name: "IBK 기업은행", meta: "NCS 40 + 전공 35 · 120분 · 4지선다", ready: true,
+    key: "ibk", category: "finance", abbr: "IBK", name: "기업은행", meta: "NCS 40 + 전공 35 · 120분 · 4지선다", ready: true,
     questions: IBK_QUESTIONS, sections: IBK_SECTIONS, minutes: 120,
     lede: "NCS 직업기초능력(의사소통·수리·문제해결·자료해석·명제논리) 40문제, 직무수행능력 35문제(경제학 12 · 재무관리 8 · 회계 8 · 경영·금융상식 7). 총 75문제, 120분, 4지선다. 출제 구성만 참고해 새로 만든 문제입니다.",
   },
@@ -114,7 +114,7 @@ export const COMPANIES = [
     lede: "데이터베이스 11문제, 운영체제·인프라 10문제, 네트워크·분산통신 8문제, 정보보호 11문제, 자료구조·설계·아키텍처 10문제. 총 50문제, 60분, 4지선다. 계좌·입출금·결제 같은 실무 상황을 제시하고 '왜 이 기술을 택하는가'를 묻는 응시 후기 경향을 따라 새로 만든 문제입니다.",
   },
   {
-    key: "korail", category: "public", abbr: "KORAIL", name: "코레일(한국철도공사)", meta: "전산 전공 40문제 · 50분 · 5지선다", ready: true,
+    key: "korail", category: "public", abbr: "KORAIL", name: "코레일", meta: "전산 전공 40문제 · 50분 · 5지선다", ready: true,
     questions: KORAIL_QUESTIONS, sections: KORAIL_SECTIONS, minutes: 50,
     lede: "소프트웨어공학 9문제, 데이터베이스 9문제, 운영체제·컴퓨터구조 10문제, 네트워크 6문제, 정보보호 6문제. 총 40문제, 50분, 5지선다. 2026 상반기 응시 후기에 복원된 문항(포렌식, 블록 암호 모드, 파이프라인·AMAT 계산, 관계대수, 서브넷 등)을 바탕으로 새로 만든 문제입니다.",
   },
