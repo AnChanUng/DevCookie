@@ -406,7 +406,7 @@ function MarkButton({ on, onClick }) {
   );
 }
 
-function ReviewCard({ q, a, extra, sections, marked, onMark }) {
+export function ReviewCard({ q, a, extra, sections, marked, onMark }) {
   const ok = a === q.a;
   return (
     <div className="exam-rv">

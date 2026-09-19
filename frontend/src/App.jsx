@@ -15,6 +15,7 @@ const ExamListPage = lazy(() => import('./pages/ExamListPage'));
 const ExamCompanyPage = lazy(() => import('./pages/ExamCompanyPage'));
 const ComputerGeneralPage = lazy(() => import('./pages/ComputerGeneralPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
+const SearchPage = lazy(() => import('./pages/SearchPage'));
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
           <Route path="exam/category/:category" element={<ExamListPage />} />
           <Route path="exam/:company" element={<ExamCompanyPage />} />
           <Route path="computer-general" element={<ComputerGeneralPage />} />
+          <Route path="search" element={<SearchPage />} />
           <Route path="admin/cu" element={<AdminPage />} />
         </Route>
       </Routes>
