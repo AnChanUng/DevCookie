@@ -51,10 +51,10 @@
   color: var(--text-primary);
 }
 
-.exam-category-abbrs {
-  font-family: ui-monospace, Consolas, monospace;
-  font-size: 0.78rem;
-  letter-spacing: 0.04em;
+.exam-category-names {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  word-break: keep-all;
   color: var(--text-tertiary);
 }
 

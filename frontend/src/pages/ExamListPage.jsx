@@ -50,7 +50,7 @@ function CategoryPicker() {
             <Link key={cat.key} to={`/exam/category/${cat.key}`} className="exam-company-card exam-category-card">
               <span className="exam-category-name">{cat.name}</span>
               <span className="exam-company-meta">{cat.desc}</span>
-              <span className="exam-category-abbrs">{list.map(c => c.abbr).join(' · ')}</span>
+              <span className="exam-category-names">{list.map(c => c.name).join(' · ')}</span>
               <span className="exam-tag">
                 {list.length}개 기업 · {total}문항{attempts ? ` · 응시 ${attempts}회 · 오답 ${wrong}문제` : ''}
               </span>
