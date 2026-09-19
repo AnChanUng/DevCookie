@@ -7,9 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -37,7 +40,22 @@ public class ChatService {
             CS와 관련 없는 질문이면 "나는 CS 전문 고양이라 그건 잘 모르겠다냥~" 이라고 해.
             """;
 
+    // 관리자 화면용 집계. 서버가 다시 뜨면 0부터 센다
+    private final AtomicLong aiReplies = new AtomicLong();
+    private final AtomicLong fallbackReplies = new AtomicLong();
+    private final AtomicLong geminiErrors = new AtomicLong();
+    private volatile Instant lastChatAt;
+    private volatile Instant lastErrorAt;
+    private volatile String lastError;
+
     public Map<String, Object> chat(String userMessage, List<Map<String, String>> history) {
+        Map<String, Object> result = reply(userMessage, history);
+        ("ai".equals(result.get("source")) ? aiReplies : fallbackReplies).incrementAndGet();
+        lastChatAt = Instant.now();
+        return result;
+    }
+
+    private Map<String, Object> reply(String userMessage, List<Map<String, String>> history) {
         if (apiKey == null || apiKey.isBlank()) {
             return fallbackChat(userMessage);
         }
@@ -46,8 +64,31 @@ public class ChatService {
             return callGemini(userMessage, history);
         } catch (Exception e) {
             log.error("Gemini API error, falling back", e);
+            geminiErrors.incrementAndGet();
+            lastErrorAt = Instant.now();
+            lastError = errorSummary(e);
             return fallbackChat(userMessage);
         }
+    }
+
+    // 요청 주소에 API 키가 들어 있어서 예외 메시지는 그대로 내보내지 않는다
+    private static String errorSummary(Exception e) {
+        if (e instanceof RestClientResponseException r) {
+            return "HTTP " + r.getStatusCode().value();
+        }
+        return e.getClass().getSimpleName();
+    }
+
+    public Map<String, Object> adminStatus() {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("geminiConfigured", apiKey != null && !apiKey.isBlank());
+        m.put("aiReplies", aiReplies.get());
+        m.put("fallbackReplies", fallbackReplies.get());
+        m.put("geminiErrors", geminiErrors.get());
+        m.put("lastChatAt", lastChatAt == null ? null : lastChatAt.toString());
+        m.put("lastErrorAt", lastErrorAt == null ? null : lastErrorAt.toString());
+        m.put("lastError", lastError);
+        return m;
     }
 
     private List<Question> findRelevantQuestions(String userMessage) {

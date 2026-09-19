@@ -3,16 +3,12 @@ package com.csstudy.backend.controller;
 import com.csstudy.backend.entity.UsageEvent;
 import com.csstudy.backend.repository.UsageEventRepository;
 import com.csstudy.backend.repository.UserRepository;
+import com.csstudy.backend.service.AdminAuth;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -38,9 +34,7 @@ public class UsageController {
 
     private final UsageEventRepository usageEventRepository;
     private final UserRepository userRepository;
-
-    @Value("${app.admin-key:}")
-    private String adminKey;
+    private final AdminAuth adminAuth;
 
     // 누구나 호출하는 기록용 엔드포인트. 형식이 맞지 않으면 조용히 버린다
     @PostMapping("/track")
@@ -80,18 +74,23 @@ public class UsageController {
     @PostMapping("/presence")
     public Map<String, Object> presence(@RequestBody Map<String, Object> body) {
         Instant now = Instant.now();
-        presence.values().removeIf(seen -> seen.isBefore(now.minusSeconds(PRESENCE_SECONDS)));
         String visitorId = str(body.get("visitorId"), 40);
-        if (visitorId != null && (presence.size() < PRESENCE_MAX || presence.containsKey(visitorId))) {
+        if (visitorId != null && (studying() < PRESENCE_MAX || presence.containsKey(visitorId))) {
             presence.put(visitorId, now);
         }
-        return Map.of("count", presence.size());
+        return Map.of("count", studying());
+    }
+
+    private int studying() {
+        Instant cutoff = Instant.now().minusSeconds(PRESENCE_SECONDS);
+        presence.values().removeIf(seen -> seen.isBefore(cutoff));
+        return presence.size();
     }
 
     @GetMapping("/admin/usage")
     public ResponseEntity<?> usage(@RequestHeader(value = "X-Admin-Key", required = false) String key,
                                    @RequestParam(defaultValue = "30") int days) {
-        requireAdmin(key);
+        adminAuth.require(key);
         int range = Math.max(1, Math.min(days, MAX_DAYS));
         LocalDate today = LocalDate.now(KST);
         LocalDate from = today.minusDays(range - 1L);
@@ -121,6 +120,7 @@ public class UsageController {
         body.put("all", summary(LocalDate.of(2000, 1, 1)));
         body.put("users", userRepository.count());
         body.put("active", usageEventRepository.activeSince(Instant.now().minusSeconds(ACTIVE_MINUTES * 60L)));
+        body.put("studying", studying());
         body.put("newToday", usageEventRepository.newVisitorsOn(today));
         body.put("daily", daily);
         body.put("pages", paths("view", from, 20));
@@ -234,17 +234,6 @@ public class UsageController {
             row.put("visitors", r[2]);
             return row;
         }).toList();
-    }
-
-    // ADMIN_KEY 환경변수를 설정하지 않은 서버에서는 관리자 조회가 아예 열리지 않는다
-    private void requireAdmin(String key) {
-        if (adminKey == null || adminKey.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "ADMIN_KEY가 설정되지 않았습니다.");
-        }
-        if (key == null || !MessageDigest.isEqual(
-                key.getBytes(StandardCharsets.UTF_8), adminKey.getBytes(StandardCharsets.UTF_8))) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "관리자 키가 올바르지 않습니다.");
-        }
     }
 
     private static Integer num(Object value, int max) {

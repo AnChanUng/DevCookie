@@ -26,4 +26,9 @@ public interface UserQuestionProgressRepository extends JpaRepository<UserQuesti
 
     @Query("SELECT p.question.category.name, COUNT(p) FROM UserQuestionProgress p WHERE p.user.id = :userId AND p.studyCount > 0 GROUP BY p.question.category.name ORDER BY COUNT(p) DESC")
     List<Object[]> countStudiedByCategory(@Param("userId") Long userId);
+
+    // [사용자 ID, 학습한 문제 수, 북마크 수]
+    @Query("select p.user.id, sum(case when p.studyCount > 0 then 1 else 0 end), " +
+            "sum(case when p.bookmarked = true then 1 else 0 end) from UserQuestionProgress p group by p.user.id")
+    List<Object[]> summaryByUser();
 }

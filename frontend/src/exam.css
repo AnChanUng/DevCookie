@@ -794,6 +794,15 @@
   color: var(--accent-red);
 }
 
+.admin-health {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 4px 0 20px;
+}
+
+.admin-health .exam-sync.off i { background: var(--text-tertiary); }
+
 .admin-sub {
   margin-top: 2px;
   font-size: 0.72rem;
