@@ -8,6 +8,10 @@ import { KWATER_SECTIONS, KWATER_QUESTIONS } from './kwaterQuestions';
 import { KDN_SECTIONS, KDN_QUESTIONS } from './kdnQuestions';
 import { KOSCOM_SECTIONS, KOSCOM_QUESTIONS } from './koscomQuestions';
 import { BNK_SECTIONS, BNK_QUESTIONS } from './bnkQuestions';
+import { KFTC_SECTIONS, KFTC_QUESTIONS } from './kftcQuestions';
+import { BOK_SECTIONS, BOK_QUESTIONS } from './bokQuestions';
+import { KSD_SECTIONS, KSD_QUESTIONS } from './ksdQuestions';
+import { KDIC_SECTIONS, KDIC_QUESTIONS } from './kdicQuestions';
 import { HF_CPP_QUESTIONS } from './hfCppQuestions';
 import { COMIL } from './comilQuestions';
 import { NCS } from './ncsQuestions';
@@ -99,6 +103,26 @@ export const COMPANIES = [
     key: "hf", category: "finance", abbr: "HF", name: "한국주택금융공사", meta: "전공필기 60문제 · 80분 · 5지선다 · C++ 집중 48문제 · 2026 하반기 복원 41문제", ready: true,
     questions: HF_QUESTIONS, sections: SECTIONS, minutes: 80, extra: HF_CPP_QUESTIONS, recall: HF_RECALL_2026B,
     lede: "전산학일반(정보보호 포함) 36문제, 데이터베이스·네트워크 12문제, 프로그래밍(C++ · Java · Python) 12문제. 총 60문제, 80분, 5지선다. 코딩테스트 이후 치르는 전공필기 범위만 다룹니다. 프로그래밍 영역은 C++ 코드 실행 결과 문제 비중이 높아 아래에 C++ 집중 문제집을 따로 두었습니다.",
+  },
+  {
+    key: "bok", category: "finance", abbr: "BOK", name: "한국은행", meta: "전산 전공 35문제 · 50분 · 4지선다", ready: true,
+    questions: BOK_QUESTIONS, sections: BOK_SECTIONS, minutes: 50,
+    lede: "자료구조·알고리즘 7문제, 데이터베이스 7문제, 운영체제 6문제, 네트워크 6문제, 컴퓨터구조 5문제, 소프트웨어공학 4문제. 총 35문제, 50분, 4지선다. 전산 전공 출제범위를 기준으로 새로 만든 예상문제이며 실제 기출의 복원이 아닙니다.",
+  },
+  {
+    key: "ksd", category: "finance", abbr: "KSD", name: "한국예탁결제원", meta: "전산 전공 35문제 · 50분 · 4지선다", ready: true,
+    questions: KSD_QUESTIONS, sections: KSD_SECTIONS, minutes: 50,
+    lede: "데이터베이스 7문제, 자료구조·알고리즘 6문제, 네트워크 6문제, 운영체제·시스템 6문제, 정보보호 5문제, 증권·결제 도메인 5문제. 총 35문제, 50분, 4지선다. 전산 전공 범위에 예탁·결제 실무 개념을 더해 새로 만든 예상문제입니다.",
+  },
+  {
+    key: "kdic", category: "finance", abbr: "KDIC", name: "예금보험공사", meta: "전산 전공 30문제 · 45분 · 4지선다", ready: true,
+    questions: KDIC_QUESTIONS, sections: KDIC_SECTIONS, minutes: 45,
+    lede: "데이터베이스 6문제, 네트워크·보안 6문제, 운영체제 5문제, 자료구조·알고리즘 5문제, 소프트웨어공학·신기술 5문제, 예금보험 도메인 3문제. 총 30문제, 45분, 4지선다. 전산 전공 범위에 예금자보호·업무연속성 개념을 더해 새로 만든 예상문제입니다.",
+  },
+  {
+    key: "kftc", category: "finance", abbr: "KFTC", name: "금융결제원", meta: "전산 전공 35문제 · 50분 · 4지선다", ready: true,
+    questions: KFTC_QUESTIONS, sections: KFTC_SECTIONS, minutes: 50,
+    lede: "데이터베이스 7문제, 네트워크 7문제, 운영체제 6문제, 자료구조·알고리즘 5문제, 정보보호 5문제, 금융IT·지급결제 5문제. 총 35문제, 50분, 4지선다. 채용공고의 전산학 일반 출제범위와 지급결제·오픈뱅킹 도메인을 기준으로 새로 만든 예상문제입니다. 실제 기출의 복원이 아닙니다.",
   },
   {
     key: "koscom", category: "finance", abbr: "KOSCOM", name: "코스콤", meta: "전산 전공 35문제 · 45분 · 4지선다", ready: true,
