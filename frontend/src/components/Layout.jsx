@@ -4,10 +4,13 @@ import { warmUpBackend } from '../api';
 import { track } from '../track';
 import ChaosChat from './ChaosChat';
 
+// 카오스 고양이 챗봇은 잠시 숨겨 둔다. true로 바꾸면 다시 나온다
+const SHOW_CHAOS_CHAT = false;
+
 export default function Layout() {
   const location = useLocation();
 
-  // 첫 화면이 뜨는 동안 잠들어 있던 서버를 깨워 두면 챗봇 응답이 바로 온다
+  // 첫 화면이 뜨는 동안 잠들어 있던 서버를 깨워 두면 이후 요청이 바로 온다
   useEffect(() => { warmUpBackend(); }, []);
 
   useEffect(() => { track('view', location.pathname); }, [location.pathname]);
@@ -48,7 +51,7 @@ export default function Layout() {
         </Suspense>
       </main>
 
-      <ChaosChat />
+      {SHOW_CHAOS_CHAT && <ChaosChat />}
     </>
   );
 }
