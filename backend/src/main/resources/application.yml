@@ -29,7 +29,8 @@ slack:
 
 app:
   base-url: ${APP_BASE_URL:http://localhost:3000}
-  admin-key: ${ADMIN_KEY:}
+  # 관리자 화면(/admin/cu) 접속 키. Render에 ADMIN_KEY를 넣으면 그 값이 기본값을 덮는다
+  admin-key: ${ADMIN_KEY:chanung}
 
 gemini:
   api-key: ${GEMINI_API_KEY:}

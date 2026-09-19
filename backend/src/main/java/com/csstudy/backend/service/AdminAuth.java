@@ -14,7 +14,7 @@ public class AdminAuth {
     @Value("${app.admin-key:}")
     private String adminKey;
 
-    // ADMIN_KEY 환경변수를 설정하지 않은 서버에서는 관리자 조회가 아예 열리지 않는다
+    // 키를 빈 값으로 둔 서버에서는 관리자 조회가 아예 열리지 않는다. 기본값은 application.yml에 있다
     public void require(String key) {
         if (adminKey == null || adminKey.isBlank()) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "ADMIN_KEY가 설정되지 않았습니다.");
