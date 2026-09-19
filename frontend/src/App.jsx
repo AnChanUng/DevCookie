@@ -17,6 +17,7 @@ const ComputerGeneralPage = lazy(() => import('./pages/ComputerGeneralPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
 const NcsPage = lazy(() => import('./pages/NcsPage'));
+const WeakPage = lazy(() => import('./pages/WeakPage'));
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
           <Route path="computer-general" element={<ComputerGeneralPage />} />
           <Route path="ncs" element={<NcsPage />} />
           <Route path="search" element={<SearchPage />} />
+          <Route path="weak" element={<WeakPage />} />
           <Route path="admin/cu" element={<AdminPage />} />
         </Route>
       </Routes>

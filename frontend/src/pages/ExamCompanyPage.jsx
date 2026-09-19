@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { COMPANIES, CPP_GROUPS, EXAM_CATEGORIES } from '../data/examQuestions';
 import { track } from '../track';
+import ReportButton from '../components/ReportButton';
 import { useExamProgress, recordAnswer, isMarked, toggleMark } from '../hooks/useExamProgress';
 
 const CIRC = ['①', '②', '③', '④', '⑤'];
@@ -448,6 +449,7 @@ export function ReviewCard({ q, a, extra, sections, marked, onMark }) {
         {(!ok || a === undefined) && <div>정답 <b className="r">{CIRC[q.a]} {q.o[q.a]}</b></div>}
       </div>
       <div className="ex">{q.e}</div>
+      <ReportButton q={q} />
     </div>
   );
 }

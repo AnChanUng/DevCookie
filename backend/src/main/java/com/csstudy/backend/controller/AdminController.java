@@ -35,6 +35,7 @@ public class AdminController {
     private final QuestionRepository questionRepository;
     private final CategoryRepository categoryRepository;
     private final UsageEventRepository usageEventRepository;
+    private final QuestionReportRepository questionReportRepository;
     private final ChatService chatService;
     private final JdbcTemplate jdbcTemplate;
 
@@ -48,6 +49,7 @@ public class AdminController {
         body.put("accounts", accounts());
         body.put("grading", grading());
         body.put("examSync", pairs(examProgressRepository.countByCompany(), "company"));
+        body.put("openReports", questionReportRepository.countByHandledFalse());
         body.put("chat", chatService.adminStatus());
         body.put("slackEnabled", slackEnabled);
         body.put("database", database());
@@ -143,6 +145,7 @@ public class AdminController {
         tables.put("answers", answerRepository.count());
         tables.put("exam_progress", examProgressRepository.count());
         tables.put("user_question_progress", userQuestionProgressRepository.count());
+        tables.put("question_reports", questionReportRepository.count());
         tables.put("questions", questionRepository.count());
         tables.put("categories", categoryRepository.count());
         m.put("tables", tables);
