@@ -1,6 +1,7 @@
 import { Suspense, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { warmUpBackend } from '../api';
+import { track } from '../track';
 import ChaosChat from './ChaosChat';
 
 export default function Layout() {
@@ -8,6 +9,8 @@ export default function Layout() {
 
   // 첫 화면이 뜨는 동안 잠들어 있던 서버를 깨워 두면 챗봇 응답이 바로 온다
   useEffect(() => { warmUpBackend(); }, []);
+
+  useEffect(() => { track('view', location.pathname); }, [location.pathname]);
 
   return (
     <>
