@@ -4,6 +4,7 @@ import { warmUpBackend } from '../api';
 import { track } from '../track';
 import ChaosChat from './ChaosChat';
 import StudyAmbience from './StudyAmbience';
+import StudyCount from './StudyCount';
 
 // 카오스 고양이 챗봇은 잠시 숨겨 둔다. true로 바꾸면 다시 나온다
 const SHOW_CHAOS_CHAT = false;
@@ -48,6 +49,7 @@ export default function Layout() {
                 통계
               </Link>
             </nav>
+            <StudyCount />
           </div>
         </div>
       </header>
