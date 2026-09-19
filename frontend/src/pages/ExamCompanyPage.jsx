@@ -24,6 +24,7 @@ const modeLabel = (sections, mode, sec) =>
   mode === 'exam' ? '실전 모의고사'
     : mode === 'wrong' ? '오답 다시 풀기'
     : mode === 'marked' ? '북마크 다시 풀기'
+    : mode === 'recall' ? '응시 후기 복원 문제'
     : mode === 'cpp' ? `C++ 집중 문제집 · ${sec === 'all' ? '전체' : CPP_GROUPS[sec]?.name || ''}`
     : `영역별 연습 · ${sections[sec]?.name || ''}`;
 
@@ -41,9 +42,10 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
   const Q = company.questions;
   const SECTIONS = company.sections;
   const secKeys = Object.keys(SECTIONS).filter(k => !SECTIONS[k].extra); // 모의고사 채점 영역
-  const label = (mode, sec) => modeLabel(SECTIONS, mode, sec);
   const CPP = useMemo(() => company.extra || [], [company]); // C++ 집중 문제집 (모의고사 미포함)
-  const ALL = useMemo(() => [...Q, ...CPP], [Q, CPP]);       // 오답노트·오답 다시 풀기 범위
+  const RECALL = company.recall; // 응시 후기 복원 문제 (모의고사 미포함)
+  const label = (mode, sec) => (mode === 'recall' && RECALL ? RECALL.title : modeLabel(SECTIONS, mode, sec));
+  const ALL = useMemo(() => [...Q, ...CPP, ...(RECALL?.questions || [])], [Q, CPP, RECALL]); // 오답노트·오답 다시 풀기 범위
   const byId = useMemo(() => Object.fromEntries(ALL.map(q => [q.id, q])), [ALL]);
   const { data, save } = useExamProgress(company.key);
   const [view, setView] = useState({ name: 'home' });
@@ -117,6 +119,7 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
         byId={byId}
         stats={data.stats}
         mode={view.mode}
+        title={label(view.mode, view.sec)}
         sec={view.sec}
         sections={SECTIONS}
         minutes={company.minutes}
@@ -206,6 +209,26 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
         </button>
       </div>
 
+      {RECALL && (
+        <>
+          <div className="section-title">{RECALL.title}</div>
+          <p className="exam-lede">{RECALL.lede}</p>
+          <div className="exam-sections">
+            <button className="exam-section" onClick={() => start('recall', RECALL.questions.map(q => q.id))}>
+              <span className="t">순서대로 풀기</span>
+              <span className="d">프로그래밍 → DB · 네트워크 → 전산학일반 순서 · 한 문제씩 즉시 채점</span>
+              <span className="d">{RECALL.questions.length}문제 · 최근 정답 {RECALL.questions.filter(q => data.stats[q.id]?.last === 'r').length}/{RECALL.questions.filter(q => data.stats[q.id]).length}</span>
+              <span className="bar"><i style={{ width: `${Math.round(RECALL.questions.filter(q => data.stats[q.id]?.last === 'r').length / RECALL.questions.length * 100)}%` }} /></span>
+            </button>
+            <button className="exam-section" onClick={() => start('recall', shuffle(RECALL.questions.map(q => q.id)))}>
+              <span className="t">섞어서 풀기</span>
+              <span className="d">같은 문제를 무작위 순서로 출제</span>
+              <span className="d">틀린 문제는 오답노트에 함께 쌓입니다</span>
+            </button>
+          </div>
+        </>
+      )}
+
       <div className="section-title">영역별 연습</div>
       <div className="exam-sections">
         {Object.entries(SECTIONS).filter(([, s]) => !s.extra).map(([k, s]) => {
@@ -284,7 +307,7 @@ function StatTile({ k, v, of, unit }) {
   );
 }
 
-function Quiz({ byId, stats, mode, sec, ids, sections, minutes, onPractice, onFinish, header, marks, onMark }) {
+function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractice, onFinish, header, marks, onMark }) {
   const EXAM_SECONDS = minutes * 60;
   const isExam = mode === 'exam';
   const [idx, setIdx] = useState(0);
@@ -329,7 +352,7 @@ function Quiz({ byId, stats, mode, sec, ids, sections, minutes, onPractice, onFi
 
   return (
     <div className="fade-in">
-      {header(modeLabel(sections, mode, sec))}
+      {header(title)}
       <div className="exam-qhead">
         <span className="prog">{idx + 1} / {total}</span>
         <span className="prog">답변 {answered}</span>

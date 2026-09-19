@@ -11,6 +11,7 @@ import { BNK_SECTIONS, BNK_QUESTIONS } from './bnkQuestions';
 import { HF_CPP_QUESTIONS } from './hfCppQuestions';
 import { COMIL } from './comilQuestions';
 import { NCS } from './ncsQuestions';
+import { HF_RECALL_2026B } from './hfRecall2026bQuestions';
 export { HF_CPP_QUESTIONS, CPP_GROUPS } from './hfCppQuestions';
 export { COMIL, NCS };
 
@@ -95,8 +96,8 @@ export const EXAM_CATEGORIES = [
 
 export const COMPANIES = [
   {
-    key: "hf", category: "finance", abbr: "HF", name: "한국주택금융공사", meta: "전공필기 60문제 · 80분 · 5지선다 · C++ 집중 48문제", ready: true,
-    questions: HF_QUESTIONS, sections: SECTIONS, minutes: 80, extra: HF_CPP_QUESTIONS,
+    key: "hf", category: "finance", abbr: "HF", name: "한국주택금융공사", meta: "전공필기 60문제 · 80분 · 5지선다 · C++ 집중 48문제 · 2026 하반기 복원 41문제", ready: true,
+    questions: HF_QUESTIONS, sections: SECTIONS, minutes: 80, extra: HF_CPP_QUESTIONS, recall: HF_RECALL_2026B,
     lede: "전산학일반(정보보호 포함) 36문제, 데이터베이스·네트워크 12문제, 프로그래밍(C++ · Java · Python) 12문제. 총 60문제, 80분, 5지선다. 코딩테스트 이후 치르는 전공필기 범위만 다룹니다. 프로그래밍 영역은 C++ 코드 실행 결과 문제 비중이 높아 아래에 C++ 집중 문제집을 따로 두었습니다.",
   },
   {
@@ -143,3 +144,6 @@ export const COMPANIES = [
 
 // 풀이 기록을 남기는 모든 문제은행 (회사별 + 컴퓨터일반). 백업·복원 범위
 export const BANKS = [...COMPANIES, COMIL, NCS];
+
+// 모의고사 문제에 더해 별도 문제집(extra)과 응시 후기 복원 문제(recall)까지 합친 전체 문항
+export const allQuestions = (bank) => [...bank.questions, ...(bank.extra || []), ...(bank.recall?.questions || [])];
