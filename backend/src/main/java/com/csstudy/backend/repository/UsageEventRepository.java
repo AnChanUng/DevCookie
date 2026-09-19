@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -28,4 +29,45 @@ public interface UsageEventRepository extends JpaRepository<UsageEvent, Long> {
     List<Object[]> byPathSince(@Param("type") String type, @Param("from") LocalDate from, Pageable pageable);
 
     List<UsageEvent> findByOrderByIdDesc(Pageable pageable);
+
+    List<UsageEvent> findByTypeOrderByIdDesc(String type, Pageable pageable);
+
+    // 지금 접속 중인 방문자 수
+    @Query("select count(distinct e.visitorId) from UsageEvent e where e.createdAt >= :since")
+    long activeSince(@Param("since") Instant since);
+
+    // 그날 처음 온 방문자 수
+    @Query("select count(distinct e.visitorId) from UsageEvent e where e.day = :day " +
+            "and not exists (select 1 from UsageEvent p where p.visitorId = e.visitorId and p.day < :day)")
+    long newVisitorsOn(@Param("day") LocalDate day);
+
+    // [경로, 풀이 방식, 횟수, 방문자 수, 평균 정답률(%), 평균 소요(초)] 점수가 기록된 풀이만
+    @Query("select e.path, e.detail, count(e), count(distinct e.visitorId), avg(e.score * 100.0 / e.total), avg(e.seconds) " +
+            "from UsageEvent e where e.type = 'exam' and e.total > 0 and e.day >= :from " +
+            "group by e.path, e.detail order by count(e) desc")
+    List<Object[]> scoresByPathSince(@Param("from") LocalDate from);
+
+    // [방문자, 열람 수, 첫 방문, 마지막 방문]
+    @Query("select e.visitorId, count(e), min(e.createdAt), max(e.createdAt) from UsageEvent e " +
+            "where e.day >= :from group by e.visitorId order by max(e.createdAt) desc")
+    List<Object[]> visitorsSince(@Param("from") LocalDate from, Pageable pageable);
+
+    // [방문자, 풀이 수, 평균 정답률(%)]
+    @Query("select e.visitorId, count(e), avg(case when e.total > 0 then e.score * 100.0 / e.total else null end) " +
+            "from UsageEvent e where e.type = 'exam' and e.day >= :from group by e.visitorId")
+    List<Object[]> visitorScoresSince(@Param("from") LocalDate from);
+
+    // [기기, 방문자 수]
+    @Query("select e.device, count(distinct e.visitorId) from UsageEvent e " +
+            "where e.day >= :from and e.device is not null group by e.device")
+    List<Object[]> devicesSince(@Param("from") LocalDate from);
+
+    // [유입 경로, 횟수]
+    @Query("select e.referrer, count(e) from UsageEvent e " +
+            "where e.day >= :from and e.referrer is not null group by e.referrer order by count(e) desc")
+    List<Object[]> referrersSince(@Param("from") LocalDate from, Pageable pageable);
+
+    // 시간대별 분포를 서버에서 한국 시간으로 나누려고 시각만 가져온다
+    @Query("select e.createdAt from UsageEvent e where e.type = 'view' and e.day >= :from")
+    List<Instant> viewTimesSince(@Param("from") LocalDate from);
 }
