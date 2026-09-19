@@ -34,6 +34,9 @@ export default function Layout() {
               <Link to="/computer-general" className={location.pathname === '/computer-general' ? 'active' : ''}>
                 컴퓨터일반
               </Link>
+              <Link to="/search" className={location.pathname === '/search' ? 'active' : ''}>
+                문제 검색
+              </Link>
               <Link to="/major" className={location.pathname === '/major' ? 'active' : ''}>
                 필기이론
               </Link>

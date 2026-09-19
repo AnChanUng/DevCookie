@@ -861,3 +861,24 @@
 @media (max-width: 640px) {
   .admin-table .admin-barcol { display: none; }
 }
+
+/* 문제 검색 */
+.exam-search {
+  width: 100%;
+  font: inherit;
+  font-size: 1rem;
+  padding: 13px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.exam-search:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+}
+
+.exam-search-count { margin: 14px 0 12px; }
+
+a.exam-search-bank:hover { color: var(--accent-blue); }
