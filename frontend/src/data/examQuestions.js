@@ -12,6 +12,10 @@ import { KFTC_SECTIONS, KFTC_QUESTIONS } from './kftcQuestions';
 import { BOK_SECTIONS, BOK_QUESTIONS } from './bokQuestions';
 import { KSD_SECTIONS, KSD_QUESTIONS } from './ksdQuestions';
 import { KDIC_SECTIONS, KDIC_QUESTIONS } from './kdicQuestions';
+import { KAMCO_SECTIONS, KAMCO_QUESTIONS } from './kamcoQuestions';
+import { KODIT_SECTIONS, KODIT_QUESTIONS } from './koditQuestions';
+import { KDB_SECTIONS, KDB_QUESTIONS } from './kdbQuestions';
+import { KEXIM_SECTIONS, KEXIM_QUESTIONS } from './keximQuestions';
 import { HF_CPP_QUESTIONS } from './hfCppQuestions';
 import { COMIL } from './comilQuestions';
 import { NCS } from './ncsQuestions';
@@ -103,6 +107,26 @@ export const COMPANIES = [
     key: "hf", category: "finance", abbr: "HF", name: "한국주택금융공사", meta: "전공필기 60문제 · 80분 · 5지선다 · C++ 집중 48문제 · 2026 하반기 복원 41문제", ready: true,
     questions: HF_QUESTIONS, sections: SECTIONS, minutes: 80, extra: HF_CPP_QUESTIONS, recall: HF_RECALL_2026B,
     lede: "전산학일반(정보보호 포함) 36문제, 데이터베이스·네트워크 12문제, 프로그래밍(C++ · Java · Python) 12문제. 총 60문제, 80분, 5지선다. 코딩테스트 이후 치르는 전공필기 범위만 다룹니다. 프로그래밍 영역은 C++ 코드 실행 결과 문제 비중이 높아 아래에 C++ 집중 문제집을 따로 두었습니다.",
+  },
+  {
+    key: "kdb", category: "finance", abbr: "KDB", name: "한국산업은행", meta: "전산 전공 35문제 · 50분 · 4지선다", ready: true,
+    questions: KDB_QUESTIONS, sections: KDB_SECTIONS, minutes: 50,
+    lede: "데이터베이스 7문제, 자료구조·알고리즘 6문제, 네트워크 6문제, 운영체제 6문제, 정보보호 5문제, 시스템 아키텍처 5문제. 총 35문제, 50분, 4지선다. 전산 전공 범위에 분산·가용성 설계 주제를 더해 새로 만든 예상문제입니다.",
+  },
+  {
+    key: "kexim", category: "finance", abbr: "KEXIM", name: "한국수출입은행", meta: "전산 전공 30문제 · 45분 · 4지선다", ready: true,
+    questions: KEXIM_QUESTIONS, sections: KEXIM_SECTIONS, minutes: 45,
+    lede: "데이터베이스 6문제, 운영체제 5문제, 네트워크 5문제, 자료구조·알고리즘 5문제, 프로그래밍·개발 5문제, 정보보호 4문제. 총 30문제, 45분, 4지선다. 전산 전공 출제범위를 기준으로 새로 만든 예상문제입니다.",
+  },
+  {
+    key: "kodit", category: "finance", abbr: "KODIT", name: "신용보증기금", meta: "전산 전공 30문제 · 45분 · 4지선다", ready: true,
+    questions: KODIT_QUESTIONS, sections: KODIT_SECTIONS, minutes: 45,
+    lede: "데이터베이스 6문제, 프로그래밍 6문제, 자료구조·알고리즘 5문제, 운영체제 5문제, 네트워크·보안 5문제, 소프트웨어공학 3문제. 총 30문제, 45분, 4지선다. Java·Python 활용 문항을 포함해 새로 만든 예상문제입니다.",
+  },
+  {
+    key: "kamco", category: "finance", abbr: "KAMCO", name: "한국자산관리공사", meta: "전산 전공 30문제 · 45분 · 4지선다", ready: true,
+    questions: KAMCO_QUESTIONS, sections: KAMCO_SECTIONS, minutes: 45,
+    lede: "데이터베이스 6문제, 자료구조·알고리즘 6문제, 운영체제 5문제, 네트워크 5문제, 소프트웨어공학 5문제, 정보보호·신기술 3문제. 총 30문제, 45분, 4지선다. 전산 전공 출제범위를 기준으로 새로 만든 예상문제입니다.",
   },
   {
     key: "bok", category: "finance", abbr: "BOK", name: "한국은행", meta: "전산 전공 35문제 · 50분 · 4지선다", ready: true,
