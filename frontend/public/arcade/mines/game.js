@@ -1,4 +1,5 @@
 import { store } from '../common.js';
+import { createRanking } from '../rank.js';
 
 const LEVELS = {
   easy: { rows: 9, cols: 9, mines: 10 },
@@ -13,6 +14,8 @@ let level, cells, state, flags, opened, seconds, timer, flagMode = false;
 let bests = store.get('mines:best', {});
 
 const fmt = (sec) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+const LEVEL_NAMES = { easy: '초급', normal: '중급', hard: '고급' };
+let ranking = null;
 const idx = (r, c) => r * level.cols + c;
 
 function neighbors(i) {
@@ -133,6 +136,7 @@ function win() {
   const record = !bests[levelKey] || took < bests[levelKey];
   if (record) { bests = { ...bests, [levelKey]: took }; store.set('mines:best', bests); }
   setStatus(`모두 찾았습니다! ${fmt(seconds)}${record ? ' · 신기록' : ''}`, 'win');
+  ranking.submit(took);
   hud();
 }
 
@@ -195,8 +199,11 @@ $('restart').addEventListener('click', reset);
 document.querySelectorAll('[data-level]').forEach(b => b.addEventListener('click', () => {
   levelKey = b.dataset.level;
   store.set('mines:level', levelKey);
+  ranking.setBoard({ game: `mines-${levelKey}`, label: LEVEL_NAMES[levelKey] });
   reset();
 }));
 
 if (!LEVELS[levelKey]) levelKey = 'easy';
+// 시간은 짧을수록 좋은 기록이다
+ranking = createRanking(`mines-${levelKey}`, { lowerWins: true, format: fmt, label: LEVEL_NAMES[levelKey] });
 reset();

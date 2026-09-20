@@ -1,4 +1,5 @@
 import { store, onSwipe, onDirKey } from '../common.js';
+import { createRanking } from '../rank.js';
 
 const N = 4;
 const VEC = { up: [-1, 0], down: [1, 0], left: [0, -1], right: [0, 1] };
@@ -13,6 +14,7 @@ let over = false;
 let nextId = 1;
 let undoState = null;
 const nodes = new Map();
+const ranking = createRanking('2048');
 
 $('cells').innerHTML = '<i></i>'.repeat(N * N);
 
@@ -76,6 +78,7 @@ function move(dir) {
     show('2048 달성!', '여기서 멈춰도 되고, 더 큰 숫자에 도전해도 됩니다.', true);
   } else if (!canMove()) {
     over = true;
+    ranking.submit(score);
     show('더 밀 곳이 없습니다', `${score.toLocaleString('ko-KR')}점으로 끝났습니다.`, false);
   }
 }

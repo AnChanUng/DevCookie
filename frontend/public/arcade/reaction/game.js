@@ -1,4 +1,5 @@
 import { store } from '../common.js';
+import { createRanking } from '../rank.js';
 
 const ROUNDS = 5;
 const $ = (id) => document.getElementById(id);
@@ -9,6 +10,7 @@ let times = [];
 let timer = 0;
 let shownAt = 0;
 let best = store.get('reaction:best', 0);
+const ranking = createRanking('reaction', { lowerWins: true, format: (n) => `${n}ms` });
 
 const rank = (ms) => (ms < 200 ? '프로게이머급' : ms < 250 ? '아주 빠름' : ms < 300 ? '평균보다 빠름' : ms < 380 ? '평균' : '커피가 필요합니다');
 
@@ -59,6 +61,7 @@ function press() {
       const record = !best || avg < best;
       if (record) { best = avg; store.set('reaction:best', best); hud(); }
       show('', `평균 ${avg}ms`, `${rank(avg)}${record ? ' · 신기록' : ''} · 눌러서 다시 하기`);
+      ranking.submit(avg);
     }
   }
 }

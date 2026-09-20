@@ -1,4 +1,5 @@
 import { store, setupCanvas } from '../common.js';
+import { createRanking } from '../rank.js';
 
 const W = 400, H = 600, GROUND = 540;
 const BIRD_X = 110, BIRD_R = 14;
@@ -10,6 +11,7 @@ const ctx = setupCanvas($('canvas'), W, H);
 let state = 'ready';   // ready | playing | falling | over
 let bird, pipes, score, prev, scroll = 0;
 let best = store.get('flappy:best', 0);
+const ranking = createRanking('flappy', { format: (n) => `${n}개` });
 
 // 많이 넘길수록 빨라지고 틈이 좁아진다
 const speed = () => Math.min(260, 165 + score * 3);
@@ -169,6 +171,7 @@ function end() {
   $('start').textContent = '다시 하기';
   // 떨어지자마자 누른 탭이 바로 재시작으로 이어지지 않게 잠깐 뒤에 띄운다
   setTimeout(() => { $('overlay').hidden = false; }, 350);
+  ranking.submit(score);
 }
 
 $('stage').addEventListener('pointerdown', (e) => {

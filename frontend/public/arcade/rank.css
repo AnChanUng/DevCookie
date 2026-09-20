@@ -1,0 +1,124 @@
+/* 오른쪽 위에 떠 있는 TOP 3 순위판. 소거법 디펜스는 common.css를 쓰지 않으므로 색을 직접 적는다 */
+.rank {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 30;
+  width: 232px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 0.82rem;
+  color: #0F172A;
+}
+
+.rank-head { font-weight: 900; font-size: 0.8rem; letter-spacing: -0.01em; margin-bottom: 8px; }
+
+.rank-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+
+.rank-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: 9px;
+  background: #F6F8FC;
+}
+.rank-row.me { background: rgba(99, 102, 241, 0.12); box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.45); }
+.rank-row.empty .rank-name { color: #94A3B8; font-weight: 500; }
+.rank-medal { flex: none; }
+.rank-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+.rank-score { flex: none; font-weight: 800; font-variant-numeric: tabular-nums; color: #6366F1; }
+.rank-note { color: #94A3B8; padding: 4px 2px; }
+
+/* 화면이 좁으면 게임을 가리지 않게 본문 위에 얹는다 */
+@media (max-width: 1300px) {
+  .rank {
+    position: static;
+    width: auto;
+    max-width: 728px;
+    margin: 12px 16px 0;
+    box-shadow: none;
+  }
+  .rank-list { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .rank-row { flex-wrap: wrap; row-gap: 0; }
+  .rank-row.empty .rank-name { font-size: 0.72rem; }
+}
+
+@media (min-width: 777px) and (max-width: 1300px) {
+  .rank { margin: 12px auto 0; }
+}
+
+@media (max-width: 520px) {
+  .rank-list { grid-template-columns: 1fr; }
+}
+
+/* ===== 닉네임 입력 ===== */
+.rank-modal-back {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(11, 16, 38, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: rank-fade 0.2s;
+}
+
+.rank-modal {
+  width: min(340px, 100%);
+  padding: 24px;
+  border-radius: 20px;
+  background: #fff;
+  color: #0F172A;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  animation: rank-pop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.rank-modal-title { font-size: 1.15rem; font-weight: 900; letter-spacing: -0.03em; }
+.rank-modal-score { margin: 6px 0 2px; font-size: 2rem; font-weight: 900; letter-spacing: -0.04em; color: #6366F1; font-variant-numeric: tabular-nums; }
+.rank-modal-text { margin: 0 0 14px; font-size: 0.86rem; color: #475569; }
+
+.rank-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid rgba(148, 163, 184, 0.45);
+  border-radius: 12px;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  color: #0F172A;
+  outline: none;
+}
+.rank-input:focus { border-color: #6366F1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18); }
+
+.rank-modal-buttons { display: flex; gap: 8px; margin-top: 14px; }
+.rank-btn {
+  flex: 1;
+  padding: 11px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 12px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+}
+.rank-btn.primary { flex: 1.6; border-color: #6366F1; background: #6366F1; color: #fff; }
+.rank-btn.primary:hover { background: #4F46E5; }
+
+@keyframes rank-fade { from { opacity: 0; } }
+@keyframes rank-pop { from { transform: scale(0.9); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .rank-modal-back, .rank-modal { animation: none; }
+}

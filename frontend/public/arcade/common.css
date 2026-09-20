@@ -120,6 +120,7 @@ body {
 .game-icon { font-size: 2rem; line-height: 1; margin-bottom: 10px; }
 .game b { display: block; font-size: 1.02rem; font-weight: 800; margin-bottom: 2px; }
 .game span { display: block; color: var(--text-2); font-size: 0.84rem; }
+.game em.champ { margin-top: 2px; color: #B45309; min-height: 0; }
 .game em { display: block; margin-top: 10px; font-style: normal; font-size: 0.76rem; font-weight: 700; color: var(--blue); min-height: 1.2em; }
 
 @media (prefers-reduced-motion: reduce) {

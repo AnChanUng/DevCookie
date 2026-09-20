@@ -1,4 +1,5 @@
 import { store, setupCanvas } from '../common.js';
+import { createRanking } from '../rank.js';
 
 const W = 480, H = 600;
 const COLS = 8, BRICK_H = 22, GAP = 6, TOP = 60;
@@ -13,6 +14,7 @@ const ctx = setupCanvas(canvas, W, H);
 let state = 'ready';   // ready | serve | playing | over
 let score, lives, level, bricks, ball, paddleX, particles, prev, keys = {};
 let best = store.get('breakout:best', 0);
+const ranking = createRanking('breakout');
 
 // 판마다 모양이 달라진다. 1은 보통 벽돌, 2는 두 번 맞혀야 깨지는 벽돌
 const LAYOUTS = [
@@ -194,6 +196,7 @@ function end() {
   $('overlay-text').textContent = `${score.toLocaleString('ko-KR')}점 · ${level}판까지 갔습니다.`;
   $('start').textContent = '다시 하기';
   $('overlay').hidden = false;
+  ranking.submit(score);
 }
 
 const toCanvasX = (e) => (e.clientX - canvas.getBoundingClientRect().left) / canvas.getBoundingClientRect().width * W;
