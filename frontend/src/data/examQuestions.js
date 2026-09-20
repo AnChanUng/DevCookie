@@ -99,6 +99,25 @@ export const HF_QUESTIONS = [
 {id:'pl12',sec:'pl',topic:'Python·딕셔너리·정렬',q:'다음 Python 코드의 출력 결과는?',code:'d = {}\nfor w in "banana":\n    d[w] = d.get(w, 0) + 1\nprint(sorted(d.items(), key=lambda x: -x[1])[0])',o:["('a', 3)","('n', 2)","('b', 1)","('a', 2)","('n', 3)"],a:0,e:'문자 빈도: b=1, a=3, n=2. dict.get(key, 0)은 키가 없으면 기본값 0을 반환한다. 빈도 내림차순(−x[1])으로 정렬한 첫 항목은 (\'a\', 3).'},
 ];
 
+// 문제은행이 무엇을 근거로 만들어졌는지. 저장소에 복기·복원 원본 파일이 있으면 recall, 없으면 predicted.
+// 목록 화면과 회사 화면이 같은 문구를 쓰도록 여기에 모아 둔다
+export const SOURCE_KINDS = {
+  recall: {
+    icon: "📕",
+    group: "복기문제집",
+    badge: "복기문제",
+    summary: "실제 응시자 복기·복원 자료를 바탕으로 만든 문제입니다.",
+    detail: "실제 응시자 복기·복원 자료를 바탕으로 만든 문제입니다. 자료에 남은 주제와 유형을 따랐고, 기억나지 않는 보기와 수치는 새로 채웠으므로 실제 문항과는 다를 수 있습니다.",
+  },
+  predicted: {
+    icon: "📝",
+    group: "예상문제집",
+    badge: "예상문제",
+    summary: "채용공고의 출제범위를 반영해 새로 만든 예상문제입니다. 실제 기출의 복원이 아닙니다.",
+    detail: "채용공고의 출제 과목·문항 수 구성과 공개된 출제범위를 반영해 새로 만든 예상문제입니다. 실제 기출의 복원이 아닙니다.",
+  },
+};
+
 // 기업별 기출문제 첫 화면의 분류. 회사마다 category로 어느 쪽에 들어갈지 정한다
 export const EXAM_CATEGORIES = [
   { key: "finance", name: "금융공기업", desc: "금융공기업 · 금융권 IT직무 필기" },
@@ -108,101 +127,121 @@ export const EXAM_CATEGORIES = [
 export const COMPANIES = [
   {
     key: "hf", category: "finance", abbr: "HF", name: "한국주택금융공사", meta: "전공필기 60문제 · 80분 · 5지선다 · C++ 집중 48문제 · 2026 하반기 복원 41문제", ready: true,
+    source: { kind: "predicted" },
     questions: HF_QUESTIONS, sections: SECTIONS, minutes: 80, extra: HF_CPP_QUESTIONS, recall: HF_RECALL_2026B,
     lede: "전산학일반(정보보호 포함) 36문제, 데이터베이스·네트워크 12문제, 프로그래밍(C++ · Java · Python) 12문제. 총 60문제, 80분, 5지선다. 코딩테스트 이후 치르는 전공필기 범위만 다룹니다. 프로그래밍 영역은 C++ 코드 실행 결과 문제 비중이 높아 아래에 C++ 집중 문제집을 따로 두었습니다.",
   },
   {
     key: "kdb", category: "finance", abbr: "KDB", name: "한국산업은행", meta: "전산 전공 35문제 · 50분 · 4지선다", ready: true,
+    source: { kind: "predicted" },
     questions: KDB_QUESTIONS, sections: KDB_SECTIONS, minutes: 50,
     lede: "데이터베이스 7문제, 자료구조·알고리즘 6문제, 네트워크 6문제, 운영체제 6문제, 정보보호 5문제, 시스템 아키텍처 5문제. 총 35문제, 50분, 4지선다. 전산 전공 범위에 분산·가용성 설계 주제를 더해 새로 만든 예상문제입니다.",
   },
   {
     key: "kexim", category: "finance", abbr: "KEXIM", name: "한국수출입은행", meta: "전산 전공 30문제 · 45분 · 4지선다", ready: true,
+    source: { kind: "predicted" },
     questions: KEXIM_QUESTIONS, sections: KEXIM_SECTIONS, minutes: 45,
     lede: "데이터베이스 6문제, 운영체제 5문제, 네트워크 5문제, 자료구조·알고리즘 5문제, 프로그래밍·개발 5문제, 정보보호 4문제. 총 30문제, 45분, 4지선다. 전산 전공 출제범위를 기준으로 새로 만든 예상문제입니다.",
   },
   {
     key: "kodit", category: "finance", abbr: "KODIT", name: "신용보증기금", meta: "전산 전공 30문제 · 45분 · 4지선다", ready: true,
+    source: { kind: "predicted" },
     questions: KODIT_QUESTIONS, sections: KODIT_SECTIONS, minutes: 45,
     lede: "데이터베이스 6문제, 프로그래밍 6문제, 자료구조·알고리즘 5문제, 운영체제 5문제, 네트워크·보안 5문제, 소프트웨어공학 3문제. 총 30문제, 45분, 4지선다. Java·Python 활용 문항을 포함해 새로 만든 예상문제입니다.",
   },
   {
     key: "kamco", category: "finance", abbr: "KAMCO", name: "한국자산관리공사", meta: "전산 전공 30문제 · 45분 · 4지선다", ready: true,
+    source: { kind: "predicted" },
     questions: KAMCO_QUESTIONS, sections: KAMCO_SECTIONS, minutes: 45,
     lede: "데이터베이스 6문제, 자료구조·알고리즘 6문제, 운영체제 5문제, 네트워크 5문제, 소프트웨어공학 5문제, 정보보호·신기술 3문제. 총 30문제, 45분, 4지선다. 전산 전공 출제범위를 기준으로 새로 만든 예상문제입니다.",
   },
   {
     key: "bok", category: "finance", abbr: "BOK", name: "한국은행", meta: "전산 전공 35문제 · 50분 · 4지선다", ready: true,
+    source: { kind: "predicted" },
     questions: BOK_QUESTIONS, sections: BOK_SECTIONS, minutes: 50,
     lede: "자료구조·알고리즘 7문제, 데이터베이스 7문제, 운영체제 6문제, 네트워크 6문제, 컴퓨터구조 5문제, 소프트웨어공학 4문제. 총 35문제, 50분, 4지선다. 전산 전공 출제범위를 기준으로 새로 만든 예상문제이며 실제 기출의 복원이 아닙니다.",
   },
   {
     key: "ksd", category: "finance", abbr: "KSD", name: "한국예탁결제원", meta: "전산 전공 35문제 · 50분 · 4지선다", ready: true,
+    source: { kind: "predicted" },
     questions: KSD_QUESTIONS, sections: KSD_SECTIONS, minutes: 50,
     lede: "데이터베이스 7문제, 자료구조·알고리즘 6문제, 네트워크 6문제, 운영체제·시스템 6문제, 정보보호 5문제, 증권·결제 도메인 5문제. 총 35문제, 50분, 4지선다. 전산 전공 범위에 예탁·결제 실무 개념을 더해 새로 만든 예상문제입니다.",
   },
   {
     key: "kdic", category: "finance", abbr: "KDIC", name: "예금보험공사", meta: "전산 전공 30문제 · 45분 · 4지선다", ready: true,
+    source: { kind: "predicted" },
     questions: KDIC_QUESTIONS, sections: KDIC_SECTIONS, minutes: 45,
     lede: "데이터베이스 6문제, 네트워크·보안 6문제, 운영체제 5문제, 자료구조·알고리즘 5문제, 소프트웨어공학·신기술 5문제, 예금보험 도메인 3문제. 총 30문제, 45분, 4지선다. 전산 전공 범위에 예금자보호·업무연속성 개념을 더해 새로 만든 예상문제입니다.",
   },
   {
     key: "kftc", category: "finance", abbr: "KFTC", name: "금융결제원", meta: "전산 전공 35문제 · 50분 · 4지선다", ready: true,
+    source: { kind: "predicted" },
     questions: KFTC_QUESTIONS, sections: KFTC_SECTIONS, minutes: 50,
     lede: "데이터베이스 7문제, 네트워크 7문제, 운영체제 6문제, 자료구조·알고리즘 5문제, 정보보호 5문제, 금융IT·지급결제 5문제. 총 35문제, 50분, 4지선다. 채용공고의 전산학 일반 출제범위와 지급결제·오픈뱅킹 도메인을 기준으로 새로 만든 예상문제입니다. 실제 기출의 복원이 아닙니다.",
   },
   {
     key: "koscom", category: "finance", abbr: "KOSCOM", name: "코스콤", meta: "전산 전공 35문제 · 45분 · 4지선다", ready: true,
+    source: { kind: "recall", label: "2026 상반기 복기문제", file: "공기업 필기/2026 상반기 코스콤 필기전형 복기.pdf" },
     questions: KOSCOM_QUESTIONS, sections: KOSCOM_SECTIONS, minutes: 45,
     lede: "소프트웨어공학 6문제, 운영체제 7문제, 데이터베이스 7문제, 네트워크·데이터통신 8문제, 자료구조 7문제. 총 35문제, 45분, 4지선다. 2026 상반기 응시 후기에 복원된 35문항(CMMI 순서, COCOMO II, 격리 수준, 2PL 변형, 포트 번호 등 명칭·순서·예외를 묻는 경향)을 바탕으로 새로 만든 문제입니다.",
   },
   {
     key: "ibk", category: "finance", abbr: "IBK", name: "기업은행", meta: "NCS 40 + 전공 35 · 120분 · 4지선다", ready: true,
+    source: { kind: "recall", label: "2026 상반기 복기문제", file: "공기업 필기/IBK기업은행 2026 상반기 필기 기출복원 문제지.pdf" },
     questions: IBK_QUESTIONS, sections: IBK_SECTIONS, minutes: 120,
     lede: "NCS 직업기초능력(의사소통·수리·문제해결·자료해석·명제논리) 40문제, 직무수행능력 35문제(경제학 12 · 재무관리 8 · 회계 8 · 경영·금융상식 7). 총 75문제, 120분, 4지선다. 출제 구성만 참고해 새로 만든 문제입니다.",
   },
   {
     key: "kfsb", category: "finance", abbr: "KFSB", name: "저축은행중앙회", meta: "IT직무 전공 50문제 · 60분 · 4지선다", ready: true,
+    source: { kind: "recall", label: "복기문제", file: "공기업 필기/저은중IT필기복원.txt" },
     questions: KFSB_QUESTIONS, sections: KFSB_SECTIONS, minutes: 60,
     lede: "데이터베이스 11문제, 운영체제·인프라 10문제, 네트워크·분산통신 8문제, 정보보호 11문제, 자료구조·설계·아키텍처 10문제. 총 50문제, 60분, 4지선다. 계좌·입출금·결제 같은 실무 상황을 제시하고 '왜 이 기술을 택하는가'를 묻는 응시 후기 경향을 따라 새로 만든 문제입니다.",
   },
   {
     key: "kepco", category: "public", abbr: "KEPCO", name: "한국전력공사", meta: "전산 전공 30문제 · 45분 · 4지선다", ready: true,
+    source: { kind: "predicted" },
     questions: KEPCO_QUESTIONS, sections: KEPCO_SECTIONS, minutes: 45,
     lede: "자료구조·알고리즘 6문제, 데이터베이스 6문제, 운영체제 5문제, 통신·네트워크 5문제, 컴퓨터구조·논리회로 5문제, 정보보호·신기술 3문제. 총 30문제, 45분, 4지선다. 전산 전공 범위에 전력 제어·IoT 주제를 더해 새로 만든 예상문제입니다.",
   },
   {
     key: "nhis", category: "public", abbr: "NHIS", name: "국민건강보험공단", meta: "전산 전공 30문제 · 45분 · 4지선다", ready: true,
+    source: { kind: "predicted" },
     questions: NHIS_QUESTIONS, sections: NHIS_SECTIONS, minutes: 45,
     lede: "데이터베이스 7문제, 프로그래밍 5문제, 자료구조·알고리즘 5문제, 운영체제 5문제, 네트워크 4문제, 정보보호·개인정보 4문제. 총 30문제, 45분, 4지선다. 대용량 자격·이력 데이터와 개인정보 보호 주제를 더해 새로 만든 예상문제입니다.",
   },
   {
     key: "lh", category: "public", abbr: "LH", name: "한국토지주택공사", meta: "전산 전공 30문제 · 45분 · 4지선다", ready: true,
+    source: { kind: "predicted" },
     questions: LH_QUESTIONS, sections: LH_SECTIONS, minutes: 45,
     lede: "데이터베이스 6문제, 자료구조·알고리즘 6문제, 소프트웨어공학 5문제, 운영체제 5문제, 네트워크 5문제, 정보보호·신기술 3문제. 총 30문제, 45분, 4지선다. 전산 전공 범위에 공간정보(GIS) 주제를 더해 새로 만든 예상문제입니다.",
   },
   {
     key: "korail", category: "public", abbr: "KORAIL", name: "코레일", meta: "전산 전공 40문제 · 50분 · 5지선다", ready: true,
+    source: { kind: "recall", label: "2026 상반기 복기문제", file: "공기업 필기/2026 상반기 코레일.hwpx" },
     questions: KORAIL_QUESTIONS, sections: KORAIL_SECTIONS, minutes: 50,
     lede: "소프트웨어공학 9문제, 데이터베이스 9문제, 운영체제·컴퓨터구조 10문제, 네트워크 6문제, 정보보호 6문제. 총 40문제, 50분, 5지선다. 2026 상반기 응시 후기에 복원된 문항(포렌식, 블록 암호 모드, 파이프라인·AMAT 계산, 관계대수, 서브넷 등)을 바탕으로 새로 만든 문제입니다.",
   },
   {
     key: "ex", category: "public", abbr: "EX", name: "한국도로공사", meta: "전산 전공 40문제 · 50분 · 5지선다", ready: true,
+    source: { kind: "recall", label: "2026 상반기 복기문제", file: "공기업 필기/2026_한국도로공사_상반기전산전공.hwp" },
     questions: EX_QUESTIONS, sections: EX_SECTIONS, minutes: 50,
     lede: "데이터베이스 8문제, 소프트웨어공학 8문제, 운영체제 9문제, 정보보호 7문제, 네트워크 8문제. 총 40문제, 50분, 5지선다. 2026 상반기 응시 후기에 복원된 40문항의 주제와 보기 구성을 따라 새로 만든 문제입니다.",
   },
   {
     key: "kwater", category: "public", abbr: "K-water", name: "한국수자원공사", meta: "전산 전공(2차) 30문제 · 40분 · 4지선다", ready: true,
+    source: { kind: "recall", label: "2026 상반기 복기문제", file: "공기업 필기/2026_한국수자원공사_상반기2차전산전공.hwp" },
     questions: KWATER_QUESTIONS, sections: KWATER_SECTIONS, minutes: 40,
     lede: "프로그래밍 실행 결과 6문제, 자료구조 3문제, 네트워크 3문제, 운영체제 8문제, 컴퓨터구조 10문제. 총 30문제, 40분, 4지선다. 2026 상반기 2차 응시 후기에 복원된 문항(C·Python·Java 코드, C-SCAN, LRU, 논리회로, RAID 등)을 바탕으로 새로 만든 문제입니다.",
   },
   {
     key: "kdn", category: "public", abbr: "KDN", name: "한전KDN", meta: "전산 필기(1차) 50문제 · 60분 · 5지선다", ready: true,
+    source: { kind: "recall", label: "2026 복기문제", file: "공기업 필기/2026_한전KDN_전산필기_1차.hwp" },
     questions: KDN_QUESTIONS, sections: KDN_SECTIONS, minutes: 60,
     lede: "소프트웨어공학 7문제, 프로그래밍·자료구조 5문제, 운영체제 5문제, 데이터베이스 17문제, 네트워크 16문제. 총 50문제, 60분, 5지선다. 2026 1차 응시 후기에 복원된 50문항의 주제 순서를 따라 새로 만든 문제로, DB와 네트워크 비중이 높습니다.",
   },
   {
     key: "bnk", category: "finance", abbr: "BNK", name: "BNK캐피탈", meta: "금융상식 15 + NCS 15 · 40분 · 4지선다", ready: true,
+    source: { kind: "recall", label: "2024 하반기 복기문제", file: "공기업 필기/2024_하반기_BNK_IT직무_필기복기.pdf" },
     questions: BNK_QUESTIONS, sections: BNK_SECTIONS, minutes: 40,
     lede: "금융·경제·경영 기초상식 15문제, 직무기초소양(NCS) 15문제. 총 30문제, 40분, 4지선다. 2024 하반기 IT직무 응시 후기의 키워드 정리(예금자보호, CD, 롱숏펀드, 레그테크, 환헤지, 재정환율, 피셔 방정식, MR=MC, BCG 등)와 NCS 기록 유형을 바탕으로 새로 만든 문제입니다. 코딩테스트(SQL·알고리즘)는 포함하지 않습니다.",
   },

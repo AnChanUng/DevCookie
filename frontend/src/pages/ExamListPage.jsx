@@ -1,5 +1,5 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { COMPANIES, EXAM_CATEGORIES, allQuestions } from '../data/examQuestions';
+import { COMPANIES, EXAM_CATEGORIES, SOURCE_KINDS, allQuestions } from '../data/examQuestions';
 import ProgressBackup from '../components/ProgressBackup';
 
 function summary(company) {
@@ -35,7 +35,7 @@ function CategoryPicker() {
       <div className="page-header">
         <Link to="/" className="back-link">← 홈으로</Link>
         <h1>📚 기업별 기출문제</h1>
-        <p>공기업 IT직무 전공필기 · 응시 후기 기반 자체 제작 문제은행 · 즉시 채점 · 오답노트 · 북마크</p>
+        <p>공기업 IT직무 전공필기 · 복기 자료 기반 문제집과 출제범위 기반 예상문제집 · 즉시 채점 · 오답노트 · 북마크</p>
       </div>
 
       <div className="exam-category-grid">
@@ -51,6 +51,9 @@ function CategoryPicker() {
               <span className="exam-category-name">{cat.name}</span>
               <span className="exam-company-meta">{cat.desc}</span>
               <span className="exam-category-names">{list.map(c => c.name).join(' · ')}</span>
+              <span className="exam-category-mix">
+                📕 복기 {ready.filter(c => c.source?.kind === 'recall').length}곳 · 📝 예상 {ready.filter(c => c.source?.kind !== 'recall').length}곳
+              </span>
               <span className="exam-tag">
                 {list.length}개 기업 · {total}문항{attempts ? ` · 응시 ${attempts}회 · 오답 ${wrong}문제` : ''}
               </span>
@@ -65,35 +68,51 @@ function CategoryPicker() {
   );
 }
 
+function CompanyCard({ company }) {
+  const s = company.ready ? summary(company) : null;
+  const recall = company.source?.kind === 'recall';
+  const inner = (
+    <>
+      <span className="exam-company-abbr">{company.abbr}</span>
+      <span className="exam-company-name">{company.name}</span>
+      {recall && <span className="exam-company-source">{company.source.label}</span>}
+      <span className="exam-company-meta">{company.meta}</span>
+      <span className={`exam-tag ${company.ready ? '' : 'soon'}`}>
+        {!company.ready ? '준비 중' : s?.attempts ? `응시 ${s.attempts}회 · 오답 ${s.wrong}문제` : '풀이 시작 가능'}
+      </span>
+    </>
+  );
+  return company.ready ? (
+    <Link to={`/exam/${company.key}`} className="exam-company-card">{inner}</Link>
+  ) : (
+    <div className="exam-company-card disabled">{inner}</div>
+  );
+}
+
+// 복기 자료로 만든 문제은행과 출제범위만 보고 만든 예상문제집을 갈라서 보여 준다
 function CompanyList({ category }) {
+  const list = COMPANIES.filter(c => c.category === category.key);
+  const groups = ['recall', 'predicted']
+    .map(kind => ({ kind, ...SOURCE_KINDS[kind], items: list.filter(c => (c.source?.kind || 'predicted') === kind) }))
+    .filter(g => g.items.length);
+
   return (
     <div className="fade-in">
       <div className="page-header">
         <Link to="/exam" className="back-link">← 기업별 기출문제</Link>
         <h1>📚 {category.name}</h1>
-        <p>{category.desc} · 응시 후기 기반 자체 제작 문제은행</p>
+        <p>{category.desc}</p>
       </div>
 
-      <div className="exam-company-grid">
-        {COMPANIES.filter(c => c.category === category.key).map(c => {
-          const s = c.ready ? summary(c) : null;
-          const inner = (
-            <>
-              <span className="exam-company-abbr">{c.abbr}</span>
-              <span className="exam-company-name">{c.name}</span>
-              <span className="exam-company-meta">{c.meta}</span>
-              <span className={`exam-tag ${c.ready ? '' : 'soon'}`}>
-                {!c.ready ? '준비 중' : s?.attempts ? `응시 ${s.attempts}회 · 오답 ${s.wrong}문제` : '풀이 시작 가능'}
-              </span>
-            </>
-          );
-          return c.ready ? (
-            <Link key={c.key} to={`/exam/${c.key}`} className="exam-company-card">{inner}</Link>
-          ) : (
-            <div key={c.key} className="exam-company-card disabled">{inner}</div>
-          );
-        })}
-      </div>
+      {groups.map(g => (
+        <section key={g.kind} className="exam-group">
+          <div className="section-title">{g.icon} {g.group} <span className="exam-group-count">{g.items.length}곳</span></div>
+          <p className="exam-lede">{g.detail}</p>
+          <div className="exam-company-grid">
+            {g.items.map(c => <CompanyCard key={c.key} company={c} />)}
+          </div>
+        </section>
+      ))}
 
       {NOTE}
     </div>

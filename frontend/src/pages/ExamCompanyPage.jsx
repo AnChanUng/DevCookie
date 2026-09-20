@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { COMPANIES, CPP_GROUPS, EXAM_CATEGORIES } from '../data/examQuestions';
+import { COMPANIES, CPP_GROUPS, EXAM_CATEGORIES, SOURCE_KINDS } from '../data/examQuestions';
 import { track } from '../track';
 import ReportButton from '../components/ReportButton';
 import { useExamProgress, recordAnswer, isMarked, toggleMark } from '../hooks/useExamProgress';
@@ -103,9 +103,27 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
     <div className="page-header exam-page-header">
       <Link to={back.to} className="back-link">{back.label}</Link>
       {links && (
-        <div className="exam-toplinks">
-          <button type="button" className={view.name === 'wrongbook' ? 'on' : ''} onClick={() => setView({ name: 'wrongbook' })}>틀린문제 모아보기 {everWrongIds.length}</button>
-          <button type="button" className={view.name === 'markbook' ? 'on' : ''} onClick={() => setView({ name: 'markbook' })}>북마크 모아보기 {markedIds.length}</button>
+        <div className="exam-books">
+          <button
+            type="button"
+            className={`exam-book wrong${view.name === 'wrongbook' ? ' on' : ''}${everWrongIds.length ? ' has' : ''}`}
+            disabled={!everWrongIds.length}
+            title={everWrongIds.length ? '한 번이라도 틀린 문제 모아보기' : '아직 틀린 문제가 없습니다'}
+            onClick={() => setView({ name: 'wrongbook' })}
+          >
+            <span className="n">{everWrongIds.length}</span>
+            <span className="t">틀린문제</span>
+          </button>
+          <button
+            type="button"
+            className={`exam-book mark${view.name === 'markbook' ? ' on' : ''}${markedIds.length ? ' has' : ''}`}
+            disabled={!markedIds.length}
+            title={markedIds.length ? '별표해 둔 문제 모아보기' : '아직 북마크한 문제가 없습니다'}
+            onClick={() => setView({ name: 'markbook' })}
+          >
+            <span className="n">{markedIds.length}</span>
+            <span className="t">북마크</span>
+          </button>
         </div>
       )}
       <h1>{title}</h1>
@@ -190,6 +208,14 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
   return (
     <div className="fade-in">
       {header(company.name)}
+      {company.source && SOURCE_KINDS[company.source.kind] && (
+        <div className={`exam-source ${company.source.kind}`}>
+          <span className="badge">
+            {SOURCE_KINDS[company.source.kind].icon} {company.source.label || SOURCE_KINDS[company.source.kind].badge}
+          </span>
+          <span className="txt">{SOURCE_KINDS[company.source.kind].detail}</span>
+        </div>
+      )}
       <p className="exam-lede">{company.lede}</p>
 
       <div className="exam-stats">

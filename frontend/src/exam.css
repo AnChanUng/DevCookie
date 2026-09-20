@@ -108,6 +108,7 @@
   margin-bottom: 4px;
 }
 
+/* 제목 오른쪽 위의 작은 글씨 링크 모음 (관리자 화면의 기간 · 새로고침 · 잠그기) */
 .exam-toplinks {
   position: absolute;
   top: 34px;
@@ -135,6 +136,123 @@
 .exam-toplinks button.on {
   color: var(--text-primary);
   font-weight: 700;
+}
+
+/* 제목 오른쪽 위의 오답·북마크 바로가기 */
+.exam-books {
+  position: absolute;
+  top: 26px;
+  right: 0;
+  display: flex;
+  gap: 8px;
+}
+
+.exam-book {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  min-width: 78px;
+  padding: 10px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font: inherit;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.exam-book .n {
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.exam-book .t {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+
+/* 풀 것이 없으면 조용히 물러나 있는다 */
+.exam-book:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.exam-book.has.wrong { background: var(--accent-red-light); border-color: var(--accent-red-light); }
+.exam-book.has.wrong .n { color: var(--accent-red); }
+.exam-book.has.mark { background: #fff4d6; border-color: #fbe3a6; }
+.exam-book.has.mark .n { color: #b98400; }
+
+.exam-book:hover:not(:disabled) { box-shadow: var(--card-shadow); transform: translateY(-1px); }
+
+.exam-book.on {
+  border-color: var(--accent-blue);
+  box-shadow: var(--card-shadow-glow);
+}
+
+/* 문제집의 근거를 제목 바로 아래에서 알려 준다 */
+.exam-source {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--text-tertiary);
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+}
+
+.exam-source .badge {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.exam-source .txt {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.exam-source.recall { border-left-color: var(--accent-green); }
+.exam-source.predicted { border-left-color: var(--accent-blue); }
+
+/* 목록 화면: 복기 / 예상 그룹 */
+.exam-group { margin-bottom: 30px; }
+
+.exam-group-count {
+  margin-left: 2px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+
+.exam-group .exam-lede { margin-bottom: 14px; }
+
+.exam-company-source {
+  display: inline-block;
+  align-self: flex-start;
+  margin-bottom: 2px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--accent-green-light);
+  color: var(--accent-green);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.exam-category-mix {
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  font-weight: 600;
 }
 
 .exam-sync {
@@ -684,6 +802,10 @@
 
 @media (max-width: 640px) {
   .exam-toplinks { position: static; margin: -4px 0 8px; flex-wrap: wrap; }
+
+  .exam-books { position: static; margin: 2px 0 10px; }
+  .exam-book { flex: 1; min-width: 0; padding: 8px 10px; }
+  .exam-book .n { font-size: 1.2rem; }
 
   .exam-qcard { padding: 18px 16px; }
   .exam-score .big { font-size: 2.6rem; }
