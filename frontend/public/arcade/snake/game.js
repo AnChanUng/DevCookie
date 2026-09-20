@@ -1,4 +1,5 @@
 import { store, onSwipe, onDirKey, setupCanvas } from '../common.js';
+import { createRanking } from '../rank.js';
 
 const N = 20;          // 한 변의 칸 수
 const CELL = 24;
@@ -10,6 +11,7 @@ const ctx = setupCanvas($('canvas'), SIZE, SIZE);
 
 let snake, dir, queue, food, bonus, score, timer, state = 'ready';
 let best = store.get('snake:best', 0);
+const ranking = createRanking('snake');
 
 const level = () => Math.min(12, 1 + Math.floor((snake.length - 3) / 4));
 const delay = () => 150 - (level() - 1) * 8;
@@ -141,6 +143,7 @@ function end() {
   const record = score > best;
   if (record) { best = score; store.set('snake:best', best); }
   overlay(record ? '신기록!' : '게임 오버', `${score}점 · 길이 ${snake.length}`, '다시 하기');
+  ranking.submit(score);
 }
 
 function togglePause() {

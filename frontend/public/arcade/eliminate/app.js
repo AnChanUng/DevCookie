@@ -2,6 +2,7 @@
 // 객관식 시험에서 실제로 쓰는 "아닌 것부터 지우기"를 속도 압박 아래에서 연습하는 게 목적이다.
 // 본 사이트와는 번들을 공유하지 않는다. 사이트의 풀이 기록(exam-progress:*)은 읽기만 하고, 쓰는 건 이 게임의 키뿐이다
 import { createEngine, readStore, FIELD_H, CARD_H } from './engine.js';
+import { createRanking } from '../rank.js';
 
 const MARKS = ['①', '②', '③', '④', '⑤'];
 const MUTE_KEY = 'arcade-eliminate:mute';
@@ -96,7 +97,16 @@ const grudge = () => {
 };
 
 /* ===== 화면 ===== */
-const engine = createEngine({ onChange: (next) => { snap = next; render(); }, sound });
+const ranking = createRanking('eliminate');
+const engine = createEngine({
+  onChange: (next) => {
+    const finished = next.phase === 'over' && snap?.phase !== 'over';
+    snap = next;
+    render();
+    if (finished) ranking.submit(next.score);
+  },
+  sound,
+});
 let builtWave = 0;   // 필드 DOM을 만들어 둔 문제 번호. 같은 문제 안에서는 클래스만 고친다
 let shownShake = 0;
 let shownPops = new Set();

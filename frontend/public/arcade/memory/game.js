@@ -1,4 +1,5 @@
 import { store } from '../common.js';
+import { createRanking } from '../rank.js';
 
 const FACES = ['🐶', '🐱', '🦊', '🐼', '🐸', '🐵', '🦁', '🐷', '🐙', '🦄', '🐝', '🐢', '🦉', '🐳', '🦖', '🍀', '🍉', '🚀'];
 const $ = (id) => document.getElementById(id);
@@ -76,6 +77,7 @@ function finish() {
   const record = !bests[size] || moves < bests[size];
   if (record) { bests = { ...bests, [size]: moves }; store.set('memory:best', bests); }
   $('status').textContent = `${moves}번 만에 다 찾았습니다!${record ? ' 신기록입니다.' : ''}`;
+  ranking.submit(moves);
 }
 
 grid.addEventListener('click', (e) => {
@@ -86,8 +88,11 @@ $('restart').addEventListener('click', reset);
 document.querySelectorAll('[data-size]').forEach(b => b.addEventListener('click', () => {
   size = Number(b.dataset.size);
   store.set('memory:size', size);
+  ranking.setBoard({ game: `memory-${size}`, label: `${size}×${size}` });
   reset();
 }));
 
 if (size !== 4 && size !== 6) size = 4;
+// 적게 뒤집을수록 좋은 기록이다
+const ranking = createRanking(`memory-${size}`, { lowerWins: true, format: (n) => `${n}회`, label: `${size}×${size}` });
 reset();
