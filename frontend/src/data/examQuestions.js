@@ -6,6 +6,7 @@ import { KORAIL_SECTIONS, KORAIL_QUESTIONS } from './korailQuestions';
 import { EX_SECTIONS, EX_QUESTIONS } from './exQuestions';
 import { KWATER_SECTIONS, KWATER_QUESTIONS } from './kwaterQuestions';
 import { KDN_SECTIONS, KDN_QUESTIONS } from './kdnQuestions';
+import { KICOX_SECTIONS, KICOX_QUESTIONS } from './kicoxQuestions';
 import { KOSCOM_SECTIONS, KOSCOM_QUESTIONS } from './koscomQuestions';
 import { BNK_SECTIONS, BNK_QUESTIONS } from './bnkQuestions';
 import { KFTC_SECTIONS, KFTC_QUESTIONS } from './kftcQuestions';
@@ -238,6 +239,12 @@ export const COMPANIES = [
     source: { kind: "recall", label: "2026 복기문제", file: "공기업 필기/2026_한전KDN_전산필기_1차.hwp" },
     questions: KDN_QUESTIONS, sections: KDN_SECTIONS, minutes: 60,
     lede: "소프트웨어공학 7문제, 프로그래밍·자료구조 5문제, 운영체제 5문제, 데이터베이스 17문제, 네트워크 16문제. 총 50문제, 60분, 5지선다. 2026 1차 응시 후기에 복원된 50문항의 주제 순서를 따라 새로 만든 문제로, DB와 네트워크 비중이 높습니다.",
+  },
+  {
+    key: "kicox", category: "public", abbr: "KICOX", name: "한국산업단지공단", meta: "정보기술 전공 39문제 · 55분 · 5지선다", ready: true,
+    source: { kind: "recall", label: "복기문제", file: "공기업 필기/산업단지공단 복기 문제.pdf" },
+    questions: KICOX_QUESTIONS, sections: KICOX_SECTIONS, minutes: 55,
+    lede: "데이터베이스 14문제, 자료구조·알고리즘 12문제, 소프트웨어공학 6문제, AI·보안 7문제. 총 39문제, 55분, 5지선다. 응시 후기에 복원된 39문항의 주제(인덱스 선택도, 비트맵 인덱스, Strict 2PL, 체크포인트, AVL·Red-Black 트리, 정렬 성질, V-모델, 결정 커버리지, Adam, Self-Attention, K-means 등)를 따라 새로 만든 문제로, DB와 자료구조 비중이 높고 딥러닝 기초가 함께 나옵니다.",
   },
   {
     key: "bnk", category: "finance", abbr: "BNK", name: "BNK캐피탈", meta: "금융상식 15 + NCS 15 · 40분 · 4지선다", ready: true,
