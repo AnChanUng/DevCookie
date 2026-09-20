@@ -227,12 +227,30 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
 
       <div className="exam-modes">
         <button className="exam-mode primary" onClick={() => start('exam', examIds())}>
-          <span><span className="t">실전 모의고사</span><span className="d">{examCount}문제 · {company.minutes}분 타이머 · {company.draw ? `문제은행 ${Q.length}문항에서 실제 출제 비율대로 추출` : '실제 영역 순서로 출제'}, 고르면 바로 정답·해설</span></span>
-          <span className="n">{examCount}문항</span>
+          <span className="exam-mode-head">
+            <span className="exam-mode-icon" aria-hidden="true">⏱</span>
+            <span className="exam-mode-count"><b>{examCount}</b>문항</span>
+          </span>
+          <span className="t">실전 모의고사</span>
+          <span className="d">{company.draw ? `문제은행 ${Q.length}문항에서 실제 출제 비율대로 뽑아 냅니다.` : '실제 시험의 영역 순서 그대로 출제합니다.'} 고르면 바로 정답과 해설이 나옵니다.</span>
+          <span className="exam-mode-foot">
+            <span className="exam-mode-chip">{company.minutes}분 타이머</span>
+            <span className="exam-mode-chip">즉시 채점</span>
+            <span className="exam-mode-go">시작하기 →</span>
+          </span>
         </button>
-        <button className="exam-mode" disabled={!wrongIds.length} onClick={() => start('wrong', shuffle(wrongIds))}>
-          <span><span className="t">오답 다시 풀기</span><span className="d">마지막에 틀린 문제만 모아서 즉시 채점 · 맞히면 오답에서 빠집니다</span></span>
-          <span className="n">{wrongIds.length}문항</span>
+        <button className={`exam-mode wrong${wrongIds.length ? '' : ' empty'}`} disabled={!wrongIds.length} onClick={() => start('wrong', shuffle(wrongIds))}>
+          <span className="exam-mode-head">
+            <span className="exam-mode-icon" aria-hidden="true">{wrongIds.length ? '↺' : '✓'}</span>
+            <span className="exam-mode-count"><b>{wrongIds.length}</b>문항</span>
+          </span>
+          <span className="t">오답 다시 풀기</span>
+          <span className="d">{wrongIds.length ? '마지막에 틀린 문제만 모아서 다시 풉니다. 맞히면 오답에서 빠집니다.' : '지금은 남은 오답이 없습니다. 문제를 풀다 틀리면 여기에 모입니다.'}</span>
+          <span className="exam-mode-foot">
+            <span className="exam-mode-chip">무작위 순서</span>
+            <span className="exam-mode-chip">즉시 채점</span>
+            {wrongIds.length > 0 && <span className="exam-mode-go">다시 풀기 →</span>}
+          </span>
         </button>
       </div>
 
