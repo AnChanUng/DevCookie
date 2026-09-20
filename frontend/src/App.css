@@ -2545,3 +2545,21 @@
   .ambience-sky { display: none; }
   .ambience-note.toast { animation: none; }
 }
+
+/* ===== 첫 화면 왼쪽 아래의 작은 오락실 입구. 눈에 잘 안 띄게 둔다 ===== */
+.arcade-door {
+  position: fixed;
+  left: 12px;
+  bottom: 10px;
+  z-index: 20;
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  opacity: 0.5;
+  transition: var(--transition);
+}
+
+.arcade-door:hover {
+  opacity: 1;
+  color: var(--accent-blue);
+}

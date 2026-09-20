@@ -29,6 +29,9 @@ export default function Home() {
           </Link>
         ))}
       </div>
+
+      {/* 오락실은 SPA 밖의 정적 페이지라 Link가 아니라 일반 링크로 연다 */}
+      <a href="/arcade/" className="arcade-door">오락실</a>
     </div>
   );
 }

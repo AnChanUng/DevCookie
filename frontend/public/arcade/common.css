@@ -1,0 +1,127 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+
+/* 오락실 공통 스타일. 본 사이트의 색만 빌려 오고 스타일시트는 공유하지 않는다 */
+:root {
+  --bg: #F6F8FC;
+  --surface: #FFFFFF;
+  --text: #0F172A;
+  --text-2: #475569;
+  --text-3: #94A3B8;
+  --line: rgba(148, 163, 184, 0.28);
+  --blue: #6366F1;
+  --blue-hover: #4F46E5;
+  --blue-light: rgba(99, 102, 241, 0.08);
+  --green: #10B981;
+  --red: #EF4444;
+  --orange: #F59E0B;
+  --night: #0B1026;
+}
+
+* { box-sizing: border-box; margin: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 16px 64px; }
+.wrap.narrow { max-width: 480px; }
+
+.head { padding: 28px 0 16px; }
+.head h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; margin-bottom: 6px; }
+.head p, .note { color: var(--text-3); font-size: 0.9rem; }
+.note { margin-top: 14px; }
+.back { display: inline-block; color: var(--text-3); font-size: 0.88rem; font-weight: 600; text-decoration: none; margin-bottom: 10px; }
+.back:hover { color: var(--blue); }
+
+.tag {
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--text);
+  color: #fff;
+}
+
+.btn {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 9px 16px;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.btn:hover:not(:disabled) { border-color: var(--blue); }
+.btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+.btn.primary:hover { background: var(--blue-hover); }
+.btn.sm { padding: 6px 12px; font-size: 0.8rem; }
+.btn.on { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
+
+/* 점수판 */
+.bar { display: flex; align-items: stretch; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 6px 14px; min-width: 78px; }
+.stat span { display: block; font-size: 0.68rem; font-weight: 700; color: var(--text-3); }
+.stat b { font-size: 1.15rem; font-weight: 900; font-variant-numeric: tabular-nums; }
+.bar .spacer { flex: 1; }
+.bar .btn { align-self: center; }
+
+/* 캔버스 게임 무대 */
+.stage {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--night);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.stage canvas { display: block; width: 100%; height: auto; }
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px;
+  text-align: center;
+  color: #fff;
+  background: rgba(11, 16, 38, 0.72);
+  backdrop-filter: blur(3px);
+}
+.overlay[hidden] { display: none; }
+.overlay h2 { font-size: 1.5rem; font-weight: 900; letter-spacing: -0.03em; }
+.overlay p { color: rgba(255, 255, 255, 0.78); font-size: 0.9rem; }
+
+/* 오락실 입구 */
+.games { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.game {
+  display: block;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px;
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.game:hover { transform: translateY(-3px); border-color: var(--blue); box-shadow: 0 12px 28px rgba(99, 102, 241, 0.14); }
+.game-icon { font-size: 2rem; line-height: 1; margin-bottom: 10px; }
+.game b { display: block; font-size: 1.02rem; font-weight: 800; margin-bottom: 2px; }
+.game span { display: block; color: var(--text-2); font-size: 0.84rem; }
+.game em { display: block; margin-top: 10px; font-style: normal; font-size: 0.76rem; font-weight: 700; color: var(--blue); min-height: 1.2em; }
+
+@media (prefers-reduced-motion: reduce) {
+  .game { transition: none; }
+}

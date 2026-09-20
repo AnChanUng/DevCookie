@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>벽돌깨기 · 숨은 오락실</title>
+    <link rel="stylesheet" href="/arcade/common.css" />
+  </head>
+  <body>
+    <main class="wrap narrow">
+      <header class="head">
+        <a class="back" href="/arcade/">← 오락실</a>
+        <h1>벽돌깨기</h1>
+        <p>마우스·손가락이나 방향키로 막대를 움직입니다. 막대 끝에 맞을수록 공이 크게 꺾입니다.</p>
+      </header>
+      <div class="bar">
+        <div class="stat"><span>점수</span><b id="score">0</b></div>
+        <div class="stat"><span>최고</span><b id="best">0</b></div>
+        <div class="stat"><span>판</span><b id="level">1</b></div>
+        <div class="stat"><span>목숨</span><b id="lives">3</b></div>
+      </div>
+      <div class="stage" id="stage" style="max-width: 60vh; margin: 0 auto">
+        <canvas id="canvas"></canvas>
+        <div class="overlay" id="overlay">
+          <h2 id="overlay-title">벽돌깨기</h2>
+          <p id="overlay-text">단단한 벽돌은 두 번 맞혀야 깨집니다.</p>
+          <button class="btn primary" id="start">시작</button>
+        </div>
+      </div>
+    </main>
+    <script type="module" src="/arcade/breakout/game.js"></script>
+  </body>
+</html>
