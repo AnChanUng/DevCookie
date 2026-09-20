@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>지뢰찾기 · 숨은 오락실</title>
+    <link rel="stylesheet" href="/arcade/common.css" />
+    <link rel="stylesheet" href="/arcade/mines/style.css" />
+  </head>
+  <body>
+    <main class="wrap narrow">
+      <header class="head">
+        <a class="back" href="/arcade/">← 오락실</a>
+        <h1>지뢰찾기</h1>
+        <p>우클릭이나 길게 누르기로 깃발을 꽂습니다. 열린 숫자를 누르면 주변을 한꺼번에 엽니다.</p>
+      </header>
+      <div class="bar">
+        <div class="stat"><span>남은 지뢰</span><b id="left">10</b></div>
+        <div class="stat"><span>시간</span><b id="time">0:00</b></div>
+        <div class="stat"><span>최고</span><b id="best">–</b></div>
+        <div class="spacer"></div>
+        <button class="btn" id="flag-mode">🚩 깃발 모드</button>
+      </div>
+      <div class="bar">
+        <button class="btn sm" data-level="easy">초급 9×9</button>
+        <button class="btn sm" data-level="normal">중급 16×16</button>
+        <button class="btn sm" data-level="hard">고급 16×22</button>
+        <div class="spacer"></div>
+        <button class="btn sm primary" id="restart">새 게임</button>
+      </div>
+      <div class="mines-status" id="status">아무 칸이나 눌러 시작하세요.</div>
+      <div class="mines-grid" id="grid"></div>
+    </main>
+    <script type="module" src="/arcade/mines/game.js"></script>
+  </body>
+</html>

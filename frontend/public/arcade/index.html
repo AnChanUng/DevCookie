@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>숨은 오락실</title>
+    <link rel="stylesheet" href="/arcade/common.css" />
+  </head>
+  <body>
+    <main class="wrap">
+      <header class="head">
+        <a class="back" href="/">← 공부하러 돌아가기</a>
+        <h1>숨은 오락실 <span class="tag">HIDDEN</span></h1>
+        <p>여기까지 찾아오셨네요. 머리 식힐 때 한 판만 하고 가세요. 기록은 이 브라우저에만 남습니다.</p>
+      </header>
+
+      <div class="games">
+        <a class="game" href="/arcade/eliminate/">
+          <div class="game-icon">🎯</div>
+          <b>소거법 디펜스</b>
+          <span>내려오는 선지 중 오답만 쏴서 지운다. 유일하게 공부가 되는 게임.</span>
+          <em data-best="eliminate"></em>
+        </a>
+        <a class="game" href="/arcade/2048/">
+          <div class="game-icon">🔢</div>
+          <b>2048</b>
+          <span>같은 숫자를 밀어서 합친다. 2048을 만들면 성공.</span>
+          <em data-best="2048"></em>
+        </a>
+        <a class="game" href="/arcade/snake/">
+          <div class="game-icon">🐍</div>
+          <b>스네이크</b>
+          <span>먹을수록 길어지고 빨라진다. 벽과 자기 몸을 피해라.</span>
+          <em data-best="snake"></em>
+        </a>
+        <a class="game" href="/arcade/breakout/">
+          <div class="game-icon">🧱</div>
+          <b>벽돌깨기</b>
+          <span>공을 튕겨 벽돌을 전부 부순다. 판이 넘어갈수록 빨라진다.</span>
+          <em data-best="breakout"></em>
+        </a>
+        <a class="game" href="/arcade/flappy/">
+          <div class="game-icon">🐤</div>
+          <b>퇴근 비행</b>
+          <span>탭 한 번에 날갯짓 한 번. 기둥 사이를 빠져나가 퇴근하라.</span>
+          <em data-best="flappy"></em>
+        </a>
+        <a class="game" href="/arcade/mines/">
+          <div class="game-icon">💣</div>
+          <b>지뢰찾기</b>
+          <span>숫자를 읽고 지뢰를 피한다. 첫 칸은 절대 안 터진다.</span>
+          <em data-best="mines"></em>
+        </a>
+        <a class="game" href="/arcade/memory/">
+          <div class="game-icon">🃏</div>
+          <b>짝 맞추기</b>
+          <span>카드를 두 장씩 뒤집어 같은 그림을 찾는다. 4×4와 6×6.</span>
+          <em data-best="memory"></em>
+        </a>
+        <a class="game" href="/arcade/reaction/">
+          <div class="game-icon">⚡</div>
+          <b>반응속도</b>
+          <span>초록으로 바뀌는 순간 누른다. 다섯 번의 평균으로 겨룬다.</span>
+          <em data-best="reaction"></em>
+        </a>
+      </div>
+    </main>
+
+    <script type="module">
+      import { store } from '/arcade/common.js';
+
+      const fmtTime = (sec) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+      const bests = {
+        eliminate: () => {
+          try { return JSON.parse(localStorage.getItem('arcade-eliminate') || '{}').best || 0; } catch { return 0; }
+        },
+        memory: () => {
+          const t = store.get('memory:best', {});
+          const parts = [[4, '4×4'], [6, '6×6']].filter(([k]) => t[k]).map(([k, n]) => `${n} ${t[k]}회`);
+          return parts.length ? parts.join(' · ') : 0;
+        },
+        reaction: () => {
+          const ms = store.get('reaction:best', 0);
+          return ms ? `평균 ${ms}ms` : 0;
+        },
+        mines: () => {
+          const t = store.get('mines:best', {});
+          const parts = [['easy', '초급'], ['normal', '중급'], ['hard', '고급']].filter(([k]) => t[k]).map(([k, n]) => `${n} ${fmtTime(t[k])}`);
+          return parts.length ? parts.join(' · ') : 0;
+        },
+      };
+      for (const el of document.querySelectorAll('[data-best]')) {
+        const key = el.dataset.best;
+        const best = bests[key] ? bests[key]() : store.get(`${key}:best`, 0);
+        if (best) el.textContent = typeof best === 'number' ? `최고 ${best.toLocaleString('ko-KR')}점` : `최고 ${best}`;
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,45 @@
+.mines-status { font-size: 0.88rem; font-weight: 700; color: var(--text-2); margin-bottom: 10px; min-height: 1.4em; }
+.mines-status.win { color: var(--green); }
+.mines-status.lose { color: var(--red); }
+
+.mines-grid {
+  display: grid;
+  gap: 2px;
+  padding: 6px;
+  border-radius: 14px;
+  background: var(--night);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+
+.cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 4px;
+  padding: 0;
+  font: inherit;
+  font-weight: 900;
+  font-size: clamp(0.62rem, 3.4vw, 1rem);
+  line-height: 1;
+  background: #4F56A6;
+  color: #fff;
+  cursor: pointer;
+}
+.cell:hover:not(.open) { background: #6068C2; }
+.cell.open { background: #1E2347; cursor: default; }
+.cell.boom { background: var(--red); }
+.cell.wrong { background: #7F1D1D; }
+
+.cell[data-n="1"] { color: #93C5FD; }
+.cell[data-n="2"] { color: #6EE7B7; }
+.cell[data-n="3"] { color: #FCA5A5; }
+.cell[data-n="4"] { color: #C4B5FD; }
+.cell[data-n="5"] { color: #FDBA74; }
+.cell[data-n="6"] { color: #67E8F9; }
+.cell[data-n="7"] { color: #F9A8D4; }
+.cell[data-n="8"] { color: #E5E7EB; }

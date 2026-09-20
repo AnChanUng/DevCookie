@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>짝 맞추기 · 숨은 오락실</title>
+    <link rel="stylesheet" href="/arcade/common.css" />
+    <link rel="stylesheet" href="/arcade/memory/style.css" />
+  </head>
+  <body>
+    <main class="wrap narrow">
+      <header class="head">
+        <a class="back" href="/arcade/">← 오락실</a>
+        <h1>짝 맞추기</h1>
+        <p>카드를 두 장씩 뒤집어 같은 그림을 찾습니다. 적게 뒤집을수록 좋은 기록입니다.</p>
+      </header>
+      <div class="bar">
+        <div class="stat"><span>뒤집은 횟수</span><b id="moves">0</b></div>
+        <div class="stat"><span>찾은 짝</span><b id="pairs">0 / 8</b></div>
+        <div class="stat"><span>최소 기록</span><b id="best">–</b></div>
+        <div class="spacer"></div>
+        <button class="btn primary" id="restart">새 게임</button>
+      </div>
+      <div class="bar">
+        <button class="btn sm" data-size="4">4×4</button>
+        <button class="btn sm" data-size="6">6×6</button>
+      </div>
+      <div class="memory-status" id="status"></div>
+      <div class="memory-grid" id="grid"></div>
+    </main>
+    <script type="module" src="/arcade/memory/game.js"></script>
+  </body>
+</html>

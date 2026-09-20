@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>퇴근 비행 · 숨은 오락실</title>
+    <link rel="stylesheet" href="/arcade/common.css" />
+  </head>
+  <body>
+    <main class="wrap narrow">
+      <header class="head">
+        <a class="back" href="/arcade/">← 오락실</a>
+        <h1>퇴근 비행</h1>
+        <p>탭, 클릭, 스페이스 중 아무거나 누르면 날갯짓합니다. 빌딩 사이를 빠져나가세요.</p>
+      </header>
+      <div class="bar">
+        <div class="stat"><span>통과</span><b id="score">0</b></div>
+        <div class="stat"><span>최고</span><b id="best">0</b></div>
+      </div>
+      <div class="stage" id="stage" style="max-width: 50vh; margin: 0 auto">
+        <canvas id="canvas"></canvas>
+        <div class="overlay" id="overlay">
+          <h2 id="overlay-title">퇴근 비행</h2>
+          <p id="overlay-text">10개를 넘기면 칼퇴, 30개를 넘기면 전설입니다.</p>
+          <button class="btn primary" id="start">시작</button>
+        </div>
+      </div>
+    </main>
+    <script type="module" src="/arcade/flappy/game.js"></script>
+  </body>
+</html>

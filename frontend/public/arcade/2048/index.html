@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>2048 · 숨은 오락실</title>
+    <link rel="stylesheet" href="/arcade/common.css" />
+    <link rel="stylesheet" href="/arcade/2048/style.css" />
+  </head>
+  <body>
+    <main class="wrap narrow">
+      <header class="head">
+        <a class="back" href="/arcade/">← 오락실</a>
+        <h1>2048</h1>
+        <p>방향키나 스와이프로 밉니다. 같은 숫자끼리 부딪히면 합쳐집니다.</p>
+      </header>
+      <div class="bar">
+        <div class="stat"><span>점수</span><b id="score">0</b></div>
+        <div class="stat"><span>최고</span><b id="best">0</b></div>
+        <div class="spacer"></div>
+        <button class="btn" id="undo">한 수 무르기</button>
+        <button class="btn primary" id="restart">새 게임</button>
+      </div>
+      <div class="stage board" id="board">
+        <div class="cells" id="cells"></div>
+        <div class="tiles" id="tiles"></div>
+        <div class="overlay" id="overlay" hidden>
+          <h2 id="overlay-title"></h2>
+          <p id="overlay-text"></p>
+          <div>
+            <button class="btn" id="keep" hidden>계속 하기</button>
+            <button class="btn primary" id="again">새 게임</button>
+          </div>
+        </div>
+      </div>
+    </main>
+    <script type="module" src="/arcade/2048/game.js"></script>
+  </body>
+</html>
