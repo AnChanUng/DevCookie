@@ -17,6 +17,7 @@
 }
 
 .header-inner {
+  max-width: 1128px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2213,19 +2214,31 @@
 }
 
 /* ===== Home Menu (번호가 붙은 학습 메뉴 3종) ===== */
+/* 첫 화면만 본문 폭(760px)을 벗어나 넓게 쓴다. fade-in이 transform을 쓰므로 위치는 margin으로 잡는다 */
+.home {
+  position: relative;
+  left: 50%;
+  width: min(1080px, calc(100vw - 48px));
+  margin-left: calc(min(1080px, calc(100vw - 48px)) / -2);
+}
+
 .home-menu {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  padding-bottom: 48px;
+  gap: 16px;
+  padding-bottom: 16px;
 }
 
 .home-menu-item {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  min-height: 200px;
-  padding: 22px 18px;
+  position: relative;
+  overflow: hidden;
+  min-height: 220px;
+  padding: 24px 22px;
+  --tone: var(--accent-blue);
+  --tone-light: var(--accent-blue-light);
   background: var(--glass-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -2235,10 +2248,30 @@
   transition: var(--transition);
 }
 
+.home-menu-item.violet { --tone: var(--accent-purple); --tone-light: var(--accent-purple-light); }
+.home-menu-item.cyan { --tone: #0891B2; --tone-light: rgba(6, 182, 212, 0.1); }
+.home-menu-item.pink { --tone: #DB2777; --tone-light: rgba(236, 72, 153, 0.08); }
+
+/* 카드 위쪽의 색 띠. 올리면 끝까지 차오른다 */
+.home-menu-item::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 36%;
+  height: 4px;
+  background: var(--tone);
+  border-radius: 0 0 4px 0;
+  transition: var(--transition);
+}
+
+.home-menu-item:hover::before {
+  width: 100%;
+}
+
 .home-menu-item:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--card-shadow-glow);
-  border-color: rgba(99, 102, 241, 0.25);
+  transform: translateY(-4px);
+  box-shadow: var(--card-shadow-hover);
+  border-color: var(--tone-light);
 }
 
 .home-menu-item:active {
@@ -2254,14 +2287,111 @@
   place-items: center;
   font-size: 1.15rem;
   font-weight: 900;
-  color: var(--accent-blue);
-  background: var(--accent-blue-light);
+  color: var(--tone);
+  background: var(--tone-light);
   transition: var(--transition);
 }
 
 .home-menu-item:hover .home-menu-no {
   color: #fff;
+  background: var(--tone);
+}
+
+.home-menu-go {
+  margin-top: auto;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--tone);
+  opacity: 0.55;
+  transition: var(--transition);
+}
+
+.home-menu-item:hover .home-menu-go {
+  opacity: 1;
+  transform: translateX(4px);
+}
+
+.home-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding-bottom: 56px;
+}
+
+.home-shortcut {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 14px 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.5);
+  transition: var(--transition);
+}
+
+.home-shortcut:hover {
+  background: var(--bg-primary);
+  border-color: var(--accent-blue);
+  box-shadow: var(--card-shadow);
+}
+
+.home-shortcut-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.home-shortcut-desc {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+}
+
+.home-eyebrow {
+  display: inline-block;
+  margin-bottom: 14px;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: var(--accent-blue);
+  background: var(--accent-blue-light);
+}
+
+.home-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.home-cta-btn {
+  padding: 12px 22px;
+  border-radius: var(--radius-full);
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+}
+
+.home-cta-btn:hover {
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
+.home-cta-btn.primary {
+  color: #fff;
+  border-color: transparent;
   background: var(--gradient-primary);
+  box-shadow: 0 8px 24px var(--accent-blue-glow);
+}
+
+.home-cta-btn.primary:hover {
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px var(--accent-blue-glow);
 }
 
 .home-menu-title {
@@ -2282,8 +2412,18 @@
 .home-top {
   display: flex;
   align-items: center;
-  gap: 28px;
-  padding: 36px 0 22px;
+  gap: 48px;
+  padding: 56px 0 40px;
+}
+
+.home-top .hero h1 {
+  font-size: 3rem;
+  line-height: 1.2;
+}
+
+.home-top .hero p {
+  max-width: 520px;
+  font-size: 1.05rem;
 }
 
 .home-top .hero {
@@ -2299,7 +2439,7 @@
 
 .goal-card {
   flex: none;
-  width: 270px;
+  width: 330px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -2401,9 +2541,42 @@
   color: var(--text-primary);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 900px) {
   .home-menu {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .home-top .hero h1 {
+    font-size: 2.4rem;
+  }
+
+  .home-top {
+    gap: 28px;
+  }
+
+  .goal-card {
+    width: 270px;
+  }
+}
+
+@media (max-width: 640px) {
+  .home-menu,
+  .home-shortcuts {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .home-top .hero h1 {
+    font-size: 2rem;
+  }
+
+  .home-cta {
+    justify-content: center;
+  }
+
+  .home-top .hero p {
+    max-width: none;
+    font-size: 0.98rem;
   }
 
   .home-menu-item {
