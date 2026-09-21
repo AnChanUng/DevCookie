@@ -2736,3 +2736,32 @@
   opacity: 1;
   color: var(--accent-blue);
 }
+
+/* ===== 자료 기부하기 ===== */
+.home-donate {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 20px 24px;
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--border-color);
+  background: linear-gradient(120deg, rgba(139, 122, 246, 0.10), rgba(56, 189, 248, 0.10));
+  transition: var(--transition);
+}
+
+.home-donate:hover {
+  border-color: var(--accent-blue);
+  box-shadow: var(--card-shadow);
+}
+
+.home-donate-icon { font-size: 1.9rem; }
+.home-donate-body { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+.home-donate-title { font-weight: 700; font-size: 1.02rem; }
+.home-donate-desc { font-size: 0.84rem; color: var(--text-tertiary); }
+.home-donate-go { font-size: 0.82rem; font-weight: 700; color: var(--accent-blue); white-space: nowrap; }
+
+@media (max-width: 640px) {
+  .home-donate { flex-wrap: wrap; }
+  .home-donate-go { width: 100%; text-align: right; }
+}
