@@ -6,6 +6,7 @@ const NOTES = [
   { file: 'ipe-silgi-theory.pdf', title: '정보처리기사 실기', desc: '실기 이론편 요약노트 · 서술형 대비'},
   { file: 'sqld-concepts.pdf', title: 'SQLD', desc: '2024 개념 정리 노트 · 데이터 모델링 · SQL 기본 및 활용 · 22쪽'},
   { file: 'bigdata-analyst-summary.pdf', title: '빅데이터분석기사', desc: '2026.02.05 개정판 요약노트 · 필기 전 과목 · 69쪽'},
+  { file: 'adsp-summary.pdf', title: 'ADsP', desc: '데이터분석 준전문가 요약노트 · 데이터 이해 · 분석 기획 · 분석 · 23쪽'},
 ];
 
 export default function MajorPage() {
@@ -18,25 +19,30 @@ export default function MajorPage() {
       <div className="page-header">
         <Link to="/" className="back-link">← 홈으로</Link>
         <h1>📝 필기이론</h1>
-        <p>정보처리기사 · SQLD · 빅데이터분석기사 요약노트 PDF · 화면에서 바로 읽는 열람 전용</p>
+        <p>정보처리기사 · SQLD · 빅데이터분석기사 · ADsP 요약노트 PDF · 화면에서 바로 읽거나 내려받기</p>
       </div>
 
       <div className="section-title">이론노트</div>
       <div className="notes-grid">
         {NOTES.map(n => (
-          <button
-            key={n.file}
-            type="button"
-            className={`note-card ${open === n.file ? 'on' : ''}`}
-            onClick={() => { setOpen(open === n.file ? null : n.file); }}
-          >
-            <span className="note-icon">📄</span>
-            <span className="note-body">
-              <span className="note-title">{n.title}</span>
-              <span className="note-desc">{n.desc}</span>
-            </span>
-            <span className="note-tag">{open === n.file ? '닫기' : '보기'}</span>
-          </button>
+          <div key={n.file} className={`note-card ${open === n.file ? 'on' : ''}`}>
+            <button
+              type="button"
+              className="note-open"
+              onClick={() => { setOpen(open === n.file ? null : n.file); }}
+            >
+              <span className="note-icon">📄</span>
+              <span className="note-body">
+                <span className="note-title">{n.title}</span>
+                <span className="note-desc">{n.desc}</span>
+              </span>
+              <span className="note-tag">{open === n.file ? '닫기' : '보기'}</span>
+            </button>
+            {/* download 속성: 뷰어로 열지 않고 제목 그대로 저장한다 */}
+            <a className="note-dl" href={`/notes/${n.file}`} download={`${n.title} 요약노트.pdf`}>
+              ⬇ 저장
+            </a>
+          </div>
         ))}
       </div>
 
@@ -45,11 +51,10 @@ export default function MajorPage() {
           <div className="note-viewer-bar">
             <strong>{note.title}</strong>
             <span className="spacer" />
-            <span className="note-tag">열람 전용</span>
+            <a className="exam-btn" href={`/notes/${note.file}`} download={`${note.title} 요약노트.pdf`}>⬇ 다운로드</a>
           </div>
-          {/* toolbar=0: 브라우저 PDF 뷰어의 다운로드·인쇄 버튼을 숨긴다 */}
-          <iframe title={note.title} src={`/notes/${note.file}#toolbar=0&navpanes=0&view=FitH`} className="note-frame" />
-          <p className="note-hint">화면에서 바로 읽는 열람 전용 자료입니다. 일부 모바일 브라우저에서는 PDF가 표시되지 않을 수 있습니다.</p>
+          <iframe title={note.title} src={`/notes/${note.file}#navpanes=0&view=FitH`} className="note-frame" />
+          <p className="note-hint">화면에서 바로 읽거나 다운로드해 보관할 수 있습니다. 일부 모바일 브라우저에서는 PDF가 표시되지 않을 수 있습니다.</p>
         </div>
       )}
     </div>
