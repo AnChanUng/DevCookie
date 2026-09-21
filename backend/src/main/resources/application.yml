@@ -24,6 +24,11 @@ spring:
 
 server:
   port: 8080
+  # 멀티파트의 텍스트 필드가 ISO-8859-1로 읽혀 한글이 깨지던 것을 막는다
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
 
 slack:
   webhook-url: ${SLACK_WEBHOOK_URL:https://hooks.slack.com/services/YOUR/WEBHOOK/URL}

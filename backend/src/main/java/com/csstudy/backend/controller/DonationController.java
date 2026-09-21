@@ -48,9 +48,9 @@ public class DonationController {
     /** 누구나 부르는 기부 엔드포인트 */
     @PostMapping(value = "/donations", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Map<String, Object> donate(@RequestPart("file") MultipartFile file,
-                                      @RequestPart(value = "kind", required = false) String kind,
-                                      @RequestPart(value = "label", required = false) String label,
-                                      @RequestPart(value = "note", required = false) String note,
+                                      @RequestParam(value = "kind", required = false) String kind,
+                                      @RequestParam(value = "label", required = false) String label,
+                                      @RequestParam(value = "note", required = false) String note,
                                       @RequestHeader(value = "X-Visitor-Id", required = false) String visitorId) {
 
         if (file == null || file.isEmpty()) bad("올릴 파일이 없습니다.");
@@ -137,6 +137,19 @@ public class DonationController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "그런 자료가 없습니다."));
         d.setHandled(true);
         donationRepository.save(d);
+        return Map.of("ok", true, "id", id);
+    }
+
+    /** 쓸모없는 자료나 장난으로 올라온 것을 지운다 */
+    @DeleteMapping("/donations/{id}")
+    public Map<String, Object> delete(@PathVariable Long id,
+                                      @RequestHeader(value = "X-Admin-Key", required = false) String key) {
+        adminAuth.require(key);
+        if (!donationRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "그런 자료가 없습니다.");
+        }
+        donationRepository.deleteById(id);
+        log.info("자료 기부 삭제: #{}", id);
         return Map.of("ok", true, "id", id);
     }
 
