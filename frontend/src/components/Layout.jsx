@@ -51,6 +51,10 @@ export default function Layout() {
               <Link to="/stats" className={location.pathname === '/stats' ? 'active' : ''}>
                 통계
               </Link>
+              {/* 자료가 들어와야 문제은행이 늘어난다. 눈에 띄게 따로 칠한다 */}
+              <Link to="/donate" className={`nav-donate${location.pathname === '/donate' ? ' active' : ''}`}>
+                자료 기부
+              </Link>
             </nav>
             <StudyCount />
           </div>

@@ -51,17 +51,6 @@ export default function Home() {
           </Link>
         ))}
       </div>
-
-      {/* 복기 자료가 들어와야 문제은행이 늘어난다. 그래서 홈에 따로 자리를 준다 */}
-      <Link to="/donate" className="home-donate">
-        <span className="home-donate-icon" aria-hidden="true">🎁</span>
-        <span className="home-donate-body">
-          <span className="home-donate-title">자료 기부하기</span>
-          <span className="home-donate-desc">필기 복기·복원 자료나 요약노트를 올려 주세요. 저장소에 저장되고, 이를 바탕으로 새 문제은행을 만듭니다.</span>
-        </span>
-        <span className="home-donate-go">올리러 가기 →</span>
-      </Link>
-
       {/* 오락실은 SPA 밖의 정적 페이지라 Link가 아니라 일반 링크로 연다 */}
       <a href="/arcade/" className="arcade-door">오락실</a>
     </div>

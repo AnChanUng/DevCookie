@@ -55,11 +55,24 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
 }
 
 .nav-links {
   display: flex;
   gap: 4px;
+  /* 메뉴가 늘어 창 너비를 넘어서면 잘리지 않고 가로로 밀리게 한다 */
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.nav-links::-webkit-scrollbar {
+  display: none;
+}
+
+.nav-links a {
+  flex: none;
 }
 
 /* 헤더 오른쪽의 "지금 공부 중" 표시 */
@@ -2737,31 +2750,20 @@
   color: var(--accent-blue);
 }
 
-/* ===== 자료 기부하기 ===== */
-.home-donate {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-top: 16px;
-  padding: 20px 24px;
-  border-radius: var(--radius-lg, 16px);
-  border: 1px solid var(--border-color);
-  background: linear-gradient(120deg, rgba(139, 122, 246, 0.10), rgba(56, 189, 248, 0.10));
-  transition: var(--transition);
+/* 내비게이션의 자료 기부. 다른 메뉴와 달리 항상 칠해 두어 눈에 띄게 한다 */
+.nav-links a.nav-donate {
+  color: var(--accent-blue);
+  background: var(--accent-blue-light);
+  font-weight: 700;
 }
 
-.home-donate:hover {
-  border-color: var(--accent-blue);
+.nav-links a.nav-donate::before {
+  content: '🎁';
+  margin-right: 4px;
+  font-size: 0.82em;
+}
+
+.nav-links a.nav-donate:hover {
+  color: var(--accent-blue);
   box-shadow: var(--card-shadow);
-}
-
-.home-donate-icon { font-size: 1.9rem; }
-.home-donate-body { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
-.home-donate-title { font-weight: 700; font-size: 1.02rem; }
-.home-donate-desc { font-size: 0.84rem; color: var(--text-tertiary); }
-.home-donate-go { font-size: 0.82rem; font-weight: 700; color: var(--accent-blue); white-space: nowrap; }
-
-@media (max-width: 640px) {
-  .home-donate { flex-wrap: wrap; }
-  .home-donate-go { width: 100%; text-align: right; }
 }
