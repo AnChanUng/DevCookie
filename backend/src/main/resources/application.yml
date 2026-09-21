@@ -19,8 +19,8 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 20MB
-      max-request-size: 22MB
+      max-file-size: 10MB
+      max-request-size: 12MB
 
 server:
   port: 8080
@@ -39,9 +39,3 @@ app:
 
 gemini:
   api-key: ${GEMINI_API_KEY:}
-
-# 자료 기부 화면에서 올린 파일을 저장소에 커밋할 때 쓰는 토큰. Render 대시보드에서 설정한다
-github:
-  token: ${GITHUB_TOKEN:}
-  repo: ${GITHUB_REPO:AnChanUng/cs-study-platform}
-  branch: ${GITHUB_BRANCH:master}

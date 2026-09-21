@@ -8,7 +8,7 @@ const KINDS = [
   { key: 'major', dir: '전공필기', title: '전공·자격증 필기', desc: '요약노트 · 개념정리 · 기출 모음' },
 ];
 
-const MAX_MB = 20;
+const MAX_MB = 10;
 
 // 같은 사람이 하루에 몇 번 올렸는지 세는 용도. 기기마다 한 번 만들어 두고 계속 쓴다
 const visitorId = () => {
@@ -72,7 +72,7 @@ export default function DonatePage() {
       <div className="page-header">
         <Link to="/" className="back-link">← 홈으로</Link>
         <h1>🎁 자료 기부하기</h1>
-        <p>복기·복원 자료나 요약노트를 올려 주세요. 그대로 보관되고, 이를 바탕으로 새 문제은행을 만듭니다.</p>
+        <p>복기·복원 자료나 요약노트를 올려 주세요. 로그인도 가입도 필요 없습니다. 받은 자료로 새 문제은행을 만듭니다.</p>
       </div>
 
       <form className="donate-form" onSubmit={submit}>
@@ -150,8 +150,9 @@ export default function DonatePage() {
             <table className="exam-table">
               <thead><tr><th>날짜</th><th>자료</th><th>분류</th><th>문제 제작</th></tr></thead>
               <tbody>
-                {ledger.slice().reverse().map((d, i) => (
-                  <tr key={i}>
+                {/* 서버가 최신순으로 내려준다 */}
+                {ledger.map((d, i) => (
+                  <tr key={d.id ?? i}>
                     <td>{d.at?.slice(0, 10)}</td>
                     <td>{d.label}{d.note ? ` · ${d.note}` : ''}</td>
                     <td>{KINDS.find(k => k.key === d.kind)?.title || d.kind}</td>

@@ -16,10 +16,6 @@ services:
       # 관리자 페이지(/admin/cu) 접속 키. Render 대시보드에서 직접 설정한다
       - key: ADMIN_KEY
         sync: false
-      # 자료 기부하기에서 올린 파일을 저장소에 커밋할 때 쓰는 GitHub 토큰.
-      # Fine-grained token · cs-study-platform 저장소만 · Contents: Read and write
-      - key: GITHUB_TOKEN
-        sync: false
 
   - type: web
     name: cs-study-frontend
