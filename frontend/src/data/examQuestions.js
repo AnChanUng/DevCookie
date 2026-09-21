@@ -20,7 +20,7 @@ import { KEXIM_SECTIONS, KEXIM_QUESTIONS } from './keximQuestions';
 import { KEPCO_SECTIONS, KEPCO_QUESTIONS } from './kepcoQuestions';
 import { NHIS_SECTIONS, NHIS_QUESTIONS } from './nhisQuestions';
 import { LH_SECTIONS, LH_QUESTIONS } from './lhQuestions';
-import { NHFIRE_SECTIONS, NHFIRE_QUESTIONS } from './nhfireQuestions';
+import { NHFIRE_SECTIONS, NHFIRE_QUESTIONS, NHFIRE_SETS } from './nhfireQuestions';
 import { IBKDT_SECTIONS, IBKDT_QUESTIONS, IBKDT_SETS } from './ibkDigitalQuestions';
 import { HF_CPP_QUESTIONS } from './hfCppQuestions';
 import { COMIL } from './comilQuestions';
@@ -202,10 +202,11 @@ export const COMPANIES = [
     lede: "데이터베이스 9문제, 빅데이터·AI 모델링 9문제, 전산학 8문제, 블록체인·디지털금융 시사 4문제. 한 회 30문제, 45분, 4지선다로 3회분을 준비했습니다. 필기 구성(직업기초 40 + 직무수행 35 = 객관식 30 · 주관식 5, 120분)과 디지털 분야 공개 출제범위(데이터베이스 · 빅데이터 · 인공지능 모델링 · 블록체인 · 전산학 · 시사)를 반영해 새로 만든 예상문제입니다. 실제 시험의 주관식 5문항은 포함하지 않았으며, 위의 실전 모의고사는 90문항 문제은행에서 같은 비율로 매번 새로 뽑아 냅니다.",
   },
   {
-    key: "nhfire", category: "finance", abbr: "NH손보", name: "NH농협손해보험", meta: "직무상식평가 30문제 · 25분 · 4지선다", ready: true,
+    key: "nhfire", category: "finance", abbr: "NH손보", name: "NH농협손해보험", meta: "직무상식평가 30문제 × 3회 · 25분 · 4지선다", ready: true,
     source: { kind: "predicted" },
     questions: NHFIRE_QUESTIONS, sections: NHFIRE_SECTIONS, minutes: 25,
-    lede: "농업·농촌·농협 5문제, 손해보험·디지털금융 5문제, 데이터베이스 6문제, 전자계산기구조·운영체제 5문제, 소프트웨어공학 5문제, 데이터통신·정보보호 4문제. 총 30문제, 25분, 4지선다. NH 계열사 공통 필기(인적성 + 직무능력평가 50문제·70분 + 직무상식평가 30문제·25분) 중 직무상식평가를 대상으로 하며, IT직 출제범위로 공개된 농업·농촌 및 디지털 상식과 데이터베이스·전자계산기 구조·운영체제·소프트웨어공학·데이터통신에 손해보험 도메인을 더해 새로 만든 예상문제입니다.",
+    sets: NHFIRE_SETS, draw: { agri: 5, ins: 5, db: 6, arch: 5, se: 5, net: 4 },
+    lede: "농업·농촌·농협 5문제, 손해보험·디지털금융 5문제, 데이터베이스 6문제, 전자계산기구조·운영체제 5문제, 소프트웨어공학 5문제, 데이터통신·정보보호 4문제. 한 회 30문제, 25분, 4지선다로 3회분을 준비했습니다. NH 계열사 공통 필기(인적성 + 직무능력평가 50문제·70분 + 직무상식평가 30문제·25분) 중 직무상식평가를 대상으로 하며, IT직 출제범위로 공개된 농업·농촌 및 디지털 상식과 데이터베이스·전자계산기 구조·운영체제·소프트웨어공학·데이터통신에 손해보험 도메인을 더해 새로 만든 예상문제입니다. 위의 실전 모의고사는 90문항 문제은행에서 같은 비율로 매번 새로 뽑아 냅니다.",
   },
   {
     key: "kfsb", category: "finance", abbr: "KFSB", name: "저축은행중앙회", meta: "IT직무 전공 50문제 · 60분 · 4지선다", ready: true,
