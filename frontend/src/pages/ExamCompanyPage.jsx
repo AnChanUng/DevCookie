@@ -21,8 +21,9 @@ const fmtDate = (ts) => {
   const p = (n) => String(n).padStart(2, '0');
   return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 };
-const modeLabel = (sections, mode, sec) =>
+const modeLabel = (sections, mode, sec, sets) =>
   mode === 'exam' ? '실전 모의고사'
+    : mode === 'set' ? sets?.find(s => s.key === sec)?.name || '회차별 모의고사'
     : mode === 'wrong' ? '오답 다시 풀기'
     : mode === 'marked' ? '북마크 다시 풀기'
     : mode === 'recall' ? '응시 후기 복원 문제'
@@ -45,7 +46,8 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
   const secKeys = Object.keys(SECTIONS).filter(k => !SECTIONS[k].extra); // 모의고사 채점 영역
   const CPP = useMemo(() => company.extra || [], [company]); // C++ 집중 문제집 (모의고사 미포함)
   const RECALL = company.recall; // 응시 후기 복원 문제 (모의고사 미포함)
-  const label = (mode, sec) => (mode === 'recall' && RECALL ? RECALL.title : modeLabel(SECTIONS, mode, sec));
+  const SETS = company.sets || []; // 실제 시험처럼 한 번에 치르는 고정 회차
+  const label = (mode, sec) => (mode === 'recall' && RECALL ? RECALL.title : modeLabel(SECTIONS, mode, sec, SETS));
   const ALL = useMemo(() => [...Q, ...CPP, ...(RECALL?.questions || [])], [Q, CPP, RECALL]); // 오답노트·오답 다시 풀기 범위
   const byId = useMemo(() => Object.fromEntries(ALL.map(q => [q.id, q])), [ALL]);
   const { data, save } = useExamProgress(company.key);
@@ -73,7 +75,7 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
   };
 
   const finish = (quiz, answers, aborted) => {
-    const isExam = quiz.mode === 'exam';
+    const isExam = quiz.mode === 'exam' || quiz.mode === 'set'; // 회차 시험도 실전과 똑같이 기록·영역별 채점
     let score = 0;
     const secScore = Object.fromEntries(secKeys.map(k => [k, 0]));
     const items = [];
@@ -160,7 +162,7 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
         {header('채점 결과')}
         <p className="exam-eyebrow">{label(r.mode, r.sec)} · 소요 {fmtT(r.elapsed)}</p>
         <div className="exam-score"><span className="big">{r.score}</span><span className="of">/ {r.total}문제 · {r.total ? Math.round(r.score / r.total * 100) : 0}%</span></div>
-        {r.mode === 'exam' && (
+        {(r.mode === 'exam' || r.mode === 'set') && (
           <div className="exam-stats">
             {secKeys.map(k => <StatTile key={k} k={SECTIONS[k].name} v={r.secScore[k]} of={r.items.filter(x => x.q.sec === k).length} />)}
           </div>
@@ -274,6 +276,28 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
         </>
       )}
 
+      {SETS.length > 0 && (
+        <>
+          <div className="section-title">회차별 모의고사</div>
+          <p className="exam-lede">실제 시험과 같은 문항 수·영역 구성으로 묶은 고정 세트입니다. 위의 실전 모의고사가 문제은행에서 매번 새로 뽑는 것과 달리, 각 회차는 같은 문제를 같은 순서로 출제하므로 회차 간 점수를 비교할 수 있습니다.</p>
+          <div className="exam-sections">
+            {SETS.map(s => {
+              const qs = Q.filter(q => q.set === s.key);
+              const done = qs.filter(q => data.stats[q.id]).length;
+              const right = qs.filter(q => data.stats[q.id]?.last === 'r').length;
+              return (
+                <button key={s.key} className="exam-section" onClick={() => start('set', qs.map(q => q.id), s.key)}>
+                  <span className="t">{s.name}</span>
+                  <span className="d">{s.sub}</span>
+                  <span className="d">{qs.length}문제 · {company.minutes}분 · 최근 정답 {right}/{done}</span>
+                  <span className="bar"><i style={{ width: `${qs.length ? Math.round(right / qs.length * 100) : 0}%` }} /></span>
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
+
       <div className="section-title">영역별 연습</div>
       <div className="exam-sections">
         {Object.entries(SECTIONS).filter(([, s]) => !s.extra).map(([k, s]) => {
@@ -354,7 +378,7 @@ function StatTile({ k, v, of, unit }) {
 
 function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractice, onFinish, header, marks, onMark }) {
   const EXAM_SECONDS = minutes * 60;
-  const isExam = mode === 'exam';
+  const isExam = mode === 'exam' || mode === 'set'; // 회차 시험도 타이머를 걸고 제출 후 한꺼번에 채점한다
   const [idx, setIdx] = useState(0);
   const [answers, setAnswers] = useState({});
   const [revealed, setRevealed] = useState({});
