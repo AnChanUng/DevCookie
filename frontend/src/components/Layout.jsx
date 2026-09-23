@@ -30,14 +30,11 @@ export default function Layout() {
               <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
                 홈
               </Link>
-              <Link to="/exam" className={location.pathname.startsWith('/exam') ? 'active' : ''}>
+              <Link to="/exam" className={location.pathname.startsWith('/exam') || location.pathname === '/computer-general' ? 'active' : ''}>
                 기업별 기출
               </Link>
               <Link to="/ssafy" className={location.pathname.startsWith('/ssafy') ? 'active' : ''}>
                 SSAFY
-              </Link>
-              <Link to="/computer-general" className={location.pathname === '/computer-general' ? 'active' : ''}>
-                컴퓨터일반
               </Link>
               <Link to="/ncs" className={location.pathname === '/ncs' ? 'active' : ''}>
                 NCS

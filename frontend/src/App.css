@@ -2263,6 +2263,7 @@
 
 .home-menu-item.violet { --tone: var(--accent-purple); --tone-light: var(--accent-purple-light); }
 .home-menu-item.cyan { --tone: #0891B2; --tone-light: rgba(6, 182, 212, 0.1); }
+.home-menu-item.ssafy { --tone: #1D6FE0; --tone-light: rgba(29, 111, 224, 0.08); }
 .home-menu-item.pink { --tone: #DB2777; --tone-light: rgba(236, 72, 153, 0.08); }
 
 /* 카드 위쪽의 색 띠. 올리면 끝까지 차오른다 */

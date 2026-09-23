@@ -4,7 +4,7 @@
 // 위상 정렬 대상 그래프의 구조적 제한 2가지)을 그대로 따르고, 같은 주제의 연습 문항을 더해 새로 만들었다.
 export const SSAFY_MONTHLY_SECTIONS = {
   bfs:   {name:'BFS · DFS', short:'탐색', sub:'진행 방식 · 핵심 자료구조 · 최단 거리 · 방문 처리', count:5},
-  repr:  {name:'그래프 표현과 탐색 시간', short:'표현', sub:'인접 행렬 · 인접 리스트 · 시간 · 공간 복잡도', count:5},
+  repr:  {name:'그래프 표현', short:'표현', sub:'인접 행렬 · 인접 리스트 · 시간 · 공간 복잡도', count:5},
   topo:  {name:'위상 정렬', short:'위상', sub:'DAG 조건 · Kahn 알고리즘 · 사이클 판별', count:5},
 };
 
