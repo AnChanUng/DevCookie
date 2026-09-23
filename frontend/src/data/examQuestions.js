@@ -22,6 +22,7 @@ import { NHIS_SECTIONS, NHIS_QUESTIONS } from './nhisQuestions';
 import { LH_SECTIONS, LH_QUESTIONS } from './lhQuestions';
 import { NHFIRE_SECTIONS, NHFIRE_QUESTIONS, NHFIRE_SETS } from './nhfireQuestions';
 import { IBKDT_SECTIONS, IBKDT_QUESTIONS, IBKDT_SETS } from './ibkDigitalQuestions';
+import { IBKIT_SECTIONS, IBKIT_QUESTIONS, IBKIT_SETS } from './ibkItQuestions';
 import { HF_CPP_QUESTIONS } from './hfCppQuestions';
 import { COMIL } from './comilQuestions';
 import { NCS } from './ncsQuestions';
@@ -209,6 +210,13 @@ export const COMPANIES = [
     questions: IBKDT_QUESTIONS, sections: IBKDT_SECTIONS, minutes: 45,
     sets: IBKDT_SETS, draw: { db: 9, bda: 9, cs: 8, fin: 4 },
     lede: "데이터베이스 9문제, 빅데이터·AI 모델링 9문제, 전산학 8문제, 블록체인·디지털금융 시사 4문제. 한 회 30문제, 45분, 4지선다로 3회분을 준비했습니다. 필기 구성(직업기초 40 + 직무수행 35 = 객관식 30 · 주관식 5, 120분)과 디지털 분야 공개 출제범위(데이터베이스 · 빅데이터 · 인공지능 모델링 · 블록체인 · 전산학 · 시사)를 반영해 새로 만든 예상문제입니다. 실제 시험의 주관식 5문항은 포함하지 않았으며, 위의 실전 모의고사는 90문항 문제은행에서 같은 비율로 매번 새로 뽑아 냅니다.",
+  },
+  {
+    key: "ibkit", category: "finance", abbr: "IBK IT", name: "IBK기업은행 IT", meta: "직무수행(IT) 객관식 30 + 주관식 5 × 3회 · 55분", ready: true,
+    source: { kind: "predicted" },
+    questions: IBKIT_QUESTIONS, sections: IBKIT_SECTIONS, minutes: 55,
+    sets: IBKIT_SETS, draw: { ds: 6, os: 5, db: 6, nw: 5, sec: 4, se: 2, fin: 2, sub: 5 },
+    lede: "직무수행능력(IT) 파트를 실제 시험처럼 객관식 30문제(4지선다)와 주관식 5문제로 구성했습니다. 자료구조·알고리즘 6, 운영체제·컴퓨터구조 5, 데이터베이스 6, 네트워크 5, 정보보호 4, 소프트웨어공학 2, 디지털금융·IT시사 2, 주관식 계산 5문제. 한 회 35문제, 55분으로 3회분을 준비했습니다. 2026 상반기 복기 자료의 출제 형식(ㄱ~ㄹ 중 옳은 것 모두 고르기, 계산형, (주)IBK 상황 제시, 단위까지 쓰는 주관식)을 IT 분야 출제범위에 맞춰 새로 만든 예상문제이며, NCS 직업기초능력 40문제는 기업은행 문제집에서 풀 수 있습니다.",
   },
   {
     key: "nhfire", category: "finance", abbr: "NH손보", name: "NH농협손해보험", meta: "직무상식평가 30문제 × 3회 · 25분 · 4지선다", ready: true,
