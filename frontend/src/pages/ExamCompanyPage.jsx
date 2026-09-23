@@ -7,6 +7,10 @@ import { useExamProgress, recordAnswer, isMarked, toggleMark } from '../hooks/us
 
 const CIRC = ['①', '②', '③', '④', '⑤'];
 
+// 단답형·서술형(kind)은 보기 없이 답을 직접 써 보고 모범답안과 비교한다. 답은 'r'(맞음) / 'w'(틀림)으로 기록
+const isRight = (q, a) => (q.kind ? a === 'r' : a === q.a);
+const normAns = (s) => s.replace(/[\s()[\]{}.,·'"`_-]/g, '').toLowerCase();
+
 const shuffle = (arr) => {
   const a = arr.slice();
   for (let i = a.length - 1; i > 0; i--) {
@@ -84,7 +88,7 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
       const q = byId[id];
       const a = answers[id];
       if (a === undefined && aborted) return;
-      const ok = a === q.a;
+      const ok = isRight(q, a);
       if (isExam) stats = recordAnswer(stats, id, ok);
       if (ok) { score++; if (q.sec in secScore) secScore[q.sec]++; }
       items.push({ q, a, ok });
@@ -382,6 +386,8 @@ function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractic
   const [idx, setIdx] = useState(0);
   const [answers, setAnswers] = useState({});
   const [revealed, setRevealed] = useState({});
+  const [texts, setTexts] = useState({}); // 단답형·서술형에 적은 답
+  const [peeked, setPeeked] = useState({}); // 모범답안을 펼쳐 자가채점을 기다리는 문제
   const [left, setLeft] = useState(EXAM_SECONDS);
   const startedAt = useRef(Date.now());
   const quiz = { mode, sec, ids, startedAt: startedAt.current };
@@ -416,7 +422,14 @@ function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractic
     if (revealed[q.id]) return;
     setAnswers(a => ({ ...a, [q.id]: i }));
     setRevealed(r => ({ ...r, [q.id]: true }));
-    if (!isExam) onPractice(q.id, i === q.a);
+    if (!isExam) onPractice(q.id, isRight(q, i));
+  };
+
+  // 단답형은 허용 답안과 글자가 같으면 바로 정답 처리하고, 아니면 모범답안을 보여 주고 스스로 채점하게 한다
+  const peek = () => {
+    const t = texts[q.id] || '';
+    if (q.kind === 'short' && t.trim() && q.acc?.some(x => normAns(x) === normAns(t))) choose('r');
+    else setPeeked(p => ({ ...p, [q.id]: true }));
   };
 
   return (
@@ -438,6 +451,26 @@ function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractic
           <MarkButton on={!!marks?.[q.id]?.on} onClick={() => onMark(q.id)} />
         </div>
         <QuestionBody q={q} />
+        {q.kind ? (
+          <div className="exam-written">
+            {q.kind === 'essay'
+              ? <textarea rows={6} value={texts[q.id] || ''} disabled={shown} placeholder="답안을 적어 보세요. 적지 않고 바로 모범답안을 확인해도 됩니다." onChange={e => setTexts(t => ({ ...t, [q.id]: e.target.value }))} />
+              : <input type="text" value={texts[q.id] || ''} disabled={shown} placeholder="답을 입력하세요" onChange={e => setTexts(t => ({ ...t, [q.id]: e.target.value }))} onKeyDown={e => { if (e.key === 'Enter' && !shown && !peeked[q.id]) peek(); }} />}
+            {!shown && !peeked[q.id] && (
+              <div className="exam-actions"><button className="exam-btn primary" onClick={peek}>답안 확인</button></div>
+            )}
+            {!shown && peeked[q.id] && (
+              <div className="exam-expl">
+                <ModelAnswer q={q} />
+                <div className="exam-written-ask">모범답안과 비교해 스스로 채점하세요.</div>
+                <div className="exam-actions">
+                  <button className="exam-btn primary" onClick={() => choose('r')}>맞았어요</button>
+                  <button className="exam-btn" onClick={() => choose('w')}>틀렸어요</button>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
         <ul className="exam-opts">
           {q.o.map((opt, i) => {
             let cls = 'exam-opt';
@@ -452,9 +485,11 @@ function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractic
             );
           })}
         </ul>
+        )}
         {shown && (
-          <div className={`exam-expl ${sel === q.a ? 'ok' : 'bad'}`}>
-            <div className="lab">{sel === q.a ? '정답' : `오답 · 정답은 ${CIRC[q.a]}`}</div>
+          <div className={`exam-expl ${isRight(q, sel) ? 'ok' : 'bad'}`}>
+            <div className="lab">{q.kind ? (isRight(q, sel) ? '정답' : '오답') : sel === q.a ? '정답' : `오답 · 정답은 ${CIRC[q.a]}`}</div>
+            {q.kind && <ModelAnswer q={q} />}
             <div>{q.e}</div>
           </div>
         )}
@@ -472,7 +507,7 @@ function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractic
         {ids.map((id, i) => {
           let cls = 'gn';
           if (i === idx) cls += ' cur';
-          if (answers[id] !== undefined) cls += answers[id] === byId[id].a ? ' r' : ' w';
+          if (answers[id] !== undefined) cls += isRight(byId[id], answers[id]) ? ' r' : ' w';
           return <button key={id} className={cls} onClick={() => setIdx(i)}>{i + 1}</button>;
         })}
       </div>
@@ -490,6 +525,21 @@ function QuestionBody({ q, className = 'exam-qtext' }) {
   );
 }
 
+function ModelAnswer({ q }) {
+  return (
+    <div className="exam-model">
+      <div className="lab">모범답안</div>
+      <div className="ans">{q.ans}</div>
+      {q.pts && (
+        <>
+          <div className="lab">채점 포인트</div>
+          <ul>{q.pts.map(p => <li key={p}>{p}</li>)}</ul>
+        </>
+      )}
+    </div>
+  );
+}
+
 function MarkButton({ on, onClick }) {
   return (
     <button type="button" className={`exam-mark ${on ? 'on' : ''}`} onClick={onClick} title={on ? '북마크 해제' : '북마크 (나중에 다시 보기)'} aria-pressed={on}>
@@ -499,7 +549,7 @@ function MarkButton({ on, onClick }) {
 }
 
 export function ReviewCard({ q, a, extra, sections, marked, onMark }) {
-  const ok = a === q.a;
+  const ok = isRight(q, a);
   return (
     <div className="exam-rv">
       <div className="h">
@@ -510,12 +560,21 @@ export function ReviewCard({ q, a, extra, sections, marked, onMark }) {
         {onMark && <MarkButton on={!!marked} onClick={() => onMark(q.id)} />}
       </div>
       <QuestionBody q={q} className="q" />
-      <div className="a">
-        {a === undefined
-          ? (extra ? null : <span className="w">미답변</span>)
-          : <>내 답 <b className={ok ? 'r' : 'w'}>{CIRC[a]} {q.o[a]}</b></>}
-        {(!ok || a === undefined) && <div>정답 <b className="r">{CIRC[q.a]} {q.o[q.a]}</b></div>}
-      </div>
+      {q.kind ? (
+        <div className="a">
+          {a === undefined
+            ? (extra ? null : <span className="w">미답변</span>)
+            : <>채점 <b className={ok ? 'r' : 'w'}>{ok ? '맞음' : '틀림'}</b></>}
+          <ModelAnswer q={q} />
+        </div>
+      ) : (
+        <div className="a">
+          {a === undefined
+            ? (extra ? null : <span className="w">미답변</span>)
+            : <>내 답 <b className={ok ? 'r' : 'w'}>{CIRC[a]} {q.o[a]}</b></>}
+          {(!ok || a === undefined) && <div>정답 <b className="r">{CIRC[q.a]} {q.o[q.a]}</b></div>}
+        </div>
+      )}
       <div className="ex">{q.e}</div>
       <ReportButton q={q} />
     </div>

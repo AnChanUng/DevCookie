@@ -55,7 +55,7 @@ function CategoryPicker() {
                 📕 복기 {ready.filter(c => c.source?.kind === 'recall').length}곳 · 📝 예상 {ready.filter(c => c.source?.kind !== 'recall').length}곳
               </span>
               <span className="exam-tag">
-                {list.length}개 기업 · {total}문항{attempts ? ` · 응시 ${attempts}회 · 오답 ${wrong}문제` : ''}
+                {list.length}개 {cat.unit || '기업'} · {total}문항{attempts ? ` · 응시 ${attempts}회 · 오답 ${wrong}문제` : ''}
               </span>
             </Link>
           );

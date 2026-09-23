@@ -1278,3 +1278,28 @@ a.exam-search-bank:hover { color: var(--accent-blue); }
 }
 .donate-done span { color: var(--text-tertiary); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .donate-done a { color: var(--accent-blue); font-weight: 700; }
+
+/* 단답형·서술형: 직접 써 보고 모범답안과 비교 */
+.exam-written input,
+.exam-written textarea {
+  width: 100%;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 11px 14px;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  resize: vertical;
+}
+.exam-written input:focus,
+.exam-written textarea:focus { outline: none; border-color: var(--accent-blue); }
+.exam-written input:disabled,
+.exam-written textarea:disabled { opacity: 0.8; }
+.exam-written-ask { margin-top: 10px; font-weight: 600; }
+.exam-model { margin: 4px 0 10px; }
+.exam-model .lab { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; margin: 8px 0 4px; color: var(--accent-blue); }
+.exam-model .ans { white-space: pre-line; font-weight: 600; }
+.exam-model ul { margin: 0; padding-left: 18px; }
+.exam-model li { margin: 2px 0; }

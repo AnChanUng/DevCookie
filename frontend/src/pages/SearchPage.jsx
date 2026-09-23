@@ -14,7 +14,7 @@ const BANKS = [
 const INDEX = BANKS.flatMap(({ bank, to }) =>
   allQuestions(bank).map(q => ({
     q, bank, to,
-    text: [q.topic, q.ctx, q.code, q.q, ...q.o, q.e].filter(Boolean).join('\n').toLowerCase(),
+    text: [q.topic, q.ctx, q.code, q.q, ...(q.o || []), q.ans, ...(q.pts || []), q.e].filter(Boolean).join('\n').toLowerCase(),
   })));
 
 export default function SearchPage() {
