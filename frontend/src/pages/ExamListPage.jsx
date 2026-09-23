@@ -1,5 +1,5 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { COMPANIES, EXAM_CATEGORIES, SOURCE_KINDS, allQuestions, companyPath } from '../data/examQuestions';
+import { COMIL, COMPANIES, EXAM_CATEGORIES, SOURCE_KINDS, allQuestions, companyPath } from '../data/examQuestions';
 import ProgressBackup from '../components/ProgressBackup';
 
 function summary(company) {
@@ -20,7 +20,7 @@ const NOTE = (
   </p>
 );
 
-// /exam 은 분류(금융공기업 / 공기업) 선택, /exam/category/:category 는 그 분류의 기업 목록
+// /exam 은 분류(금융공기업 / 공기업)와 컴퓨터일반 선택, /exam/category/:category 는 그 분류의 기업 목록
 export default function ExamListPage() {
   const { category: key } = useParams();
   if (!key) return <CategoryPicker />;
@@ -36,7 +36,7 @@ function CategoryPicker() {
       <div className="page-header">
         <Link to="/" className="back-link">← 홈으로</Link>
         <h1>📚 기업별 기출문제</h1>
-        <p>공기업 IT직무 전공필기 · 복기 자료 기반 문제집과 출제범위 기반 예상문제집 · 즉시 채점 · 오답노트 · 북마크</p>
+        <p>공기업 IT직무 전공필기 · 컴퓨터일반 기출 · 복기 자료 기반 문제집과 출제범위 기반 예상문제집 · 즉시 채점 · 오답노트 · 북마크</p>
       </div>
 
       <div className="exam-category-grid">
@@ -61,11 +61,27 @@ function CategoryPicker() {
             </Link>
           );
         })}
+        <ComilCard />
       </div>
 
       <ProgressBackup />
       {NOTE}
     </div>
+  );
+}
+
+// 컴퓨터일반은 회사가 아니라 문제은행 하나지만, 기출문제라 분류 카드와 나란히 둔다
+function ComilCard() {
+  const s = summary(COMIL);
+  return (
+    <Link to="/computer-general" className="exam-company-card exam-category-card">
+      <span className="exam-category-name">컴퓨터일반</span>
+      <span className="exam-company-meta">전산직 9급 컴퓨터일반 기출</span>
+      <span className="exam-category-names">{Object.values(COMIL.sections).map(s => s.name).join(' · ')}</span>
+      <span className="exam-tag">
+        {Object.keys(COMIL.sections).length}개 영역 · {allQuestions(COMIL).length}문항{s?.attempts ? ` · 응시 ${s.attempts}회 · 오답 ${s.wrong}문제` : ''}
+      </span>
+    </Link>
   );
 }
 
