@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
-import { COMPANIES, EXAM_CATEGORIES } from '../data/examQuestions';
+import { COMPANIES, EXAM_CATEGORIES, companyPath } from '../data/examQuestions';
 
 const KEY = 'admin-key';
 const RANGES = [7, 30, 90];
@@ -12,9 +12,9 @@ const MODES = { exam: '모의고사', practice: '영역별 연습', wrong: '오�
 
 const PAGE_NAMES = {
   '/': '홈', '/exam': '기업별 기출문제', '/computer-general': '컴퓨터일반', '/major': '필기이론',
-  '/major-exam': '필기이론 문제', '/stats': '통계', '/search': '문제 검색', '/ncs': 'NCS', '/interview': '면접 연습',
+  '/major-exam': '필기이론 문제', '/stats': '통계', '/search': '문제 검색', '/ncs': 'NCS', '/interview': '면접 연습', '/ssafy': 'SSAFY',
   ...Object.fromEntries(EXAM_CATEGORIES.map(c => [`/exam/category/${c.key}`, `기업별 기출 · ${c.name}`])),
-  ...Object.fromEntries(COMPANIES.map(c => [`/exam/${c.key}`, c.name])),
+  ...Object.fromEntries(COMPANIES.map(c => [companyPath(c), c.name])),
 };
 const pageName = (path) => PAGE_NAMES[path] || path;
 const companyName = (key) => COMPANIES.find(c => c.key === key)?.name || key;

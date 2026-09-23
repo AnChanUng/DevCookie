@@ -127,9 +127,14 @@ export const SOURCE_KINDS = {
 export const EXAM_CATEGORIES = [
   { key: "finance", name: "금융공기업", desc: "금융공기업 · 금융권 IT직무 필기" },
   { key: "public", name: "공기업", desc: "일반 공기업 전산직 전공필기" },
-  { key: "major", name: "전공필기", desc: "SSAFY 과목평가 · 객관식 · 단답형 · 서술형", unit: "과목" },
-  { key: "monthly", name: "월말평가", desc: "SSAFY 월말평가 서술형 (구현 문제 제외)", unit: "과목" },
+  // hub가 있는 분류는 기업별 기출이 아니라 그 이름의 상단 메뉴(/ssafy)에 모아 보여 준다
+  { key: "major", name: "전공필기", desc: "SSAFY 과목평가 · 객관식 · 단답형 · 서술형", unit: "과목", hub: "ssafy" },
+  { key: "monthly", name: "월말평가", desc: "SSAFY 월말평가 서술형 (구현 문제 제외)", unit: "과목", hub: "ssafy" },
 ];
+
+// 문제은행 풀이 화면 주소. SSAFY처럼 따로 메뉴를 가진 분류는 그 메뉴 아래에 둔다
+export const hubOf = (company) => EXAM_CATEGORIES.find(c => c.key === company.category)?.hub;
+export const companyPath = (company) => `/${hubOf(company) || 'exam'}/${company.key}`;
 
 export const COMPANIES = [
   {

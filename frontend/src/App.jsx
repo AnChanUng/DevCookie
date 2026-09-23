@@ -19,6 +19,7 @@ const SearchPage = lazy(() => import('./pages/SearchPage'));
 const NcsPage = lazy(() => import('./pages/NcsPage'));
 const WeakPage = lazy(() => import('./pages/WeakPage'));
 const DonatePage = lazy(() => import('./pages/DonatePage'));
+const SsafyPage = lazy(() => import('./pages/SsafyPage'));
 
 function App() {
   return (
@@ -35,6 +36,8 @@ function App() {
           <Route path="exam" element={<ExamListPage />} />
           <Route path="exam/category/:category" element={<ExamListPage />} />
           <Route path="exam/:company" element={<ExamCompanyPage />} />
+          <Route path="ssafy" element={<SsafyPage />} />
+          <Route path="ssafy/:company" element={<ExamCompanyPage />} />
           <Route path="computer-general" element={<ComputerGeneralPage />} />
           <Route path="ncs" element={<NcsPage />} />
           <Route path="search" element={<SearchPage />} />
