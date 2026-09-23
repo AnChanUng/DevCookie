@@ -94,9 +94,12 @@ export function CompanyCard({ company }) {
       <span className="exam-company-name">{company.name}</span>
       {recall && <span className="exam-company-source">{company.source.label}</span>}
       <span className="exam-company-meta">{company.meta}</span>
-      <span className={`exam-tag ${company.ready ? '' : 'soon'}`}>
-        {!company.ready ? '준비 중' : s?.attempts ? `응시 ${s.attempts}회 · 오답 ${s.wrong}문제` : '풀이 시작 가능'}
-      </span>
+      {/* 아직 안 푼 곳은 표시를 생략해 타일을 작게 유지한다 */}
+      {(!company.ready || s?.attempts > 0) && (
+        <span className={`exam-tag ${company.ready ? '' : 'soon'}`}>
+          {!company.ready ? '준비 중' : `응시 ${s.attempts}회 · 오답 ${s.wrong}문제`}
+        </span>
+      )}
     </>
   );
   return company.ready ? (
@@ -125,7 +128,7 @@ function CompanyList({ category }) {
         <section key={g.kind} className="exam-group">
           <div className="section-title">{g.icon} {g.group} <span className="exam-group-count">{g.items.length}곳</span></div>
           <p className="exam-lede">{g.detail}</p>
-          <div className="exam-company-grid">
+          <div className="exam-company-grid compact">
             {g.items.map(c => <CompanyCard key={c.key} company={c} />)}
           </div>
         </section>
