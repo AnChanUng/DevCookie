@@ -26,6 +26,8 @@ import { HF_CPP_QUESTIONS } from './hfCppQuestions';
 import { COMIL } from './comilQuestions';
 import { NCS } from './ncsQuestions';
 import { HF_RECALL_2026B } from './hfRecall2026bQuestions';
+import { SSAFY_ALGO_SECTIONS, SSAFY_ALGO_QUESTIONS, SSAFY_ALGO_SETS } from './ssafyAlgoQuestions';
+import { SSAFY_MONTHLY_SECTIONS, SSAFY_MONTHLY_QUESTIONS, SSAFY_MONTHLY_SETS } from './ssafyMonthlyQuestions';
 export { HF_CPP_QUESTIONS, CPP_GROUPS } from './hfCppQuestions';
 export { COMIL, NCS };
 
@@ -125,6 +127,8 @@ export const SOURCE_KINDS = {
 export const EXAM_CATEGORIES = [
   { key: "finance", name: "금융공기업", desc: "금융공기업 · 금융권 IT직무 필기" },
   { key: "public", name: "공기업", desc: "일반 공기업 전산직 전공필기" },
+  { key: "major", name: "전공필기", desc: "SSAFY 과목평가 · 객관식 · 단답형 · 서술형", unit: "과목" },
+  { key: "monthly", name: "월말평가", desc: "SSAFY 월말평가 서술형 (구현 문제 제외)", unit: "과목" },
 ];
 
 export const COMPANIES = [
@@ -267,6 +271,20 @@ export const COMPANIES = [
     source: { kind: "recall", label: "2024 하반기 복기문제", file: "공기업 필기/2024_하반기_BNK_IT직무_필기복기.pdf" },
     questions: BNK_QUESTIONS, sections: BNK_SECTIONS, minutes: 40,
     lede: "금융·경제·경영 기초상식 15문제, 직무기초소양(NCS) 15문제. 총 30문제, 40분, 4지선다. 2024 하반기 IT직무 응시 후기의 키워드 정리(예금자보호, CD, 롱숏펀드, 레그테크, 환헤지, 재정환율, 피셔 방정식, MR=MC, BCG 등)와 NCS 기록 유형을 바탕으로 새로 만든 문제입니다. 코딩테스트(SQL·알고리즘)는 포함하지 않습니다.",
+  },
+  {
+    key: "ssafyalgo", category: "major", abbr: "SSAFY", name: "SSAFY 알고리즘 과목평가", meta: "객관식 21 · 단답형 9 · 서술형 2 × 2회 · 60분", ready: true,
+    source: { kind: "recall", label: "복기 범위" },
+    questions: SSAFY_ALGO_QUESTIONS, sections: SSAFY_ALGO_SECTIONS, minutes: 60,
+    sets: SSAFY_ALGO_SETS, draw: { obj: 21, short: 9, essay: 2 },
+    lede: "객관식 21문제, 단답형 9문제, 서술형 2문제. 시간복잡도·빅오 계산, 큐 메서드, 트리 용어·순회, 힙 구조, 재귀 구조와 완전탐색, 순열·조합·부분집합 구분과 next_permutation, 그래프 표현·차수·BFS/DFS, 비트마스킹 상태관리와 장점, Union-Find와 경로 압축, 분할 정복 설계, 위상 정렬 전제 조건, 백트래킹 가지치기, 탐욕 알고리즘 특징, 이진 탐색 조건 처리, 투 포인터까지 복기된 출제 범위를 따라 2회분을 만들었습니다. 단답형은 답을 입력하면 자동 채점하고(표기가 다르면 모범답안을 보고 직접 채점), 서술형은 답안을 써 본 뒤 모범답안·채점 포인트와 비교해 스스로 채점합니다.",
+  },
+  {
+    key: "ssafymonthly", category: "monthly", abbr: "SSAFY", name: "SSAFY 알고리즘 월말평가", meta: "서술형 15문항 · 복기 서술형 1세트 · 20분", ready: true,
+    source: { kind: "recall", label: "복기 범위" },
+    questions: SSAFY_MONTHLY_QUESTIONS, sections: SSAFY_MONTHLY_SECTIONS, minutes: 20,
+    sets: SSAFY_MONTHLY_SETS, draw: { bfs: 1, repr: 1, topo: 1 },
+    lede: "월말평가는 구현 3문제(과제 복기 2 + 기본 알고리즘 1)와 서술형 1문제로 치러지며, 여기서는 구현을 빼고 서술형만 연습합니다. 복기된 서술형 소문항 3개(BFS·DFS 진행 방식 차이와 핵심 자료구조, 그래프 표현 방식에 따른 탐색 소요시간과 이유, 위상 정렬 대상 그래프의 구조적 제한 2가지)를 '월말평가 서술형 복기' 세트로 그대로 담고, 같은 주제의 서술형·단답형 12문항을 더했습니다. 실전 모의고사는 세 주제에서 한 문항씩 뽑습니다.",
   },
 ];
 
