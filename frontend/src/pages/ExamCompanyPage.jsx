@@ -39,7 +39,8 @@ export default function ExamCompanyPage() {
   const company = COMPANIES.find(c => c.key === key);
   if (!company || !company.ready) return <Navigate to="/exam" replace />;
   const category = EXAM_CATEGORIES.find(c => c.key === company.category);
-  const back = category ? { to: `/exam/category/${category.key}`, label: `← ${category.name}` } : undefined;
+  const back = category?.hub === 'ssafy' ? { to: '/ssafy', label: '← SSAFY' }
+    : category ? { to: `/exam/category/${category.key}`, label: `← ${category.name}` } : undefined;
   return <CompanyExam company={company} back={back} />;
 }
 

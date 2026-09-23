@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { COMPANIES, COMIL, NCS, allQuestions } from '../data/examQuestions';
+import { COMPANIES, COMIL, NCS, allQuestions, companyPath } from '../data/examQuestions';
 import { ReviewCard } from './ExamCompanyPage';
 
 const LIMIT = 50;
 
 // 모든 문제은행을 한 목록으로 펴고, 검색용으로 문제 · 보기 · 해설 · 토픽을 한 줄로 합쳐 둔다
 const BANKS = [
-  ...COMPANIES.filter(c => c.ready).map(c => ({ bank: c, to: `/exam/${c.key}` })),
+  ...COMPANIES.filter(c => c.ready).map(c => ({ bank: c, to: companyPath(c) })),
   { bank: COMIL, to: '/computer-general' },
   { bank: NCS, to: '/ncs' },
 ];

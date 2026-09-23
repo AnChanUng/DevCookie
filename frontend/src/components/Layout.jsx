@@ -33,6 +33,9 @@ export default function Layout() {
               <Link to="/exam" className={location.pathname.startsWith('/exam') ? 'active' : ''}>
                 기업별 기출
               </Link>
+              <Link to="/ssafy" className={location.pathname.startsWith('/ssafy') ? 'active' : ''}>
+                SSAFY
+              </Link>
               <Link to="/computer-general" className={location.pathname === '/computer-general' ? 'active' : ''}>
                 컴퓨터일반
               </Link>

@@ -3,6 +3,7 @@ import StudyGoal from '../components/StudyGoal';
 
 const MENUS = [
   { to: '/exam', tone: 'indigo', title: '기업별 기출문제', desc: '금융공기업 · 공기업 응시 후기 기반 모의고사 · 영역별 연습 · 오답 다시 풀기' },
+  { to: '/ssafy', tone: 'cyan', title: 'SSAFY', desc: '알고리즘 과목평가(객관식 · 단답형 · 서술형) · 월말평가 서술형 대비' },
   { to: '/computer-general', tone: 'violet', title: '컴퓨터일반 기출문제', desc: '전산직 9급 컴퓨터일반 · 운영체제부터 통신 · 보안 · 신기술까지 7개 영역' },
   { to: '/ncs', tone: 'cyan', title: 'NCS', desc: '직업기초능력 PSAT형 · 언어논리 · 자료해석 · 상황판단 모의고사와 영역별 연습' },
   { to: '/major', tone: 'pink', title: '필기이론', desc: '정보처리기사 실기 · SQLD · 빅데이터분석기사 · ADsP 요약노트를 바로 열람하거나 다운로드' },

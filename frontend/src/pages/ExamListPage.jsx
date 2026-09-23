@@ -1,5 +1,5 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { COMPANIES, EXAM_CATEGORIES, SOURCE_KINDS, allQuestions } from '../data/examQuestions';
+import { COMPANIES, EXAM_CATEGORIES, SOURCE_KINDS, allQuestions, companyPath } from '../data/examQuestions';
 import ProgressBackup from '../components/ProgressBackup';
 
 function summary(company) {
@@ -26,6 +26,7 @@ export default function ExamListPage() {
   if (!key) return <CategoryPicker />;
   const category = EXAM_CATEGORIES.find(c => c.key === key);
   if (!category) return <Navigate to="/exam" replace />;
+  if (category.hub) return <Navigate to={`/${category.hub}`} replace />;
   return <CompanyList category={category} />;
 }
 
@@ -39,7 +40,7 @@ function CategoryPicker() {
       </div>
 
       <div className="exam-category-grid">
-        {EXAM_CATEGORIES.map(cat => {
+        {EXAM_CATEGORIES.filter(cat => !cat.hub).map(cat => {
           const list = COMPANIES.filter(c => c.category === cat.key);
           const ready = list.filter(c => c.ready);
           const total = ready.reduce((n, c) => n + allQuestions(c).length, 0);
@@ -68,7 +69,7 @@ function CategoryPicker() {
   );
 }
 
-function CompanyCard({ company }) {
+export function CompanyCard({ company }) {
   const s = company.ready ? summary(company) : null;
   const recall = company.source?.kind === 'recall';
   const inner = (
@@ -83,7 +84,7 @@ function CompanyCard({ company }) {
     </>
   );
   return company.ready ? (
-    <Link to={`/exam/${company.key}`} className="exam-company-card">{inner}</Link>
+    <Link to={companyPath(company)} className="exam-company-card">{inner}</Link>
   ) : (
     <div className="exam-company-card disabled">{inner}</div>
   );

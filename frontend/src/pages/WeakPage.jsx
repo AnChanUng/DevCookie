@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { BANKS, allQuestions } from '../data/examQuestions';
+import { BANKS, allQuestions, companyPath } from '../data/examQuestions';
 
 // 문제은행마다 따로 쌓이는 풀이 기록을 한자리에 모아, 어느 영역이 약한지 보여 준다.
 // 기록은 이 브라우저의 로컬 저장소에만 있으므로 서버를 부르지 않는다
@@ -62,7 +62,7 @@ function collect() {
       banks.push({
         key: bank.key, name: bank.name, seen: bankSeen, total: questions.length,
         percent: rate(bankC, bankW), open: bankOpen,
-        to: bank.key === 'comil' ? '/computer-general' : bank.key === 'ncs' ? '/ncs' : `/exam/${bank.key}`,
+        to: bank.key === 'comil' ? '/computer-general' : bank.key === 'ncs' ? '/ncs' : companyPath(bank),
       });
     }
   }
