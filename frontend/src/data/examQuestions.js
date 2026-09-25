@@ -28,7 +28,7 @@ import { COMIL } from './comilQuestions';
 import { NCS } from './ncsQuestions';
 import { HF_RECALL_2026B } from './hfRecall2026bQuestions';
 import { SSAFY_ALGO_SECTIONS, SSAFY_ALGO_QUESTIONS, SSAFY_ALGO_SETS } from './ssafyAlgoQuestions';
-import { DAOU_SECTIONS, DAOU_QUESTIONS } from './daouQuestions';
+import { DAOU_SECTIONS, DAOU_QUESTIONS, DAOU_SETS, DAOU_DRAW } from './daouQuestions';
 import { SSAFY_MONTHLY_SECTIONS, SSAFY_MONTHLY_QUESTIONS, SSAFY_MONTHLY_SETS } from './ssafyMonthlyQuestions';
 export { HF_CPP_QUESTIONS, CPP_GROUPS } from './hfCppQuestions';
 export { COMIL, NCS };
@@ -302,10 +302,11 @@ export const COMPANIES = [
     lede: "월말평가는 구현 3문제(과제 복기 2 + 기본 알고리즘 1)와 서술형 1문제로 치러지며, 여기서는 구현을 빼고 서술형만 연습합니다. 복기된 서술형 소문항 3개(BFS·DFS 진행 방식 차이와 핵심 자료구조, 그래프 표현 방식에 따른 탐색 소요시간과 이유, 위상 정렬 대상 그래프의 구조적 제한 2가지)를 '월말평가 서술형 복기' 세트로 그대로 담고, 같은 주제의 서술형·단답형 12문항을 더했습니다. 실전 모의고사는 세 주제에서 한 문항씩 뽑습니다.",
   },
   {
-    key: "daou", category: "aptitude", abbr: "DAOU", name: "다우기술", meta: "언어 · 수리 · 추리 · 문제해결력 60문제 · 60분 · 5지선다", ready: true,
+    key: "daou", category: "aptitude", abbr: "DAOU", name: "다우기술", meta: "언어 · 수리 · 추리 · 문제해결력 60문제 × 3회 · 60분 · 5지선다", ready: true,
     source: { kind: "predicted", label: "응시 후기 구성 기반 예상문제", detail: "응시 후기로 전해진 시험 구성(60분 60문항, 영역 4개, 영역별 문제 유형)을 따라 새로 만든 예상문제입니다. 실제 기출의 복원이 아닙니다." },
     questions: DAOU_QUESTIONS, sections: DAOU_SECTIONS, minutes: 60,
-    lede: "언어 15문제, 수리 15문제, 추리 15문제, 문제해결력 15문제. 총 60문제, 60분이라 한 문제에 1분꼴입니다. 언어는 유의어·반의어·어휘 관계 같은 어휘 문제와 맞춤법, 짧은 독해가 나오고, 수리는 1분 안에 풀 수 있는 속력·농도·일률·원가·경우의 수·수열·자료 계산입니다. 추리는 명제·참거짓·배치·순서·문자와 기호 규칙, 문제해결력은 일정·요금 비교·규정 적용·선발 기준·장애 원인 파악·업무 배정을 다룹니다. 응시 후기로 전해진 구성만 따라 새로 만든 문제이며 실제 문항의 복원이 아닙니다.",
+    sets: DAOU_SETS, draw: DAOU_DRAW,
+    lede: "언어 15문제, 수리 15문제, 추리 15문제, 문제해결력 15문제. 총 60문제, 60분이라 한 문제에 1분꼴입니다. 같은 구성의 예상문제를 3회분(180문항) 담았습니다. 회차별 모의고사는 한 회분을 그대로 풀고, 실전 모의고사는 세 회차에서 영역마다 15문제씩 새로 뽑습니다. 언어는 유의어·반의어·어휘 관계 같은 어휘 문제와 맞춤법, 짧은 독해가 나오고, 수리는 1분 안에 풀 수 있는 속력·농도·일률·원가·경우의 수·수열·자료 계산입니다. 추리는 명제·참거짓·배치·순서·문자와 기호 규칙, 문제해결력은 일정·요금 비교·규정 적용·선발 기준·장애 원인 파악·업무 배정을 다룹니다. 응시 후기로 전해진 구성만 따라 새로 만든 문제이며 실제 문항의 복원이 아닙니다.",
   },
 ];
 

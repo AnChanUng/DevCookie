@@ -69,11 +69,13 @@ export default function AptitudePage() {
           const pct = p ? Math.round(p.solved / qs.length * 100) : 0;
           const topics = [...new Set(qs.map(q => q.topic))];
           const secs = Object.entries(bank.sections);
+          // 회차가 있으면 영역별 문항 수는 한 회분 기준으로 보여 준다
+          const nSets = bank.sets?.length || 1;
           return (
             <Link key={bank.key} to={companyPath(bank)} className="ssafy-card">
               <div className="ssafy-card-top">
                 <span className="ssafy-tag">{bank.abbr}</span>
-                <span className="ssafy-time">⏱ {bank.minutes}분 · {qs.length}문항</span>
+                <span className="ssafy-time">⏱ {bank.minutes}분 · {nSets > 1 ? `${nSets}회분 ${qs.length}문항` : `${qs.length}문항`}</span>
               </div>
               <h2>{bank.name}</h2>
               <p className="ssafy-desc">{bank.meta}</p>
@@ -81,7 +83,7 @@ export default function AptitudePage() {
               <div className="ssafy-secs" style={{ gridTemplateColumns: `repeat(${secs.length}, 1fr)` }}>
                 {secs.map(([k, s]) => (
                   <div key={k} className="ssafy-sec">
-                    <b>{bank.questions.filter(q => q.sec === k).length}</b>
+                    <b>{Math.round(bank.questions.filter(q => q.sec === k).length / nSets)}</b>
                     <span>{s.name}</span>
                   </div>
                 ))}

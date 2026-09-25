@@ -205,7 +205,7 @@ function Overview({ data, sys }) {
   return (
     <>
       <div className="exam-stats">
-        <Tile k="지금 공부 중" v={data.studying ?? data.active} sub="화면을 열어 둔 방문자 (홈에 보이는 숫자)" />
+        <Tile k="지금 공부 중" v={data.studying ?? data.active} sub="화면을 열어 둔 방문자 (관리자만 볼 수 있음)" />
         <Tile k="최근 5분 활동" v={data.active} sub="페이지를 옮기거나 풀이를 끝낸 방문자" />
         <Tile k="오늘 방문자" v={data.today.visitors} sub={`조회 ${data.today.views} · 풀이 ${data.today.exams}`} />
         <Tile k="오늘 신규 방문자" v={data.newToday} sub={`재방문 ${Math.max(0, data.today.visitors - data.newToday)}명`} />

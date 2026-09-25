@@ -33,7 +33,7 @@ const PARTICLES = Array.from({ length: 48 }, (_, i) => ({
 
 const isDawn = () => new Date().getHours() < 6;
 
-// 첫 화면의 분위기 요소: 비 · 눈 효과, 새벽 응원. 공부 중인 사람 수는 헤더의 StudyCount가 맡는다
+// 첫 화면의 분위기 요소: 비 · 눈 효과, 새벽 응원. 공부 중인 사람 수는 관리자 페이지에서만 본다
 export default function StudyAmbience() {
   const [weather, setWeather] = useState(null);
   const [toasts, setToasts] = useState(() => {
