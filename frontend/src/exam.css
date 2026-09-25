@@ -1573,3 +1573,180 @@ a.exam-search-bank:hover { color: var(--accent-blue); }
 @media (max-width: 480px) {
   .apt-areas { grid-template-columns: 1fr; }
 }
+
+/* ===== 인적성 화면 아래의 코딩 문제 입구 ===== */
+.exam-section.coding { text-decoration: none; border-left: 3px solid #059669; }
+.exam-section.coding.go { background: rgba(5, 150, 105, 0.07); }
+.exam-section.coding .bar i { background: #059669; }
+
+/* ===== COS Pro 1급 (Java) 코딩 채점 ===== */
+.cos { --cos: #059669; --cos-light: rgba(5, 150, 105, 0.09); --cos-bad: #DC2626; }
+.cos .back-link { display: inline-block; margin: 8px 0 14px; }
+.cos-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 28px 30px;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, #0B2B26 0%, #064E3B 55%, #059669 100%);
+  color: #fff;
+  margin-bottom: 20px;
+}
+.cos-eyebrow {
+  display: inline-block;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 5px 11px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.16);
+  margin-bottom: 10px;
+}
+.cos-hero h1 { margin: 0 0 8px; font-size: 1.8rem; font-weight: 800; color: #fff; }
+.cos-hero p { margin: 0; max-width: 640px; font-size: 0.9rem; line-height: 1.7; color: rgba(255, 255, 255, 0.86); }
+.cos-score { flex: none; text-align: center; padding: 14px 20px; border-radius: var(--radius-md); background: rgba(255, 255, 255, 0.13); }
+.cos-score b { display: block; font-size: 2.2rem; font-weight: 800; line-height: 1; }
+.cos-score span { font-size: 0.8rem; color: rgba(255, 255, 255, 0.85); }
+
+.cos-group { margin-bottom: 10px; }
+.cos-part { margin: 12px 0 18px; }
+.cos-part-head { display: flex; align-items: center; gap: 8px; font-weight: 800; margin-bottom: 10px; flex-wrap: wrap; }
+.cos-part-head small { font-weight: 500; font-size: 0.78rem; color: var(--text-tertiary); }
+.cos-chip {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  font-size: 0.8rem;
+  font-weight: 900;
+  color: #fff;
+  background: var(--cos);
+}
+.cos-chip.line { background: #D97706; }
+.cos-chip.func { background: #2563EB; }
+.cos-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; }
+.cos-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: var(--transition);
+}
+.cos-item:hover { border-color: var(--cos); transform: translateY(-2px); }
+.cos-item.pass { border-color: var(--cos); background: var(--cos-light); }
+.cos-item-title { font-weight: 800; }
+.cos-item-topic { font-size: 0.76rem; color: var(--text-tertiary); }
+.cos-item-state { margin-top: 6px; font-size: 0.8rem; font-weight: 700; color: var(--cos); }
+.cos-item.tried .cos-item-state { color: #D97706; }
+
+.cos-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.cos-nav { display: flex; gap: 14px; font-size: 0.86rem; font-weight: 700; }
+.cos-nav a { color: var(--text-secondary); text-decoration: none; }
+.cos-nav a:hover { color: var(--cos); }
+
+.cos-solve { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 20px; align-items: start; }
+.cos-problem, .cos-editor-wrap {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 22px 22px;
+  box-shadow: var(--card-shadow);
+  min-width: 0;
+}
+.cos-editor-wrap { position: sticky; top: 76px; padding: 14px; }
+.cos-problem-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 0.82rem; }
+.cos-part-name { font-weight: 800; }
+.cos-topic { color: var(--text-tertiary); }
+.cos-pass-badge { margin-left: auto; font-weight: 800; color: var(--cos); }
+.cos-problem h1 { margin: 10px 0 4px; font-size: 1.45rem; font-weight: 800; }
+.cos-part-desc { margin: 0 0 14px; font-size: 0.82rem; color: var(--text-tertiary); }
+.cos-statement { white-space: pre-line; line-height: 1.75; font-size: 0.93rem; }
+.cos-problem h3 { margin: 20px 0 8px; font-size: 0.95rem; font-weight: 800; }
+.cos-constraints { margin: 0; padding-left: 18px; font-size: 0.86rem; line-height: 1.7; color: var(--text-secondary); }
+.cos-examples code { font-family: ui-monospace, Consolas, "D2Coding", monospace; font-size: 0.8rem; white-space: pre-wrap; word-break: break-all; }
+.cos-hidden-note { font-size: 0.78rem; color: var(--text-tertiary); margin: 6px 0 14px; }
+.cos-answer-btn { margin-top: 4px; }
+.cos-answer { margin-top: 12px; }
+.cos-answer .lab, .cos-result .lab { font-size: 0.78rem; font-weight: 800; color: var(--text-tertiary); margin: 10px 0 6px; }
+.cos-answer p { margin: 0; font-size: 0.88rem; line-height: 1.7; }
+
+.cos-editor-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 10px 10px 0 0;
+  background: #111827;
+  color: #9CA3AF;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.8rem;
+}
+.cos-editor-bar button { background: none; border: 1px solid #374151; color: #D1D5DB; border-radius: 6px; padding: 3px 10px; cursor: pointer; font-size: 0.76rem; }
+.cos-editor-bar button:hover { border-color: #9CA3AF; }
+.cos-editor {
+  display: block;
+  width: 100%;
+  min-height: 460px;
+  box-sizing: border-box;
+  resize: vertical;
+  margin: 0;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 0 0 10px 10px;
+  background: #1B2436;
+  color: #E8ECF3;
+  caret-color: #34D399;
+  font-family: ui-monospace, Consolas, "D2Coding", monospace;
+  font-size: 0.86rem;
+  line-height: 1.6;
+  tab-size: 4;
+  white-space: pre;
+  overflow: auto;
+  outline: none;
+}
+.cos-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+.cos-wait { font-size: 0.8rem; color: var(--text-tertiary); margin: 10px 0 0; }
+
+.cos-result { margin-top: 14px; padding: 14px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
+.cos-result.good { border-color: var(--cos); background: var(--cos-light); }
+.cos-result.bad { border-color: rgba(220, 38, 38, 0.35); background: rgba(220, 38, 38, 0.05); }
+.cos-result-head { display: flex; align-items: center; gap: 8px; font-weight: 800; }
+.cos-result p { margin: 8px 0 0; font-size: 0.86rem; }
+.cos-ms { margin-left: auto; font-size: 0.76rem; font-weight: 600; color: var(--text-tertiary); }
+.cos-cases { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.cos-cases li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; font-size: 0.84rem; }
+.cos-cases li span { font-weight: 800; }
+.cos-cases li.pass span { color: var(--cos); }
+.cos-cases li.fail span, .cos-cases li.error span { color: var(--cos-bad); }
+.cos-cases li em { flex-basis: 100%; font-style: normal; font-family: ui-monospace, Consolas, monospace; font-size: 0.78rem; color: var(--text-secondary); word-break: break-all; }
+.cos-log {
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #111827;
+  color: #F3F4F6;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 260px;
+  overflow: auto;
+}
+
+@media (max-width: 960px) {
+  .cos-solve { grid-template-columns: 1fr; }
+  .cos-editor-wrap { position: static; }
+}
+@media (max-width: 640px) {
+  .cos-hero { flex-direction: column; align-items: flex-start; padding: 22px 18px; }
+  .cos-problem { padding: 18px 16px; }
+  .cos-editor { min-height: 360px; font-size: 0.8rem; }
+}

@@ -9,7 +9,8 @@ RUN chmod +x gradlew
 COPY src src
 RUN ./gradlew bootJar --no-daemon
 
-FROM eclipse-temurin:17-jre-alpine
+# 코딩 문제 채점(JavaRunner)이 서버에서 자바를 컴파일하므로 실행 이미지도 JDK를 쓴다
+FROM eclipse-temurin:17-jdk-alpine
 ENV LANG=ko_KR.UTF-8
 ENV LC_ALL=ko_KR.UTF-8
 ENV JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8"

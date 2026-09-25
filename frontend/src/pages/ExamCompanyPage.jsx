@@ -329,6 +329,8 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
         })}
       </div>
 
+      {company.coding && <CodingEntry coding={company.coding} />}
+
       {CPP.length > 0 && (
         <>
           <div className="section-title">C++ 집중 문제집</div>
@@ -522,6 +524,36 @@ function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractic
         })}
       </div>
     </div>
+  );
+}
+
+// 인적성 화면 아래에 붙는 코딩 문제(COS Pro 등) 입구. 문제 데이터는 코딩 화면에서만 불러오고, 여기서는 푼 개수만 센다
+function CodingEntry({ coding }) {
+  let solved = 0;
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k?.startsWith(`${coding.store}:solved:`) && localStorage.getItem(k) === 'pass') solved++;
+    }
+  } catch { /* 저장소를 못 쓰면 0으로 둔다 */ }
+  return (
+    <>
+      <div className="section-title">{coding.name}</div>
+      <p className="exam-lede">{coding.desc}</p>
+      <div className="exam-sections">
+        {coding.parts.map(p => (
+          <Link key={p.name} to={coding.to} className="exam-section coding">
+            <span className="t">{p.name}</span>
+            <span className="d">{p.sub}</span>
+          </Link>
+        ))}
+        <Link to={coding.to} className="exam-section coding go">
+          <span className="t">문제 목록 열기 →</span>
+          <span className="d">{coding.count}문제 · 통과 {solved}/{coding.count}</span>
+          <span className="bar"><i style={{ width: `${Math.round(solved / coding.count * 100)}%` }} /></span>
+        </Link>
+      </div>
+    </>
   );
 }
 
