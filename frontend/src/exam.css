@@ -1498,3 +1498,78 @@ a.exam-search-bank:hover { color: var(--accent-blue); }
 @media (max-width: 520px) {
   .exam-company-grid.compact { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* ===== 인적성검사 허브: SSAFY 허브와 같은 틀에 초록 계열 색만 바꾼다 ===== */
+.ssafy.apt { --ssafy: #059669; --ssafy-2: #34D399; --ssafy-light: rgba(5, 150, 105, 0.09); }
+.apt .ssafy-hero {
+  background: linear-gradient(135deg, #064E3B 0%, #059669 55%, #34D399 100%);
+  box-shadow: 0 18px 40px rgba(5, 150, 105, 0.22);
+}
+
+.apt-areas {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.apt-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--card-shadow);
+}
+.apt-area-icon {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  background: var(--ssafy-light);
+  color: var(--ssafy);
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+.apt-area div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.apt-area b { font-size: 0.95rem; font-weight: 800; color: var(--text-primary); }
+.apt-area span { font-size: 0.74rem; line-height: 1.45; color: var(--text-secondary); word-break: keep-all; }
+
+.apt-more {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 26px 24px;
+  border-radius: var(--radius-lg);
+  border: 2px dashed var(--border-color);
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: var(--transition);
+}
+.apt-more:hover { border-color: var(--ssafy); color: var(--text-primary); }
+.apt-more-plus {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ssafy-light);
+  color: var(--ssafy);
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+.apt-more b { font-size: 1.1rem; color: var(--text-primary); }
+.apt-more span { font-size: 0.86rem; line-height: 1.6; word-break: keep-all; }
+.apt-more .apt-more-go { font-weight: 700; color: var(--ssafy); }
+
+@media (max-width: 900px) {
+  .apt-areas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 480px) {
+  .apt-areas { grid-template-columns: 1fr; }
+}

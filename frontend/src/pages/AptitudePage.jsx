@@ -1,0 +1,123 @@
+import { Link } from 'react-router-dom';
+import { COMPANIES, allQuestions, companyPath } from '../data/examQuestions';
+
+// 기업별 인적성검사 문제은행. 기업마다 큰 카드 하나씩 보여 주고, 아직 없는 기업은 자료 기부로 안내한다
+const BANKS = COMPANIES.filter(c => c.category === 'aptitude' && c.ready);
+
+// 인적성검사에 흔히 나오는 영역. 기업마다 이름은 조금씩 달라도 이 네 갈래로 묶인다
+const AREAS = [
+  { icon: '가', name: '언어', desc: '유의어 · 반의어 · 어휘 관계 · 맞춤법 · 독해' },
+  { icon: '＋', name: '수리', desc: '속력 · 농도 · 일률 · 확률 · 수열 · 자료 계산' },
+  { icon: '∴', name: '추리', desc: '명제 · 참거짓 · 배치 · 순서 · 규칙 찾기' },
+  { icon: '✓', name: '문제해결', desc: '규정 적용 · 비용 비교 · 일정 · 우선순위' },
+];
+
+function progress(bank) {
+  try {
+    const d = JSON.parse(localStorage.getItem(`exam-progress:${bank.key}`) || 'null');
+    if (!d) return null;
+    const qs = allQuestions(bank);
+    const last = (d.history || []).filter(h => h.mode === 'exam' || h.mode === 'set').at(-1);
+    return {
+      attempts: (d.history || []).length,
+      solved: qs.filter(q => d.stats?.[q.id]).length,
+      wrong: qs.filter(q => d.stats?.[q.id]?.last === 'w').length,
+      last: last ? Math.round(last.score / last.total * 100) : null,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export default function AptitudePage() {
+  const total = BANKS.reduce((n, b) => n + allQuestions(b).length, 0);
+
+  return (
+    <div className="fade-in ssafy apt">
+      <Link to="/" className="back-link">← 홈으로</Link>
+
+      <section className="ssafy-hero">
+        <div className="ssafy-hero-text">
+          <span className="ssafy-eyebrow">인적성검사 · 기업별</span>
+          <h1>기업별 인적성검사 대비</h1>
+          <p>기업마다 영역 구성과 시간이 다릅니다. 실제 시험과 같은 문항 수와 제한 시간으로 풀어 보고, 영역별 정답률로 약한 곳을 찾으세요. 한 문제에 1분 안쪽으로 푸는 연습이 핵심입니다.</p>
+        </div>
+        <div className="ssafy-hero-stats">
+          <div className="ssafy-stat big"><b>{total}</b><span>전체 문항</span></div>
+          <div className="ssafy-stat"><b>{BANKS.length}</b><span>기업</span></div>
+          <div className="ssafy-stat"><b>{AREAS.length}</b><span>영역</span></div>
+          <div className="ssafy-stat"><b>5지</b><span>선다</span></div>
+        </div>
+      </section>
+
+      <div className="apt-areas">
+        {AREAS.map(a => (
+          <div key={a.name} className="apt-area">
+            <span className="apt-area-icon">{a.icon}</span>
+            <div>
+              <b>{a.name}</b>
+              <span>{a.desc}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="ssafy-grid">
+        {BANKS.map(bank => {
+          const qs = allQuestions(bank);
+          const p = progress(bank);
+          const pct = p ? Math.round(p.solved / qs.length * 100) : 0;
+          const topics = [...new Set(qs.map(q => q.topic))];
+          const secs = Object.entries(bank.sections);
+          return (
+            <Link key={bank.key} to={companyPath(bank)} className="ssafy-card">
+              <div className="ssafy-card-top">
+                <span className="ssafy-tag">{bank.abbr}</span>
+                <span className="ssafy-time">⏱ {bank.minutes}분 · {qs.length}문항</span>
+              </div>
+              <h2>{bank.name}</h2>
+              <p className="ssafy-desc">{bank.meta}</p>
+
+              <div className="ssafy-secs" style={{ gridTemplateColumns: `repeat(${secs.length}, 1fr)` }}>
+                {secs.map(([k, s]) => (
+                  <div key={k} className="ssafy-sec">
+                    <b>{bank.questions.filter(q => q.sec === k).length}</b>
+                    <span>{s.name}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="ssafy-topics">
+                {topics.slice(0, 10).map(t => <span key={t}>{t}</span>)}
+                {topics.length > 10 && <span className="more">+{topics.length - 10}</span>}
+              </div>
+
+              <div className="ssafy-foot">
+                <div className="ssafy-progress">
+                  <div className="ssafy-progress-label">
+                    {p
+                      ? <>푼 문제 {p.solved}/{qs.length} · 응시 {p.attempts}회{p.last !== null && <> · 최근 {p.last}점</>} · 오답 {p.wrong}</>
+                      : <>아직 풀지 않았어요 · {qs.length}문항</>}
+                  </div>
+                  <div className="ssafy-bar"><i style={{ width: `${pct}%` }} /></div>
+                </div>
+                <span className="ssafy-go">풀러 가기 →</span>
+              </div>
+            </Link>
+          );
+        })}
+
+        <Link to="/donate" className="apt-more">
+          <span className="apt-more-plus">＋</span>
+          <b>다른 기업도 준비 중이에요</b>
+          <span>응시한 기업의 영역 구성이나 복기 자료를 보내 주시면 그 기업 문제은행을 만들어 드립니다.</span>
+          <span className="apt-more-go">자료 보내기 →</span>
+        </Link>
+      </div>
+
+      <p className="exam-note">
+        풀이 기록과 오답은 이 브라우저에 저장됩니다. 문제는 응시 후기로 전해진 시험 구성을 따라 새로 만든 것이며 실제 문항의 복원이 아닙니다.
+      </p>
+    </div>
+  );
+}

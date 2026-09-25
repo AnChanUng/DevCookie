@@ -2,10 +2,11 @@ import { Link } from 'react-router-dom';
 import StudyGoal from '../components/StudyGoal';
 
 const MENUS = [
-  { to: '/exam', tone: 'indigo', title: '기업별 기출문제', desc: '금융공기업, 공기업, 컴퓨터일반 기출 모의고사' },
-  { to: '/ssafy', tone: 'ssafy', title: 'SSAFY', desc: '알고리즘 과목평가와 월말평가 대비' },
-  { to: '/ncs', tone: 'cyan', title: 'NCS', desc: 'PSAT형 직업기초능력 모의고사' },
-  { to: '/major', tone: 'pink', title: '필기이론', desc: '자격증 요약노트 열람과 다운로드' },
+  { to: '/exam', tone: 'indigo', tag: '전공필기', title: '기업별 기출문제', desc: '금융공기업, 공기업, 컴퓨터일반 기출 모의고사' },
+  { to: '/ssafy', tone: 'ssafy', tag: '교육 평가', title: 'SSAFY', desc: '알고리즘 과목평가와 월말평가 대비' },
+  { to: '/ncs', tone: 'cyan', tag: '직업기초', title: 'NCS', desc: 'PSAT형 직업기초능력 모의고사' },
+  { to: '/aptitude', tone: 'emerald', tag: '적성검사', title: '인적성검사', desc: '기업별 언어 · 수리 · 추리 · 문제해결 모의고사', isNew: true },
+  { to: '/major', tone: 'pink', tag: '요약노트', title: '필기이론', desc: '자격증 요약노트 열람과 다운로드' },
 ];
 
 // 메뉴 카드 아래의 작은 바로가기. 풀고 난 뒤에 찾게 되는 기능들이다
@@ -35,8 +36,14 @@ export default function Home() {
       <div className="home-menu">
         {MENUS.map((m, i) => (
           <Link key={m.to} to={m.to} className={`home-menu-item ${m.tone}`}>
-            <span className="home-menu-no">{i + 1}</span>
-            <span className="home-menu-title">{m.title}</span>
+            <span className="home-menu-head">
+              <span className="home-menu-no">{i + 1}</span>
+              <span className="home-menu-tag">{m.tag}</span>
+            </span>
+            <span className="home-menu-title">
+              {m.title}
+              {m.isNew && <span className="home-menu-new">NEW</span>}
+            </span>
             <span className="home-menu-desc">{m.desc}</span>
             <span className="home-menu-go">바로가기 →</span>
           </Link>

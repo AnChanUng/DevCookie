@@ -39,6 +39,9 @@ export default function Layout() {
               <Link to="/ncs" className={location.pathname === '/ncs' ? 'active' : ''}>
                 NCS
               </Link>
+              <Link to="/aptitude" className={location.pathname.startsWith('/aptitude') ? 'active' : ''}>
+                인적성
+              </Link>
               <Link to="/search" className={location.pathname === '/search' ? 'active' : ''}>
                 문제 검색
               </Link>

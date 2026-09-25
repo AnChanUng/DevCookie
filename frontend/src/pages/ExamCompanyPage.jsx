@@ -11,6 +11,15 @@ const CIRC = ['①', '②', '③', '④', '⑤'];
 const isRight = (q, a) => (q.kind ? a === 'r' : a === q.a);
 const normAns = (s) => s.replace(/[\s()[\]{}.,·'"`_-]/g, '').toLowerCase();
 
+// 인적성 어휘 문제처럼 "밑줄 친 말"을 묻는 문항은 본문에 <u>…</u>로 표시해 둔다. 그 부분만 밑줄로 그린다
+const Rich = ({ text }) => {
+  if (!text || !text.includes('<u>')) return text ?? null;
+  return text.split(/<u>(.*?)<\/u>/g).map((part, i) => (i % 2 ? <u key={i}>{part}</u> : part));
+};
+
+// 따로 상단 메뉴를 가진 분류(hub)에서 풀이 화면을 열었을 때 돌아갈 메뉴 이름
+const HUB_NAMES = { ssafy: 'SSAFY', aptitude: '인적성검사' };
+
 const shuffle = (arr) => {
   const a = arr.slice();
   for (let i = a.length - 1; i > 0; i--) {
@@ -39,7 +48,7 @@ export default function ExamCompanyPage() {
   const company = COMPANIES.find(c => c.key === key);
   if (!company || !company.ready) return <Navigate to="/exam" replace />;
   const category = EXAM_CATEGORIES.find(c => c.key === company.category);
-  const back = category?.hub === 'ssafy' ? { to: '/ssafy', label: '← SSAFY' }
+  const back = category?.hub ? { to: `/${category.hub}`, label: `← ${HUB_NAMES[category.hub] || category.name}` }
     : category ? { to: `/exam/category/${category.key}`, label: `← ${category.name}` } : undefined;
   return <CompanyExam company={company} back={back} />;
 }
@@ -220,7 +229,7 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
           <span className="badge">
             {SOURCE_KINDS[company.source.kind].icon} {company.source.label || SOURCE_KINDS[company.source.kind].badge}
           </span>
-          <span className="txt">{SOURCE_KINDS[company.source.kind].detail}</span>
+          <span className="txt">{company.source.detail || SOURCE_KINDS[company.source.kind].detail}</span>
         </div>
       )}
       <p className="exam-lede">{company.lede}</p>
@@ -480,7 +489,7 @@ function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractic
             return (
               <li key={i}>
                 <button className={cls} disabled={shown} onClick={() => choose(i)}>
-                  <span className="no">{i + 1}</span><span className="tx">{opt}</span>
+                  <span className="no">{i + 1}</span><span className="tx"><Rich text={opt} /></span>
                 </button>
               </li>
             );
@@ -519,9 +528,9 @@ function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractic
 function QuestionBody({ q, className = 'exam-qtext' }) {
   return (
     <>
-      {q.ctx && <div className="exam-ctx">{q.ctx}</div>}
+      {q.ctx && <div className="exam-ctx"><Rich text={q.ctx} /></div>}
       {q.code && <pre className="exam-code">{q.code}</pre>}
-      <p className={className}>{q.q}</p>
+      <p className={className}><Rich text={q.q} /></p>
     </>
   );
 }
@@ -572,8 +581,8 @@ export function ReviewCard({ q, a, extra, sections, marked, onMark }) {
         <div className="a">
           {a === undefined
             ? (extra ? null : <span className="w">미답변</span>)
-            : <>내 답 <b className={ok ? 'r' : 'w'}>{CIRC[a]} {q.o[a]}</b></>}
-          {(!ok || a === undefined) && <div>정답 <b className="r">{CIRC[q.a]} {q.o[q.a]}</b></div>}
+            : <>내 답 <b className={ok ? 'r' : 'w'}>{CIRC[a]} <Rich text={q.o[a]} /></b></>}
+          {(!ok || a === undefined) && <div>정답 <b className="r">{CIRC[q.a]} <Rich text={q.o[q.a]} /></b></div>}
         </div>
       )}
       <div className="ex">{q.e}</div>
