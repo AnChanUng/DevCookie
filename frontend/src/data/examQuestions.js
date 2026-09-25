@@ -7,6 +7,11 @@ import { EX_SECTIONS, EX_QUESTIONS } from './exQuestions';
 import { KWATER_SECTIONS, KWATER_QUESTIONS } from './kwaterQuestions';
 import { KDN_SECTIONS, KDN_QUESTIONS } from './kdnQuestions';
 import { KICOX_SECTIONS, KICOX_QUESTIONS } from './kicoxQuestions';
+import { KORAIL_PRED_QUESTIONS } from './korailPredictedQuestions';
+import { EX_PRED_QUESTIONS } from './exPredictedQuestions';
+import { KWATER_PRED_QUESTIONS } from './kwaterPredictedQuestions';
+import { KDN_PRED_QUESTIONS } from './kdnPredictedQuestions';
+import { KICOX_PRED_QUESTIONS } from './kicoxPredictedQuestions';
 import { KOSCOM_SECTIONS, KOSCOM_QUESTIONS } from './koscomQuestions';
 import { BNK_SECTIONS, BNK_QUESTIONS } from './bnkQuestions';
 import { KFTC_SECTIONS, KFTC_QUESTIONS } from './kftcQuestions';
@@ -104,6 +109,15 @@ export const HF_QUESTIONS = [
 {id:'pl10',sec:'pl',topic:'Java·예외 처리',q:'다음 Java 코드의 출력 결과는?',code:'public class Main {\n    static int f() {\n        try {\n            return 1;\n        } finally {\n            System.out.print("F");\n        }\n    }\n    public static void main(String[] args) {\n        System.out.print(f());\n    }\n}',o:['1F','F1','1','F','컴파일 오류'],a:1,e:'try 블록에서 return 값 1이 결정된 뒤, 메서드가 실제로 반환되기 전에 finally 블록이 반드시 실행되어 "F"를 먼저 출력한다. 그 후 main에서 반환값 1을 출력. 출력: F1.'},
 {id:'pl11',sec:'pl',topic:'Python·슬라이싱',q:'다음 Python 코드의 출력 결과는?',code:'a = [1, 2, 3, 4, 5, 6]\nprint(a[::-2], a[1:4])',o:['[6, 4, 2] [2, 3, 4]','[5, 3, 1] [2, 3, 4]','[6, 4, 2] [2, 3, 4, 5]','[6, 5, 4] [1, 2, 3]','[2, 4, 6] [2, 3, 4]'],a:0,e:'a[::-2]는 끝에서부터 2칸씩 건너뛰며 역순으로 → [6, 4, 2]. a[1:4]는 인덱스 1부터 4 직전까지 → [2, 3, 4]. 슬라이싱의 끝 인덱스는 포함되지 않는다.'},
 {id:'pl12',sec:'pl',topic:'Python·딕셔너리·정렬',q:'다음 Python 코드의 출력 결과는?',code:'d = {}\nfor w in "banana":\n    d[w] = d.get(w, 0) + 1\nprint(sorted(d.items(), key=lambda x: -x[1])[0])',o:["('a', 3)","('n', 2)","('b', 1)","('a', 2)","('n', 3)"],a:0,e:'문자 빈도: b=1, a=3, n=2. dict.get(key, 0)은 키가 없으면 기본값 0을 반환한다. 빈도 내림차순(−x[1])으로 정렬한 첫 항목은 (\'a\', 3).'},
+];
+
+// 복기 문제집이 있는 공기업은 복기 기반 회차(r)와 같은 경향으로 새로 만든 예상문제 회차(p)를 한 문제은행으로 합친다.
+// 실전 모의고사는 두 회차를 합친 문제은행에서 영역마다 실제 시험 문항 수(count)만큼 뽑는다
+const withPredicted = (recall, predicted) => [...recall.map(q => ({ ...q, set: 'r' })), ...predicted.map(q => ({ ...q, set: 'p' }))];
+const drawOf = (sections) => Object.fromEntries(Object.entries(sections).map(([k, s]) => [k, s.count]));
+const recallSets = (rSub, pSub) => [
+  { key: 'r', name: '복기 기반 문제 1회', sub: rSub },
+  { key: 'p', name: '예상문제 1회', sub: pSub },
 ];
 
 // 문제은행이 무엇을 근거로 만들어졌는지. 저장소에 복기·복원 원본 파일이 있으면 recall, 없으면 predicted.
@@ -252,34 +266,39 @@ export const COMPANIES = [
     lede: "데이터베이스 6문제, 자료구조·알고리즘 6문제, 소프트웨어공학 5문제, 운영체제 5문제, 네트워크 5문제, 정보보호·신기술 3문제. 총 30문제, 45분, 4지선다. 전산 전공 범위에 공간정보(GIS) 주제를 더해 새로 만든 예상문제입니다.",
   },
   {
-    key: "korail", category: "public", abbr: "KORAIL", name: "코레일", meta: "전산 전공 40문제 · 50분 · 5지선다", ready: true,
+    key: "korail", category: "public", abbr: "KORAIL", name: "코레일", meta: "전산 전공 40문제 × 2회(복기 기반 + 예상) · 50분 · 5지선다", ready: true,
     source: { kind: "recall", label: "2026 상반기 복기문제", file: "공기업 필기/2026 상반기 코레일.hwpx" },
-    questions: KORAIL_QUESTIONS, sections: KORAIL_SECTIONS, minutes: 50,
-    lede: "소프트웨어공학 9문제, 데이터베이스 9문제, 운영체제·컴퓨터구조 10문제, 네트워크 6문제, 정보보호 6문제. 총 40문제, 50분, 5지선다. 2026 상반기 응시 후기에 복원된 문항(포렌식, 블록 암호 모드, 파이프라인·AMAT 계산, 관계대수, 서브넷 등)을 바탕으로 새로 만든 문제입니다.",
+    questions: withPredicted(KORAIL_QUESTIONS, KORAIL_PRED_QUESTIONS), sections: KORAIL_SECTIONS, minutes: 50,
+    sets: recallSets('복원 문항을 바탕으로 만든 40문제 · 포렌식·블록 암호 모드·파이프라인·관계대수 중심', '같은 경향의 새 40문제 · 스크럼·PERT·SRT·LRU·세마포어·ARP 스푸핑·umask 중심'), draw: drawOf(KORAIL_SECTIONS),
+    lede: "소프트웨어공학 9문제, 데이터베이스 9문제, 운영체제·컴퓨터구조 10문제, 네트워크 6문제, 정보보호 6문제. 총 40문제, 50분, 5지선다. 2026 상반기 응시 후기에 복원된 문항(포렌식, 블록 암호 모드, 파이프라인·AMAT 계산, 관계대수, 서브넷 등)을 바탕으로 만든 1회분에, 같은 출제 경향(결합도·응집도 판별, 일정·비용 계산, 스케줄링·페이지 교체 계산, 서브넷 계산)을 따라 새로 만든 예상문제 1회분을 더했습니다. 실전 모의고사는 두 회차 80문항에서 영역별 문항 수대로 뽑습니다.",
   },
   {
-    key: "ex", category: "public", abbr: "EX", name: "한국도로공사", meta: "전산 전공 40문제 · 50분 · 5지선다", ready: true,
+    key: "ex", category: "public", abbr: "EX", name: "한국도로공사", meta: "전산 전공 40문제 × 2회(복기 기반 + 예상) · 50분 · 5지선다", ready: true,
     source: { kind: "recall", label: "2026 상반기 복기문제", file: "공기업 필기/2026_한국도로공사_상반기전산전공.hwp" },
-    questions: EX_QUESTIONS, sections: EX_SECTIONS, minutes: 50,
-    lede: "데이터베이스 8문제, 소프트웨어공학 8문제, 운영체제 9문제, 정보보호 7문제, 네트워크 8문제. 총 40문제, 50분, 5지선다. 2026 상반기 응시 후기에 복원된 40문항의 주제와 보기 구성을 따라 새로 만든 문제입니다.",
+    questions: withPredicted(EX_QUESTIONS, EX_PRED_QUESTIONS), sections: EX_SECTIONS, minutes: 50,
+    sets: recallSets('복원된 40문항의 주제와 보기 구성을 따른 40문제', '같은 경향의 새 40문제 · 키·뷰·SAVEPOINT·합성 관계·최악 적합·SSTF·Go-Back-N·IPsec 중심'), draw: drawOf(EX_SECTIONS),
+    lede: "데이터베이스 8문제, 소프트웨어공학 8문제, 운영체제 9문제, 정보보호 7문제, 네트워크 8문제. 총 40문제, 50분, 5지선다. 2026 상반기 응시 후기에 복원된 40문항의 주제와 보기 구성을 따라 만든 1회분에, 같은 출제 경향으로 새로 만든 예상문제 1회분을 더했습니다. 실전 모의고사는 두 회차 80문항에서 영역별 문항 수대로 뽑습니다.",
   },
   {
-    key: "kwater", category: "public", abbr: "K-water", name: "한국수자원공사", meta: "전산 전공(2차) 30문제 · 40분 · 4지선다", ready: true,
+    key: "kwater", category: "public", abbr: "K-water", name: "한국수자원공사", meta: "전산 전공(2차) 30문제 × 2회(복기 기반 + 예상) · 40분 · 4지선다", ready: true,
     source: { kind: "recall", label: "2026 상반기 복기문제", file: "공기업 필기/2026_한국수자원공사_상반기2차전산전공.hwp" },
-    questions: KWATER_QUESTIONS, sections: KWATER_SECTIONS, minutes: 40,
-    lede: "프로그래밍 실행 결과 6문제, 자료구조 3문제, 네트워크 3문제, 운영체제 8문제, 컴퓨터구조 10문제. 총 30문제, 40분, 4지선다. 2026 상반기 2차 응시 후기에 복원된 문항(C·Python·Java 코드, C-SCAN, LRU, 논리회로, RAID 등)을 바탕으로 새로 만든 문제입니다.",
+    questions: withPredicted(KWATER_QUESTIONS, KWATER_PRED_QUESTIONS), sections: KWATER_SECTIONS, minutes: 40,
+    sets: recallSets('복원 문항을 바탕으로 만든 30문제 · C·Python·Java 코드·C-SCAN·LRU·RAID 중심', '같은 경향의 새 30문제 · 코드 실행 6·AVL·슬라이딩 윈도우·LOOK·TLB·fork·반가산기·암달 중심'), draw: drawOf(KWATER_SECTIONS),
+    lede: "프로그래밍 실행 결과 6문제, 자료구조 3문제, 네트워크 3문제, 운영체제 8문제, 컴퓨터구조 10문제. 총 30문제, 40분, 4지선다. 2026 상반기 2차 응시 후기에 복원된 문항(C·Python·Java 코드, C-SCAN, LRU, 논리회로, RAID 등)을 바탕으로 만든 1회분에, 같은 출제 경향(코드 실행 결과, 주소 변환·접근 시간 계산, 논리회로·캐시 계산)을 따라 새로 만든 예상문제 1회분을 더했습니다. 실전 모의고사는 두 회차 60문항에서 영역별 문항 수대로 뽑습니다.",
   },
   {
-    key: "kdn", category: "public", abbr: "KDN", name: "한전KDN", meta: "전산 필기(1차) 50문제 · 60분 · 5지선다", ready: true,
+    key: "kdn", category: "public", abbr: "KDN", name: "한전KDN", meta: "전산 필기(1차) 50문제 × 2회(복기 기반 + 예상) · 60분 · 5지선다", ready: true,
     source: { kind: "recall", label: "2026 복기문제", file: "공기업 필기/2026_한전KDN_전산필기_1차.hwp" },
-    questions: KDN_QUESTIONS, sections: KDN_SECTIONS, minutes: 60,
-    lede: "소프트웨어공학 7문제, 프로그래밍·자료구조 5문제, 운영체제 5문제, 데이터베이스 17문제, 네트워크 16문제. 총 50문제, 60분, 5지선다. 2026 1차 응시 후기에 복원된 50문항의 주제 순서를 따라 새로 만든 문제로, DB와 네트워크 비중이 높습니다.",
+    questions: withPredicted(KDN_QUESTIONS, KDN_PRED_QUESTIONS), sections: KDN_SECTIONS, minutes: 60,
+    sets: recallSets('복원된 50문항의 주제 순서를 따른 50문제', '같은 경향의 새 50문제 · COCOMO·은행가 안전 순서·OPT·외부 조인·후보키·해밍 코드·혼잡 제어·DHCP 중심'), draw: drawOf(KDN_SECTIONS),
+    lede: "소프트웨어공학 7문제, 프로그래밍·자료구조 5문제, 운영체제 5문제, 데이터베이스 17문제, 네트워크 16문제. 총 50문제, 60분, 5지선다. 2026 1차 응시 후기에 복원된 50문항의 주제 순서를 따라 만든 1회분에, 같은 출제 경향으로 새로 만든 예상문제 1회분을 더했습니다. DB와 네트워크 비중이 높습니다. 실전 모의고사는 두 회차 100문항에서 영역별 문항 수대로 뽑습니다.",
   },
   {
-    key: "kicox", category: "public", abbr: "KICOX", name: "한국산업단지공단", meta: "정보기술 전공 39문제 · 55분 · 5지선다", ready: true,
+    key: "kicox", category: "public", abbr: "KICOX", name: "한국산업단지공단", meta: "정보기술 전공 39문제 × 2회(복기 기반 + 예상) · 55분 · 5지선다", ready: true,
     source: { kind: "recall", label: "복기문제", file: "공기업 필기/산업단지공단 복기 문제.pdf" },
-    questions: KICOX_QUESTIONS, sections: KICOX_SECTIONS, minutes: 55,
-    lede: "데이터베이스 14문제, 자료구조·알고리즘 12문제, 소프트웨어공학 6문제, AI·보안 7문제. 총 39문제, 55분, 5지선다. 응시 후기에 복원된 39문항의 주제(인덱스 선택도, 비트맵 인덱스, Strict 2PL, 체크포인트, AVL·Red-Black 트리, 정렬 성질, V-모델, 결정 커버리지, Adam, Self-Attention, K-means 등)를 따라 새로 만든 문제로, DB와 자료구조 비중이 높고 딥러닝 기초가 함께 나옵니다.",
+    questions: withPredicted(KICOX_QUESTIONS, KICOX_PRED_QUESTIONS), sections: KICOX_SECTIONS, minutes: 55,
+    sets: recallSets('복원된 39문항의 주제를 따른 39문제', '같은 경향의 새 39문제 · 복합 인덱스·격리 수준·MVCC·CAP·다익스트라·MST·MC/DC·위치 인코딩 중심'), draw: drawOf(KICOX_SECTIONS),
+    lede: "데이터베이스 14문제, 자료구조·알고리즘 12문제, 소프트웨어공학 6문제, AI·보안 7문제. 총 39문제, 55분, 5지선다. 응시 후기에 복원된 39문항의 주제(인덱스 선택도, 비트맵 인덱스, Strict 2PL, 체크포인트, AVL·Red-Black 트리, 정렬 성질, V-모델, 결정 커버리지, Adam, Self-Attention, K-means 등)를 따라 만든 1회분에, 같은 출제 경향으로 새로 만든 예상문제 1회분을 더했습니다. DB와 자료구조 비중이 높고 딥러닝 기초가 함께 나옵니다. 실전 모의고사는 두 회차 78문항에서 영역별 문항 수대로 뽑습니다.",
   },
   {
     key: "bnk", category: "finance", abbr: "BNK", name: "BNK캐피탈", meta: "금융상식 15 + NCS 15 · 40분 · 4지선다", ready: true,
