@@ -2237,7 +2237,7 @@
 
 .home-menu {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 16px;
   padding-bottom: 16px;
 }
@@ -2265,6 +2265,7 @@
 .home-menu-item.cyan { --tone: #0891B2; --tone-light: rgba(6, 182, 212, 0.1); }
 .home-menu-item.ssafy { --tone: #1D6FE0; --tone-light: rgba(29, 111, 224, 0.08); }
 .home-menu-item.pink { --tone: #DB2777; --tone-light: rgba(236, 72, 153, 0.08); }
+.home-menu-item.emerald { --tone: #059669; --tone-light: rgba(5, 150, 105, 0.09); }
 
 /* 카드 위쪽의 색 띠. 올리면 끝까지 차오른다 */
 .home-menu-item::before {
@@ -2767,4 +2768,47 @@
 .nav-links a.nav-donate:hover {
   color: var(--accent-blue);
   box-shadow: var(--card-shadow);
+}
+
+/* 첫 화면 메뉴 카드 머리: 번호와 분류 칩을 한 줄에 */
+.home-menu-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.home-menu-head .home-menu-no { margin-bottom: 0; }
+.home-menu-tag {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 4px 9px;
+  border-radius: var(--radius-full);
+  color: var(--tone);
+  background: var(--tone-light);
+  white-space: nowrap;
+}
+.home-menu-new {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  vertical-align: 3px;
+  color: #fff;
+  background: var(--tone);
+}
+.home-menu-item { min-height: 200px; padding: 22px 18px; }
+
+/* 카드 다섯 장: 넓으면 한 줄, 중간 폭이면 위 3장 · 아래 2장으로 빈칸 없이 채운다 */
+@media (max-width: 1100px) {
+  .home-menu { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .home-menu-item { grid-column: span 2; }
+  .home-menu-item:nth-child(n + 4) { grid-column: span 3; }
+}
+@media (max-width: 640px) {
+  .home-menu { grid-template-columns: 1fr; }
+  .home-menu-item,
+  .home-menu-item:nth-child(n + 4) { grid-column: auto; min-height: 0; padding: 18px; }
 }
