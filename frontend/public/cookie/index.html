@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍪</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>쿠키 연구소</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+    <link rel="stylesheet" href="/cookie/cookie.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <div class="brand">
+          <span class="brand-mark">🍪</span>
+          <div>
+            <h1>쿠키 연구소</h1>
+            <p>여긴 지도에 없는 곳입니다. 방 네 곳 어딘가에 <b>황금 쿠키</b>가 하나씩 숨어 있어요.</p>
+          </div>
+        </div>
+        <button class="gold-meter" id="goldMeter" title="모은 황금 쿠키">
+          <span class="gold-slots" id="goldSlots"></span>
+          <span class="gold-count" id="goldCount">0 / 4</span>
+        </button>
+      </header>
+
+      <nav class="rooms" id="rooms">
+        <button data-room="fortune"><span>🥠</span><b>포춘쿠키</b><i>깨 보기 전엔 모른다</i></button>
+        <button data-room="lab"><span>🔬</span><b>해부실</b><i>브라우저가 흘리는 것들</i></button>
+        <button data-room="terminal"><span>💻</span><b>터미널</b><i>guest@cookie:~$</i></button>
+        <button data-room="consent"><span>📜</span><b>동의서</b><i>모두 거부할 수 있을까</i></button>
+      </nav>
+
+      <!-- ============ 포춘쿠키 ============ -->
+      <section class="room" id="room-fortune">
+        <div class="fortune-stage">
+          <div class="fc-area">
+            <button class="fc" id="fc" aria-label="포춘쿠키 깨기">
+              <span class="fc-half fc-l"></span>
+              <span class="fc-half fc-r"></span>
+              <span class="fc-crack"></span>
+            </button>
+            <div class="slip" id="slip" hidden>
+              <p class="slip-text" id="slipText"></p>
+              <dl class="slip-lucky" id="slipLucky"></dl>
+            </div>
+          </div>
+          <p class="fc-hint" id="fcHint">쿠키를 세 번 두드려 깨 보세요</p>
+          <button class="btn ghost" id="fcAgain" hidden>새 쿠키 굽기</button>
+        </div>
+        <aside class="panel">
+          <h3>지금까지 나온 운세 <small id="fcTotal"></small></h3>
+          <ol class="fortune-log" id="fortuneLog"></ol>
+        </aside>
+      </section>
+
+      <!-- ============ 해부실 ============ -->
+      <section class="room" id="room-lab">
+        <p class="room-lede">이 페이지는 아무것도 서버로 보내지 않습니다. 그런데도 자바스크립트 몇 줄이면 이만큼 알 수 있어요. 광고 회사는 이걸 조합해서 쿠키 없이도 당신을 알아봅니다.</p>
+        <div class="lab-grid">
+          <div class="panel fp">
+            <h3>당신의 브라우저 지문</h3>
+            <canvas id="identicon" width="140" height="140"></canvas>
+            <code class="fp-hash" id="fpHash">계산 중…</code>
+            <p class="muted">화면에 보이지 않는 캔버스에 글자와 그라데이션을 그리고 그 픽셀을 해시한 값입니다. 그래픽 카드, 드라이버, 글꼴, 브라우저가 조금씩 다르게 그리기 때문에 기기마다 값이 달라집니다. 시크릿 창에서 열어도 똑같이 나올 거예요.</p>
+          </div>
+          <div class="panel">
+            <h3>제가 알아낸 것</h3>
+            <dl class="facts" id="facts"></dl>
+          </div>
+          <div class="panel live">
+            <h3>지금 이 순간에도 <span class="rec">● REC</span></h3>
+            <dl class="facts" id="live"></dl>
+            <p class="muted">키보드 내용은 안 봤습니다. 누른 횟수만 셌어요. 하지만 볼 수도 있었죠.</p>
+          </div>
+          <div class="panel oven">
+            <h3>쿠키 오븐 <small>이 브라우저에 진짜 쿠키가 구워집니다</small></h3>
+            <form id="ovenForm" class="oven-form">
+              <input id="ovenName" placeholder="이름 (영문·숫자)" maxlength="20" required />
+              <input id="ovenValue" placeholder="값" maxlength="40" required />
+              <select id="ovenLife">
+                <option value="10">10초</option>
+                <option value="30" selected>30초</option>
+                <option value="60">1분</option>
+                <option value="300">5분</option>
+              </select>
+              <button class="btn">굽기</button>
+            </form>
+            <p class="muted">document.cookie로 읽을 수 있는 쿠키만 보입니다. 🍴를 누르면 먹습니다(삭제). HttpOnly 쿠키는 자바스크립트로는 보이지 않아요. 그래서 로그인 세션은 보통 HttpOnly로 굽습니다.</p>
+            <ul class="jar" id="jar"></ul>
+          </div>
+          <div class="panel attrs">
+            <h3>쿠키 속성 한눈에</h3>
+            <dl class="attr-list">
+              <dt>Expires / Max-Age</dt><dd>없으면 세션 쿠키. 브라우저를 닫으면 사라집니다. 위 오븐의 타이머가 바로 Max-Age입니다.</dd>
+              <dt>Domain · Path</dt><dd>어느 주소로 요청할 때 따라갈지 정합니다. 오븐 쿠키는 Path=/cookie/라 이 방에서만 보입니다.</dd>
+              <dt>Secure</dt><dd>HTTPS 요청에만 실어 보냅니다.</dd>
+              <dt>HttpOnly</dt><dd>document.cookie에서 숨깁니다. XSS로 세션을 훔쳐 가는 걸 막는 첫 번째 방패.</dd>
+              <dt>SameSite</dt><dd>Strict · Lax · None. 다른 사이트에서 시작된 요청에 쿠키를 실을지 정해 CSRF를 막습니다. 요즘 브라우저 기본값은 Lax.</dd>
+              <dt>제3자 쿠키</dt><dd>보고 있는 사이트가 아닌 다른 도메인(광고 서버)이 굽는 쿠키. 막히는 추세라 그 빈자리를 위의 지문 같은 기법이 채우고 있습니다.</dd>
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 터미널 ============ -->
+      <section class="room" id="room-terminal">
+        <div class="term" id="term">
+          <div class="term-bar"><i></i><i></i><i></i><span>guest@cookie: ~</span></div>
+          <div class="term-body" id="termBody">
+            <div id="termOut"></div>
+            <form class="term-line" id="termForm" autocomplete="off">
+              <span class="prompt" id="termPrompt"></span>
+              <input id="termIn" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="명령어 입력" />
+            </form>
+          </div>
+        </div>
+        <p class="muted center">모르겠으면 <code>help</code>. 위아래 화살표로 이전 명령, Tab으로 자동 완성.</p>
+      </section>
+
+      <!-- ============ 동의서 ============ -->
+      <section class="room" id="room-consent">
+        <p class="room-lede">임무: 아래 뉴스 사이트에서 쿠키를 <b>모두 거부</b>하세요. 수락은 0.4초면 됩니다. 거부는 몇 초가 걸릴까요?</p>
+        <div class="consent-layout">
+          <div class="fake-site" id="fakeSite">
+            <div class="fake-head"><b>데일리 코딩 뉴스</b><span>구독 · 로그인</span></div>
+            <div class="fake-body">
+              <h4>"금요일 배포는 이제 그만" 개발자 94% 동의</h4>
+              <p>한 설문에 따르면 개발자 대부분이 금요일 오후 배포에 반대한다고 답했다. 나머지 6%는 설문 당시 장애 대응 중이라 응답하지 못했다.</p>
+              <h4>신입 개발자, 첫 PR에 코멘트 214개 받아</h4>
+              <p>"다 제 성장을 위한 거라고 믿습니다." 그는 현재 215번째 코멘트에 답하는 중이다.</p>
+              <h4>연구진 "스택오버플로 복붙, 이해하고 하면 공부"</h4>
+              <p>연구진은 다만 이해했는지는 본인만 안다고 덧붙였다.</p>
+            </div>
+            <div class="consent-overlay" id="consentOverlay"></div>
+          </div>
+          <aside class="panel">
+            <h3>발견한 다크 패턴 <small id="dpCount"></small></h3>
+            <ul class="dp-list" id="dpList"></ul>
+            <button class="btn ghost" id="consentReset">처음부터 다시</button>
+          </aside>
+        </div>
+      </section>
+
+      <footer class="foot">
+        <a href="/">← 공부하러 돌아가기</a>
+        <span>이 방의 기록은 이 브라우저에만 남습니다.</span>
+      </footer>
+    </div>
+
+    <div class="modal" id="modal" hidden><div class="modal-card" id="modalCard"></div></div>
+    <div class="toast" id="toast"></div>
+    <div class="rain" id="rain" aria-hidden="true"></div>
+    <canvas class="matrix" id="matrix" hidden></canvas>
+
+    <script src="/cookie/cookie.js"></script>
+  </body>
+</html>
