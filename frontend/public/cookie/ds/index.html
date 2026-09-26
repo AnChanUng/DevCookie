@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧬</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>자료구조 유형 검사</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+    <link rel="stylesheet" href="/cookie/ds/ds.css" />
+  </head>
+  <body>
+    <main class="wrap">
+      <!-- 시작 -->
+      <section class="screen" id="intro">
+        <p class="kicker">쿠키 연구소 별관 · 성격 검사실</p>
+        <h1>나는 어떤<br /><span class="grad">자료구조</span>일까?</h1>
+        <p class="lede">12개의 질문에 답하면 당신의 성격과 가장 닮은 자료구조를 찾아 드립니다.<br />결과에는 그 자료구조를 <b>면접에서 설명하는 법</b>도 들어 있어요. 성격 검사인 척하는 전공 공부입니다.</p>
+        <div class="orbit" aria-hidden="true">
+          <span>📚</span><span>🚶</span><span>🔗</span><span>🌳</span><span>🗝️</span><span>🧱</span><span>🕸️</span><span>⛰️</span>
+        </div>
+        <button class="btn big" id="start">검사 시작하기</button>
+        <p class="muted" id="introMeta">약 2분 · 정답은 없습니다 (시험이 아니니까요)</p>
+        <button class="link" id="showAll">유형 8가지 먼저 구경하기</button>
+      </section>
+
+      <!-- 질문 -->
+      <section class="screen" id="quiz" hidden>
+        <div class="progress"><i id="bar"></i></div>
+        <div class="qhead">
+          <button class="link" id="back">← 이전</button>
+          <span id="qno"></span>
+        </div>
+        <div class="qcard" id="qcard">
+          <p class="qscene" id="qscene"></p>
+          <h2 id="qtext"></h2>
+          <div class="answers" id="answers"></div>
+        </div>
+      </section>
+
+      <!-- 분석 중 -->
+      <section class="screen" id="loading" hidden>
+        <div class="spinner" aria-hidden="true"></div>
+        <pre class="logs" id="logs"></pre>
+      </section>
+
+      <!-- 결과 -->
+      <section class="screen" id="result" hidden>
+        <p class="kicker" id="rKicker">당신의 자료구조는</p>
+        <div class="hero">
+          <div class="hero-emoji" id="rEmoji"></div>
+          <h1 id="rName"></h1>
+          <p class="tagline" id="rTag"></p>
+          <div class="axes" id="rAxes"></div>
+        </div>
+
+        <div class="grid">
+          <article class="card wide">
+            <h3>이런 사람입니다</h3>
+            <p id="rDesc"></p>
+            <ul class="quotes" id="rQuotes"></ul>
+          </article>
+          <article class="card">
+            <h3>능력치</h3>
+            <div class="stats" id="rStats"></div>
+          </article>
+          <article class="card">
+            <h3>강점과 버그</h3>
+            <p class="pro" id="rPro"></p>
+            <p class="con" id="rCon"></p>
+          </article>
+          <article class="card match">
+            <h3>💘 찰떡궁합</h3>
+            <button class="mate" id="rBest"></button>
+          </article>
+          <article class="card match">
+            <h3>⚡ 상극</h3>
+            <button class="mate" id="rWorst"></button>
+          </article>
+          <article class="card wide study">
+            <h3>🎓 면접에서 이렇게 설명하세요</h3>
+            <p class="say" id="rSay"></p>
+            <table class="bigo" id="rBigO"></table>
+            <p class="muted" id="rUse"></p>
+            <p class="trap" id="rTrap"></p>
+          </article>
+        </div>
+
+        <div class="actions">
+          <button class="btn" id="saveCard">결과 카드 저장</button>
+          <button class="btn ghost" id="copyLink">링크 복사</button>
+          <button class="btn ghost" id="retry">다시 검사</button>
+        </div>
+        <button class="link" id="showAll2">다른 유형 전부 보기</button>
+      </section>
+
+      <!-- 전체 유형 -->
+      <section class="screen" id="all" hidden>
+        <p class="kicker">자료구조 유형 8가지</p>
+        <h1>세 가지 축, 여덟 가지 성격</h1>
+        <div class="axis-legend" id="legend"></div>
+        <div class="types" id="types"></div>
+        <button class="btn ghost" id="allBack">돌아가기</button>
+      </section>
+
+      <footer class="foot">
+        <a href="/cookie/">← 쿠키 연구소 본관</a>
+        <span>답변은 이 브라우저 밖으로 나가지 않습니다.</span>
+      </footer>
+    </main>
+    <div class="toast" id="toast"></div>
+    <script src="/cookie/ds/ds.js"></script>
+  </body>
+</html>
