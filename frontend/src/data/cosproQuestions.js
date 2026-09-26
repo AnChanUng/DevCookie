@@ -13,6 +13,7 @@ export const COSPRO_PARTS = {
 export const COSPRO_GROUPS = {
   mock:  { name: 'COS Pro 1급 모의고사 (Java)', desc: '프로그래머스 COS Pro 1급 Python 모의고사 10문제를 자바로 옮겼습니다. 실제 시험처럼 빈칸 4 · 한 줄 3 · 함수 3 구성입니다.' },
   extra: { name: '추가 예제', desc: '같은 세 유형으로 새로 만든 연습 문제입니다.' },
+  bit:   { name: '비트마스킹', desc: '정수 하나의 비트로 집합을 나타내는 문제입니다. 부분집합 순회 · 권한 플래그 · 비트 DP를 세 유형으로 풀어 봅니다.' },
 };
 
 export const COSPRO_PROBLEMS = [
@@ -857,6 +858,162 @@ class Solution {
     { input: 'sessions = [[1, 3], [3, 5], [5, 7]]', args: 'new int[][]{{1, 3}, {3, 5}, {5, 7}}', expect: '1', sample: true },
     { args: 'new int[][]{{0, 100}, {10, 20}, {15, 25}, {18, 19}, {30, 40}}', expect: '4' },
     { args: 'new int[][]{{5, 6}, {5, 6}, {5, 6}, {6, 7}}', expect: '3' },
+  ],
+},
+
+/* ================= 비트마스킹 ================= */
+{
+  id: 'cb01', group: 'bit', part: 'blank', title: '예산 딱 맞추기', topic: '비트마스크 · 부분집합',
+  statement: `팀 회식 메뉴 가격이 배열 prices로 주어집니다. 메뉴를 한 개 이상 골라 가격 합이 정확히 budget이 되는 방법의 수를 return 하려고 합니다. 가격이 같아도 서로 다른 메뉴는 따로 셉니다.
+
+메뉴가 n개일 때 1부터 2ⁿ - 1까지의 정수 mask 하나가 메뉴 선택 하나를 뜻합니다. mask의 i번째 비트가 1이면 i번 메뉴를 고른 것입니다. 예를 들어 n = 4일 때 mask = 5(이진수 0101)는 0번과 2번 메뉴를 고른 것입니다.
+빈칸을 채워 주세요.`,
+  constraints: ['prices의 길이는 1 이상 20 이하입니다.', 'prices의 원소와 budget은 1 이상 1,000 이하의 자연수입니다.'],
+  starter: `class Solution {
+    public int solution(int[] prices, int budget) {
+        int n = prices.length;
+        int answer = 0;
+        // 공집합(mask = 0)은 세지 않는다
+        for (int mask = 1; mask < ___________; mask++) {
+            int sum = 0;
+            for (int i = 0; i < n; i++) {
+                if (___________)
+                    sum += prices[i];
+            }
+            if (sum == budget)
+                ___________;
+        }
+        return answer;
+    }
+}`,
+  answer: `class Solution {
+    public int solution(int[] prices, int budget) {
+        int n = prices.length;
+        int answer = 0;
+        for (int mask = 1; mask < (1 << n); mask++) {
+            int sum = 0;
+            for (int i = 0; i < n; i++) {
+                if ((mask & (1 << i)) != 0)
+                    sum += prices[i];
+            }
+            if (sum == budget)
+                answer++;
+        }
+        return answer;
+    }
+}`,
+  explain: '원소가 n개인 집합의 부분집합은 2ⁿ개이고, 1 << n이 바로 2ⁿ입니다. i번 비트가 켜져 있는지는 mask & (1 << i)가 0이 아닌지로 확인합니다(((mask >> i) & 1) == 1로 써도 같습니다). 자바에서 & 는 == 보다 우선순위가 낮으므로 괄호를 꼭 씌워야 합니다. n이 20이면 약 100만 × 20번이라 충분히 빠릅니다.',
+  tests: [
+    { input: 'prices = [1, 2, 3, 4], budget = 5', args: 'new int[]{1, 2, 3, 4}, 5', expect: '2', sample: true },
+    { input: 'prices = [3, 3, 3], budget = 6', args: 'new int[]{3, 3, 3}, 6', expect: '3', sample: true },
+    { input: 'prices = [7, 1, 2, 3], budget = 100', args: 'new int[]{7, 1, 2, 3}, 100', expect: '0', sample: true },
+    { args: 'new int[]{1, 1, 1, 1}, 2', expect: '6' },
+    { args: 'new int[]{2, 4, 6, 8, 10}, 12', expect: '3' },
+  ],
+},
+{
+  id: 'cb02', group: 'bit', part: 'line', title: '그룹웨어 권한 검사', topic: '비트 플래그',
+  statement: `그룹웨어는 사용자 권한을 정수 하나에 비트로 저장합니다. 0번 비트는 READ, 1번 비트는 WRITE, 2번 비트는 DELETE, 3번 비트는 SHARE 권한입니다. 예를 들어 권한 값 5(이진수 0101)는 READ와 DELETE를 가진 사용자입니다.
+
+사용자들의 권한 값 perms와 어떤 작업에 필요한 권한 이름 목록 required가 주어질 때, 필요한 권한을 하나도 빠짐없이 모두 가진 사용자 수를 return 하려고 합니다. required가 비어 있으면 모든 사용자가 작업할 수 있습니다.
+아래 코드는 한 줄이 틀렸습니다. 한 줄만 고쳐 주세요.`,
+  constraints: ['perms의 길이는 1 이상 1,000 이하이고, 원소는 0 이상 15 이하입니다.', 'required의 원소는 "READ", "WRITE", "DELETE", "SHARE" 중 하나이며 중복되지 않습니다.'],
+  starter: `class Solution {
+    static final String[] NAMES = {"READ", "WRITE", "DELETE", "SHARE"};
+
+    int bitOf(String name) {
+        for (int i = 0; i < NAMES.length; i++)
+            if (NAMES[i].equals(name))
+                return 1 << i;
+        return 0;
+    }
+
+    public int solution(int[] perms, String[] required) {
+        int need = 0;
+        for (String r : required)
+            need |= bitOf(r);
+
+        int answer = 0;
+        for (int p : perms) {
+            if ((p & need) != 0)
+                answer++;
+        }
+        return answer;
+    }
+}`,
+  answer: `class Solution {
+    static final String[] NAMES = {"READ", "WRITE", "DELETE", "SHARE"};
+
+    int bitOf(String name) {
+        for (int i = 0; i < NAMES.length; i++)
+            if (NAMES[i].equals(name))
+                return 1 << i;
+        return 0;
+    }
+
+    public int solution(int[] perms, String[] required) {
+        int need = 0;
+        for (String r : required)
+            need |= bitOf(r);
+
+        int answer = 0;
+        for (int p : perms) {
+            if ((p & need) == need)
+                answer++;
+        }
+        return answer;
+    }
+}`,
+  explain: '(p & need) != 0은 필요한 권한 중 "하나라도" 가졌는지를 봅니다. "모두" 가졌는지는 p & need가 need 그대로 남는지, 즉 (p & need) == need로 확인해야 합니다. (need & ~p) == 0으로 써도 같습니다. 필요한 권한이 없으면 need = 0이라 모든 사용자가 조건을 만족합니다.',
+  tests: [
+    { input: 'perms = [7, 5, 3, 15], required = ["READ", "DELETE"]', args: 'new int[]{7, 5, 3, 15}, new String[]{"READ", "DELETE"}', expect: '3', sample: true },
+    { input: 'perms = [8, 12, 14, 6], required = ["DELETE", "SHARE"]', args: 'new int[]{8, 12, 14, 6}, new String[]{"DELETE", "SHARE"}', expect: '2', sample: true },
+    { input: 'perms = [0, 1, 2], required = []', args: 'new int[]{0, 1, 2}, new String[]{}', expect: '3', sample: true },
+    { args: 'new int[]{1, 2, 4, 8}, new String[]{"READ", "WRITE"}', expect: '0' },
+    { args: 'new int[]{15, 13, 11}, new String[]{"SHARE", "READ", "WRITE"}', expect: '2' },
+  ],
+},
+{
+  id: 'cb03', group: 'bit', part: 'func', title: '업무 배정 최소 비용', topic: '비트마스크 DP',
+  statement: `n명의 직원에게 n개의 업무를 한 사람당 정확히 하나씩 맡기려고 합니다. cost[i][j]는 i번 직원이 j번 업무를 맡을 때 드는 비용입니다.
+
+모든 업무를 배정했을 때 드는 비용 합의 최솟값을 return 하는 solution 함수를 작성해 주세요.`,
+  constraints: ['n은 1 이상 12 이하입니다.', 'cost는 n × n 배열이고, 원소는 0 이상 1,000 이하입니다.', '배정 순서를 모두 따지면 n = 12에서 12! ≈ 4억 8천만 가지라 시간이 부족할 수 있습니다.'],
+  starter: `class Solution {
+    public int solution(int[][] cost) {
+        int answer = 0;
+        return answer;
+    }
+}`,
+  answer: `import java.util.*;
+
+class Solution {
+    public int solution(int[][] cost) {
+        int n = cost.length;
+        // dp[mask] = mask에 든 업무들을 0번 직원부터 차례로 배정했을 때의 최소 비용
+        int[] dp = new int[1 << n];
+        Arrays.fill(dp, Integer.MAX_VALUE);
+        dp[0] = 0;
+        for (int mask = 0; mask < (1 << n); mask++) {
+            if (dp[mask] == Integer.MAX_VALUE) continue;
+            int worker = Integer.bitCount(mask);   // 다음에 업무를 받을 직원
+            if (worker == n) continue;
+            for (int job = 0; job < n; job++) {
+                if ((mask & (1 << job)) != 0) continue;
+                int next = mask | (1 << job);
+                dp[next] = Math.min(dp[next], dp[mask] + cost[worker][job]);
+            }
+        }
+        return dp[(1 << n) - 1];
+    }
+}`,
+  explain: '이미 배정한 업무의 집합을 비트마스크 mask로 두면, 켜진 비트 수(Integer.bitCount)가 곧 지금까지 업무를 받은 직원 수라 다음 직원 번호가 저절로 정해집니다. dp[mask]에서 아직 꺼진 업무 job을 골라 dp[mask | (1 << job)]을 갱신하면 상태 2ⁿ개 × 전이 n번, n = 12에서 약 5만 번으로 끝납니다.',
+  tests: [
+    { input: 'cost = [[9, 2, 7, 8], [6, 4, 3, 7], [5, 8, 1, 8], [7, 6, 9, 4]]', args: 'new int[][]{{9, 2, 7, 8}, {6, 4, 3, 7}, {5, 8, 1, 8}, {7, 6, 9, 4}}', expect: '13', sample: true },
+    { input: 'cost = [[5]]', args: 'new int[][]{{5}}', expect: '5', sample: true },
+    { input: 'cost = [[1, 2], [3, 4]]', args: 'new int[][]{{1, 2}, {3, 4}}', expect: '5', sample: true },
+    { args: 'new int[][]{{10, 1, 1}, {1, 10, 1}, {1, 1, 10}}', expect: '3' },
+    { args: 'new int[][]{{4, 1, 3}, {2, 0, 5}, {3, 2, 2}}', expect: '5' },
   ],
 },
 ];
