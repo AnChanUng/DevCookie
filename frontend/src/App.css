@@ -2812,3 +2812,126 @@
   .home-menu-item,
   .home-menu-item:nth-child(n + 4) { grid-column: auto; min-height: 0; padding: 18px; }
 }
+
+/* 홈 오른쪽 아래의 오늘의 운세. 왼쪽 아래 오락실 문과 짝을 이루는 작은 글씨 버튼이다 */
+.fortune-door {
+  position: fixed;
+  right: 12px;
+  bottom: 10px;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.fortune-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  opacity: 0.5;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.fortune-toggle:hover,
+.fortune-toggle[aria-expanded='true'] {
+  opacity: 1;
+  color: var(--accent-purple);
+}
+
+.fortune-pop {
+  width: min(300px, calc(100vw - 24px));
+  max-height: calc(100vh - 60px);
+  overflow-y: auto;
+  margin-bottom: 8px;
+  padding: 16px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--card-shadow-hover);
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  animation: fortune-in 0.2s ease;
+}
+
+@keyframes fortune-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.98); }
+}
+
+.fortune-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+}
+
+.fortune-head b { font-size: 0.95rem; }
+.fortune-head span { color: var(--text-tertiary); font-size: 0.75rem; }
+
+.fortune-form { display: grid; gap: 8px; }
+.fortune-form label { color: var(--text-secondary); font-weight: 600; }
+
+.fortune-form input {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.fortune-form button {
+  font: inherit;
+  font-weight: 700;
+  padding: 9px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--gradient-primary);
+  color: #fff;
+  cursor: pointer;
+}
+
+.fortune-form button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.fortune-note {
+  margin: 8px 0 0;
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+}
+
+.fortune-body p { margin: 0; }
+.fortune-bday { background: var(--accent-orange-light); color: #b45309; border-radius: 8px; padding: 6px 8px; margin-bottom: 8px !important; font-weight: 600; }
+.fortune-who { color: var(--text-secondary); font-size: 0.75rem; }
+.fortune-stars { color: var(--accent-orange); font-size: 1.05rem; letter-spacing: 2px; margin: 4px 0 !important; }
+.fortune-stars span { color: var(--text-quaternary); }
+.fortune-msg { font-weight: 600; line-height: 1.5; word-break: keep-all; }
+
+.fortune-bars { display: grid; gap: 5px; margin: 12px 0; }
+.fortune-bars div { display: grid; grid-template-columns: 44px 1fr 24px; align-items: center; gap: 8px; font-size: 0.72rem; color: var(--text-secondary); }
+.fortune-bars i { height: 6px; border-radius: 999px; background: var(--bg-tertiary); overflow: hidden; }
+.fortune-bars i b { display: block; height: 100%; border-radius: 999px; background: var(--gradient-primary); }
+.fortune-bars em { font-style: normal; text-align: right; font-variant-numeric: tabular-nums; }
+
+.fortune-lucky {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+}
+
+.fortune-lucky dt { color: var(--text-tertiary); }
+.fortune-lucky dd { margin: 0; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.fortune-lucky dd i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.fortune-tip { font-size: 0.75rem; color: var(--text-secondary); line-height: 1.5; word-break: keep-all; }
+
+.fortune-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+.fortune-foot a { font-weight: 700; color: var(--accent-blue); font-size: 0.78rem; }
+.fortune-foot button { background: none; border: none; padding: 0; font: inherit; font-size: 0.72rem; color: var(--text-tertiary); text-decoration: underline; cursor: pointer; }
