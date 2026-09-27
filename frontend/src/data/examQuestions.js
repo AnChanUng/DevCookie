@@ -314,11 +314,11 @@ export const COMPANIES = [
     lede: "객관식 21문제, 단답형 9문제, 서술형 2문제. 시간복잡도·빅오 계산, 큐 메서드, 트리 용어·순회, 힙 구조, 재귀 구조와 완전탐색, 순열·조합·부분집합 구분과 next_permutation, 그래프 표현·차수·BFS/DFS, 비트마스킹 상태관리와 장점, Union-Find와 경로 압축, 분할 정복 설계, 위상 정렬 전제 조건, 백트래킹 가지치기, 탐욕 알고리즘 특징, 이진 탐색 조건 처리, 투 포인터까지 복기된 출제 범위를 따라 2회분을 만들었습니다. 단답형은 답을 입력하면 자동 채점하고(표기가 다르면 모범답안을 보고 직접 채점), 서술형은 답안을 써 본 뒤 모범답안·채점 포인트와 비교해 스스로 채점합니다.",
   },
   {
-    key: "ssafymonthly", category: "monthly", abbr: "SSAFY", name: "SSAFY 알고리즘 월말평가", meta: "서술형 15문항 · 복기 서술형 1세트 · 20분", ready: true,
+    key: "ssafymonthly", category: "monthly", abbr: "SSAFY", name: "SSAFY 알고리즘 월말평가", meta: "복기 서술형 3문항 · 20분", ready: true,
     source: { kind: "recall", label: "복기 범위" },
     questions: SSAFY_MONTHLY_QUESTIONS, sections: SSAFY_MONTHLY_SECTIONS, minutes: 20,
     sets: SSAFY_MONTHLY_SETS, draw: { bfs: 1, repr: 1, topo: 1 },
-    lede: "월말평가는 구현 3문제(과제 복기 2 + 기본 알고리즘 1)와 서술형 1문제로 치러지며, 여기서는 구현을 빼고 서술형만 연습합니다. 복기된 서술형 소문항 3개(BFS·DFS 진행 방식 차이와 핵심 자료구조, 그래프 표현 방식에 따른 탐색 소요시간과 이유, 위상 정렬 대상 그래프의 구조적 제한 2가지)를 '월말평가 서술형 복기' 세트로 그대로 담고, 같은 주제의 서술형·단답형 12문항을 더했습니다. 실전 모의고사는 세 주제에서 한 문항씩 뽑습니다.",
+    lede: "월말평가는 구현 3문제(과제 복기 2 + 기본 알고리즘 1)와 서술형 1문제로 치러지며, 여기서는 구현을 빼고 서술형만 연습합니다. 복기된 서술형 소문항 3개(BFS·DFS 진행 방식 차이와 핵심 자료구조, 그래프 표현 방식에 따른 탐색 소요시간과 이유, 위상 정렬 대상 그래프의 구조적 제한 2가지)만 그대로 담았습니다.",
   },
   {
     key: "daou", category: "aptitude", abbr: "DAOU", name: "다우기술", meta: "언어 · 수리 · 추리 · 문제해결력 60문제 × 3회 · 60분 · 5지선다", ready: true,
