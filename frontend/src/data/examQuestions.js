@@ -307,11 +307,11 @@ export const COMPANIES = [
     lede: "금융·경제·경영 기초상식 15문제, 직무기초소양(NCS) 15문제. 총 30문제, 40분, 4지선다. 2024 하반기 IT직무 응시 후기의 키워드 정리(예금자보호, CD, 롱숏펀드, 레그테크, 환헤지, 재정환율, 피셔 방정식, MR=MC, BCG 등)와 NCS 기록 유형을 바탕으로 새로 만든 문제입니다. 코딩테스트(SQL·알고리즘)는 포함하지 않습니다.",
   },
   {
-    key: "ssafyalgo", category: "major", abbr: "SSAFY", name: "SSAFY 알고리즘 과목평가", meta: "객관식 21 · 단답형 9 · 서술형 2 × 2회 · 60분", ready: true,
+    key: "ssafyalgo", category: "major", abbr: "SSAFY", name: "SSAFY 알고리즘 과목평가", meta: "객관식 21 · 단답형 9 · 서술형 2 × 2회 + 기초 다지기 30문제 · 60분", ready: true,
     source: { kind: "recall", label: "복기 범위" },
     questions: SSAFY_ALGO_QUESTIONS, sections: SSAFY_ALGO_SECTIONS, minutes: 60,
     sets: SSAFY_ALGO_SETS, draw: { obj: 21, short: 9, essay: 2 },
-    lede: "객관식 21문제, 단답형 9문제, 서술형 2문제. 시간복잡도·빅오 계산, 큐 메서드, 트리 용어·순회, 힙 구조, 재귀 구조와 완전탐색, 순열·조합·부분집합 구분과 next_permutation, 그래프 표현·차수·BFS/DFS, 비트마스킹 상태관리와 장점, Union-Find와 경로 압축, 분할 정복 설계, 위상 정렬 전제 조건, 백트래킹 가지치기, 탐욕 알고리즘 특징, 이진 탐색 조건 처리, 투 포인터까지 복기된 출제 범위를 따라 2회분을 만들었습니다. 단답형은 답을 입력하면 자동 채점하고(표기가 다르면 모범답안을 보고 직접 채점), 서술형은 답안을 써 본 뒤 모범답안·채점 포인트와 비교해 스스로 채점합니다.",
+    lede: "객관식 21문제, 단답형 9문제, 서술형 2문제. 시간복잡도·빅오 계산, 큐 메서드, 트리 용어·순회, 힙 구조, 재귀 구조와 완전탐색, 순열·조합·부분집합 구분과 next_permutation, 그래프 표현·차수·BFS/DFS, 비트마스킹 상태관리와 장점, Union-Find와 경로 압축, 분할 정복 설계, 위상 정렬 전제 조건, 백트래킹 가지치기, 탐욕 알고리즘 특징, 이진 탐색 조건 처리, 투 포인터까지 복기된 출제 범위를 따라 2회분을 만들었고, 같은 범위를 쉬운 난이도로 다시 짚는 기초 다지기 30문제(객관식 21 · 단답형 9)를 더했습니다. 단답형은 답을 입력하면 자동 채점하고(표기가 다르면 모범답안을 보고 직접 채점), 서술형은 답안을 써 본 뒤 모범답안·채점 포인트와 비교해 스스로 채점합니다.",
   },
   {
     key: "ssafymonthly", category: "monthly", abbr: "SSAFY", name: "SSAFY 알고리즘 월말평가", meta: "복기 서술형 3문항 · 20분", ready: true,
