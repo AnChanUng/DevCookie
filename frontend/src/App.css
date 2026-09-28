@@ -2237,7 +2237,7 @@
 
 .home-menu {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
   padding-bottom: 16px;
 }
@@ -2801,46 +2801,63 @@
 }
 .home-menu-item { min-height: 200px; padding: 22px 18px; }
 
-/* 카드 다섯 장: 넓으면 한 줄, 중간 폭이면 위 3장 · 아래 2장으로 빈칸 없이 채운다 */
-@media (max-width: 1100px) {
-  .home-menu { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-  .home-menu-item { grid-column: span 2; }
-  .home-menu-item:nth-child(n + 4) { grid-column: span 3; }
+/* 카드 네 장: 넓으면 한 줄, 중간 폭이면 2 × 2, 좁으면 한 장씩 */
+@media (max-width: 900px) {
+  .home-menu-item { min-height: 0; }
 }
 @media (max-width: 640px) {
-  .home-menu { grid-template-columns: 1fr; }
-  .home-menu-item,
-  .home-menu-item:nth-child(n + 4) { grid-column: auto; min-height: 0; padding: 18px; }
+  .home-menu-item { padding: 18px; }
 }
 
-/* 홈 오른쪽 아래의 오늘의 운세. 왼쪽 아래 오락실 문과 짝을 이루는 작은 글씨 버튼이다 */
-.fortune-door {
+/* 홈 오른쪽 아래 도크: 멘탈 기르기와 오늘의 운세 알약 버튼을 세로로 쌓는다.
+   팝업은 각 버튼 바로 위로 열리고, 열리면 도크가 위로 자란다 */
+.home-dock {
   position: fixed;
-  right: 12px;
-  bottom: 10px;
+  right: 20px;
+  bottom: 20px;
   z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.fortune-door {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
 }
 
-.fortune-toggle {
-  background: none;
-  border: none;
-  padding: 0;
+.fortune-toggle,
+.mental-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px 8px 12px;
   font: inherit;
-  font-size: 0.66rem;
-  font-weight: 600;
-  color: var(--text-tertiary);
-  opacity: 0.5;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: var(--radius-full);
+  box-shadow: var(--card-shadow);
   cursor: pointer;
   transition: var(--transition);
 }
 
+.fortune-toggle span,
+.mental-toggle span { font-size: 0.95rem; line-height: 1; }
+
 .fortune-toggle:hover,
 .fortune-toggle[aria-expanded='true'] {
-  opacity: 1;
   color: var(--accent-purple);
+  border-color: rgba(139, 92, 246, 0.35);
+  background: var(--bg-primary);
+  box-shadow: var(--card-shadow-glow);
+  transform: translateY(-1px);
 }
 
 .fortune-pop {
@@ -2936,39 +2953,29 @@
 .fortune-foot a { font-weight: 700; color: var(--accent-blue); font-size: 0.78rem; }
 .fortune-foot button { background: none; border: none; padding: 0; font: inherit; font-size: 0.72rem; color: var(--text-tertiary); text-decoration: underline; cursor: pointer; }
 
-/* 오늘의 운세 바로 위의 멘탈 기르기. 운세와 같은 작은 글씨 버튼이고, 결과는 화면 전체를 덮는다 */
+/* 도크 위쪽의 멘탈 기르기. 결과는 화면 전체를 덮는다 */
 .mental-door {
-  position: fixed;
-  right: 12px;
-  bottom: 30px;
-  z-index: 29;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
 }
 
-.mental-toggle {
-  background: none;
-  border: none;
-  padding: 0;
-  font: inherit;
-  font-size: 0.66rem;
-  font-weight: 600;
-  color: var(--text-tertiary);
-  opacity: 0.5;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
 .mental-toggle:hover,
 .mental-toggle[aria-expanded='true'] {
-  opacity: 1;
-  color: var(--accent-green);
+  color: #047857;
+  border-color: rgba(16, 185, 129, 0.35);
+  background: var(--bg-primary);
+  box-shadow: 0 8px 32px rgba(16, 185, 129, 0.14), 0 2px 8px rgba(16, 185, 129, 0.08);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 640px) {
+  .home-dock { right: 12px; bottom: 12px; gap: 6px; }
+  .fortune-toggle, .mental-toggle { padding: 6px 12px 6px 10px; font-size: 0.74rem; }
 }
 
 .mental-pop {
   width: min(280px, calc(100vw - 24px));
-  margin-bottom: 8px;
   padding: 16px;
   display: grid;
   gap: 10px;
@@ -3050,6 +3057,23 @@
   padding: 26px 28px;
   box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
   color: #0f172a;
+}
+
+.mental-card { position: relative; overflow: hidden; }
+.mental-card > :not(.mental-watermark) { position: relative; }
+
+.mental-watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-24deg);
+  font-size: 2.6rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  color: rgba(148, 163, 184, 0.13);
+  pointer-events: none;
+  user-select: none;
 }
 
 .mental-overlay.pass .mental-card { border-top: 5px solid #10b981; }

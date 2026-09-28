@@ -61,8 +61,11 @@ export default function Home() {
       </div>
       {/* 오락실은 SPA 밖의 정적 페이지라 Link가 아니라 일반 링크로 연다 */}
       <a href="/arcade/" className="arcade-door">오락실</a>
-      <MentalTraining />
-      <DailyFortune />
+      {/* 오른쪽 아래 도크: 위에서부터 멘탈 기르기, 오늘의 운세 */}
+      <div className="home-dock">
+        <MentalTraining />
+        <DailyFortune />
+      </div>
     </div>
   );
 }

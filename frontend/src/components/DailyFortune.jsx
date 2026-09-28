@@ -158,7 +158,7 @@ export default function DailyFortune() {
           )}
         </div>
       )}
-      <button type="button" className="fortune-toggle" onClick={() => setOpen(o => !o)} aria-expanded={open}>🔮 오늘의 운세</button>
+      <button type="button" className="fortune-toggle" onClick={() => setOpen(o => !o)} aria-expanded={open}><span>🔮</span>오늘의 운세</button>
     </div>
   );
 }
