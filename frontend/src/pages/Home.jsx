@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import StudyGoal from '../components/StudyGoal';
 import DailyFortune from '../components/DailyFortune';
+import MentalTraining from '../components/MentalTraining';
 
 const MENUS = [
   { to: '/exam', tone: 'indigo', tag: '전공필기', title: '기업별 기출문제', desc: '금융공기업, 공기업, 컴퓨터일반 기출 모의고사' },
@@ -60,6 +61,7 @@ export default function Home() {
       </div>
       {/* 오락실은 SPA 밖의 정적 페이지라 Link가 아니라 일반 링크로 연다 */}
       <a href="/arcade/" className="arcade-door">오락실</a>
+      <MentalTraining />
       <DailyFortune />
     </div>
   );
