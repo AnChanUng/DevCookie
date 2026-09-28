@@ -3,8 +3,8 @@ import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 
 // 홈 오른쪽 아래, 오늘의 운세 위의 "멘탈 기르기". 대기업 공채 최종 결과 화면을 미리 맛보는 장난감이다.
-// 회사 이름은 전부 지어낸 것이라 실제 기업과 상관없다.
-const COMPANIES = ['한울그룹', '새빛전자', '누리금융지주', '다온에너지', '가람건설', '미르통신'];
+// 회사 이름은 실제 기업이지만 화면은 가상이다. 캡처해도 오해가 없게 카드에 워터마크를 깐다.
+const COMPANIES = ['삼성SDS', '국민은행', '네이버', '카카오'];
 const JOBS = ['IT · SW개발', '전산 · 정보보안', '데이터 · AI', '인프라 · 클라우드'];
 
 const PASS_CHEER = [
@@ -64,6 +64,7 @@ function ResultScreen({ r, onClose, onRetry }) {
         </div>
 
         <div className="mental-card">
+          <span className="mental-watermark" aria-hidden="true">멘탈 기르기 · 가상</span>
           <dl className="mental-meta">
             <dt>공고</dt><dd>{r.title}</dd>
             <dt>지원 분야</dt><dd>{r.job} (신입)</dd>
@@ -110,7 +111,7 @@ function ResultScreen({ r, onClose, onRetry }) {
           <button type="button" onClick={onRetry}>{pass ? '탈락도 맛보기' : '합격도 맛보기'}</button>
           <button type="button" onClick={onClose}>닫기</button>
         </div>
-        <p className="mental-note">※ 멘탈 기르기용 가상 화면입니다. 회사와 결과는 모두 지어낸 것입니다.</p>
+        <p className="mental-note">※ 멘탈 기르기용 가상 화면입니다. 실제 회사의 채용 결과와 무관합니다.</p>
       </div>
     </div>,
     document.body,
@@ -162,7 +163,7 @@ export default function MentalTraining() {
           </div>
         </div>
       )}
-      <button type="button" className="mental-toggle" onClick={() => setOpen(o => !o)} aria-expanded={open}>🧘 멘탈 기르기</button>
+      <button type="button" className="mental-toggle" onClick={() => setOpen(o => !o)} aria-expanded={open}><span>🧘</span>멘탈 기르기</button>
       {result && (
         <ResultScreen
           r={result}
