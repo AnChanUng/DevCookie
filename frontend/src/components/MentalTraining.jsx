@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
+import { track } from '../track';
 
 // 홈 오른쪽 아래, 오늘의 운세 위의 "멘탈 기르기". 대기업 공채 최종 결과 화면을 미리 맛보는 장난감이다.
 // 회사 이름은 실제 기업이지만 화면은 가상이다. 캡처해도 오해가 없게 카드에 워터마크를 깐다.
@@ -32,6 +33,9 @@ const COMFORT_SUB = [
   '오늘은 맛있는 거 먹고, 내일 한 세트만 풀어요.',
   '지금 이 순간도 나중엔 "그때 떨어져서 다행이었지"가 됩니다.',
 ];
+
+// 누를 때마다 관리자 모니터링(admin/cu)의 코너 클릭 수에 쌓인다
+const tap = what => track('click', '/fun/mental', what);
 
 const pick = a => a[Math.floor(Math.random() * a.length)];
 const LOADING_MS = 1700;
@@ -273,6 +277,7 @@ export default function MentalTraining() {
   }, [open]);
 
   function show(kind) {
+    tap(kind);
     setResult(makeResult(kind, name));
     setOpen(false);
   }
@@ -286,7 +291,7 @@ export default function MentalTraining() {
             <span>대기업 공채 최종 발표</span>
           </div>
 
-          <button type="button" className="mental-sos" onClick={() => { setComfort(true); setOpen(false); }}>
+          <button type="button" className="mental-sos" onClick={() => { tap('comfort'); setComfort(true); setOpen(false); }}>
             <span className="mental-sos-icon" aria-hidden="true">📮</span>
             <span className="mental-sos-text">
               <b>떨어졌을 때 보시오</b>
@@ -319,14 +324,14 @@ export default function MentalTraining() {
           </div>
         </div>
       )}
-      <button type="button" className="mental-toggle" onClick={() => setOpen(o => !o)} aria-expanded={open}><span>🧘</span>멘탈 기르기</button>
+      <button type="button" className="mental-toggle" onClick={() => { if (!open) tap('open'); setOpen(o => !o); }} aria-expanded={open}><span>🧘</span>멘탈 기르기</button>
       {result && (
         <ResultScreen
           key={result.no}
           r={result}
           onClose={() => setResult(null)}
-          onRetry={() => setResult(makeResult(result.kind === 'pass' ? 'fail' : 'pass', name))}
-          onComfort={() => { setResult(null); setComfort(true); }}
+          onRetry={() => { const kind = result.kind === 'pass' ? 'fail' : 'pass'; tap(kind); setResult(makeResult(kind, name)); }}
+          onComfort={() => { tap('comfort'); setResult(null); setComfort(true); }}
         />
       )}
       {comfort && <ComfortScreen onClose={() => setComfort(false)} />}

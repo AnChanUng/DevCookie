@@ -1552,6 +1552,8 @@ a.exam-search-bank:hover { color: var(--accent-blue); }
   transition: var(--transition);
 }
 .apt-more:hover { border-color: var(--ssafy); color: var(--text-primary); }
+/* 바깥 CBT로 가는 카드(GSAT). 삼성 쪽 파란색으로 우리 문제은행과 구분한다 */
+.ssafy-card.apt-ext { --tone: #1d4ed8; --tone-light: rgba(29, 78, 216, 0.08); text-decoration: none; }
 .apt-more-plus {
   width: 44px;
   height: 44px;

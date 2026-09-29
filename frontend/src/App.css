@@ -2326,42 +2326,6 @@
   transform: translateX(4px);
 }
 
-.home-shortcuts {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  padding-bottom: 56px;
-}
-
-.home-shortcut {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  padding: 14px 20px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-color);
-  background: rgba(255, 255, 255, 0.5);
-  transition: var(--transition);
-}
-
-.home-shortcut:hover {
-  background: var(--bg-primary);
-  border-color: var(--accent-blue);
-  box-shadow: var(--card-shadow);
-}
-
-.home-shortcut-title {
-  font-size: 0.92rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  white-space: nowrap;
-}
-
-.home-shortcut-desc {
-  font-size: 0.8rem;
-  color: var(--text-tertiary);
-}
-
 .home-eyebrow {
   display: inline-block;
   margin-bottom: 14px;
@@ -2484,7 +2448,7 @@
   gap: 1px;
 }
 
-.goal-exam:hover .goal-title { color: var(--accent-blue); }
+a.goal-exam:hover .goal-title { color: var(--accent-blue); }
 
 .goal-title { font-weight: 800; font-size: 0.98rem; color: var(--text-primary); }
 .goal-sub { font-size: 0.78rem; color: var(--text-secondary); }
@@ -2495,65 +2459,6 @@
   letter-spacing: -0.03em;
   color: var(--accent-blue);
   font-variant-numeric: tabular-nums;
-}
-
-.goal-today {
-  margin-top: 6px;
-  padding-top: 12px;
-  border-top: 1px solid var(--border-color);
-}
-
-.goal-today-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.goal-bar {
-  display: block;
-  height: 6px;
-  border-radius: var(--radius-full);
-  background: var(--bg-tertiary);
-  overflow: hidden;
-}
-
-.goal-bar i {
-  display: block;
-  height: 100%;
-  border-radius: var(--radius-full);
-  background: var(--accent-green);
-}
-
-.goal-edit {
-  flex: none;
-  background: none;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 2px 8px;
-  font: inherit;
-  font-size: 0.72rem;
-  color: var(--text-tertiary);
-  cursor: pointer;
-}
-
-.goal-edit:hover { color: var(--text-primary); }
-
-.goal-form {
-  display: flex;
-  gap: 4px;
-}
-
-.goal-form input {
-  width: 62px;
-  font: inherit;
-  font-size: 0.8rem;
-  padding: 2px 6px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  background: var(--bg-primary);
-  color: var(--text-primary);
 }
 
 @media (max-width: 900px) {
@@ -2575,8 +2480,7 @@
 }
 
 @media (max-width: 640px) {
-  .home-menu,
-  .home-shortcuts {
+  .home-menu {
     grid-template-columns: 1fr;
     gap: 12px;
   }
@@ -2833,9 +2737,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 14px 8px 12px;
+  padding: 7px 12px 7px 10px;
   font: inherit;
-  font-size: 0.8rem;
+  font-size: 0.74rem;
   font-weight: 700;
   color: var(--text-secondary);
   background: var(--glass-bg);
@@ -2849,7 +2753,7 @@
 }
 
 .fortune-toggle span,
-.mental-toggle span { font-size: 0.95rem; line-height: 1; }
+.mental-toggle span { font-size: 0.88rem; line-height: 1; }
 
 .fortune-toggle:hover,
 .fortune-toggle[aria-expanded='true'] {
@@ -2971,7 +2875,7 @@
 
 @media (max-width: 640px) {
   .home-dock { right: 12px; bottom: 12px; gap: 6px; }
-  .fortune-toggle, .mental-toggle { padding: 6px 12px 6px 10px; font-size: 0.74rem; }
+  .fortune-toggle, .mental-toggle { padding: 5px 10px 5px 9px; font-size: 0.7rem; }
 }
 
 .mental-pop {

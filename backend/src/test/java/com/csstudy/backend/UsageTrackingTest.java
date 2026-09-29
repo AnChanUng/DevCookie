@@ -62,6 +62,25 @@ class UsageTrackingTest {
     }
 
     @Test
+    void cornerClicksAreCountedPerButton() throws Exception {
+        track("clicker-1", "click", "/fun/mental", "open");
+        track("clicker-1", "click", "/fun/mental", "open");
+        track("clicker-2", "click", "/fun/mental", "open");
+        track("clicker-2", "click", "/fun/mental", "comfort");
+        track("clicker-1", "click", "/fun/fortune", "view");
+
+        mvc.perform(get("/api/v1/admin/usage").header("X-Admin-Key", "test-admin-key"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.clicks[?(@.path == '/fun/mental' && @.detail == 'open')].today").value(3))
+                .andExpect(jsonPath("$.clicks[?(@.path == '/fun/mental' && @.detail == 'open')].all").value(3))
+                .andExpect(jsonPath("$.clicks[?(@.path == '/fun/mental' && @.detail == 'open')].visitors").value(2))
+                .andExpect(jsonPath("$.clicks[?(@.path == '/fun/mental' && @.detail == 'comfort')].range").value(1))
+                .andExpect(jsonPath("$.clicks[?(@.path == '/fun/fortune')].all").value(1))
+                // 버튼 클릭은 방문자 열람 수에 들어가지 않는다
+                .andExpect(jsonPath("$.visitors[?(@.visitor == 'clicker-')].views").value(org.hamcrest.Matchers.everyItem(org.hamcrest.Matchers.is(0))));
+    }
+
+    @Test
     void presenceCountsDistinctVisitors() throws Exception {
         for (String visitor : new String[]{"here-1", "here-2", "here-1"}) {
             mvc.perform(post("/api/v1/presence").contentType(MediaType.APPLICATION_JSON)

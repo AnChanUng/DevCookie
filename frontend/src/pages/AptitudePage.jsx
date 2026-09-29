@@ -4,6 +4,20 @@ import { COMPANIES, allQuestions, companyPath } from '../data/examQuestions';
 // 기업별 인적성검사 문제은행. 기업마다 큰 카드 하나씩 보여 주고, 아직 없는 기업은 자료 기부로 안내한다
 const BANKS = COMPANIES.filter(c => c.category === 'aptitude' && c.ready);
 
+// 우리 문제은행 없이 바깥 CBT로 보내는 기업. 새 탭으로 연다
+const EXTERNAL = [
+  {
+    key: 'gsat',
+    abbr: 'GSAT',
+    name: '삼성 GSAT',
+    meta: '삼성 직무적성검사. 링커리어 CBT에서 실전처럼 풀어 볼 수 있습니다.',
+    minutes: 60,
+    secs: [['20', '수리'], ['30', '추리']],
+    site: '링커리어 CBT',
+    url: 'https://cbt.linkareer.com/exam/detail/1230',
+  },
+];
+
 // 인적성검사에 흔히 나오는 영역. 기업마다 이름은 조금씩 달라도 이 네 갈래로 묶인다
 const AREAS = [
   { icon: '가', name: '언어', desc: '유의어 · 반의어 · 어휘 관계 · 맞춤법 · 독해' },
@@ -108,6 +122,28 @@ export default function AptitudePage() {
             </Link>
           );
         })}
+
+        {EXTERNAL.map(x => (
+          <a key={x.key} href={x.url} target="_blank" rel="noopener noreferrer" className="ssafy-card apt-ext">
+            <div className="ssafy-card-top">
+              <span className="ssafy-tag">{x.abbr}</span>
+              <span className="ssafy-time">⏱ {x.minutes}분 · 외부 사이트</span>
+            </div>
+            <h2>{x.name}</h2>
+            <p className="ssafy-desc">{x.meta}</p>
+            <div className="ssafy-secs" style={{ gridTemplateColumns: `repeat(${x.secs.length}, 1fr)` }}>
+              {x.secs.map(([n, name]) => (
+                <div key={name} className="ssafy-sec"><b>{n}</b><span>{name}</span></div>
+              ))}
+            </div>
+            <div className="ssafy-foot">
+              <div className="ssafy-progress">
+                <div className="ssafy-progress-label">{x.site}에서 새 탭으로 열립니다</div>
+              </div>
+              <span className="ssafy-go">GSAT 풀러 가기 ↗</span>
+            </div>
+          </a>
+        ))}
 
         <Link to="/donate" className="apt-more">
           <span className="apt-more-plus">＋</span>

@@ -16,6 +16,14 @@ const PAGE_NAMES = {
   ...Object.fromEntries(EXAM_CATEGORIES.map(c => [`/exam/category/${c.key}`, `기업별 기출 · ${c.name}`])),
   ...Object.fromEntries(COMPANIES.map(c => [companyPath(c), c.name])),
 };
+// 홈 코너 버튼 클릭(click) 기록의 경로 · 버튼 이름
+const CORNERS = { '/fun/mental': '🧘 멘탈 기르기', '/fun/fortune': '🔮 오늘의 운세' };
+const CORNER_BUTTONS = {
+  '/fun/mental': { open: '열기', pass: '합격 맛보기', fail: '탈락 맛보기', comfort: '떨어졌을 때 보시오' },
+  '/fun/fortune': { open: '열기', view: '생일 넣고 운세 보기' },
+};
+const cornerButton = (path, detail) => CORNER_BUTTONS[path]?.[detail] || detail || '';
+
 const pageName = (path) => PAGE_NAMES[path] || path;
 const companyName = (key) => COMPANIES.find(c => c.key === key)?.name || key;
 
@@ -227,6 +235,8 @@ function Overview({ data, sys }) {
         </div>
       )}
 
+      <Corners data={data} />
+
       <div className="section-title">일별 추이</div>
       <div className="exam-table-wrap">
         <table className="exam-table admin-table">
@@ -254,6 +264,41 @@ function Overview({ data, sys }) {
           </div>
         ))}
       </div>
+    </>
+  );
+}
+
+// 홈 오른쪽 아래 코너(멘탈 기르기 · 오늘의 운세) 버튼을 누른 횟수
+function Corners({ data }) {
+  const rows = data.clicks || [];
+  const sum = (path, k) => rows.filter(r => r.path === path).reduce((n, r) => n + r[k], 0);
+  return (
+    <>
+      <div className="section-title">홈 코너 클릭</div>
+      <div className="exam-stats">
+        {Object.entries(CORNERS).map(([path, name]) => (
+          <Tile key={path} k={name} v={sum(path, 'today')} unit=" 회" sub={`오늘 · 최근 ${data.days}일 ${sum(path, 'range')}회 · 누적 ${sum(path, 'all')}회`} />
+        ))}
+      </div>
+      {rows.length ? (
+        <div className="exam-table-wrap">
+          <table className="exam-table admin-table">
+            <thead><tr><th>코너</th><th>버튼</th><th>오늘</th><th>최근 {data.days}일</th><th>누적</th><th>누른 사람</th></tr></thead>
+            <tbody>
+              {rows.map(r => (
+                <tr key={r.path + r.detail}>
+                  <td>{CORNERS[r.path] || r.path}</td>
+                  <td>{cornerButton(r.path, r.detail)}</td>
+                  <td className="num">{r.today}</td>
+                  <td className="num">{r.range}</td>
+                  <td className="num">{r.all}</td>
+                  <td className="num">{r.visitors}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : <p className="exam-note">아직 누른 기록이 없습니다. 백엔드 배포 뒤부터 쌓입니다.</p>}
     </>
   );
 }
@@ -359,8 +404,8 @@ function Visitors({ data }) {
               <tr key={i}>
                 <td>{fmtAt(r.at)}</td>
                 <td className="num">{r.visitor}</td>
-                <td>{r.type === 'exam' ? `풀이 완료 · ${MODES[r.detail] || r.detail || ''}${r.total ? ` · ${r.score}/${r.total}` : ''}` : '열람'}</td>
-                <td>{pageName(r.path)}</td>
+                <td>{r.type === 'exam' ? `풀이 완료 · ${MODES[r.detail] || r.detail || ''}${r.total ? ` · ${r.score}/${r.total}` : ''}` : r.type === 'click' ? `버튼 · ${cornerButton(r.path, r.detail)}` : '열람'}</td>
+                <td>{CORNERS[r.path] || pageName(r.path)}</td>
               </tr>
             ))}
           </tbody>

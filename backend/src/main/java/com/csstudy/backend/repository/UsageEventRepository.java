@@ -47,8 +47,8 @@ public interface UsageEventRepository extends JpaRepository<UsageEvent, Long> {
             "group by e.path, e.detail order by count(e) desc")
     List<Object[]> scoresByPathSince(@Param("from") LocalDate from);
 
-    // [방문자, 열람 수, 첫 방문, 마지막 방문]
-    @Query("select e.visitorId, count(e), min(e.createdAt), max(e.createdAt) from UsageEvent e " +
+    // [방문자, 열람 수, 첫 방문, 마지막 방문] 코너 버튼 클릭(click)은 열람 수에서 뺀다
+    @Query("select e.visitorId, sum(case when e.type = 'click' then 0 else 1 end), min(e.createdAt), max(e.createdAt) from UsageEvent e " +
             "where e.day >= :from group by e.visitorId order by max(e.createdAt) desc")
     List<Object[]> visitorsSince(@Param("from") LocalDate from, Pageable pageable);
 
@@ -56,6 +56,12 @@ public interface UsageEventRepository extends JpaRepository<UsageEvent, Long> {
     @Query("select e.visitorId, count(e), avg(case when e.total > 0 then e.score * 100.0 / e.total else null end) " +
             "from UsageEvent e where e.type = 'exam' and e.day >= :from group by e.visitorId")
     List<Object[]> visitorScoresSince(@Param("from") LocalDate from);
+
+    // [코너, 버튼, 오늘, 기간 안, 누적, 누적 방문자 수] 누적까지 한 번에 세려고 기간은 case로 나눈다
+    @Query("select e.path, e.detail, sum(case when e.day = :today then 1 else 0 end), " +
+            "sum(case when e.day >= :from then 1 else 0 end), count(e), count(distinct e.visitorId) " +
+            "from UsageEvent e where e.type = 'click' group by e.path, e.detail order by count(e) desc")
+    List<Object[]> clicks(@Param("from") LocalDate from, @Param("today") LocalDate today);
 
     // [기기, 방문자 수]
     @Query("select e.device, count(distinct e.visitorId) from UsageEvent e " +

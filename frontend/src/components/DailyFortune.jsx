@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { track } from '../track';
 
 // 홈 오른쪽 아래의 작은 "오늘의 운세". 생년월일과 오늘 날짜로 시드를 만들어서
 // 같은 날 같은 생일이면 하루 종일 같은 운세가 나온다. 생일은 이 브라우저(localStorage)에만 둔다.
@@ -109,6 +110,7 @@ export default function DailyFortune() {
     try { localStorage.setItem(KEY, draft); } catch { /* 저장 못 해도 이번엔 보여 준다 */ }
     setBirth(draft);
     setEditing(false);
+    track('click', '/fun/fortune', 'view');
   }
 
   const f = birth && !editing ? makeFortune(birth) : null;
@@ -158,7 +160,7 @@ export default function DailyFortune() {
           )}
         </div>
       )}
-      <button type="button" className="fortune-toggle" onClick={() => setOpen(o => !o)} aria-expanded={open}><span>🔮</span>오늘의 운세</button>
+      <button type="button" className="fortune-toggle" onClick={() => { if (!open) track('click', '/fun/fortune', 'open'); setOpen(o => !o); }} aria-expanded={open}><span>🔮</span>오늘의 운세</button>
     </div>
   );
 }
