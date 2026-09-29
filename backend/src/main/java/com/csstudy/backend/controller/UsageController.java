@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class UsageController {
 
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
-    private static final Set<String> TYPES = Set.of("view", "exam");
+    private static final Set<String> TYPES = Set.of("view", "exam", "click");
     private static final Set<String> DEVICES = Set.of("mobile", "desktop");
     private static final int MAX_DAYS = 90;
     private static final int ACTIVE_MINUTES = 5;
@@ -129,6 +129,7 @@ public class UsageController {
         body.put("solves", usageEventRepository.findByTypeOrderByIdDesc("exam", PageRequest.of(0, 100)).stream()
                 .map(UsageController::eventRow).toList());
         body.put("visitors", visitors(from));
+        body.put("clicks", clicks(from, today));
         body.put("hours", hours(from));
         body.put("devices", pairs(usageEventRepository.devicesSince(from), "device"));
         body.put("referrers", pairs(usageEventRepository.referrersSince(from, PageRequest.of(0, 15)), "referrer"));
@@ -161,6 +162,20 @@ public class UsageController {
             row.put("visitors", r[3]);
             row.put("avgPercent", round(r[4]));
             row.put("avgSeconds", round(r[5]));
+            return row;
+        }).toList();
+    }
+
+    // 홈의 멘탈 기르기 · 오늘의 운세 같은 코너 버튼을 누른 횟수. 경로가 코너, detail이 버튼이다
+    private List<Map<String, Object>> clicks(LocalDate from, LocalDate today) {
+        return usageEventRepository.clicks(from, today).stream().map(r -> {
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("path", r[0]);
+            row.put("detail", r[1]);
+            row.put("today", r[2]);
+            row.put("range", r[3]);
+            row.put("all", r[4]);
+            row.put("visitors", r[5]);
             return row;
         }).toList();
     }

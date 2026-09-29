@@ -10,13 +10,6 @@ const MENUS = [
   { to: '/major', tone: 'pink', tag: '요약노트', title: '필기이론', desc: '자격증 요약노트 열람과 다운로드' },
 ];
 
-// 메뉴 카드 아래의 작은 바로가기. 풀고 난 뒤에 찾게 되는 기능들이다
-const SHORTCUTS = [
-  { to: '/weak', title: '약점 분석', desc: '영역별 정답률' },
-  { to: '/search', title: '문제 검색', desc: '키워드로 문제 찾기' },
-  { to: '/stats', title: '통계', desc: '학습 기록' },
-];
-
 export default function Home() {
   return (
     <div className="fade-in home">
@@ -51,14 +44,6 @@ export default function Home() {
         ))}
       </div>
 
-      <div className="home-shortcuts">
-        {SHORTCUTS.map(s => (
-          <Link key={s.to} to={s.to} className="home-shortcut">
-            <span className="home-shortcut-title">{s.title}</span>
-            <span className="home-shortcut-desc">{s.desc}</span>
-          </Link>
-        ))}
-      </div>
       {/* 오락실은 SPA 밖의 정적 페이지라 Link가 아니라 일반 링크로 연다 */}
       <a href="/arcade/" className="arcade-door">오락실</a>
       {/* 오른쪽 아래 도크: 위에서부터 멘탈 기르기, 오늘의 운세 */}

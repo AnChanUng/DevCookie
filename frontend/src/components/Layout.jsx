@@ -39,14 +39,8 @@ export default function Layout() {
               <Link to="/aptitude" className={location.pathname.startsWith('/aptitude') ? 'active' : ''}>
                 인적성
               </Link>
-              <Link to="/search" className={location.pathname === '/search' ? 'active' : ''}>
-                문제 검색
-              </Link>
               <Link to="/major" className={location.pathname === '/major' ? 'active' : ''}>
                 필기이론
-              </Link>
-              <Link to="/weak" className={location.pathname === '/weak' ? 'active' : ''}>
-                약점 분석
               </Link>
               <Link to="/stats" className={location.pathname === '/stats' ? 'active' : ''}>
                 통계

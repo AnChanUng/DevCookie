@@ -25,7 +25,7 @@ public class UsageEvent {
     @Column(name = "visitor_id", nullable = false, length = 40)
     private String visitorId;
 
-    // view: 페이지 열람, exam: 풀이 완료
+    // view: 페이지 열람, exam: 풀이 완료, click: 홈 코너(멘탈 기르기 · 오늘의 운세) 버튼 누름
     @Column(name = "event_type", nullable = false, length = 16)
     private String type;
 
