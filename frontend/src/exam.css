@@ -1203,86 +1203,6 @@ a.exam-search-bank:hover { color: var(--accent-blue); }
   color: var(--accent-green);
 }
 
-/* ===== 자료 기부 화면 ===== */
-.donate-gate,
-.donate-form {
-  padding: 20px 22px;
-  border: 1px solid var(--border-color, #e5e5e5);
-  border-radius: var(--radius-lg, 14px);
-  background: var(--bg-primary, #fff);
-  margin-bottom: 24px;
-}
-.donate-steps {
-  margin: 0 0 16px;
-  padding-left: 20px;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  line-height: 1.9;
-}
-.donate-row { display: flex; gap: 8px; flex-wrap: wrap; }
-.donate-row .donate-input { flex: 1; min-width: 240px; }
-.donate-input {
-  padding: 10px 12px;
-  border: 1px solid var(--border-color, #e5e5e5);
-  border-radius: var(--radius-md, 10px);
-  background: var(--bg-primary, #fff);
-  color: inherit;
-  font: inherit;
-  font-size: 0.9rem;
-  width: 100%;
-}
-.donate-input:focus { outline: none; border-color: var(--accent-blue); }
-.donate-kinds {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 10px;
-  margin-bottom: 18px;
-}
-.donate-kind {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 14px 16px;
-  border: 1px solid var(--border-color, #e5e5e5);
-  border-radius: var(--radius-md, 10px);
-  background: var(--bg-primary, #fff);
-  text-align: left;
-  cursor: pointer;
-  font: inherit;
-  color: inherit;
-  transition: border-color .15s, background .15s;
-}
-.donate-kind:hover { border-color: var(--accent-blue); }
-.donate-kind.on { border-color: var(--accent-blue); background: var(--accent-blue-light); }
-.donate-kind .t { font-weight: 700; font-size: 0.92rem; }
-.donate-kind .d { font-size: 0.78rem; color: var(--text-tertiary); }
-.donate-kind .d.path { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; opacity: .8; }
-.donate-field { display: block; margin-bottom: 16px; }
-.donate-label { display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 700; }
-.donate-label b { color: var(--accent-blue); }
-.donate-file { display: block; font-size: 0.85rem; }
-.donate-hint { display: block; margin-top: 6px; font-size: 0.78rem; color: var(--text-tertiary); }
-.donate-error {
-  margin: 0 0 14px;
-  padding: 10px 12px;
-  border-radius: var(--radius-md, 10px);
-  background: rgba(239, 68, 68, .08);
-  color: #b91c1c;
-  font-size: 0.85rem;
-}
-.donate-done {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-top: 16px;
-  padding: 14px 16px;
-  border-radius: var(--radius-md, 10px);
-  background: rgba(34, 197, 94, .10);
-  font-size: 0.86rem;
-}
-.donate-done span { color: var(--text-tertiary); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-.donate-done a { color: var(--accent-blue); font-weight: 700; }
-
 /* 단답형·서술형: 직접 써 보고 모범답안과 비교 */
 .exam-written input,
 .exam-written textarea {
@@ -1538,37 +1458,8 @@ a.exam-search-bank:hover { color: var(--accent-blue); }
 .apt-area b { font-size: 0.95rem; font-weight: 800; color: var(--text-primary); }
 .apt-area span { font-size: 0.74rem; line-height: 1.45; color: var(--text-secondary); word-break: keep-all; }
 
-.apt-more {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 26px 24px;
-  border-radius: var(--radius-lg);
-  border: 2px dashed var(--border-color);
-  color: var(--text-secondary);
-  text-decoration: none;
-  transition: var(--transition);
-}
-.apt-more:hover { border-color: var(--ssafy); color: var(--text-primary); }
 /* 바깥 CBT로 가는 카드(GSAT). 삼성 쪽 파란색으로 우리 문제은행과 구분한다 */
 .ssafy-card.apt-ext { --tone: #1d4ed8; --tone-light: rgba(29, 78, 216, 0.08); text-decoration: none; }
-.apt-more-plus {
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--ssafy-light);
-  color: var(--ssafy);
-  font-size: 1.4rem;
-  font-weight: 800;
-}
-.apt-more b { font-size: 1.1rem; color: var(--text-primary); }
-.apt-more span { font-size: 0.86rem; line-height: 1.6; word-break: keep-all; }
-.apt-more .apt-more-go { font-weight: 700; color: var(--ssafy); }
-
 @media (max-width: 900px) {
   .apt-areas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
