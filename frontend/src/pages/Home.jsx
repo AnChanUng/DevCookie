@@ -44,6 +44,16 @@ export default function Home() {
         ))}
       </div>
 
+      {/* 코드 타자 연습은 따로 배포된 외부 사이트라 새 탭으로 연다 */}
+      <a href="https://ssafy-code-race.onrender.com/" target="_blank" rel="noopener noreferrer" className="home-typing">
+        <span className="home-typing-icon" aria-hidden="true">⌨️</span>
+        <span className="home-typing-text">
+          <span className="home-typing-title">코딩으로 타자 연습하러 가기</span>
+          <span className="home-typing-desc">실제 코드를 따라 치며 손을 풀어 보세요</span>
+        </span>
+        <span className="home-typing-go">바로가기 →</span>
+      </a>
+
       {/* 오락실은 SPA 밖의 정적 페이지라 Link가 아니라 일반 링크로 연다 */}
       <a href="/arcade/" className="arcade-door">오락실</a>
       {/* 오른쪽 아래 도크: 위에서부터 멘탈 기르기, 오늘의 운세 */}
