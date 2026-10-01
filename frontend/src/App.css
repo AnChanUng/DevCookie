@@ -90,6 +90,29 @@
   white-space: nowrap;
 }
 
+/* 헤더 맨 오른쪽의 코드 타자 연습 버튼. 따로 배포된 외부 사이트로 나간다 */
+.typing-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  padding: 6px 13px;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #fff;
+  background: var(--gradient-primary);
+  box-shadow: 0 4px 14px var(--accent-blue-glow);
+  white-space: nowrap;
+  transition: var(--transition);
+}
+
+.typing-link:hover {
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px var(--accent-blue-glow);
+}
+
 .user-info {
   display: flex;
   align-items: center;
@@ -2693,71 +2716,6 @@ a.goal-exam:hover .goal-title { color: var(--accent-blue); }
 }
 @media (max-width: 640px) {
   .home-menu-item { padding: 18px; }
-}
-
-/* 메뉴 카드 아래의 가로 띠: 코드 타자 연습(외부 사이트)으로 나간다 */
-.home-typing {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 16px;
-  padding: 16px 20px;
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--card-shadow);
-  transition: var(--transition);
-}
-.home-typing:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--card-shadow-hover);
-  border-color: var(--accent-blue-light);
-}
-.home-typing-icon {
-  flex: none;
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-  font-size: 1.3rem;
-  border-radius: var(--radius-sm);
-  background: var(--accent-blue-light);
-}
-.home-typing-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-.home-typing-title {
-  font-size: 1.02rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: var(--text-primary);
-}
-.home-typing-desc {
-  font-size: 0.82rem;
-  color: var(--text-secondary);
-  word-break: keep-all;
-}
-.home-typing-go {
-  flex: none;
-  margin-left: auto;
-  font-size: 0.8rem;
-  font-weight: 800;
-  color: var(--accent-blue);
-  opacity: 0.55;
-  transition: var(--transition);
-}
-.home-typing:hover .home-typing-go {
-  opacity: 1;
-  transform: translateX(4px);
-}
-@media (max-width: 640px) {
-  .home-typing { padding: 14px 16px; }
-  .home-typing-go { display: none; }
 }
 
 /* 홈 오른쪽 아래 도크: 멘탈 기르기와 오늘의 운세 알약 버튼을 세로로 쌓는다.
