@@ -47,6 +47,10 @@ export default function Layout() {
               </Link>
             </nav>
             <StudyCount />
+            {/* 코드 타자 연습은 따로 배포된 외부 사이트라 새 탭으로 연다 */}
+            <a href="https://ssafy-code-race.onrender.com/" target="_blank" rel="noopener noreferrer" className="typing-link" title="코딩으로 타자 연습하러 가기">
+              <span aria-hidden="true">⌨️</span>코딩 타자 연습
+            </a>
           </div>
         </div>
       </header>
