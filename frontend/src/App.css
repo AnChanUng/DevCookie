@@ -2656,24 +2656,6 @@ a.goal-exam:hover .goal-title { color: var(--accent-blue); }
   color: var(--accent-blue);
 }
 
-/* 내비게이션의 자료 기부. 다른 메뉴와 달리 항상 칠해 두어 눈에 띄게 한다 */
-.nav-links a.nav-donate {
-  color: var(--accent-blue);
-  background: var(--accent-blue-light);
-  font-weight: 700;
-}
-
-.nav-links a.nav-donate::before {
-  content: '🎁';
-  margin-right: 4px;
-  font-size: 0.82em;
-}
-
-.nav-links a.nav-donate:hover {
-  color: var(--accent-blue);
-  box-shadow: var(--card-shadow);
-}
-
 /* 첫 화면 메뉴 카드 머리: 번호와 분류 칩을 한 줄에 */
 .home-menu-head {
   display: flex;

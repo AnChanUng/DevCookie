@@ -18,7 +18,6 @@ const AdminPage = lazy(() => import('./pages/AdminPage'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
 const NcsPage = lazy(() => import('./pages/NcsPage'));
 const WeakPage = lazy(() => import('./pages/WeakPage'));
-const DonatePage = lazy(() => import('./pages/DonatePage'));
 const SsafyPage = lazy(() => import('./pages/SsafyPage'));
 const AptitudePage = lazy(() => import('./pages/AptitudePage'));
 const CosProPage = lazy(() => import('./pages/CosProPage'));
@@ -48,7 +47,6 @@ function App() {
           <Route path="ncs" element={<NcsPage />} />
           <Route path="search" element={<SearchPage />} />
           <Route path="weak" element={<WeakPage />} />
-          <Route path="donate" element={<DonatePage />} />
           <Route path="admin/cu" element={<AdminPage />} />
         </Route>
       </Routes>

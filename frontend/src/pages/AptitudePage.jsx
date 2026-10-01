@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { COMPANIES, allQuestions, companyPath } from '../data/examQuestions';
 
-// 기업별 인적성검사 문제은행. 기업마다 큰 카드 하나씩 보여 주고, 아직 없는 기업은 자료 기부로 안내한다
+// 기업별 인적성검사 문제은행. 기업마다 큰 카드 하나씩 보여 준다
 const BANKS = COMPANIES.filter(c => c.category === 'aptitude' && c.ready);
 
 // 우리 문제은행 없이 바깥 CBT로 보내는 기업. 새 탭으로 연다
@@ -144,13 +144,6 @@ export default function AptitudePage() {
             </div>
           </a>
         ))}
-
-        <Link to="/donate" className="apt-more">
-          <span className="apt-more-plus">＋</span>
-          <b>다른 기업도 준비 중이에요</b>
-          <span>응시한 기업의 영역 구성이나 복기 자료를 보내 주시면 그 기업 문제은행을 만들어 드립니다.</span>
-          <span className="apt-more-go">자료 보내기 →</span>
-        </Link>
       </div>
 
       <p className="exam-note">
