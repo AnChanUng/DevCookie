@@ -17,7 +17,16 @@ public class VisitorProfileService {
 
     public static final int NICKNAME_MAX = 10;
 
+    private static final String[] ADJECTIVES = {"졸린", "배고픈", "열공하는", "합격할", "씩씩한", "차분한", "든든한", "느긋한"};
+    private static final String[] ANIMALS = {"수달", "고양이", "판다", "펭귄", "다람쥐", "올빼미", "거북이", "여우"};
+
     private final VisitorProfileRepository profileRepository;
+
+    // 닉네임을 정하지 않은 방문자에게 붙이는 이름. 같은 방문자는 늘 같은 이름이 나온다
+    public static String anonymous(String visitorId) {
+        int h = visitorId.hashCode();
+        return ADJECTIVES[Math.floorMod(h, ADJECTIVES.length)] + " " + ANIMALS[Math.floorMod(h / ADJECTIVES.length, ANIMALS.length)];
+    }
 
     // 제어 문자와 꺾쇠를 걷어 내고 공백을 하나로 줄인다. 쓸 수 없는 값이면 null
     public static String nickname(Object value) {

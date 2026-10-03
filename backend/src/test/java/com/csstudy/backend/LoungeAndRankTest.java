@@ -2,6 +2,7 @@ package com.csstudy.backend;
 
 import com.csstudy.backend.entity.UsageEvent;
 import com.csstudy.backend.repository.UsageEventRepository;
+import com.csstudy.backend.service.VisitorProfileService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -115,48 +116,45 @@ class LoungeAndRankTest {
     // 순위는 잠깐 캐시되므로 기록을 모두 넣은 뒤 한 번에 확인한다.
     // 다른 테스트가 오늘 풀이 수를 세므로 넣은 기록은 끝나고 지운다
     @Test
-    void streakRankCountsConsecutiveDaysUpToToday() throws Exception {
+    void solvedRankCountsEverySolveSoFar() throws Exception {
         try {
-            checkStreakRank();
+            checkSolvedRank();
         } finally {
             usageEventRepository.deleteAll(usageEventRepository.findAll().stream()
                     .filter(e -> e.getVisitorId().startsWith("rank-visitor-")).toList());
         }
     }
 
-    private void checkStreakRank() throws Exception {
+    private void checkSolvedRank() throws Exception {
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
-        // 5일 연속(오늘 포함)
-        for (int i = 0; i < 5; i++) solved("rank-visitor-five", today.minusDays(i));
-        solved("rank-visitor-five", today);   // 하루에 여러 번 풀어도 하루로 센다
-        // 어제까지 4일 연속: 오늘 아직 안 풀었어도 이어진 것으로 본다
-        for (int i = 1; i <= 4; i++) solved("rank-visitor-four", today.minusDays(i));
-        // 그저께까지만 풀었다: 끊겼으므로 순위에 없다
-        for (int i = 2; i <= 9; i++) solved("rank-visitor-broken", today.minusDays(i));
+        // 하루에 여러 번 풀어도, 오래전에 풀었어도 모두 센다
+        for (int i = 0; i < 8; i++) solved("rank-visitor-eight", today);
+        for (int i = 0; i < 6; i++) solved("rank-visitor-six", today.minusDays(200 + i));
+        solved("rank-visitor-one", today);
 
         mvc.perform(put("/api/v1/profile").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"visitorId\":\"rank-visitor-five\",\"nickname\":\" 매일<b>푸는</b>사람 \"}"))
+                        .content("{\"visitorId\":\"rank-visitor-eight\",\"nickname\":\" 많이<b>푸는</b>사람 \"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nickname").value("매일b푸는/b사람"));
+                .andExpect(jsonPath("$.nickname").value("많이b푸는/b사람"));
         mvc.perform(put("/api/v1/profile").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"visitorId\":\"rank-visitor-five\",\"nickname\":\"  \"}"))
+                        .content("{\"visitorId\":\"rank-visitor-eight\",\"nickname\":\"  \"}"))
                 .andExpect(status().isBadRequest());
 
-        mvc.perform(get("/api/v1/rank/streak").header("X-Visitor-Id", "rank-visitor-four"))
+        mvc.perform(get("/api/v1/rank/solved").header("X-Visitor-Id", "rank-visitor-six"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.top[0].streak").value(5))
-                .andExpect(jsonPath("$.top[0].nickname").value("매일b푸는/b사람"))
-                .andExpect(jsonPath("$.top[0].today").value(true))
+                .andExpect(jsonPath("$.top[0].count").value(8))
+                .andExpect(jsonPath("$.top[0].nickname").value("많이b푸는/b사람"))
                 .andExpect(jsonPath("$.top[0].me").value(false))
-                .andExpect(jsonPath("$.top[1].streak").value(4))
-                .andExpect(jsonPath("$.top[1].today").value(false))
+                .andExpect(jsonPath("$.top[1].count").value(6))
                 .andExpect(jsonPath("$.top[1].me").value(true))
-                .andExpect(jsonPath("$.top[1].nickname").doesNotExist())
+                // 닉네임을 정하지 않았으면 익명 닉네임이 붙는다
+                .andExpect(jsonPath("$.top[1].nickname").value(VisitorProfileService.anonymous("rank-visitor-six")))
+                .andExpect(jsonPath("$.nickname").doesNotExist())
                 .andExpect(jsonPath("$.me.rank").value(2))
-                .andExpect(jsonPath("$.me.streak").value(4));
+                .andExpect(jsonPath("$.me.count").value(6));
 
-        mvc.perform(get("/api/v1/rank/streak").header("X-Visitor-Id", "rank-visitor-broken"))
+        mvc.perform(get("/api/v1/rank/solved").header("X-Visitor-Id", "rank-visitor-none"))
                 .andExpect(jsonPath("$.me").doesNotExist());
-        mvc.perform(get("/api/v1/rank/streak")).andExpect(status().isOk()).andExpect(jsonPath("$.me").doesNotExist());
+        mvc.perform(get("/api/v1/rank/solved")).andExpect(status().isOk()).andExpect(jsonPath("$.me").doesNotExist());
     }
 }
