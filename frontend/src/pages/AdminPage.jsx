@@ -6,7 +6,7 @@ import { COMPANIES, EXAM_CATEGORIES, companyPath } from '../data/examQuestions';
 const KEY = 'admin-key';
 const RANGES = [7, 30, 90];
 const AUTO_SECONDS = 60;
-const TABS = [['overview', '개요'], ['solves', '풀이'], ['visitors', '방문자'], ['reports', '제보'], ['accounts', '계정 · 채점'], ['system', '시스템']];
+const TABS = [['overview', '개요'], ['solves', '풀이'], ['visitors', '방문자'], ['reports', '제보'], ['chat', '채팅'], ['accounts', '계정 · 채점'], ['system', '시스템']];
 const REPORT_KINDS = { answer: '정답 오류', typo: '오타', explain: '해설 문제', etc: '기타' };
 const MODES = { exam: '모의고사', practice: '영역별 연습', wrong: '오답 다시 풀기', marked: '북마크 다시 풀기', cpp: 'C++ 문제집', recall: '응시 후기 복원 문제' };
 
@@ -55,6 +55,7 @@ export default function AdminPage() {
   const [data, setData] = useState(null);
   const [sys, setSys] = useState(null);
   const [reports, setReports] = useState(null);
+  const [chat, setChat] = useState(null);
   const [updatedAt, setUpdatedAt] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(() => !!savedKey());
@@ -71,6 +72,9 @@ export default function AdminPage() {
     api.get('/admin/reports', options)
       .then(res => { if (!stale) setReports(res.data); })
       .catch(() => { if (!stale) setReports(null); });
+    api.get('/admin/lounge/messages', options)
+      .then(res => { if (!stale) setChat(res.data); })
+      .catch(() => { if (!stale) setChat(null); });
     api.get('/admin/usage', { ...options, params: { days } })
       .then(res => { if (!stale) { setData(res.data); setUpdatedAt(new Date()); setError(''); } })
       .catch(err => {
@@ -82,6 +86,7 @@ export default function AdminPage() {
           setData(null);
           setSys(null);
           setReports(null);
+          setChat(null);
           setError('관리자 키가 올바르지 않습니다.');
         } else if (status === 503) {
           setError('서버에 ADMIN_KEY 환경변수가 설정되지 않았습니다.');
@@ -117,6 +122,7 @@ export default function AdminPage() {
     setData(null);
     setSys(null);
     setReports(null);
+    setChat(null);
     setAuto(false);
   };
 
@@ -174,6 +180,9 @@ export default function AdminPage() {
           {tab === 'reports' && (reports
             ? <Reports reports={reports} adminKey={key} onChange={setReports} />
             : <p className="exam-note">제보 정보를 불러오지 못했습니다. 백엔드 배포가 끝난 뒤 새로고침해 주세요.</p>)}
+          {tab === 'chat' && (chat
+            ? <Chat chat={chat} adminKey={key} onChange={setChat} />
+            : <p className="exam-note">채팅 글을 불러오지 못했습니다. 백엔드 배포가 끝난 뒤 새로고침해 주세요.</p>)}
           {tab === 'accounts' && (sys ? <Accounts sys={sys} /> : <SysMissing />)}
           {tab === 'system' && (sys ? <System sys={sys} events={data.server.events} /> : <SysMissing />)}
         </>
@@ -213,7 +222,7 @@ function Overview({ data, sys }) {
   return (
     <>
       <div className="exam-stats">
-        <Tile k="지금 공부 중" v={data.studying ?? data.active} sub="화면을 열어 둔 방문자 (관리자만 볼 수 있음)" />
+        <Tile k="지금 공부 중" v={data.studying ?? data.active} sub="화면을 열어 둔 방문자 (헤더에도 표시됨)" />
         <Tile k="최근 5분 활동" v={data.active} sub="페이지를 옮기거나 풀이를 끝낸 방문자" />
         <Tile k="오늘 방문자" v={data.today.visitors} sub={`조회 ${data.today.views} · 풀이 ${data.today.exams}`} />
         <Tile k="오늘 신규 방문자" v={data.newToday} sub={`재방문 ${Math.max(0, data.today.visitors - data.newToday)}명`} />
@@ -483,6 +492,44 @@ function Reports({ reports, adminKey, onChange }) {
           </div>
         </>
       )}
+    </>
+  );
+}
+
+// 채팅방에 올라온 글. 부적절한 글은 여기서 지운다
+function Chat({ chat, adminKey, onChange }) {
+  const [busy, setBusy] = useState(0);
+
+  const remove = (item) => {
+    setBusy(item.id);
+    api.delete(`/admin/lounge/messages/${item.id}`, { headers: { 'X-Admin-Key': adminKey }, timeout: 60000 })
+      .then(() => onChange(chat.filter(m => m.id !== item.id)))
+      .catch(() => {})
+      .finally(() => setBusy(0));
+  };
+
+  if (!chat.length) return <p className="exam-note">아직 올라온 채팅이 없습니다.</p>;
+
+  return (
+    <>
+      <div className="section-title">최근 채팅 {chat.length}건</div>
+      <div className="exam-table-wrap">
+        <table className="exam-table admin-table">
+          <thead><tr><th>시각</th><th>방문자</th><th>닉네임</th><th>내용</th><th>삭제</th></tr></thead>
+          <tbody>
+            {chat.map(m => (
+              <tr key={m.id}>
+                <td>{fmtAt(m.at)}</td>
+                <td className="num">{m.visitor}</td>
+                <td>{m.nickname}</td>
+                <td className="admin-msg">{m.text}</td>
+                <td><button type="button" className="exam-btn sm" disabled={busy === m.id} onClick={() => remove(m)}>삭제</button></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="exam-note">지운 글은 열려 있는 채팅 창에서도 몇 초 안에 사라집니다. 30일이 지난 글은 자동으로 정리됩니다.</p>
     </>
   );
 }
