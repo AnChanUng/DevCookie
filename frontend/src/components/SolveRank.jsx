@@ -5,6 +5,8 @@ import { visitorId } from '../track';
 import { NICKNAME_MAX, cleanNickname, saveNickname, savedNickname } from '../nickname';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
+const MAX_RETRIES = 10;
+const RETRY_DELAY_MS = 5000;
 
 // 이 브라우저에 남은 풀이 기록에서 한 번이라도 푼 문제를 센다. 같은 문제를 여러 번 풀어도 한 문제다
 function solvedCount() {
@@ -34,20 +36,29 @@ export default function SolveRank() {
 
   useEffect(() => {
     let stale = false;
+    let timer;
     const id = visitorId();
     const count = solvedCount();
     // 내 문제 수를 먼저 알린 뒤 순위를 받는다. 잠든 서버가 깨어나는 동안에도 기다렸다가 보여 준다
-    const report = id && count > 0
-      ? api.put('/rank/solved', { visitorId: id, count }, { timeout: 180000 }).catch(() => {})
-      : Promise.resolve();
-    report
-      .then(() => api.get('/rank/solved', { headers: id ? { 'X-Visitor-Id': id } : {}, timeout: 180000 }))
-      .then(res => { if (!stale) setRank(res.data); })
-      .catch(() => { if (!stale) setFailed(true); });
-    return () => { stale = true; };
+    const load = (attempt) => {
+      const report = id && count > 0
+        ? api.put('/rank/solved', { visitorId: id, count }, { timeout: 180000 }).catch(() => {})
+        : Promise.resolve();
+      report
+        .then(() => api.get('/rank/solved', { headers: id ? { 'X-Visitor-Id': id } : {}, timeout: 180000 }))
+        .then(res => { if (!stale) setRank(res.data); })
+        .catch(() => {
+          if (stale) return;
+          // 깨어나는 중인 서버는 요청을 한두 번 놓치기도 한다. 잠시 뒤 다시 받아 본다
+          if (attempt < MAX_RETRIES) timer = setTimeout(() => load(attempt + 1), RETRY_DELAY_MS);
+          else setFailed(true);
+        });
+    };
+    load(0);
+    return () => { stale = true; clearTimeout(timer); };
   }, [tick]);
 
-  // 서버가 끝내 순위를 주지 못하면 자리만 차지하지 않게 비워 둔다
+  // 여러 번 다시 받아 봐도 순위를 주지 못하면 자리만 차지하지 않게 비워 둔다
   if (failed && !rank) return null;
 
   const save = (e) => {
