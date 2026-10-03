@@ -6,7 +6,7 @@ import { NICKNAME_MAX, cleanNickname, saveNickname, savedNickname } from '../nic
 
 const MEDALS = ['🥇', '🥈', '🥉'];
 
-// 문제를 많이 푼 사람 순위. 한 세트를 끝까지 풀 때마다 한 번으로 센다
+// 문제를 많이 푼 사람 순위. 끝까지 푼 세트의 문제 수를 지금까지 모두 더한다
 export default function SolveRank() {
   const [rank, setRank] = useState(null);
   const [naming, setNaming] = useState(false);
@@ -47,7 +47,7 @@ export default function SolveRank() {
     <aside className="solve-rank">
       <div className="solve-rank-head">
         <h2>🏆 문제 많이 푼 사람들</h2>
-        <span>지금까지 푼 횟수</span>
+        <span>지금까지 푼 문제 수</span>
       </div>
 
       {!rank && <p className="solve-rank-empty">순위를 불러오는 중...</p>}
@@ -58,7 +58,7 @@ export default function SolveRank() {
             <li key={r.rank} className={r.me ? 'me' : ''}>
               <span className="solve-rank-no">{MEDALS[r.rank - 1] || r.rank}</span>
               <span className="solve-rank-name">{r.nickname}{r.me && <em>나</em>}</span>
-              <span className="solve-rank-count">{r.count}회</span>
+              <span className="solve-rank-count">{r.count.toLocaleString()}문제</span>
             </li>
           ))}
         </ol>

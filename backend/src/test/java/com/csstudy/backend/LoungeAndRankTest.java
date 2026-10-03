@@ -107,16 +107,16 @@ class LoungeAndRankTest {
         }
     }
 
-    private void solved(String visitor, LocalDate day) {
+    private void solved(String visitor, LocalDate day, String detail, Integer total) {
         usageEventRepository.save(UsageEvent.builder()
-                .visitorId(visitor).type("exam").path("/exam/ibk").detail("exam")
-                .day(day).createdAt(Instant.now()).build());
+                .visitorId(visitor).type("exam").path("/exam/ibk").detail(detail).total(total)
+                .score(total == null ? null : 0).day(day).createdAt(Instant.now()).build());
     }
 
     // 순위는 잠깐 캐시되므로 기록을 모두 넣은 뒤 한 번에 확인한다.
     // 다른 테스트가 오늘 풀이 수를 세므로 넣은 기록은 끝나고 지운다
     @Test
-    void solvedRankCountsEverySolveSoFar() throws Exception {
+    void solvedRankAddsUpEveryQuestionSolvedSoFar() throws Exception {
         try {
             checkSolvedRank();
         } finally {
@@ -127,10 +127,13 @@ class LoungeAndRankTest {
 
     private void checkSolvedRank() throws Exception {
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
-        // 하루에 여러 번 풀어도, 오래전에 풀었어도 모두 센다
-        for (int i = 0; i < 8; i++) solved("rank-visitor-eight", today);
-        for (int i = 0; i < 6; i++) solved("rank-visitor-six", today.minusDays(200 + i));
-        solved("rank-visitor-one", today);
+        // 세트 수가 아니라 푼 문제 수를 더한다. 오래전에 푼 것도 모두 센다
+        solved("rank-visitor-eight", today, "exam", 5);
+        solved("rank-visitor-eight", today, "exam", 3);
+        // 코딩 문제는 테스트 케이스가 몇 개든 한 문제다. 문제 수가 없는 기록은 세지 않는다
+        for (int i = 0; i < 6; i++) solved("rank-visitor-six", today.minusDays(200 + i), "cospro", 10);
+        solved("rank-visitor-six", today, "exam", null);
+        solved("rank-visitor-none", today, "exam", null);
 
         mvc.perform(put("/api/v1/profile").contentType(MediaType.APPLICATION_JSON)
                         .content("{\"visitorId\":\"rank-visitor-eight\",\"nickname\":\" 많이<b>푸는</b>사람 \"}"))
