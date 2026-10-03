@@ -6,7 +6,24 @@ import { NICKNAME_MAX, cleanNickname, saveNickname, savedNickname } from '../nic
 
 const MEDALS = ['🥇', '🥈', '🥉'];
 
-// 문제를 많이 푼 사람 순위. 끝까지 푼 문제집의 문제 수를 더한다. 같은 문제집은 한 번만 센다
+// 이 브라우저에 남은 풀이 기록에서 한 번이라도 푼 문제를 센다. 같은 문제를 여러 번 풀어도 한 문제다
+function solvedCount() {
+  let count = 0;
+  try {
+    for (const key of Object.keys(localStorage)) {
+      if (key.startsWith('exam-progress:')) {
+        try { count += Object.keys(JSON.parse(localStorage.getItem(key))?.stats || {}).length; } catch { /* 깨진 기록은 건너뛴다 */ }
+      } else if (key.startsWith('cospro:solved:') && localStorage.getItem(key) === 'pass') {
+        count++;
+      }
+    }
+  } catch {
+    /* storage unavailable */
+  }
+  return count;
+}
+
+// 문제를 많이 푼 사람 순위. 지금까지 푼 문제 수를 서버에 알리고 순위를 받아 온다
 export default function SolveRank() {
   const [rank, setRank] = useState(null);
   const [naming, setNaming] = useState(false);
@@ -18,8 +35,13 @@ export default function SolveRank() {
   useEffect(() => {
     let stale = false;
     const id = visitorId();
-    // 잠든 서버가 깨어나는 동안에도 기다렸다가 보여 준다
-    api.get('/rank/solved', { headers: id ? { 'X-Visitor-Id': id } : {}, timeout: 180000 })
+    const count = solvedCount();
+    // 내 문제 수를 먼저 알린 뒤 순위를 받는다. 잠든 서버가 깨어나는 동안에도 기다렸다가 보여 준다
+    const report = id && count > 0
+      ? api.put('/rank/solved', { visitorId: id, count }, { timeout: 180000 }).catch(() => {})
+      : Promise.resolve();
+    report
+      .then(() => api.get('/rank/solved', { headers: id ? { 'X-Visitor-Id': id } : {}, timeout: 180000 }))
       .then(res => { if (!stale) setRank(res.data); })
       .catch(() => { if (!stale) setFailed(true); });
     return () => { stale = true; };

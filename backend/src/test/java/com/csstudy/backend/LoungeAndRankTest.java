@@ -2,6 +2,7 @@ package com.csstudy.backend;
 
 import com.csstudy.backend.entity.UsageEvent;
 import com.csstudy.backend.repository.UsageEventRepository;
+import com.csstudy.backend.repository.VisitorSolvedRepository;
 import com.csstudy.backend.service.VisitorProfileService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,6 +36,7 @@ class LoungeAndRankTest {
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper json;
     @Autowired UsageEventRepository usageEventRepository;
+    @Autowired VisitorSolvedRepository solvedRepository;
 
     // 한 사람이 연달아 보내면 막히므로, 테스트끼리 서로 다른 방문자와 IP를 쓴다
     private ResultActions say(String visitor, String nickname, String text, String ip) throws Exception {
@@ -122,6 +124,8 @@ class LoungeAndRankTest {
         } finally {
             usageEventRepository.deleteAll(usageEventRepository.findAll().stream()
                     .filter(e -> e.getVisitorId().startsWith("rank-visitor-")).toList());
+            solvedRepository.deleteAll(solvedRepository.findAll().stream()
+                    .filter(v -> v.getVisitorId().startsWith("rank-visitor-")).toList());
         }
     }
 
@@ -162,6 +166,18 @@ class LoungeAndRankTest {
 
         mvc.perform(get("/api/v1/rank/solved").header("X-Visitor-Id", "rank-visitor-none"))
                 .andExpect(jsonPath("$.me").doesNotExist());
+
+        // 브라우저가 푼 문제 수를 알려 주면 그 값이 기록으로 어림한 값을 대신하고, 순위에 바로 반영된다
+        mvc.perform(put("/api/v1/rank/solved").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"visitorId\":\"rank-visitor-six\",\"count\":120}"))
+                .andExpect(status().isOk());
+        mvc.perform(put("/api/v1/rank/solved").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"visitorId\":\"rank-visitor-six\",\"count\":999999}"))
+                .andExpect(status().isBadRequest());
+        mvc.perform(get("/api/v1/rank/solved").header("X-Visitor-Id", "rank-visitor-six"))
+                .andExpect(jsonPath("$.top[0].count").value(120))
+                .andExpect(jsonPath("$.top[0].me").value(true))
+                .andExpect(jsonPath("$.top[1].count").value(8));
         mvc.perform(get("/api/v1/rank/solved")).andExpect(status().isOk()).andExpect(jsonPath("$.me").doesNotExist());
     }
 }
