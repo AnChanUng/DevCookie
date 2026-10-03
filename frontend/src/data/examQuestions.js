@@ -116,8 +116,8 @@ export const HF_QUESTIONS = [
 const withPredicted = (recall, predicted) => [...recall.map(q => ({ ...q, set: 'r' })), ...predicted.map(q => ({ ...q, set: 'p' }))];
 const drawOf = (sections) => Object.fromEntries(Object.entries(sections).map(([k, s]) => [k, s.count]));
 const recallSets = (rSub, pSub) => [
-  { key: 'r', name: '복기 기반 문제 1회', sub: rSub },
-  { key: 'p', name: '예상문제 1회', sub: pSub },
+  { key: 'r', name: '복기 기반 문제 1회', sub: rSub, kind: 'recall' },
+  { key: 'p', name: '예상문제 1회', sub: pSub, kind: 'predicted' },
 ];
 
 // 문제은행이 무엇을 근거로 만들어졌는지. 저장소에 복기·복원 원본 파일이 있으면 recall, 없으면 predicted.

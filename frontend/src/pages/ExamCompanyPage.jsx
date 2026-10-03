@@ -43,6 +43,14 @@ const modeLabel = (sections, mode, sec, sets) =>
     : mode === 'cpp' ? `C++ 집중 문제집 · ${sec === 'all' ? '전체' : CPP_GROUPS[sec]?.name || ''}`
     : `영역별 연습 · ${sections[sec]?.name || ''}`;
 
+// 한 회사 화면에 복기 기반 문제와 예상문제가 함께 있으면 시작 카드마다 어느 쪽인지 표시한다
+const KINDS = {
+  recall: '📕 복기문제',
+  predicted: '📝 예상문제',
+  mixed: '🔀 복기 + 예상 혼합',
+};
+const Kind = ({ kind }) => (KINDS[kind] ? <span className={`exam-kind ${kind}`}>{KINDS[kind]}</span> : null);
+
 export default function ExamCompanyPage() {
   const { company: key } = useParams();
   const company = COMPANIES.find(c => c.key === key);
@@ -61,6 +69,9 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
   const CPP = useMemo(() => company.extra || [], [company]); // C++ 집중 문제집 (모의고사 미포함)
   const RECALL = company.recall; // 응시 후기 복원 문제 (모의고사 미포함)
   const SETS = company.sets || []; // 실제 시험처럼 한 번에 치르는 고정 회차
+  // 복기 회차와 예상 회차를 합친 은행은 모의고사·영역별 연습이 둘을 섞어 뽑고, 복원 문제가 따로 있는 은행은 나머지가 예상문제다
+  const splitSets = SETS.some(s => s.kind);
+  const mainKind = splitSets ? 'mixed' : RECALL ? 'predicted' : null;
   const label = (mode, sec) => (mode === 'recall' && RECALL ? RECALL.title : modeLabel(SECTIONS, mode, sec, SETS));
   const ALL = useMemo(() => [...Q, ...CPP, ...(RECALL?.questions || [])], [Q, CPP, RECALL]); // 오답노트·오답 다시 풀기 범위
   const byId = useMemo(() => Object.fromEntries(ALL.map(q => [q.id, q])), [ALL]);
@@ -221,6 +232,29 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
   const best = exams.length ? Math.max(...exams.map(h => h.score)) : null;
   const last = exams.length ? exams[exams.length - 1].score : null;
 
+  // 복기 회차와 예상 회차가 나뉜 은행은 이 구역을 맨 위에 둔다
+  const setsBlock = SETS.length > 0 && (
+    <>
+      <div className="section-title">회차별 모의고사</div>
+      <p className="exam-lede">실제 시험과 같은 문항 수·영역 구성으로 묶은 고정 세트입니다. {splitSets && '복기 기반 회차는 응시 후기에 복원된 문항을 따라 만들었고, 예상문제 회차는 같은 경향으로 새로 만든 문제입니다. '}실전 모의고사가 문제은행에서 매번 새로 뽑는 것과 달리, 각 회차는 같은 문제를 같은 순서로 출제하므로 회차 간 점수를 비교할 수 있습니다.</p>
+      <div className="exam-sections">
+        {SETS.map(s => {
+          const qs = Q.filter(q => q.set === s.key);
+          const done = qs.filter(q => data.stats[q.id]).length;
+          const right = qs.filter(q => data.stats[q.id]?.last === 'r').length;
+          return (
+            <button key={s.key} className="exam-section" onClick={() => start('set', qs.map(q => q.id), s.key)}>
+              <span className="t">{s.name}<Kind kind={s.kind} /></span>
+              <span className="d">{s.sub}</span>
+              <span className="d">{qs.length}문제 · {company.minutes}분 · 최근 정답 {right}/{done}</span>
+              <span className="bar"><i style={{ width: `${qs.length ? Math.round(right / qs.length * 100) : 0}%` }} /></span>
+            </button>
+          );
+        })}
+      </div>
+    </>
+  );
+
   return (
     <div className="fade-in">
       {header(company.name)}
@@ -237,7 +271,7 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
       {/* 실제 시험을 복원한 문제는 예상문제보다 먼저 보이게 맨 위에 둔다 */}
       {RECALL && (
         <>
-          <div className="section-title">{RECALL.title}</div>
+          <div className="section-title">{RECALL.title}<Kind kind="recall" /></div>
           <p className="exam-lede">{RECALL.lede}</p>
           <div className="exam-sections">
             <button className="exam-section" onClick={() => start('recall', RECALL.questions.map(q => q.id))}>
@@ -255,6 +289,8 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
         </>
       )}
 
+      {splitSets && setsBlock}
+
       <div className="exam-stats">
         <StatTile k="모의고사 응시" v={exams.length} unit="회" />
         <StatTile k="최고 점수" v={best ?? '–'} of={examCount} />
@@ -268,8 +304,8 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
             <span className="exam-mode-icon" aria-hidden="true">⏱</span>
             <span className="exam-mode-count"><b>{examCount}</b>문항</span>
           </span>
-          <span className="t">실전 모의고사</span>
-          <span className="d">{company.draw ? `문제은행 ${Q.length}문항에서 실제 출제 비율대로 뽑아 냅니다.` : '실제 시험의 영역 순서 그대로 출제합니다.'} 고르면 바로 정답과 해설이 나옵니다.</span>
+          <span className="t">실전 모의고사<Kind kind={mainKind} /></span>
+          <span className="d">{company.draw ? `${splitSets ? '복기 기반 회차와 예상문제 회차를 합친 ' : ''}문제은행 ${Q.length}문항에서 실제 출제 비율대로 뽑아 냅니다.` : '실제 시험의 영역 순서 그대로 출제합니다.'} 고르면 바로 정답과 해설이 나옵니다.</span>
           <span className="exam-mode-foot">
             <span className="exam-mode-chip">{company.minutes}분 타이머</span>
             <span className="exam-mode-chip">즉시 채점</span>
@@ -291,29 +327,9 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
         </button>
       </div>
 
-      {SETS.length > 0 && (
-        <>
-          <div className="section-title">회차별 모의고사</div>
-          <p className="exam-lede">실제 시험과 같은 문항 수·영역 구성으로 묶은 고정 세트입니다. 위의 실전 모의고사가 문제은행에서 매번 새로 뽑는 것과 달리, 각 회차는 같은 문제를 같은 순서로 출제하므로 회차 간 점수를 비교할 수 있습니다.</p>
-          <div className="exam-sections">
-            {SETS.map(s => {
-              const qs = Q.filter(q => q.set === s.key);
-              const done = qs.filter(q => data.stats[q.id]).length;
-              const right = qs.filter(q => data.stats[q.id]?.last === 'r').length;
-              return (
-                <button key={s.key} className="exam-section" onClick={() => start('set', qs.map(q => q.id), s.key)}>
-                  <span className="t">{s.name}</span>
-                  <span className="d">{s.sub}</span>
-                  <span className="d">{qs.length}문제 · {company.minutes}분 · 최근 정답 {right}/{done}</span>
-                  <span className="bar"><i style={{ width: `${qs.length ? Math.round(right / qs.length * 100) : 0}%` }} /></span>
-                </button>
-              );
-            })}
-          </div>
-        </>
-      )}
+      {!splitSets && setsBlock}
 
-      <div className="section-title">영역별 연습</div>
+      <div className="section-title">영역별 연습<Kind kind={mainKind} /></div>
       <div className="exam-sections">
         {Object.entries(SECTIONS).filter(([, s]) => !s.extra).map(([k, s]) => {
           const qs = Q.filter(q => q.sec === k);
@@ -334,7 +350,7 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
 
       {CPP.length > 0 && (
         <>
-          <div className="section-title">C++ 집중 문제집</div>
+          <div className="section-title">C++ 집중 문제집<Kind kind={mainKind} /></div>
           <p className="exam-lede">HF 프로그래밍 영역에서 자주 나오는 C++ 실행 결과·개념 문제 {CPP.length}문항. 모의고사 60문제와는 별도이며, 한 문제씩 즉시 채점되고 틀린 문제는 오답노트에 함께 쌓입니다.</p>
           <div className="exam-sections">
             <button className="exam-section cpp" onClick={() => start('cpp', shuffle(CPP.map(q => q.id)), 'all')}>
