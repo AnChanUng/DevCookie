@@ -68,7 +68,7 @@ export default function SolveRank() {
   return (
     <aside className="solve-rank">
       <div className="solve-rank-head">
-        <h2>🏆 문제 많이 푼 사람들</h2>
+        <h2>🏆 순위</h2>
         <span>지금까지 푼 문제 수</span>
       </div>
 
