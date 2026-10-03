@@ -156,7 +156,7 @@ export const companyPath = (company) => `/${hubOf(company) || 'exam'}/${company.
 export const COMPANIES = [
   {
     key: "hf", category: "finance", abbr: "HF", name: "한국주택금융공사", meta: "전공필기 60문제 · 80분 · 5지선다 · C++ 집중 48문제 · 2026 하반기 복원 41문제", ready: true,
-    source: { kind: "recall", label: "2026 하반기 복기문제", detail: "2026 하반기 전공필기 응시 후기를 바탕으로 복원한 41문제가 아래에 따로 있습니다. 실전 모의고사와 영역별 연습, C++ 집중 문제집은 출제범위를 반영해 새로 만든 예상문제입니다." },
+    source: { kind: "recall", label: "2026 하반기 복기문제", detail: "2026 하반기 전공필기 응시 후기를 바탕으로 복원한 41문제가 바로 아래에 있습니다. 그 밑의 실전 모의고사와 영역별 연습, C++ 집중 문제집은 출제범위를 반영해 새로 만든 예상문제입니다." },
     questions: HF_QUESTIONS, sections: SECTIONS, minutes: 80, extra: HF_CPP_QUESTIONS, recall: HF_RECALL_2026B,
     lede: "전산학일반(정보보호 포함) 36문제, 데이터베이스·네트워크 12문제, 프로그래밍(C++ · Java · Python) 12문제. 총 60문제, 80분, 5지선다. 코딩테스트 이후 치르는 전공필기 범위만 다룹니다. 프로그래밍 영역은 C++ 코드 실행 결과 문제 비중이 높아 아래에 C++ 집중 문제집을 따로 두었습니다.",
   },
