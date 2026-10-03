@@ -135,21 +135,21 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
             type="button"
             className={`exam-book wrong${view.name === 'wrongbook' ? ' on' : ''}${everWrongIds.length ? ' has' : ''}`}
             disabled={!everWrongIds.length}
-            title={everWrongIds.length ? '한 번이라도 틀린 문제 모아보기' : '아직 틀린 문제가 없습니다'}
+            title={everWrongIds.length ? '틀리면 자동으로 쌓이는 기록 · 한 번이라도 틀린 문제 모아보기' : '아직 틀린 문제가 없습니다. 문제를 틀리면 자동으로 쌓입니다'}
             onClick={() => setView({ name: 'wrongbook' })}
           >
             <span className="n">{everWrongIds.length}</span>
-            <span className="t">틀린문제</span>
+            <span className="t"><i aria-hidden="true">✕</i>틀린문제</span>
           </button>
           <button
             type="button"
             className={`exam-book mark${view.name === 'markbook' ? ' on' : ''}${markedIds.length ? ' has' : ''}`}
             disabled={!markedIds.length}
-            title={markedIds.length ? '별표해 둔 문제 모아보기' : '아직 북마크한 문제가 없습니다'}
+            title={markedIds.length ? '내가 ★로 고른, 다시 풀고 싶은 문제 모아보기' : '아직 북마크한 문제가 없습니다. 다시 풀고 싶은 문제에 ☆를 눌러 두세요'}
             onClick={() => setView({ name: 'markbook' })}
           >
             <span className="n">{markedIds.length}</span>
-            <span className="t">북마크</span>
+            <span className="t"><i aria-hidden="true">★</i>북마크</span>
           </button>
         </div>
       )}
@@ -205,7 +205,7 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
     return (
       <div className="fade-in">
         {header('틀린문제 모아보기')}
-        <p className="exam-lede">한 번이라도 틀린 문제입니다. 마지막 풀이에서 맞힌 문제는 "해결"로 표시되고, 아직 틀린 상태인 문제만 "오답 다시 풀기"에 나옵니다.</p>
+        <p className="exam-lede">틀리면 자동으로 쌓이는 기록입니다. 내가 직접 고르는 북마크와는 따로 관리됩니다. 한 번이라도 틀린 문제가 모두 나오며, 마지막 풀이에서 맞힌 문제는 "해결"로 표시되고, 아직 틀린 상태인 문제만 "오답 다시 풀기"에 나옵니다.</p>
         <div className="exam-actions">
           {wrongIds.length > 0 && <button className="exam-btn primary" onClick={() => start('wrong', shuffle(wrongIds))}>미해결 {wrongIds.length}문제 다시 풀기</button>}
           <button className="exam-btn" onClick={() => setView({ name: 'home' })}>{company.abbr} 메인으로</button>
@@ -219,8 +219,9 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
     return (
       <div className="fade-in">
         {header('북마크 모아보기')}
-        <p className="exam-lede">별표(★)로 표시해 둔 문제입니다. 오답 기록과는 따로 저장되므로, 틀린 문제 기록이 지워지더라도 여기서 다시 볼 수 있습니다. 별표를 다시 누르면 해제됩니다.</p>
+        <p className="exam-lede">내가 별표(★)로 직접 고른, 다시 풀고 싶은 문제입니다. 맞혔는지 틀렸는지와 상관없이 별표를 다시 눌러 해제할 때까지 남아 있고, 틀리면 자동으로 쌓이는 틀린문제와는 따로 저장됩니다.</p>
         <div className="exam-actions">
+          {markedIds.length > 0 && <button className="exam-btn primary" onClick={() => start('marked', shuffle(markedIds))}>북마크 {markedIds.length}문제 다시 풀기</button>}
           <button className="exam-btn" onClick={() => setView({ name: 'home' })}>{company.abbr} 메인으로</button>
         </div>
         <MarkBook Q={ALL} ids={markedIds} stats={data.stats} sections={SECTIONS} marks={data.marks} onMark={onMark} />
@@ -318,11 +319,24 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
             <span className="exam-mode-count"><b>{wrongIds.length}</b>문항</span>
           </span>
           <span className="t">오답 다시 풀기</span>
-          <span className="d">{wrongIds.length ? '마지막에 틀린 문제만 모아서 다시 풉니다. 맞히면 오답에서 빠집니다.' : '지금은 남은 오답이 없습니다. 문제를 풀다 틀리면 여기에 모입니다.'}</span>
+          <span className="d">{wrongIds.length ? '틀리면 자동으로 쌓입니다. 마지막에 틀린 문제만 모아서 다시 풀고, 맞히면 빠집니다.' : '지금은 남은 오답이 없습니다. 문제를 풀다 틀리면 자동으로 여기에 모입니다.'}</span>
           <span className="exam-mode-foot">
             <span className="exam-mode-chip">무작위 순서</span>
             <span className="exam-mode-chip">즉시 채점</span>
             {wrongIds.length > 0 && <span className="exam-mode-go">다시 풀기 →</span>}
+          </span>
+        </button>
+        <button className={`exam-mode mark${markedIds.length ? '' : ' empty'}`} disabled={!markedIds.length} onClick={() => start('marked', shuffle(markedIds))}>
+          <span className="exam-mode-head">
+            <span className="exam-mode-icon" aria-hidden="true">{markedIds.length ? '★' : '☆'}</span>
+            <span className="exam-mode-count"><b>{markedIds.length}</b>문항</span>
+          </span>
+          <span className="t">북마크 다시 풀기</span>
+          <span className="d">{markedIds.length ? '내가 ★로 직접 고른 문제만 다시 풉니다. 맞혀도 별표를 풀 때까지 남아 있습니다.' : '다시 풀고 싶은 문제에 ☆를 눌러 두면 여기에 모입니다. 틀린문제와는 따로 관리됩니다.'}</span>
+          <span className="exam-mode-foot">
+            <span className="exam-mode-chip">무작위 순서</span>
+            <span className="exam-mode-chip">즉시 채점</span>
+            {markedIds.length > 0 && <span className="exam-mode-go">다시 풀기 →</span>}
           </span>
         </button>
       </div>
