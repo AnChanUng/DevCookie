@@ -52,13 +52,23 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
+  --ui-zoom: 1;
+}
+
+/* 넓은 화면에서는 브라우저를 125%로 본 것처럼 통째로 키운다.
+   vh는 함께 커지지 않으므로 화면 높이를 쓰는 곳은 --ui-zoom으로 나눠서 쓴다 */
+@media (min-width: 1280px) {
+  html {
+    --ui-zoom: 1.25;
+    zoom: 1.25;
+  }
 }
 
 body {
   font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--bg-secondary);
   color: var(--text-primary);
-  min-height: 100vh;
+  min-height: calc(100vh / var(--ui-zoom));
   line-height: 1.6;
   letter-spacing: -0.02em;
   overflow-x: hidden;
