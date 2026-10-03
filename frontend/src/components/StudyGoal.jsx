@@ -15,7 +15,7 @@ function daysLeft(day) {
   return Math.round((day - today) / 86400000);
 }
 
-// 시험 일정 · D-day. 문제은행이 있는 시험만 그 은행으로 이어진다
+// 시험 일정 · D-day를 한 줄로 보여 준다. 문제은행이 있는 시험만 그 은행으로 이어진다
 export default function StudyGoal() {
   const exams = EXAMS
     .map(e => {
@@ -24,27 +24,22 @@ export default function StudyGoal() {
     })
     .filter(e => e.left >= 0);
 
+  if (exams.length === 0) return null;
+
   return (
-    <aside className="goal-card">
-      {exams.length > 0 && (
-        <>
-          <div className="goal-label">시험 일정</div>
-          {exams.map(e => {
-            const body = (
-              <>
-                <span>
-                  <span className="goal-title">{e.name}</span>
-                  <span className="goal-sub">{e.when}</span>
-                </span>
-                <span className="goal-dday">{e.left === 0 ? 'D-DAY' : `D-${e.left}`}</span>
-              </>
-            );
-            return e.to
-              ? <Link key={e.name} to={e.to} className="goal-exam">{body}</Link>
-              : <div key={e.name} className="goal-exam">{body}</div>;
-          })}
-        </>
-      )}
-    </aside>
+    <div className="goal-strip">
+      <span className="goal-label">시험 일정</span>
+      {exams.map(e => {
+        const body = (
+          <>
+            <span className="goal-title">{e.name}</span>
+            <span className="goal-dday">{e.left === 0 ? 'D-DAY' : `D-${e.left}`}</span>
+          </>
+        );
+        return e.to
+          ? <Link key={e.name} to={e.to} className="goal-exam" title={e.when}>{body}</Link>
+          : <span key={e.name} className="goal-exam" title={e.when}>{body}</span>;
+      })}
+    </div>
   );
 }

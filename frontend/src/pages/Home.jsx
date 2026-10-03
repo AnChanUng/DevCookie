@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import StudyGoal from '../components/StudyGoal';
 import DailyFortune from '../components/DailyFortune';
 import MentalTraining from '../components/MentalTraining';
-import StreakRank from '../components/StreakRank';
+import SolveRank from '../components/SolveRank';
 
 const MENUS = [
   { to: '/exam', tone: 'indigo', tag: '전공필기', title: '기업별 기출문제', desc: '금융공기업, 공기업, 컴퓨터일반 기출 모의고사' },
@@ -14,7 +14,7 @@ const MENUS = [
 export default function Home() {
   return (
     <div className="fade-in home">
-      {/* 왼쪽은 소개, 오른쪽은 시험 일정 · D-day */}
+      {/* 왼쪽은 소개와 시험 일정, 오른쪽은 문제 많이 푼 사람 순위 */}
       <div className="home-top">
         <div className="hero">
           <span className="home-eyebrow">공기업 IT직무</span>
@@ -24,8 +24,9 @@ export default function Home() {
             <Link to="/exam" className="home-cta-btn primary">기출 풀러 가기 →</Link>
             <Link to="/weak" className="home-cta-btn">내 약점 보기</Link>
           </div>
+          <StudyGoal />
         </div>
-        <StudyGoal />
+        <SolveRank />
       </div>
 
       <div className="home-menu">
@@ -44,8 +45,6 @@ export default function Home() {
           </Link>
         ))}
       </div>
-
-      <StreakRank />
 
       {/* 오락실은 SPA 밖의 정적 페이지라 Link가 아니라 일반 링크로 연다 */}
       <a href="/arcade/" className="arcade-door">오락실</a>
