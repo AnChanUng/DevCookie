@@ -18,7 +18,7 @@ import java.util.*;
 public class RankController {
 
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
-    private static final int TOP = 10;
+    private static final int TOP = 5;
     // 이 기간 안의 기록만 본다. 연속 일수도 여기까지만 센다
     private static final int WINDOW_DAYS = 100;
     private static final int CACHE_SECONDS = 60;
