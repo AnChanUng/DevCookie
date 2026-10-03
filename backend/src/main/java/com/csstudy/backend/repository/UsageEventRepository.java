@@ -76,4 +76,8 @@ public interface UsageEventRepository extends JpaRepository<UsageEvent, Long> {
     // 시간대별 분포를 서버에서 한국 시간으로 나누려고 시각만 가져온다
     @Query("select e.createdAt from UsageEvent e where e.type = 'view' and e.day >= :from")
     List<Instant> viewTimesSince(@Param("from") LocalDate from);
+
+    // [방문자, 날짜] 문제를 푼 날. 매일 푼 사람 순위를 서버에서 계산하려고 날짜만 가져온다
+    @Query("select e.visitorId, e.day from UsageEvent e where e.type = 'exam' and e.day >= :from group by e.visitorId, e.day")
+    List<Object[]> solvedDaysSince(@Param("from") LocalDate from);
 }
