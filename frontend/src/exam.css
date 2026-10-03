@@ -229,6 +229,25 @@
 .exam-source.recall { border-left-color: var(--accent-green); }
 .exam-source.predicted { border-left-color: var(--accent-blue); }
 
+/* 시작 카드와 구역 제목 옆의 복기 / 예상 구분 */
+.exam-kind {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-full);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  white-space: nowrap;
+  vertical-align: middle;
+  color: var(--text-secondary);
+}
+
+.exam-kind.recall { color: var(--accent-green); }
+.exam-kind.predicted { color: var(--accent-blue); }
+.exam-mode.primary .exam-kind { color: #fff; }
+
 /* 목록 화면: 복기 / 예상 그룹 */
 .exam-group { margin-bottom: 30px; }
 
