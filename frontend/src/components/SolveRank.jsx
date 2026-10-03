@@ -6,7 +6,7 @@ import { NICKNAME_MAX, cleanNickname, saveNickname, savedNickname } from '../nic
 
 const MEDALS = ['🥇', '🥈', '🥉'];
 
-// 문제를 많이 푼 사람 순위. 끝까지 푼 세트의 문제 수를 지금까지 모두 더한다
+// 문제를 많이 푼 사람 순위. 끝까지 푼 문제집의 문제 수를 더한다. 같은 문제집은 한 번만 센다
 export default function SolveRank() {
   const [rank, setRank] = useState(null);
   const [naming, setNaming] = useState(false);
