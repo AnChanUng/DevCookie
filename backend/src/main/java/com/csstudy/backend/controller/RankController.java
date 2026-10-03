@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.util.*;
 
-// 문제를 많이 푼 사람 순위. 풀이 완료 기록(usage_events의 exam)을 방문자별로 지금까지 모두 센다
+// 문제를 많이 푼 사람 순위. 풀이 완료 기록(usage_events의 exam)의 문제 수를 방문자별로 지금까지 모두 더한다
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
@@ -84,7 +84,7 @@ public class RankController {
         }
 
         List<Solver> ranked = new ArrayList<>();
-        usageEventRepository.solvedCounts().forEach(r -> ranked.add(new Solver((String) r[0], (Long) r[1])));
+        usageEventRepository.solvedCounts().forEach(r -> ranked.add(new Solver((String) r[0], ((Number) r[1]).longValue())));
 
         Map<String, Integer> rankOf = new HashMap<>();
         for (int i = 0; i < ranked.size(); i++) rankOf.put(ranked.get(i).visitorId(), i + 1);
