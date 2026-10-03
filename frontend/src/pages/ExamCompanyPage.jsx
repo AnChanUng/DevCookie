@@ -177,7 +177,28 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
         <p className="exam-eyebrow">{label(r.mode, r.sec)} · 소요 {fmtT(r.elapsed)}</p>
         <div className="exam-score"><span className="big">{r.score}</span><span className="of">/ {r.total}문제 · {r.total ? Math.round(r.score / r.total * 100) : 0}%</span></div>
         {(r.mode === 'exam' || r.mode === 'set') && (
-          <div className="exam-stats">
+          {/* 실제 시험을 복원한 문제는 예상문제보다 먼저 보이게 맨 위에 둔다 */}
+      {RECALL && (
+        <>
+          <div className="section-title">{RECALL.title}</div>
+          <p className="exam-lede">{RECALL.lede}</p>
+          <div className="exam-sections">
+            <button className="exam-section" onClick={() => start('recall', RECALL.questions.map(q => q.id))}>
+              <span className="t">순서대로 풀기</span>
+              <span className="d">프로그래밍 → DB · 네트워크 → 전산학일반 순서 · 한 문제씩 즉시 채점</span>
+              <span className="d">{RECALL.questions.length}문제 · 최근 정답 {RECALL.questions.filter(q => data.stats[q.id]?.last === 'r').length}/{RECALL.questions.filter(q => data.stats[q.id]).length}</span>
+              <span className="bar"><i style={{ width: `${Math.round(RECALL.questions.filter(q => data.stats[q.id]?.last === 'r').length / RECALL.questions.length * 100)}%` }} /></span>
+            </button>
+            <button className="exam-section" onClick={() => start('recall', shuffle(RECALL.questions.map(q => q.id)))}>
+              <span className="t">섞어서 풀기</span>
+              <span className="d">같은 문제를 무작위 순서로 출제</span>
+              <span className="d">틀린 문제는 오답노트에 함께 쌓입니다</span>
+            </button>
+          </div>
+        </>
+      )}
+
+      <div className="exam-stats">
             {secKeys.map(k => <StatTile key={k} k={SECTIONS[k].name} v={r.secScore[k]} of={r.items.filter(x => x.q.sec === k).length} />)}
           </div>
         )}
@@ -269,26 +290,6 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
           </span>
         </button>
       </div>
-
-      {RECALL && (
-        <>
-          <div className="section-title">{RECALL.title}</div>
-          <p className="exam-lede">{RECALL.lede}</p>
-          <div className="exam-sections">
-            <button className="exam-section" onClick={() => start('recall', RECALL.questions.map(q => q.id))}>
-              <span className="t">순서대로 풀기</span>
-              <span className="d">프로그래밍 → DB · 네트워크 → 전산학일반 순서 · 한 문제씩 즉시 채점</span>
-              <span className="d">{RECALL.questions.length}문제 · 최근 정답 {RECALL.questions.filter(q => data.stats[q.id]?.last === 'r').length}/{RECALL.questions.filter(q => data.stats[q.id]).length}</span>
-              <span className="bar"><i style={{ width: `${Math.round(RECALL.questions.filter(q => data.stats[q.id]?.last === 'r').length / RECALL.questions.length * 100)}%` }} /></span>
-            </button>
-            <button className="exam-section" onClick={() => start('recall', shuffle(RECALL.questions.map(q => q.id)))}>
-              <span className="t">섞어서 풀기</span>
-              <span className="d">같은 문제를 무작위 순서로 출제</span>
-              <span className="d">틀린 문제는 오답노트에 함께 쌓입니다</span>
-            </button>
-          </div>
-        </>
-      )}
 
       {SETS.length > 0 && (
         <>
