@@ -107,9 +107,9 @@ class LoungeAndRankTest {
         }
     }
 
-    private void solved(String visitor, LocalDate day, String detail, Integer total) {
+    private void solved(String visitor, LocalDate day, String path, String detail, Integer total) {
         usageEventRepository.save(UsageEvent.builder()
-                .visitorId(visitor).type("exam").path("/exam/ibk").detail(detail).total(total)
+                .visitorId(visitor).type("exam").path(path).detail(detail).total(total)
                 .score(total == null ? null : 0).day(day).createdAt(Instant.now()).build());
     }
 
@@ -128,12 +128,16 @@ class LoungeAndRankTest {
     private void checkSolvedRank() throws Exception {
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
         // 세트 수가 아니라 푼 문제 수를 더한다. 오래전에 푼 것도 모두 센다
-        solved("rank-visitor-eight", today, "exam", 5);
-        solved("rank-visitor-eight", today, "exam", 3);
+        solved("rank-visitor-eight", today, "/exam/ibk", "exam", 5);
+        solved("rank-visitor-eight", today, "/exam/hf", "exam", 3);
+        // 같은 문제집을 다시 풀거나 오답만 다시 푼 것은 더하지 않는다
+        solved("rank-visitor-eight", today, "/exam/ibk", "exam", 5);
+        solved("rank-visitor-eight", today, "/exam/ibk", "wrong", 2);
         // 코딩 문제는 테스트 케이스가 몇 개든 한 문제다. 문제 수가 없는 기록은 세지 않는다
-        for (int i = 0; i < 6; i++) solved("rank-visitor-six", today.minusDays(200 + i), "cospro", 10);
-        solved("rank-visitor-six", today, "exam", null);
-        solved("rank-visitor-none", today, "exam", null);
+        for (int i = 0; i < 6; i++) solved("rank-visitor-six", today.minusDays(200 + i), "/cospro/" + i, "cospro", 10);
+        solved("rank-visitor-six", today.minusDays(300), "/cospro/0", "cospro", 10);
+        solved("rank-visitor-six", today, "/exam/ibk", "exam", null);
+        solved("rank-visitor-none", today, "/exam/ibk", "exam", null);
 
         mvc.perform(put("/api/v1/profile").contentType(MediaType.APPLICATION_JSON)
                         .content("{\"visitorId\":\"rank-visitor-eight\",\"nickname\":\" 많이<b>푸는</b>사람 \"}"))

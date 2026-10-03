@@ -77,11 +77,9 @@ public interface UsageEventRepository extends JpaRepository<UsageEvent, Long> {
     @Query("select e.createdAt from UsageEvent e where e.type = 'view' and e.day >= :from")
     List<Instant> viewTimesSince(@Param("from") LocalDate from);
 
-    // [방문자, 문제 수] 지금까지 푼 문제 개수. 많이 푼 순서.
+    // [방문자, 문제집(경로), 문제 수] 같은 문제집은 여러 번 풀어도 가장 많이 푼 한 번만 센다.
     // 코딩 문제(cospro)의 total은 테스트 케이스 수라서 한 문제로 센다
-    @Query("select e.visitorId, sum(case when e.detail = 'cospro' then 1 else coalesce(e.total, 0) end) from UsageEvent e " +
-            "where e.type = 'exam' and e.visitorId is not null group by e.visitorId " +
-            "having sum(case when e.detail = 'cospro' then 1 else coalesce(e.total, 0) end) > 0 " +
-            "order by sum(case when e.detail = 'cospro' then 1 else coalesce(e.total, 0) end) desc, e.visitorId")
+    @Query("select e.visitorId, e.path, max(case when e.detail = 'cospro' then 1 else coalesce(e.total, 0) end) from UsageEvent e " +
+            "where e.type = 'exam' and e.visitorId is not null group by e.visitorId, e.path")
     List<Object[]> solvedCounts();
 }
