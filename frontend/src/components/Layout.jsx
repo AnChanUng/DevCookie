@@ -67,6 +67,9 @@ export default function Layout() {
               <Link to="/aptitude" className={location.pathname.startsWith('/aptitude') ? 'active' : ''}>
                 인적성
               </Link>
+              <Link to="/algo" className={location.pathname === '/algo' ? 'active' : ''}>
+                코테 풀이
+              </Link>
               <Link to="/major" className={location.pathname === '/major' ? 'active' : ''}>
                 필기이론
               </Link>
