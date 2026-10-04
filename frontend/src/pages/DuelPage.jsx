@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import api from '../api';
 import { TOPICS } from '../data/topicBank';
 import { myNickname } from '../nickname';
+import { recordAnswer, useExamProgress } from '../hooks/useExamProgress';
 import { visitorId } from '../track';
 
 const CIRC = ['①', '②', '③', '④', '⑤'];
@@ -103,6 +104,9 @@ function Room({ code }) {
   const [rematching, setRematching] = useState(false);
   const [marks, setMarks] = useState(''); // 내가 푼 순서대로의 정오답 ("1011…")
   const [openRow, setOpenRow] = useState(null); // 복기 표에서 펼친 문제
+  // 대결 문제는 주제별 통합 문제집의 문제라서, 틀린 것을 그 문제집의 오답으로 넘길 수 있다
+  const { save: saveTopics } = useExamProgress('topics');
+  const [savedWrong, setSavedWrong] = useState(false);
   const navigate = useNavigate();
   const startedAt = useRef(0);
   const link = `${window.location.origin}/duel/${code}`;
@@ -237,6 +241,12 @@ function Room({ code }) {
     setTimeout(() => setCopied(false), 1500);
   };
 
+  const myWrong = marks.length === total ? room.questions.filter((_, n) => marks[n] === '0') : [];
+  const saveWrong = () => {
+    saveTopics(prev => ({ ...prev, stats: myWrong.reduce((stats, x) => recordAnswer(stats, x.id, false), prev.stats) }));
+    setSavedWrong(true);
+  };
+
   // 다 푼 사람끼리 문제별로 누가 맞고 틀렸는지 견주어 본다. 서버는 끝낸 사람에게만 정오답을 준다
   const reviewers = room.players.filter(p => p.done && typeof p.marks === 'string' && p.marks.length === total);
   const review = started && done && reviewers.some(p => p.me) && (
@@ -247,6 +257,14 @@ function Room({ code }) {
           ? '결과가 갈린 문제는 색으로 표시했습니다. 문제를 누르면 정답과 해설이 펼쳐집니다.'
           : '상대가 다 풀면 문제별로 누가 맞았는지 나란히 볼 수 있습니다. 문제를 누르면 정답과 해설이 펼쳐집니다.'}
       </p>
+      {myWrong.length > 0 && (
+        <div className="exam-actions">
+          <button type="button" className="exam-btn primary" disabled={savedWrong} onClick={saveWrong}>
+            {savedWrong ? `오답노트에 저장했습니다 (${myWrong.length}문제)` : `내가 틀린 ${myWrong.length}문제 오답노트에 저장`}
+          </button>
+          {savedWrong && <Link className="exam-btn" to="/topics">주제별 통합에서 다시 풀기 →</Link>}
+        </div>
+      )}
       <div className="exam-table-wrap">
         <table className="exam-table duel-review-table">
           <thead>
