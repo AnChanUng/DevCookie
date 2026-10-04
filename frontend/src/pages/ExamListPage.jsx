@@ -36,13 +36,15 @@ function CategoryPicker() {
       <div className="page-header">
         <Link to="/" className="back-link">← 홈으로</Link>
         <h1>기업별 기출문제</h1>
+        <p>공기업 IT직무 전공필기 문제집 · 즉시 채점 · 오답노트 · 북마크</p>
       </div>
 
       <div className="exam-category-grid">
         {EXAM_CATEGORIES.filter(cat => !cat.hub).map(cat => (
           <Link key={cat.key} to={`/exam/category/${cat.key}`} className="exam-company-card exam-category-card">
             <span className="exam-category-name">{cat.name}</span>
-            <span className="exam-company-meta">{COMPANIES.filter(c => c.category === cat.key).length}개 {cat.unit || '기업'}</span>
+            <span className="exam-company-meta">{cat.desc}</span>
+            <span className="exam-category-count">{COMPANIES.filter(c => c.category === cat.key).length}개 {cat.unit || '기업'}</span>
           </Link>
         ))}
         <ComilCard />
@@ -58,7 +60,8 @@ function ComilCard() {
   return (
     <Link to="/computer-general" className="exam-company-card exam-category-card">
       <span className="exam-category-name">컴퓨터일반</span>
-      <span className="exam-company-meta">전산직 9급 · {allQuestions(COMIL).length}문항</span>
+      <span className="exam-company-meta">전산직 9급 컴퓨터일반 기출</span>
+      <span className="exam-category-count">모의고사 {COMIL.questions.length}문항 · 단원별 {COMIL.units.questions.length}문항</span>
     </Link>
   );
 }
