@@ -101,6 +101,8 @@ function Room({ code }) {
   const [invite, setInvite] = useState(''); // 채팅방에 올린 결과 안내
   const [record, setRecord] = useState(loadRecord);
   const [rematching, setRematching] = useState(false);
+  const [marks, setMarks] = useState(''); // 내가 푼 순서대로의 정오답 ("1011…")
+  const [openRow, setOpenRow] = useState(null); // 복기 표에서 펼친 문제
   const navigate = useNavigate();
   const startedAt = useRef(0);
   const link = `${window.location.origin}/duel/${code}`;
@@ -119,6 +121,7 @@ function Room({ code }) {
           setStarted(true);
           setIdx(mine.answered);
           setScore(mine.score);
+          setMarks(mine.marks || '');
           setDone(mine.done || mine.answered >= questions.length);
           startedAt.current = Date.now() - mine.seconds * 1000;
         }
@@ -161,9 +164,11 @@ function Room({ code }) {
     setRecord(next);
   }, [room, code]);
 
-  const report = (nextScore, answered, finished) => {
+  const report = (nextScore, answered, finished, nextMarks) => {
     const seconds = Math.floor((Date.now() - startedAt.current) / 1000);
-    api.put(`/duels/${code}/players`, { ...me, score: nextScore, answered, done: finished, seconds }, { timeout: 15000 })
+    // 새로고침 뒤에는 앞 문제의 정오답을 모르므로, 길이가 맞을 때만 함께 올린다
+    const withMarks = nextMarks.length === answered ? { marks: nextMarks } : {};
+    api.put(`/duels/${code}/players`, { ...me, score: nextScore, answered, done: finished, seconds, ...withMarks }, { timeout: 15000 })
       .then(({ data }) => setRoom(r => (r ? { ...r, players: data.players } : r)))
       .catch(() => { /* 다음 문제에서 다시 올라간다 */ });
   };
@@ -187,14 +192,16 @@ function Room({ code }) {
   const start = () => {
     startedAt.current = Date.now();
     setStarted(true);
-    report(0, 0, false);
+    report(0, 0, false, '');
   };
   const choose = (i) => {
     if (picked !== null) return;
     setPicked(i);
     const nextScore = score + (i === q.a ? 1 : 0);
     setScore(nextScore);
-    report(nextScore, idx + 1, idx + 1 === total);
+    const nextMarks = marks + (i === q.a ? '1' : '0');
+    setMarks(nextMarks);
+    report(nextScore, idx + 1, idx + 1 === total, nextMarks);
   };
   const next = () => {
     setPicked(null);
@@ -229,6 +236,49 @@ function Room({ code }) {
     try { await navigator.clipboard.writeText(link); setCopied(true); } catch { setCopied(false); }
     setTimeout(() => setCopied(false), 1500);
   };
+
+  // 다 푼 사람끼리 문제별로 누가 맞고 틀렸는지 견주어 본다. 서버는 끝낸 사람에게만 정오답을 준다
+  const reviewers = room.players.filter(p => p.done && typeof p.marks === 'string' && p.marks.length === total);
+  const review = started && done && reviewers.some(p => p.me) && (
+    <div className="duel-review">
+      <div className="section-title">문제별 복기</div>
+      <p className="exam-lede">
+        {reviewers.length > 1
+          ? '결과가 갈린 문제는 색으로 표시했습니다. 문제를 누르면 정답과 해설이 펼쳐집니다.'
+          : '상대가 다 풀면 문제별로 누가 맞았는지 나란히 볼 수 있습니다. 문제를 누르면 정답과 해설이 펼쳐집니다.'}
+      </p>
+      <div className="exam-table-wrap">
+        <table className="exam-table duel-review-table">
+          <thead>
+            <tr><th>#</th><th>문제</th>{reviewers.map((p, i) => <th key={i} className="mk">{p.me ? '나' : p.nickname}</th>)}</tr>
+          </thead>
+          <tbody>
+            {room.questions.map((x, n) => {
+              const split = new Set(reviewers.map(p => p.marks[n])).size > 1;
+              return [
+                <tr key={n} className={`${split ? 'split' : ''}${openRow === n ? ' open' : ''}`} onClick={() => setOpenRow(openRow === n ? null : n)}>
+                  <td className="num">{n + 1}</td>
+                  <td><b>{x.topic}</b><span>{x.q}</span></td>
+                  {reviewers.map((p, i) => <td key={i} className={`mk ${p.marks[n] === '1' ? 'r' : 'w'}`}>{p.marks[n] === '1' ? '○' : '✕'}</td>)}
+                </tr>,
+                openRow === n && (
+                  <tr key={`${n}-open`} className="detail">
+                    <td />
+                    <td colSpan={reviewers.length + 1}>
+                      {x.ctx && <div className="exam-ctx">{x.ctx}</div>}
+                      {x.code && <pre className="exam-code">{x.code}</pre>}
+                      <div className="ans">정답 {CIRC[x.a]} {x.o[x.a]}</div>
+                      <div className="ex">{x.e}</div>
+                    </td>
+                  </tr>
+                ),
+              ];
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 
   const board = (
     <aside className="duel-board">
@@ -329,6 +379,7 @@ function Room({ code }) {
         </div>
         {board}
       </div>
+      {review}
     </div>
   );
 }

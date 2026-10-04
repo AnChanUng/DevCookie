@@ -1969,3 +1969,19 @@ a.exam-search-bank:hover { color: var(--accent-blue); }
 }
 .lounge-join:hover { color: #fff; background: var(--accent-blue-hover); }
 .duel-board .nick small { margin-left: 6px; font-size: 0.68rem; font-weight: 600; color: var(--text-tertiary); }
+
+/* 대결 뒤 문제별 복기 */
+.duel-review { margin: 8px 0 40px; }
+.duel-review-table tbody tr { cursor: pointer; }
+.duel-review-table tbody tr:hover td { background: var(--bg-secondary); }
+.duel-review-table td b { display: block; font-size: 0.74rem; color: var(--text-tertiary); }
+.duel-review-table td span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.84rem; }
+.duel-review-table tr.open td span { display: block; }
+.duel-review-table .mk { width: 64px; text-align: center; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 84px; }
+.duel-review-table td.mk.r { color: var(--accent-green); }
+.duel-review-table td.mk.w { color: var(--accent-red); }
+.duel-review-table tr.split td { background: var(--accent-orange-light); }
+.duel-review-table tr.detail { cursor: default; }
+.duel-review-table tr.detail td { background: var(--bg-secondary); white-space: normal; }
+.duel-review-table .ans { font-size: 0.84rem; font-weight: 700; color: var(--accent-green); margin-bottom: 4px; }
+.duel-review-table .ex { font-size: 0.84rem; line-height: 1.65; color: var(--text-secondary); }
