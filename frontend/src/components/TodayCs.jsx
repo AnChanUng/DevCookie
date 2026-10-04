@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const KEY = 'today-cs';
-
 // 하루에 하나씩 돌려 보여 줄 핵심 개념. 한두 문장으로 끝나게 쓰고, 이론 글이 있으면 번호(to)를 붙인다
 const FACTS = [
   { t: '교착상태 4조건', s: '상호 배제 · 점유와 대기 · 비선점 · 환형 대기. 넷이 모두 성립해야 생기므로 하나만 깨도 예방된다.', to: 75 },
@@ -47,35 +45,19 @@ const FACTS = [
   { t: '경쟁 조건', s: '여러 실행 흐름이 공유 자원을 동시에 건드려 순서에 따라 결과가 달라지는 상황. 임계구역을 상호 배제로 보호한다.', to: 76 },
 ];
 
-function today() {
+// 날짜마다 달라지는 번호. 같은 날에는 누구에게나 같은 내용이 나온다
+function dayNumber() {
   const d = new Date();
-  return {
-    date: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
-    days: Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000),
-  };
+  return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
 }
 
-// 첫 화면 위쪽 가운데에 말풍선으로 뜨는 "오늘의 CS". 화면 위에 떠 있어서 다른 요소의 자리를 밀지 않고,
-// 닫으면 작은 버튼으로 접히고, 그 버튼을 누르면 언제든 다시 펼쳐진다
+// 첫 화면 가운데 칸에 늘 떠 있는 "오늘의 CS" 말풍선. 하루에 하나씩 핵심 개념을 보여 준다
 export default function TodayCs() {
-  const [{ date, days }] = useState(today);
-  const [closed, setClosed] = useState(() => {
-    try { return localStorage.getItem(KEY) === date; } catch { return false; }
-  });
+  const [days] = useState(dayNumber);
   const fact = FACTS[days % FACTS.length];
-  // 접어 둔 상태는 그날 동안 기억한다. 다음 날에는 새 내용으로 다시 펼쳐져 나온다
-  const toggle = (next) => {
-    setClosed(next);
-    try { if (next) localStorage.setItem(KEY, date); else localStorage.removeItem(KEY); } catch { /* storage unavailable */ }
-  };
-
-  if (closed) {
-    return <button type="button" className="today-cs-fold" onClick={() => toggle(false)}>오늘의 CS · {fact.t} 펼치기</button>;
-  }
 
   return (
     <aside className="today-cs" role="note">
-      <button type="button" className="today-cs-x" onClick={() => toggle(true)} aria-label="오늘의 CS 접기">✕</button>
       <div className="today-cs-head"><b>오늘의 CS</b><span>{fact.t}</span></div>
       <p>{fact.s}</p>
       {fact.to && <Link to={`/question/${fact.to}`}>이론 보기 →</Link>}

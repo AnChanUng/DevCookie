@@ -2767,12 +2767,13 @@
 .home-mid { flex: none; width: 270px; display: flex; flex-direction: column; gap: 0; }
 .home-mid:empty { display: none; }
 
-/* "오늘의 CS" 말풍선. 꼬리가 아래의 이어서 하기 카드를 가리키고, 카드 위로 살짝 겹친다 */
+/* "오늘의 CS" 말풍선. 늘 떠 있고, 꼬리가 아래의 이어서 하기 카드를 가리킨다 */
 .today-cs {
   position: relative;
   z-index: 2;
-  margin: 0 6px -8px;
-  padding: 12px 30px 12px 14px;
+  /* 아래의 이어서 하기 카드와는 꼬리가 닿을 만큼만 띄운다 */
+  margin: 0 6px 12px;
+  padding: 12px 14px;
   border: 1px solid var(--border-color);
   border-radius: 16px;
   background: var(--bg-primary);
@@ -2808,38 +2809,6 @@
 .today-cs-head span { font-size: 0.84rem; font-weight: 800; color: var(--text-primary); }
 .today-cs p { font-size: 0.78rem; line-height: 1.6; color: var(--text-secondary); word-break: keep-all; }
 .today-cs a { display: inline-block; margin-top: 4px; font-size: 0.74rem; font-weight: 700; color: var(--accent-blue); }
-.today-cs-x {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 22px;
-  height: 22px;
-  border: 0;
-  border-radius: 50%;
-  background: none;
-  color: var(--text-tertiary);
-  font-size: 0.74rem;
-  cursor: pointer;
-}
-.today-cs-x:hover { background: var(--bg-tertiary); color: var(--text-primary); }
-/* 접어 둔 오늘의 CS: 같은 자리에 작은 버튼으로 남아 다시 펼칠 수 있다 */
-.today-cs-fold {
-  align-self: flex-start;
-  margin: 0 6px 6px;
-  padding: 4px 11px;
-  border: 1px dashed var(--border-color);
-  border-radius: var(--radius-full);
-  background: var(--glass-bg);
-  color: var(--text-tertiary);
-  font-size: 0.72rem;
-  font-weight: 700;
-  cursor: pointer;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.today-cs-fold:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
 /* 화면이 좁으면 가운데 칸을 제목 · 순위 아래 줄로 내려 가로로 편다 */
 @media (max-width: 1199px) {
   .home-top { flex-wrap: wrap; }
@@ -2857,7 +2826,7 @@
   max-width: 100%;
   position: relative;
   z-index: 1;
-  padding: 16px 14px 12px 16px;
+  padding: 12px 14px 12px 16px;
   border: 1px solid var(--accent-blue);
   border-radius: var(--radius-md);
   background: var(--accent-blue-light);
