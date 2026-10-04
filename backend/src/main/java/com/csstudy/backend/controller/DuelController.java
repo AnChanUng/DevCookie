@@ -32,6 +32,9 @@ public class DuelController {
     private static final int MIN_QUESTIONS = 3;
     private static final int MAX_QUESTIONS = 30;
     private static final int MAX_PLAYERS = 20;
+    // 단체전은 더 많이 들어올 수 있고, 연 지 이만큼 지나면 목록에서 내린다
+    private static final int MAX_OPEN_PLAYERS = 100;
+    private static final int OPEN_LIST_MINUTES = 120;
     // 헷갈리는 글자(0·O, 1·I·L)는 빼고 방 번호를 만든다
     private static final String CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
     private static final int CODE_LENGTH = 6;
@@ -45,7 +48,24 @@ public class DuelController {
     public ResponseEntity<?> create(@RequestBody Map<String, Object> body) throws JsonProcessingException {
         List<String> ids = questionIds(body);
         if (ids == null) return ResponseEntity.badRequest().body(Map.of("error", "문제 번호를 확인해 주세요. " + MIN_QUESTIONS + "~" + MAX_QUESTIONS + "개여야 합니다."));
-        return ResponseEntity.ok(Map.of("code", open(ids).getCode()));
+        Duel duel = open(ids, Boolean.TRUE.equals(body.get("open")), VisitorProfileService.nickname(body.get("title")));
+        return ResponseEntity.ok(Map.of("code", duel.getCode()));
+    }
+
+    // 지금 열려 있는 단체전 목록. 누구나 골라서 들어갈 수 있다
+    @GetMapping("/open")
+    public List<Map<String, Object>> openRooms() throws JsonProcessingException {
+        List<Map<String, Object>> rows = new ArrayList<>();
+        for (Duel d : duelRepository.findTop20ByOpenTrueAndCreatedAtAfterOrderByCreatedAtDesc(Instant.now().minusSeconds(OPEN_LIST_MINUTES * 60L))) {
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("code", d.getCode());
+            row.put("title", d.getTitle());
+            row.put("total", json.readValue(d.getQuestionIds(), new TypeReference<List<String>>() {}).size());
+            row.put("players", playerRepository.countByDuelCode(d.getCode()));
+            row.put("createdAt", d.getCreatedAt().toEpochMilli());
+            rows.add(row);
+        }
+        return rows;
     }
 
     // 끝난 방에서 "한 판 더"를 누르면 새 방을 열어 이어 준다. 이미 열려 있으면 그 방을 돌려준다
@@ -57,14 +77,16 @@ public class DuelController {
         if (duel.getNextCode() == null) {
             List<String> ids = questionIds(body);
             if (ids == null) return ResponseEntity.badRequest().body(Map.of("error", "문제 번호를 확인해 주세요."));
-            duel.setNextCode(open(ids).getCode());
+            // 재대결 방은 앞 방의 공개 여부와 이름을 그대로 물려받는다
+            duel.setNextCode(open(ids, Boolean.TRUE.equals(duel.getOpen()), duel.getTitle()).getCode());
             duelRepository.save(duel);
         }
         return ResponseEntity.ok(Map.of("code", duel.getNextCode()));
     }
 
-    private Duel open(List<String> ids) throws JsonProcessingException {
-        return duelRepository.save(Duel.builder().code(newCode()).questionIds(json.writeValueAsString(ids)).createdAt(Instant.now()).build());
+    private Duel open(List<String> ids, boolean open, String title) throws JsonProcessingException {
+        return duelRepository.save(Duel.builder().code(newCode()).questionIds(json.writeValueAsString(ids))
+                .open(open).title(title).createdAt(Instant.now()).build());
     }
 
     // 쓸 수 없는 목록이면 null
@@ -90,6 +112,8 @@ public class DuelController {
         out.put("questionIds", json.readValue(duel.getQuestionIds(), new TypeReference<List<String>>() {}));
         out.put("players", board(duel.getCode(), visitorId));
         out.put("nextCode", duel.getNextCode());
+        out.put("open", Boolean.TRUE.equals(duel.getOpen()));
+        out.put("title", duel.getTitle());
         return ResponseEntity.ok(out);
     }
 
@@ -116,7 +140,8 @@ public class DuelController {
         if (nickname == null) nickname = VisitorProfileService.anonymous(visitorId);
 
         Optional<DuelPlayer> existing = playerRepository.findByDuelCodeAndVisitorId(duel.getCode(), visitorId);
-        if (existing.isEmpty() && playerRepository.countByDuelCode(duel.getCode()) >= MAX_PLAYERS) {
+        int limit = Boolean.TRUE.equals(duel.getOpen()) ? MAX_OPEN_PLAYERS : MAX_PLAYERS;
+        if (existing.isEmpty() && playerRepository.countByDuelCode(duel.getCode()) >= limit) {
             return ResponseEntity.badRequest().body(Map.of("error", "이 대결은 정원이 찼습니다."));
         }
         DuelPlayer player = existing.orElseGet(() -> DuelPlayer.builder().duelCode(duel.getCode()).visitorId(visitorId).build());

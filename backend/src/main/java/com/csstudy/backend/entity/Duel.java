@@ -32,6 +32,14 @@ public class Duel {
     @Column(name = "next_code", length = 8)
     private String nextCode;
 
+    // 단체전: 링크를 몰라도 목록에서 누구나 들어올 수 있는 방. 예전에 만든 방은 값이 없다(비공개로 본다)
+    @Column(name = "is_open")
+    private Boolean open;
+
+    // 목록에 보여 줄 방 이름(과목)
+    @Column(length = 40)
+    private String title;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 }

@@ -121,6 +121,30 @@ class DuelTest {
     }
 
     @Test
+    void openRoomsAreListedAndPrivateRoomsAreNot() throws Exception {
+        String hidden = create(List.of("a:1", "a:2", "a:3"));
+        Map<String, Object> body = new HashMap<>(Map.of("questionIds", List.of("b:1", "b:2", "b:3"), "open", true, "title", "데이터베이스"));
+        String shown = json.readTree(mvc.perform(post("/api/v1/duels").contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(body)))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString()).get("code").asText();
+        report(shown, "v-1", "수달", 0, 0, false, 0).andExpect(status().isOk());
+
+        JsonNode rooms = json.readTree(mvc.perform(get("/api/v1/duels/open")).andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+        boolean sawShown = false;
+        for (JsonNode r : rooms) {
+            assertTrue(!r.get("code").asText().equals(hidden));
+            if (r.get("code").asText().equals(shown)) {
+                sawShown = true;
+                assertEquals("데이터베이스", r.get("title").asText());
+                assertEquals(3, r.get("total").asInt());
+                assertEquals(1, r.get("players").asInt());
+            }
+        }
+        assertTrue(sawShown);
+        mvc.perform(get("/api/v1/duels/" + shown)).andExpect(jsonPath("$.open").value(true));
+        mvc.perform(get("/api/v1/duels/" + hidden)).andExpect(jsonPath("$.open").value(false));
+    }
+
+    @Test
     void badInputIsRejected() throws Exception {
         mvc.perform(post("/api/v1/duels").contentType(MediaType.APPLICATION_JSON)
                 .content(json.writeValueAsString(Map.of("questionIds", List.of("only-one")))))
