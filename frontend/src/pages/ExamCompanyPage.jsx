@@ -40,6 +40,7 @@ const modeLabel = (sections, mode, sec, sets) =>
     : mode === 'wrong' ? '오답 다시 풀기'
     : mode === 'marked' ? '북마크 다시 풀기'
     : mode === 'recall' ? '응시 후기 복원 문제'
+    : mode === 'unit' ? `단원별 문제집 · ${sections[sec]?.name || ''}`
     : mode === 'cpp' ? `C++ 집중 문제집 · ${sec === 'all' ? '전체' : CPP_GROUPS[sec]?.name || ''}`
     : `영역별 연습 · ${sections[sec]?.name || ''}`;
 
@@ -68,12 +69,13 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
   const secKeys = Object.keys(SECTIONS).filter(k => !SECTIONS[k].extra); // 모의고사 채점 영역
   const CPP = useMemo(() => company.extra || [], [company]); // C++ 집중 문제집 (모의고사 미포함)
   const RECALL = company.recall; // 응시 후기 복원 문제 (모의고사 미포함)
+  const UNITS = company.units; // 단원별 문제집 (모의고사 미포함). 단원은 sections에 extra로 들어 있다
   const SETS = company.sets || []; // 실제 시험처럼 한 번에 치르는 고정 회차
   // 복기 회차와 예상 회차를 합친 은행은 모의고사·영역별 연습이 둘을 섞어 뽑고, 복원 문제가 따로 있는 은행은 나머지가 예상문제다
   const splitSets = SETS.some(s => s.kind);
   const mainKind = splitSets ? 'mixed' : RECALL ? 'predicted' : null;
   const label = (mode, sec) => (mode === 'recall' && RECALL ? RECALL.title : modeLabel(SECTIONS, mode, sec, SETS));
-  const ALL = useMemo(() => [...Q, ...CPP, ...(RECALL?.questions || [])], [Q, CPP, RECALL]); // 오답노트·오답 다시 풀기 범위
+  const ALL = useMemo(() => [...Q, ...CPP, ...(RECALL?.questions || []), ...(UNITS?.questions || [])], [Q, CPP, RECALL, UNITS]); // 오답노트·오답 다시 풀기 범위
   const byId = useMemo(() => Object.fromEntries(ALL.map(q => [q.id, q])), [ALL]);
   const { data, save } = useExamProgress(company.key);
   const [view, setView] = useState({ name: 'home' });
@@ -345,6 +347,28 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
           );
         })}
       </div>
+
+      {UNITS && (
+        <>
+          <div className="section-title">{UNITS.title}</div>
+          <p className="exam-lede">{UNITS.lede}</p>
+          <div className="exam-sections">
+            {Object.entries(SECTIONS).filter(([, s]) => s.unit).map(([k, s]) => {
+              const qs = UNITS.questions.filter(q => q.sec === k);
+              const done = qs.filter(q => data.stats[q.id]).length;
+              const right = qs.filter(q => data.stats[q.id]?.last === 'r').length;
+              return (
+                <button key={k} className="exam-section" onClick={() => start('unit', qs.map(q => q.id), k)}>
+                  <span className="t">{s.name}</span>
+                  <span className="d">{s.sub}</span>
+                  <span className="d">{qs.length}문제 · 최근 정답 {right}/{done}</span>
+                  <span className="bar"><i style={{ width: `${qs.length ? Math.round(right / qs.length * 100) : 0}%` }} /></span>
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       {company.coding && <CodingEntry coding={company.coding} />}
 

@@ -15,6 +15,16 @@ import { KICOX_PRED_QUESTIONS } from './kicoxPredictedQuestions';
 import { KOSCOM_SECTIONS, KOSCOM_QUESTIONS } from './koscomQuestions';
 import { BNK_SECTIONS, BNK_QUESTIONS } from './bnkQuestions';
 import { KFTC_SECTIONS, KFTC_QUESTIONS } from './kftcQuestions';
+import { KFTC_SET2_QUESTIONS } from './kftcSet2Questions';
+import { FSEC_SECTIONS, FSEC_QUESTIONS } from './fsecQuestions';
+import { FSS_SECTIONS, FSS_QUESTIONS } from './fssQuestions';
+import { KRX_SECTIONS, KRX_QUESTIONS } from './krxQuestions';
+import { KIBO_SECTIONS, KIBO_QUESTIONS } from './kiboQuestions';
+import { KSURE_SECTIONS, KSURE_QUESTIONS } from './ksureQuestions';
+import { HUG_SECTIONS, HUG_QUESTIONS } from './hugQuestions';
+import { KSFC_SECTIONS, KSFC_QUESTIONS } from './ksfcQuestions';
+import { KCIS_SECTIONS, KCIS_QUESTIONS } from './kcisQuestions';
+import { KINFA_SECTIONS, KINFA_QUESTIONS } from './kinfaQuestions';
 import { BOK_SECTIONS, BOK_QUESTIONS } from './bokQuestions';
 import { KSD_SECTIONS, KSD_QUESTIONS } from './ksdQuestions';
 import { KDIC_SECTIONS, KDIC_QUESTIONS } from './kdicQuestions';
@@ -201,10 +211,68 @@ export const COMPANIES = [
     lede: "데이터베이스 6문제, 네트워크·보안 6문제, 운영체제 5문제, 자료구조·알고리즘 5문제, 소프트웨어공학·신기술 5문제, 예금보험 도메인 3문제. 총 30문제, 45분, 4지선다. 전산 전공 범위에 예금자보호·업무연속성 개념을 더해 새로 만든 예상문제입니다.",
   },
   {
-    key: "kftc", category: "finance", abbr: "KFTC", name: "금융결제원", meta: "전산 전공 35문제 · 50분 · 4지선다", ready: true,
+    key: "kftc", category: "finance", abbr: "KFTC", name: "금융결제원", meta: "전산 전공 35문제 × 2회 · 50분 · 4지선다", ready: true,
     source: { kind: "predicted" },
-    questions: KFTC_QUESTIONS, sections: KFTC_SECTIONS, minutes: 50,
-    lede: "데이터베이스 7문제, 네트워크 7문제, 운영체제 6문제, 자료구조·알고리즘 5문제, 정보보호 5문제, 금융IT·지급결제 5문제. 총 35문제, 50분, 4지선다. 채용공고의 전산학 일반 출제범위와 지급결제·오픈뱅킹 도메인을 기준으로 새로 만든 예상문제입니다. 실제 기출의 복원이 아닙니다.",
+    questions: [...KFTC_QUESTIONS.map(q => ({ ...q, set: 'a' })), ...KFTC_SET2_QUESTIONS.map(q => ({ ...q, set: 'b' }))], sections: KFTC_SECTIONS, minutes: 50,
+    sets: [
+      { key: 'a', name: '예상문제 1회', sub: '트랜잭션·격리 수준 · TCP·서브넷 · 스케줄링·교착상태 · 암호·전자서명 · 오픈뱅킹·이중화' },
+      { key: 'b', name: '예상문제 2회', sub: '조인·키·파티셔닝 · 혼잡 제어·라우팅 · 리눅스·레지스트리 · Java·C++ 코드 · 프롬프트 인젝션 · 금융공동망·차액결제' },
+    ],
+    lede: "데이터베이스 7문제, 네트워크 7문제, 운영체제 6문제, 자료구조·알고리즘 5문제, 정보보호 5문제, 금융IT·지급결제 5문제. 한 회 35문제, 50분, 4지선다로 2회분을 준비했습니다. 채용공고가 밝힌 출제범위(프로그래밍, DB, 시스템운영, 정보보호 등 전산학 전반)와 응시 후기에 언급된 주제(C++·Java 코드, 리눅스, 정보보안, 프롬프트 엔지니어링), 금융결제원의 지급결제 업무를 기준으로 새로 만든 예상문제입니다. 실제 문항 수와 시험 시간은 공개되어 있지 않아 문항 수·시간·보기 수는 연습용으로 정한 것이며, 실제 기출의 복원이 아닙니다.",
+  },
+  {
+    key: "fsec", category: "finance", abbr: "FSEC", name: "금융보안원", meta: "정보보호 전공 40문제 · 50분 · 4지선다", ready: true,
+    source: { kind: "predicted" },
+    questions: FSEC_QUESTIONS, sections: FSEC_SECTIONS, minutes: 50,
+    lede: "암호학 8문제, 네트워크 보안 8문제, 시스템 보안 7문제, 어플리케이션 보안 7문제, 침해사고 대응·분석 5문제, 정보보호 개론·금융보안 법규 5문제. 총 40문제, 50분, 4지선다. Tech·Security(IT·정보보호) 분야 2차 필기 전공시험 중 정보보호학 선택을 대상으로, 채용공고의 출제범위(정보보호 개론 · 네트워크 보안 · 시스템 보안 · 어플리케이션 보안 · 암호학 · 침해사고 대응 및 분석)와 응시 후기에 언급된 암호·네트워크·금융 법규 주제를 기준으로 새로 만든 예상문제입니다. 실제 시험은 객관식 30문항과 주관식 10문항으로 치러지지만 여기서는 모두 객관식으로 옮겼으며, 실제 기출의 복원이 아닙니다.",
+  },
+  {
+    key: "fss", category: "finance", abbr: "FSS", name: "금융감독원", meta: "IT 전공 40문제 · 50분 · 4지선다", ready: true,
+    source: { kind: "predicted" },
+    questions: FSS_QUESTIONS, sections: FSS_SECTIONS, minutes: 50,
+    lede: "데이터베이스 7문제, 네트워크 6문제, 컴퓨터구조·운영체제 6문제, 자료구조·알고리즘·SW공학 7문제, 정보보호 7문제, 전자금융·IT 감독 7문제. 총 40문제, 50분, 4지선다. 금융감독원 필기는 1차가 NCS 직업기초능력(객관식), 2차가 전공지식(주관식)과 논술로 치러집니다. 2차 전공에서 다루는 전산학 전반과 채용공고의 IT 직무(IT·전자금융 감독·검사, 금융정보보호)를 기준으로 핵심 개념을 객관식으로 점검하도록 새로 만든 예상문제이며, 실제 기출의 복원이 아닙니다.",
+  },
+  {
+    key: "krx", category: "finance", abbr: "KRX", name: "한국거래소", meta: "IT 전공 40문제 · 50분 · 4지선다", ready: true,
+    source: { kind: "predicted" },
+    questions: KRX_QUESTIONS, sections: KRX_SECTIONS, minutes: 50,
+    lede: "프로그래밍·자료구조 9문제, 데이터베이스 7문제, 운영체제 6문제, 네트워크 6문제, 소프트웨어공학 5문제, 최신IT·정보보호 7문제. 총 40문제, 50분, 4지선다. 채용공고에 제시된 IT 출제범위(컴퓨터프로그래밍 · 데이터베이스 · 네트워크 · 운영체제 · 자료구조 · SW공학 · 인공지능 · 정보보호)를 기준으로, 매매체결·청산결제·시장감시 시스템 상황을 입혀 새로 만든 예상문제입니다. 실제 전공시험은 객관식 외에 단답형과 서술형이 함께 출제되는 것으로 알려져 있으나 여기서는 객관식으로만 구성했으며, 실제 기출의 복원이 아닙니다.",
+  },
+  {
+    key: "kibo", category: "finance", abbr: "KIBO", name: "기술보증기금", meta: "전산학 40문제 · 60분 · 4지선다", ready: true,
+    source: { kind: "predicted" },
+    questions: KIBO_QUESTIONS, sections: KIBO_SECTIONS, minutes: 60,
+    lede: "프로그래밍·코드 해석 9문제, 데이터베이스·SQL 8문제, 자료구조·알고리즘 6문제, 운영체제 5문제, 네트워크 5문제, 정보보호·SW공학·신기술 7문제. 총 40문제, 60분, 4지선다. 필기 2교시 직무수행능력평가(전산학)를 대상으로, 채용공고의 평가과목과 과거 공고의 코딩테스트 언어(Java · Python · C++ · SQL)를 기준으로 새로 만든 예상문제입니다. 보증 신청·기술평가·보증서 발급 같은 업무 상황을 배경으로 넣었습니다. 실제 시험은 객관식 외에 단답형·약술형이 함께 출제될 수 있으며, 실제 기출의 복원이 아닙니다.",
+  },
+  {
+    key: "ksure", category: "finance", abbr: "K-SURE", name: "한국무역보험공사", meta: "전산학 40문제 · 50분 · 4지선다", ready: true,
+    source: { kind: "predicted" },
+    questions: KSURE_QUESTIONS, sections: KSURE_SECTIONS, minutes: 50,
+    lede: "데이터베이스 8문제, 소프트웨어공학 7문제, 프로그래밍언어 7문제, 정보보안 7문제, 운영체제 7문제, 전산학일반 4문제. 총 40문제, 50분, 4지선다. IT(전산학) 직렬 직무능력평가를 대상으로, 채용공고의 출제범위(데이터베이스 · 소프트웨어공학 · 프로그래밍언어 · 정보보안 · 운영체제를 포함한 전산학일반)를 기준으로 무역보험 업무 시스템 상황을 입혀 새로 만든 예상문제입니다. 실제 직무능력평가는 객관식과 주관식이 함께 나오고 별도의 직무능력논술이 있으며, 실제 기출의 복원이 아닙니다.",
+  },
+  {
+    key: "hug", category: "finance", abbr: "HUG", name: "주택도시보증공사", meta: "전산 전공 40문제 · 50분 · 5지선다", ready: true,
+    source: { kind: "predicted" },
+    questions: HUG_QUESTIONS, sections: HUG_SECTIONS, minutes: 50,
+    lede: "소프트웨어 설계 8문제, 소프트웨어 개발 8문제, 데이터베이스 구축 8문제, 프로그래밍 언어 활용 8문제, 정보시스템 구축 관리 8문제. 총 40문제, 50분, 5지선다. 채용공고에 명시된 전산 분야 출제범위 5과목(정보처리기사 필기와 같은 구성)을 기준으로, 전세보증·분양보증 업무 시스템 상황과 SQL·C·Java·Python 코드 문제를 섞어 새로 만든 예상문제입니다. 실제 전공필기는 80문항으로 알려져 있어 그 절반 분량이며, 실제 기출의 복원이 아닙니다.",
+  },
+  {
+    key: "ksfc", category: "finance", abbr: "KSFC", name: "한국증권금융", meta: "IT 전공 40문제 · 50분 · 4지선다", ready: true,
+    source: { kind: "predicted" },
+    questions: KSFC_QUESTIONS, sections: KSFC_SECTIONS, minutes: 50,
+    lede: "데이터베이스 8문제, 운영체제 6문제, 네트워크 6문제, 자료구조·알고리즘·프로그래밍 8문제, 정보보호 6문제, 금융IT·증권금융 업무 6문제. 총 40문제, 50분, 4지선다. 채용공고의 출제범위(전산학)와 증권담보대출·투자자예탁금·우리사주 같은 증권금융 업무 상황을 기준으로 새로 만든 예상문제입니다. 실제 시험의 문항 수와 형식은 공개되어 있지 않아 연습용으로 정한 것이며, 실제 기출의 복원이 아닙니다.",
+  },
+  {
+    key: "kcis", category: "finance", abbr: "KCIS", name: "한국신용정보원", meta: "IT 전공 40문제 · 50분 · 4지선다", ready: true,
+    source: { kind: "predicted" },
+    questions: KCIS_QUESTIONS, sections: KCIS_SECTIONS, minutes: 50,
+    lede: "데이터베이스·SQL 9문제, 프로그래밍·자료구조·SW공학 8문제, 네트워크·대외연계 7문제, 운영체제·인프라 6문제, 정보보호 5문제, 신용정보·데이터 활용 5문제. 총 40문제, 50분, 4지선다. 전공 필기의 문항 수와 출제범위가 공개되어 있지 않아, 채용공고의 IT 직무 내용(전문·API 대외 연계, 배치·통계 처리, 인프라·DBA)과 우대 자격증 범위, 신용정보 집중·마이데이터·가명정보 결합 같은 기관 업무를 기준으로 새로 만든 예상문제입니다. 실제 기출의 복원이 아니며 문항 수와 시간도 실제 시험과 다를 수 있습니다.",
+  },
+  {
+    key: "kinfa", category: "finance", abbr: "KINFA", name: "서민금융진흥원", meta: "전산일반 30 + 법률 5 · 60분 · 4지선다", ready: true,
+    source: { kind: "predicted" },
+    questions: KINFA_QUESTIONS, sections: KINFA_SECTIONS, minutes: 60,
+    lede: "소프트웨어공학 6문제, 데이터베이스 7문제, 프로그래밍 7문제, 운영체제 5문제, 정보보호 5문제, 서민금융법 5문제. 총 35문제, 60분, 4지선다. 채용공고에 안내된 직무수행능력평가 구성(전공 30문항 + 법률 5문항, 60분)과 전산일반 출제범위(소프트웨어공학 · 데이터베이스 · 프로그래밍 · 운영체제 · 정보보호), 「서민의 금융생활 지원에 관한 법률」을 기준으로 새로 만든 예상문제입니다. 실제 기출의 복원이 아닙니다.",
   },
   {
     key: "koscom", category: "finance", abbr: "KOSCOM", name: "코스콤", meta: "전산 전공 35문제 · 45분 · 4지선다", ready: true,
@@ -340,5 +408,5 @@ export const COMPANIES = [
 // 풀이 기록을 남기는 모든 문제은행 (회사별 + 컴퓨터일반). 백업·복원 범위
 export const BANKS = [...COMPANIES, COMIL, NCS];
 
-// 모의고사 문제에 더해 별도 문제집(extra)과 응시 후기 복원 문제(recall)까지 합친 전체 문항
-export const allQuestions = (bank) => [...bank.questions, ...(bank.extra || []), ...(bank.recall?.questions || [])];
+// 모의고사 문제에 더해 별도 문제집(extra), 응시 후기 복원 문제(recall), 단원별 문제집(units)까지 합친 전체 문항
+export const allQuestions = (bank) => [...bank.questions, ...(bank.extra || []), ...(bank.recall?.questions || []), ...(bank.units?.questions || [])];

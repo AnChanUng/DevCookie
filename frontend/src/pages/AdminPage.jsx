@@ -8,7 +8,7 @@ const RANGES = [7, 30, 90];
 const AUTO_SECONDS = 60;
 const TABS = [['overview', '개요'], ['solves', '풀이'], ['visitors', '방문자'], ['reports', '제보'], ['chat', '채팅'], ['accounts', '계정 · 채점'], ['system', '시스템']];
 const REPORT_KINDS = { answer: '정답 오류', typo: '오타', explain: '해설 문제', etc: '기타' };
-const MODES = { exam: '모의고사', practice: '영역별 연습', wrong: '오답 다시 풀기', marked: '북마크 다시 풀기', cpp: 'C++ 문제집', recall: '응시 후기 복원 문제' };
+const MODES = { exam: '모의고사', set: '회차별 모의고사', unit: '단원별 문제집', practice: '영역별 연습', wrong: '오답 다시 풀기', marked: '북마크 다시 풀기', cpp: 'C++ 문제집', recall: '응시 후기 복원 문제' };
 
 const PAGE_NAMES = {
   '/': '홈', '/exam': '기업별 기출문제', '/computer-general': '컴퓨터일반', '/major': '필기이론',
