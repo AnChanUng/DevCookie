@@ -2668,27 +2668,6 @@
   padding-bottom: 16px;
 }
 
-/* 메뉴 카드 아래의 바깥 바로가기 한 줄 */
-.home-outside {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding-bottom: 28px;
-}
-.home-outside-label { font-size: 0.74rem; font-weight: 700; color: var(--text-tertiary); }
-.home-outside-link {
-  padding: 5px 12px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-full);
-  background: var(--glass-bg);
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--text-secondary);
-  transition: var(--transition);
-}
-.home-outside-link:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
-
 .home-menu-item {
   display: flex;
   flex-direction: column;
@@ -2892,6 +2871,12 @@ a.goal-exam:hover { border-color: var(--accent-blue); }
 
 .goal-title { font-weight: 700; color: var(--text-primary); }
 
+/* 시험 일정 아래의 코딩테스트 사이트 로고 */
+.home-outside { display: flex; gap: 8px; margin-top: 10px; }
+.home-outside a { display: block; line-height: 0; opacity: 0.75; transition: var(--transition); }
+.home-outside a:hover { opacity: 1; transform: translateY(-2px); }
+.home-outside img { display: block; border-radius: 7px; background: #fff; }
+
 .goal-dday {
   font-weight: 800;
   color: var(--accent-blue);
@@ -3092,9 +3077,6 @@ a.goal-exam:hover { border-color: var(--accent-blue); }
   opacity: 0.5;
   transition: var(--transition);
 }
-
-/* 오락실 옆에 나란히 놓는 작은 바깥 링크 */
-.typing-door { left: 54px; }
 
 .arcade-door:hover {
   opacity: 1;

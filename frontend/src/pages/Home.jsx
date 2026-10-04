@@ -11,11 +11,11 @@ const MENUS = [
   { to: '/major', tone: 'pink', tag: '요약노트', title: '필기이론', desc: '자격증 요약노트 열람과 다운로드' },
 ];
 
-// 이 사이트 밖의 준비 자료. 새 탭으로 연다
+// 이 사이트 밖의 코딩테스트 준비 사이트. 로고만 작게 두고 새 탭으로 연다 (로고 파일은 public/outside/)
 const OUTSIDE = [
-  { href: 'https://www.codetree.ai/ko/frequent-problems', label: '코드트리 기출 빈출 문제' },
-  { href: 'https://school.programmers.co.kr/learn/challenges?order=acceptance_desc&levels=2%2C3&languages=java', label: '프로그래머스 Lv.2~3 (Java)' },
-  { href: 'https://jungol.co.kr/', label: '정올(JUNGOL)' },
+  { href: 'https://www.codetree.ai/ko/frequent-problems', label: '코드트리 기출 빈출 문제', logo: '/outside/codetree.png' },
+  { href: 'https://school.programmers.co.kr/learn/challenges?order=acceptance_desc&levels=2%2C3&languages=java', label: '프로그래머스', logo: '/outside/programmers.png' },
+  { href: 'https://jungol.co.kr/', label: '정올', logo: '/outside/jungol.png' },
 ];
 
 export default function Home() {
@@ -32,6 +32,13 @@ export default function Home() {
             <Link to="/weak" className="home-cta-btn">내 약점 보기</Link>
           </div>
           <StudyGoal />
+          <div className="home-outside">
+            {OUTSIDE.map(o => (
+              <a key={o.href} href={o.href} target="_blank" rel="noopener noreferrer" title={o.label} aria-label={o.label}>
+                <img src={o.logo} alt="" width="24" height="24" loading="lazy" />
+              </a>
+            ))}
+          </div>
         </div>
         <SolveRank />
       </div>
@@ -53,17 +60,8 @@ export default function Home() {
         ))}
       </div>
 
-      <div className="home-outside">
-        <span className="home-outside-label">코딩테스트</span>
-        {OUTSIDE.map(o => (
-          <a key={o.href} href={o.href} target="_blank" rel="noopener noreferrer" className="home-outside-link">{o.label} ↗</a>
-        ))}
-      </div>
-
-      {/* 오락실은 SPA 밖의 정적 페이지라 Link가 아니라 일반 링크로 연다 */}
-      <a href="/arcade/" className="arcade-door">오락실</a>
       {/* 코드 타자 연습은 따로 배포된 외부 사이트라 새 탭으로 연다 */}
-      <a href="https://ssafy-code-race.onrender.com/" target="_blank" rel="noopener noreferrer" className="arcade-door typing-door">코딩 타자 연습</a>
+      <a href="https://ssafy-code-race.onrender.com/" target="_blank" rel="noopener noreferrer" className="arcade-door">코딩 타자 연습</a>
       {/* 오른쪽 아래 도크: 위에서부터 멘탈 기르기, 오늘의 운세 */}
       <div className="home-dock">
         <MentalTraining />
