@@ -1,5 +1,5 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { COMIL, COMPANIES, EXAM_CATEGORIES, SOURCE_KINDS, allQuestions, companyPath } from '../data/examQuestions';
+import { COMPANIES, EXAM_CATEGORIES, SOURCE_KINDS, allQuestions, companyPath } from '../data/examQuestions';
 import ProgressBackup from '../components/ProgressBackup';
 
 function summary(company) {
@@ -35,54 +35,27 @@ function CategoryPicker() {
     <div className="fade-in">
       <div className="page-header">
         <Link to="/" className="back-link">← 홈으로</Link>
-        <h1>📚 기업별 기출문제</h1>
-        <p>공기업 IT직무 전공필기 · 컴퓨터일반 기출 · 복기 자료 기반 문제집과 출제범위 기반 예상문제집 · 즉시 채점 · 오답노트 · 북마크</p>
+        <h1>기업별 기출문제</h1>
+        <p>분류를 골라 시작하세요.</p>
       </div>
 
+      {/* 첫 화면은 분류 이름만 담백하게 보여 준다. 기업 목록, 문항 수 같은 세부는 들어간 뒤에 */}
       <div className="exam-category-grid">
-        {EXAM_CATEGORIES.filter(cat => !cat.hub).map(cat => {
-          const list = COMPANIES.filter(c => c.category === cat.key);
-          const ready = list.filter(c => c.ready);
-          const total = ready.reduce((n, c) => n + allQuestions(c).length, 0);
-          const sums = ready.map(summary).filter(Boolean);
-          const attempts = sums.reduce((n, s) => n + s.attempts, 0);
-          const wrong = sums.reduce((n, s) => n + s.wrong, 0);
-          return (
-            <Link key={cat.key} to={`/exam/category/${cat.key}`} className="exam-company-card exam-category-card">
-              <span className="exam-category-name">{cat.name}</span>
-              <span className="exam-company-meta">{cat.desc}</span>
-              <span className="exam-category-names">{list.map(c => c.name).join(' · ')}</span>
-              <span className="exam-category-mix">
-                📕 복기 {ready.filter(c => c.source?.kind === 'recall').length}곳 · 📝 예상 {ready.filter(c => c.source?.kind !== 'recall').length}곳
-              </span>
-              <span className="exam-tag">
-                {list.length}개 {cat.unit || '기업'} · {total}문항{attempts ? ` · 응시 ${attempts}회 · 오답 ${wrong}문제` : ''}
-              </span>
-            </Link>
-          );
-        })}
-        <ComilCard />
+        {EXAM_CATEGORIES.filter(cat => !cat.hub).map(cat => (
+          <Link key={cat.key} to={`/exam/category/${cat.key}`} className="exam-company-card exam-category-card simple">
+            <span className="exam-category-name">{cat.name}</span>
+            <span className="exam-category-arrow" aria-hidden="true">→</span>
+          </Link>
+        ))}
+        <Link to="/computer-general" className="exam-company-card exam-category-card simple">
+          <span className="exam-category-name">컴퓨터일반</span>
+          <span className="exam-category-arrow" aria-hidden="true">→</span>
+        </Link>
       </div>
 
       <ProgressBackup />
       {NOTE}
     </div>
-  );
-}
-
-// 컴퓨터일반은 회사가 아니라 문제은행 하나지만, 기출문제라 분류 카드와 나란히 둔다
-function ComilCard() {
-  const s = summary(COMIL);
-  const areas = Object.values(COMIL.sections).filter(sec => !sec.extra);
-  return (
-    <Link to="/computer-general" className="exam-company-card exam-category-card">
-      <span className="exam-category-name">컴퓨터일반</span>
-      <span className="exam-company-meta">전산직 9급 컴퓨터일반 기출</span>
-      <span className="exam-category-names">{areas.map(a => a.name).join(' · ')}</span>
-      <span className="exam-tag">
-        {areas.length}개 영역 · {allQuestions(COMIL).length}문항{s?.attempts ? ` · 응시 ${s.attempts}회 · 오답 ${s.wrong}문제` : ''}
-      </span>
-    </Link>
   );
 }
 

@@ -49,6 +49,24 @@
   gap: 10px;
 }
 
+/* /exam 첫 화면: 이름과 화살표만 있는 담백한 카드 */
+.exam-category-card.simple {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 26px 24px;
+}
+.exam-category-card.simple .exam-category-name { font-size: 1.2rem; font-weight: 700; }
+.exam-category-arrow {
+  font-size: 1.1rem;
+  color: var(--text-tertiary);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+.exam-category-card.simple:hover .exam-category-arrow {
+  transform: translateX(4px);
+  color: var(--text-primary);
+}
+
 .exam-category-name {
   font-size: 1.45rem;
   font-weight: 800;
