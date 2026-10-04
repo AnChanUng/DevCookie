@@ -79,6 +79,18 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
   const byId = useMemo(() => Object.fromEntries(ALL.map(q => [q.id, q])), [ALL]);
   const { data, save } = useExamProgress(company.key);
   const [view, setView] = useState({ name: 'home' });
+  // 풀던 문제는 새로고침하거나 탭을 닫아도 이어서 풀 수 있게 문제은행마다 한 건씩 저장해 둔다
+  const RESUME_KEY = `exam-resume:${company.key}`;
+  const [saved, setSaved] = useState(() => {
+    try {
+      const r = JSON.parse(localStorage.getItem(RESUME_KEY));
+      return r && Array.isArray(r.ids) && r.ids.length && r.ids.every(id => byId[id]) ? r : null;
+    } catch {
+      return null;
+    }
+  });
+  const saveResume = (state) => { try { localStorage.setItem(RESUME_KEY, JSON.stringify(state)); } catch { /* 저장 공간이 없으면 이어풀기만 포기한다 */ } };
+  const clearResume = () => { try { localStorage.removeItem(RESUME_KEY); } catch { /* 무시 */ } setSaved(null); };
   // 회차가 없는 은행은 문제은행 전체가 모의고사 한 회분이다
   const hasSets = SETS.length > 0;
   const examCount = company.draw ? Object.values(company.draw).reduce((n, c) => n + c, 0) : Q.length;
@@ -104,6 +116,7 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
   };
 
   const finish = (quiz, answers, aborted) => {
+    clearResume();
     const isExam = quiz.mode === 'exam' || quiz.mode === 'set'; // 회차 시험도 실전과 똑같이 기록·영역별 채점
     let score = 0;
     const secScore = Object.fromEntries(secKeys.map(k => [k, 0]));
@@ -176,6 +189,8 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
         ids={view.ids}
         onPractice={recordPractice}
         onFinish={finish}
+        resume={view.resume}
+        onSave={saveResume}
         header={(t) => header(t, false)}
         marks={data.marks}
         onMark={onMark}
@@ -262,6 +277,19 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
   return (
     <div className="fade-in">
       {header(company.name)}
+      {saved && (
+        <div className="exam-resume">
+          <div className="exam-resume-text">
+            <strong>풀던 문제가 있습니다</strong>
+            <span>
+              {label(saved.mode, saved.sec)} · {Object.keys(saved.answers || {}).length} / {saved.ids.length} 답변
+              {(saved.mode === 'exam' || saved.mode === 'set') && ` · 남은 시간 ${fmtT(Math.max(0, company.minutes * 60 - (saved.elapsed || 0)))}`}
+            </span>
+          </div>
+          <button className="exam-btn primary" onClick={() => { setView({ name: 'quiz', mode: saved.mode, sec: saved.sec, ids: saved.ids, resume: saved }); window.scrollTo({ top: 0 }); }}>이어서 풀기</button>
+          <button className="exam-btn ghost" onClick={() => { if (confirm('풀던 기록을 지울까요? 모의고사는 답한 내용이 채점되지 않고 사라집니다.')) clearResume(); }}>지우기</button>
+        </div>
+      )}
       {company.source && SOURCE_KINDS[company.source.kind] && (
         <div className={`exam-source ${company.source.kind}`}>
           <span className="badge">
@@ -433,25 +461,47 @@ function StatTile({ k, v, of, unit }) {
   );
 }
 
-function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractice, onFinish, header, marks, onMark }) {
+function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractice, onFinish: finishQuiz, resume, onSave, header, marks, onMark }) {
   const EXAM_SECONDS = minutes * 60;
   const isExam = mode === 'exam' || mode === 'set'; // 회차 시험도 타이머를 걸고 제출 후 한꺼번에 채점한다
-  const [idx, setIdx] = useState(0);
-  const [answers, setAnswers] = useState({});
-  const [revealed, setRevealed] = useState({});
-  const [texts, setTexts] = useState({}); // 단답형·서술형에 적은 답
-  const [peeked, setPeeked] = useState({}); // 모범답안을 펼쳐 자가채점을 기다리는 문제
-  const [left, setLeft] = useState(EXAM_SECONDS);
-  const startedAt = useRef(Date.now());
+  // resume이 있으면 저장해 둔 지점에서 이어 간다. 떠나 있던 시간은 타이머에 넣지 않는다
+  const [idx, setIdx] = useState(resume?.idx || 0);
+  const [answers, setAnswers] = useState(resume?.answers || {});
+  const [revealed, setRevealed] = useState(resume?.revealed || {});
+  const [texts, setTexts] = useState(resume?.texts || {}); // 단답형·서술형에 적은 답
+  const [peeked, setPeeked] = useState(resume?.peeked || {}); // 모범답안을 펼쳐 자가채점을 기다리는 문제
+  const [left, setLeft] = useState(Math.max(0, EXAM_SECONDS - (resume?.elapsed || 0)));
+  const startedAt = useRef(Date.now() - (resume?.elapsed || 0) * 1000);
   const quiz = { mode, sec, ids, startedAt: startedAt.current };
   const answersRef = useRef(answers);
   answersRef.current = answers;
+
+  // 답을 고르거나 문제를 넘길 때, 화면을 떠날 때마다 진행 상태를 저장한다. 끝낸 뒤에는 다시 저장하지 않는다
+  const finished = useRef(false);
+  const saveRef = useRef(() => {});
+  saveRef.current = () => {
+    if (finished.current) return;
+    onSave({ mode, sec, ids, idx, answers, revealed, texts, peeked, elapsed: Math.floor((Date.now() - startedAt.current) / 1000) });
+  };
+  const onFinish = (...args) => { finished.current = true; finishQuiz(...args); };
+  useEffect(() => { saveRef.current(); }, [idx, answers, revealed, texts, peeked]);
+  useEffect(() => {
+    const save = () => saveRef.current();
+    window.addEventListener('pagehide', save);
+    document.addEventListener('visibilitychange', save);
+    return () => {
+      window.removeEventListener('pagehide', save);
+      document.removeEventListener('visibilitychange', save);
+      save();
+    };
+  }, []);
 
   useEffect(() => {
     if (!isExam) return;
     const t = setInterval(() => {
       const remain = Math.max(0, EXAM_SECONDS - Math.floor((Date.now() - startedAt.current) / 1000));
       setLeft(remain);
+      if (remain % 10 === 0) saveRef.current(); // 갑자기 꺼져도 남은 시간이 크게 어긋나지 않게 한다
       if (remain <= 0) {
         clearInterval(t);
         alert(`${minutes}분이 종료되었습니다. 자동으로 채점합니다.`);
