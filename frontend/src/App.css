@@ -2668,6 +2668,27 @@
   padding-bottom: 16px;
 }
 
+/* 메뉴 카드 아래의 바깥 바로가기 한 줄 */
+.home-outside {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 28px;
+}
+.home-outside-label { font-size: 0.74rem; font-weight: 700; color: var(--text-tertiary); }
+.home-outside-link {
+  padding: 5px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  background: var(--glass-bg);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+.home-outside-link:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+
 .home-menu-item {
   display: flex;
   flex-direction: column;
