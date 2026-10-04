@@ -1985,3 +1985,6 @@ a.exam-search-bank:hover { color: var(--accent-blue); }
 .duel-review-table tr.detail td { background: var(--bg-secondary); white-space: normal; }
 .duel-review-table .ans { font-size: 0.84rem; font-weight: 700; color: var(--accent-green); margin-bottom: 4px; }
 .duel-review-table .ex { font-size: 0.84rem; line-height: 1.65; color: var(--text-secondary); }
+.exam-section.duel-room { text-decoration: none; }
+/* 사람이 많으면 점수판이 길어지므로 안에서 스크롤한다 */
+.duel-board ol { max-height: 360px; overflow-y: auto; }

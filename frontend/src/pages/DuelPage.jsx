@@ -11,6 +11,7 @@ const SIZE = 10;
 // 무료 서버가 잠들어 있으면 깨어나는 데 1분쯤 걸려서 넉넉히 기다린다
 const SLOW = { timeout: 90000 };
 const BY_ID = Object.fromEntries(TOPICS.questions.map(q => [q.id, q]));
+const clock = (ms) => { const d = new Date(ms); return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`; };
 const fmt = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
 const shuffle = (arr) => {
@@ -46,13 +47,27 @@ function Lobby() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [join, setJoin] = useState('');
+  const [rooms, setRooms] = useState(null); // 지금 열려 있는 단체전
 
-  const create = async () => {
+  // 열린 단체전 목록은 몇 초마다 새로 받는다
+  useEffect(() => {
+    let alive = true;
+    const load = () => api.get('/duels/open', { timeout: 20000 })
+      .then(({ data }) => { if (alive && Array.isArray(data)) setRooms(data); })
+      .catch(() => { if (alive) setRooms(r => r || []); });
+    load();
+    const timer = setInterval(load, 5000);
+    return () => { alive = false; clearInterval(timer); };
+  }, []);
+
+  // open이면 목록에 올라가 누구나 들어오는 단체전, 아니면 링크를 받은 사람만 들어오는 방
+  const create = async (open) => {
     setBusy(true);
     setError('');
     const pool = TOPICS.questions.filter(q => subject === 'all' || q.sec === subject);
+    const title = subject === 'all' ? '전체 과목' : TOPICS.sections[subject].name;
     try {
-      const { data } = await api.post('/duels', { questionIds: shuffle(pool).slice(0, SIZE).map(q => q.id) }, SLOW);
+      const { data } = await api.post('/duels', { questionIds: shuffle(pool).slice(0, SIZE).map(q => q.id), open, title }, SLOW);
       navigate(`/duel/${data.code}`);
     } catch {
       setError('방을 만들지 못했습니다. 서버가 깨어나는 중일 수 있으니 잠시 뒤에 다시 눌러 주세요.');
@@ -64,8 +79,8 @@ function Lobby() {
     <div className="fade-in">
       <div className="page-header">
         <Link to="/" className="back-link">← 홈으로</Link>
-        <h1>1:1 대결</h1>
-        <p>같은 {SIZE}문제를 풀고 점수를 겨룹니다. 방을 만들면 나오는 링크를 친구에게 보내세요.</p>
+        <h1>대결</h1>
+        <p>같은 {SIZE}문제를 풀고 점수를 겨룹니다. 친구와 붙으려면 1:1 방을, 여럿이 붙으려면 누구나 들어오는 단체전을 여세요.</p>
       </div>
 
       <div className="section-title">과목 고르기</div>
@@ -76,9 +91,25 @@ function Lobby() {
         ))}
       </div>
       <div className="exam-actions">
-        <button type="button" className="exam-btn primary" disabled={busy} onClick={create}>{busy ? '방 만드는 중…' : '대결 방 만들기'}</button>
+        <button type="button" className="exam-btn primary" disabled={busy} onClick={() => create(true)}>{busy ? '방 만드는 중…' : '단체전 열기 (누구나 참가)'}</button>
+        <button type="button" className="exam-btn" disabled={busy} onClick={() => create(false)}>1:1 방 만들기 (링크로 초대)</button>
       </div>
       {error && <p className="exam-note">{error}</p>}
+
+      <div className="section-title">열려 있는 단체전</div>
+      {rooms === null && <p className="exam-note">목록을 불러오는 중입니다…</p>}
+      {rooms?.length === 0 && <p className="exam-note">지금 열려 있는 단체전이 없습니다. 위에서 하나 열어 보세요.</p>}
+      {rooms?.length > 0 && (
+        <div className="exam-sections">
+          {rooms.map(r => (
+            <Link key={r.code} to={`/duel/${r.code}`} className="exam-section duel-room">
+              <span className="t">{r.title || '대결'}</span>
+              <span className="d">{r.total}문제 · {r.players}명 참가 중</span>
+              <span className="d">방 {r.code} · {clock(r.createdAt)}에 열림</span>
+            </Link>
+          ))}
+        </div>
+      )}
 
       <div className="section-title">받은 방 번호로 들어가기</div>
       <form className="exam-sync-form" onSubmit={e => { e.preventDefault(); if (join.trim()) navigate(`/duel/${join.trim().toUpperCase()}`); }}>
@@ -129,7 +160,7 @@ function Room({ code }) {
           setDone(mine.done || mine.answered >= questions.length);
           startedAt.current = Date.now() - mine.seconds * 1000;
         }
-        setRoom({ questions, players: data.players, nextCode: data.nextCode });
+        setRoom({ questions, players: data.players, nextCode: data.nextCode, open: !!data.open, title: data.title });
         setStatus('ready');
       })
       .catch(err => { if (alive) setStatus(err?.response?.status === 404 ? 'missing' : 'error'); });
@@ -325,8 +356,8 @@ function Room({ code }) {
   return (
     <div className="fade-in exam-quiz">
       <div className="page-header">
-        <Link to="/duel" className="back-link">← 1:1 대결</Link>
-        <h1>대결 방 {code}</h1>
+        <Link to="/duel" className="back-link">← 대결</Link>
+        <h1>{room.open ? '단체전' : '1:1 대결'} · {room.title ? `${room.title} · ` : ''}방 {code}</h1>
         <p>{total}문제 · 맞힌 수가 같으면 빨리 끝낸 사람이 위로 갑니다 · 내 이름: {me.nickname}</p>
       </div>
       {room.nextCode && !(started && done) && (
