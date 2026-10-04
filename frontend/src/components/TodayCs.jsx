@@ -1,77 +1,81 @@
-import { useEffect, useState } from 'react';
-import { theoryFor } from '../theory';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
-const CIRC = ['①', '②', '③', '④', '⑤'];
 const KEY = 'today-cs';
 
-// 오늘 날짜(이 기기 기준)와, 날짜마다 달라지는 번호. 같은 날에는 누구에게나 같은 문제가 나온다
+// 하루에 하나씩 돌려 보여 줄 핵심 개념. 한두 문장으로 끝나게 쓰고, 이론 글이 있으면 번호(to)를 붙인다
+const FACTS = [
+  { t: '교착상태 4조건', s: '상호 배제 · 점유와 대기 · 비선점 · 환형 대기. 넷이 모두 성립해야 생기므로 하나만 깨도 예방된다.', to: 75 },
+  { t: '트랜잭션 ACID', s: '원자성(전부 아니면 전무) · 일관성 · 격리성 · 지속성(커밋되면 장애에도 남는다).', to: 34 },
+  { t: '격리 수준', s: 'READ UNCOMMITTED → READ COMMITTED → REPEATABLE READ → SERIALIZABLE. 순서대로 dirty read, non-repeatable read, phantom read가 막힌다.', to: 35 },
+  { t: '정규화', s: '1NF 원자값 → 2NF 부분 함수 종속 제거 → 3NF 이행 함수 종속 제거 → BCNF 모든 결정자가 후보키.', to: 31 },
+  { t: '인덱스', s: '조회는 빨라지지만 쓰기는 느려진다. 복합 인덱스는 선두 컬럼 조건이 있어야 제대로 쓰인다.', to: 33 },
+  { t: 'TCP 3-way handshake', s: 'SYN → SYN+ACK → ACK. 양쪽이 서로의 송수신 가능 여부와 초기 순서 번호를 확인한다. 끊을 때는 4-way.', to: 58 },
+  { t: 'TCP vs UDP', s: 'TCP는 연결형 · 순서 보장 · 재전송 · 흐름·혼잡 제어. UDP는 비연결형이라 빠르지만 신뢰성은 응용이 챙겨야 한다.', to: 60 },
+  { t: 'OSI 7계층', s: '물리 · 데이터링크 · 네트워크 · 전송 · 세션 · 표현 · 응용. 스위치는 2계층, 라우터는 3계층, TCP/UDP는 4계층.', to: 57 },
+  { t: '프로세스와 스레드', s: '스레드는 코드 · 데이터 · 힙을 공유하고 스택과 레지스터만 따로 가진다. 그래서 문맥 교환이 프로세스보다 싸다.', to: 68 },
+  { t: 'CPU 스케줄링', s: 'SJF는 평균 대기 시간이 최소지만 기아가 생길 수 있다. RR은 시간 할당량이 너무 크면 FCFS, 너무 작으면 문맥 교환 비용이 커진다.', to: 74 },
+  { t: '페이지 교체', s: 'FIFO는 가장 먼저 들어온 것, LRU는 가장 오래 안 쓴 것, OPT는 앞으로 가장 오래 안 쓸 것을 내보낸다. FIFO는 프레임을 늘려도 부재가 늘 수 있다(벨레이디의 모순).', to: 79 },
+  { t: '세마포어와 뮤텍스', s: '뮤텍스는 잠근 쪽만 풀 수 있는 1개짜리 잠금, 세마포어는 개수를 세는 신호라 여러 개를 동시에 들여보낼 수 있다.', to: 77 },
+  { t: '페이징과 세그먼테이션', s: '페이징은 고정 크기로 나눠 외부 단편화가 없고 내부 단편화가 생긴다. 세그먼테이션은 반대다.', to: 78 },
+  { t: '스래싱', s: '프레임이 모자라 페이지 부재만 반복하느라 CPU 이용률이 떨어지는 현상. 다중 프로그래밍 정도를 낮추거나 워킹셋을 지킨다.', to: 80 },
+  { t: '해시 충돌', s: '체이닝은 같은 칸에 리스트로 매달고, 개방 주소법(선형 · 이차 조사 · 이중 해싱)은 다른 빈 칸을 찾아 넣는다.', to: 24 },
+  { t: '정렬 복잡도', s: '퀵 정렬은 평균 O(n log n) · 최악 O(n²), 병합 정렬은 항상 O(n log n)이고 안정 정렬, 힙 정렬은 O(n log n)에 제자리 정렬.', to: 4 },
+  { t: 'B+ 트리', s: '실제 데이터는 리프에만 있고 리프끼리 연결돼 있어 범위 검색이 빠르다. DB 인덱스가 주로 쓰는 구조다.', to: 26 },
+  { t: '이진 탐색 트리', s: '중위 순회하면 정렬된 순서가 나온다. 한쪽으로 치우치면 O(n)이 되므로 AVL · 레드블랙 트리로 균형을 맞춘다.', to: 23 },
+  { t: 'DFS와 BFS', s: 'DFS는 스택(재귀), BFS는 큐를 쓴다. 가중치 없는 그래프의 최단 경로는 BFS로 구한다.', to: 11 },
+  { t: '대칭키와 공개키', s: '대칭키는 빠르지만 키 전달이 문제이고(n명이면 n(n−1)/2개), 공개키는 느리지만 키 전달이 쉽다(2n개). 그래서 둘을 섞어 쓴다.', to: 61 },
+  { t: '전자서명', s: '보낸 사람의 개인키로 서명하고 공개키로 검증한다. 무결성 · 인증 · 부인 방지를 주지만 기밀성은 주지 않는다.', to: 61 },
+  { t: 'HTTP와 HTTPS', s: 'HTTPS는 TLS로 암호화한 HTTP다. 공개키로 대칭키를 안전하게 나눈 뒤 실제 데이터는 대칭키로 암호화한다.', to: 62 },
+  { t: 'SQL 인젝션', s: '입력값이 쿼리 문자열에 그대로 붙어서 생긴다. 문자열 결합 대신 바인드 변수(PreparedStatement)를 쓰면 막힌다.', to: 29 },
+  { t: 'RAID', s: 'RAID 0 스트라이핑(장애 대비 없음) · 1 미러링 · 5 패리티 1개(디스크 1개 고장까지) · 6 패리티 2개(2개 고장까지).' },
+  { t: '캐시 지역성', s: '시간 지역성은 방금 쓴 것을 곧 다시 쓰는 성질, 공간 지역성은 근처 주소를 곧 쓰는 성질. 캐시가 효과를 내는 이유다.' },
+  { t: '결합도와 응집도', s: '결합도는 낮을수록(자료 결합이 가장 좋음), 응집도는 높을수록(기능적 응집이 가장 좋음) 좋은 설계다.' },
+  { t: '화이트박스와 블랙박스 테스트', s: '화이트박스는 내부 구조를 보고(문장 · 분기 · 조건 커버리지), 블랙박스는 입출력만 본다(동치 분할 · 경계값 분석).' },
+  { t: '서브넷', s: '/26이면 호스트 비트가 6개라 주소 64개, 네트워크 · 브로드캐스트 주소를 빼면 호스트 62개.' },
+  { t: 'ARP와 DNS', s: 'ARP는 IP 주소로 MAC 주소를, DNS는 도메인 이름으로 IP 주소를 알아낸다.' },
+  { t: '2단계 로킹(2PL)', s: '잠금을 거는 확장 단계와 푸는 수축 단계를 나눈다. 직렬 가능성은 보장하지만 교착상태는 막지 못한다.', to: 34 },
+  { t: '로그 회복', s: '커밋된 트랜잭션은 REDO, 커밋 못 한 트랜잭션은 UNDO. 로그를 데이터보다 먼저 쓰는 것이 WAL 원칙이다.', to: 34 },
+  { t: '인터럽트', s: '하던 일을 멈추고 PC와 상태를 저장한 뒤 처리 루틴으로 갔다가 돌아온다. 외부(입출력 · 타이머), 내부(0 나누기 등), 소프트웨어(시스템 콜)로 나뉜다.', to: 70 },
+  { t: '객체지향 4특징', s: '캡슐화 · 상속 · 다형성 · 추상화. 오버라이딩은 실행 시점에, 오버로딩은 컴파일 시점에 결정된다.', to: 85 },
+  { t: 'SOLID', s: '단일 책임 · 개방 폐쇄 · 리스코프 치환 · 인터페이스 분리 · 의존 역전. 변경에 덜 흔들리는 구조를 만드는 다섯 원칙.', to: 103 },
+  { t: '스택과 큐', s: '스택은 후입선출(함수 호출 · 괄호 검사 · 후위식 계산), 큐는 선입선출(BFS · 버퍼 · 스케줄링).', to: 20 },
+  { t: '힙', s: '완전 이진 트리로 만든 우선순위 큐. 삽입 · 삭제 O(log n), 최댓값(최솟값) 확인 O(1).', to: 21 },
+  { t: '가용성', s: '직렬 구성은 곱(A×B)이라 낮아지고, 병렬(이중화)은 1−(1−A)(1−B)라 높아진다.' },
+  { t: 'NoSQL과 CAP', s: '분산 시스템은 일관성 · 가용성 · 분할 내성 가운데 둘까지만 온전히 가진다. 분할은 피할 수 없으니 실제로는 C와 A 사이의 선택이다.', to: 30 },
+  { t: '암달의 법칙', s: '프로그램의 일부만 빨라지면 전체 향상은 나머지 부분에 묶인다. 90%를 무한히 빠르게 해도 최대 10배.' },
+  { t: '경쟁 조건', s: '여러 실행 흐름이 공유 자원을 동시에 건드려 순서에 따라 결과가 달라지는 상황. 임계구역을 상호 배제로 보호한다.', to: 76 },
+];
+
 function today() {
   const d = new Date();
-  const date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  const days = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
-  return { date, days };
+  return {
+    date: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
+    days: Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000),
+  };
 }
 
-function loadPicked(date) {
-  try {
-    const saved = JSON.parse(localStorage.getItem(KEY));
-    return saved?.date === date && Number.isInteger(saved.picked) ? saved.picked : null;
-  } catch {
-    return null;
-  }
-}
-
-// 첫 화면의 "오늘의 CS": 하루에 한 문제를 그 자리에서 풀고 해설까지 본다.
-// 문제 데이터는 커서 첫 화면이 뜬 뒤에 따로 받아 온다
+// 첫 화면 위쪽 가운데에 말풍선으로 뜨는 "오늘의 CS". 화면 위에 떠 있어서 다른 요소의 자리를 밀지 않고,
+// 닫으면 그날은 다시 뜨지 않는다
 export default function TodayCs() {
   const [{ date, days }] = useState(today);
-  const [q, setQ] = useState(null);
-  const [picked, setPicked] = useState(() => loadPicked(date));
+  const [closed, setClosed] = useState(() => {
+    try { return localStorage.getItem(KEY) === date; } catch { return false; }
+  });
+  if (closed) return null;
 
-  useEffect(() => {
-    let alive = true;
-    import('../data/topicBank').then(({ TOPICS }) => {
-      if (!alive) return;
-      // 시험에 자주 나오는 핵심 주제(이론 글이 있는 주제: 교착상태 · 정규화 · 트랜잭션 · TCP 등)에서만 뽑고,
-      // 코드나 지문이 붙은 긴 문제는 빼서 한눈에 읽히는 문제만 낸다
-      const pool = TOPICS.questions.filter(x => theoryFor(x) && !x.code && !x.ctx && x.q.length <= 90);
-      const pickedQ = pool[(days * 7919) % pool.length];
-      setQ({ ...pickedQ, area: TOPICS.sections[pickedQ.sec].name });
-    }).catch(() => { /* 못 받으면 카드를 그리지 않는다 */ });
-    return () => { alive = false; };
-  }, [days]);
-
-  if (!q) return null;
-
-  const choose = (i) => {
-    if (picked !== null) return;
-    setPicked(i);
-    try { localStorage.setItem(KEY, JSON.stringify({ date, picked: i })); } catch { /* storage unavailable */ }
+  const fact = FACTS[days % FACTS.length];
+  const close = () => {
+    setClosed(true);
+    try { localStorage.setItem(KEY, date); } catch { /* storage unavailable */ }
   };
-  const done = picked !== null;
 
   return (
-    <section className="today-cs">
-      <div className="today-cs-head">
-        <b>오늘의 CS</b>
-        <span>{date.slice(5).replace('-', '.')} · {q.area}</span>
-        {done && <em className={picked === q.a ? 'ok' : 'bad'}>{picked === q.a ? '정답' : '오답'}</em>}
-      </div>
-      <p className="today-cs-q">{q.q}</p>
-      <ul className="today-cs-opts">
-        {q.o.map((opt, i) => {
-          let cls = '';
-          if (done) { if (i === q.a) cls = 'right'; else if (i === picked) cls = 'wrong'; }
-          return (
-            <li key={i}>
-              <button type="button" className={cls} disabled={done} onClick={() => choose(i)}>
-                <span>{CIRC[i]}</span>{opt}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
-      {done && <p className="today-cs-ex">{q.e}</p>}
-    </section>
+    <aside className="today-cs" role="note">
+      <button type="button" className="today-cs-x" onClick={close} aria-label="오늘의 CS 닫기">✕</button>
+      <div className="today-cs-head"><b>오늘의 CS</b><span>{fact.t}</span></div>
+      <p>{fact.s}</p>
+      {fact.to && <Link to={`/question/${fact.to}`} onClick={close}>이론 보기 →</Link>}
+    </aside>
   );
 }
