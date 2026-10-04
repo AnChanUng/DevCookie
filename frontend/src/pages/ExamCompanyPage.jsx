@@ -79,12 +79,21 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
   const [view, setView] = useState({ name: 'home' });
   // 회차가 없는 은행은 문제은행 전체가 모의고사 한 회분이다
   const hasSets = SETS.length > 0;
-  const examSets = hasSets ? SETS : [{ name: '모의고사', sub: '실제 시험의 영역 순서 그대로 출제', kind: mainKind }];
+  const examCount = company.draw ? Object.values(company.draw).reduce((n, c) => n + c, 0) : Q.length;
+  const examSets = hasSets ? SETS : [{ name: '모의고사', sub: company.draw ? `문제은행 ${Q.length}문항에서 실제 출제 비율대로 출제` : '실제 시험의 영역 순서 그대로 출제', kind: mainKind }];
 
   const wrongIds = ALL.filter(q => data.stats[q.id]?.last === 'w').map(q => q.id);
   const everWrongIds = ALL.filter(q => (data.stats[q.id]?.w || 0) > 0).map(q => q.id);
   const markedIds = ALL.filter(q => isMarked(data, q.id)).map(q => q.id);
   const onMark = (qid) => save(prev => ({ ...prev, marks: toggleMark(prev.marks, qid) }));
+
+  // draw가 있으면 영역별 출제 비율만큼 뽑는다. 안 푼 문제 → 마지막에 틀린 문제 → 맞힌 문제 순으로 우선한다
+  const examIds = () => {
+    if (!company.draw) return Q.map(q => q.id);
+    const rank = (q) => { const s = data.stats[q.id]; return !s ? 0 : s.last === 'w' ? 1 : 2; };
+    return Object.entries(company.draw).flatMap(([sec, n]) =>
+      shuffle(Q.filter(q => q.sec === sec)).sort((x, y) => rank(x) - rank(y)).slice(0, n).map(q => q.id));
+  };
 
   const start = (mode, ids, sec) => {
     if (!ids.length) return;
@@ -236,10 +245,10 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
           const done = qs.filter(q => data.stats[q.id]).length;
           const right = qs.filter(q => data.stats[q.id]?.last === 'r').length;
           return (
-            <button key={s.name} className="exam-section" onClick={() => start(hasSets ? 'set' : 'exam', qs.map(q => q.id), s.key)}>
+            <button key={s.name} className="exam-section" onClick={() => (hasSets ? start('set', qs.map(q => q.id), s.key) : start('exam', examIds()))}>
               <span className="t">{s.name}<Kind kind={s.kind} /></span>
               <span className="d">{s.sub}</span>
-              <span className="d">{qs.length}문제 · {company.minutes}분 · 최근 정답 {right}/{done}</span>
+              <span className="d">{hasSets ? qs.length : examCount}문제 · {company.minutes}분 · 최근 정답 {right}/{done}</span>
               <span className="bar"><i style={{ width: `${qs.length ? Math.round(right / qs.length * 100) : 0}%` }} /></span>
             </button>
           );
@@ -286,8 +295,8 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
 
       <div className="exam-stats">
         <StatTile k="모의고사 응시" v={exams.length} unit="회" />
-        <StatTile k="최고 점수" v={best?.score ?? '–'} of={best?.total ?? Q.length} />
-        <StatTile k="최근 점수" v={last?.score ?? '–'} of={last?.total ?? Q.length} />
+        <StatTile k="최고 점수" v={best?.score ?? '–'} of={best?.total ?? examCount} />
+        <StatTile k="최근 점수" v={last?.score ?? '–'} of={last?.total ?? examCount} />
         <StatTile k="현재 오답" v={wrongIds.length} unit="문제" />
       </div>
 
