@@ -2831,17 +2831,14 @@
   font-size: 1.05rem;
 }
 
-/* 소개 영역(제목 · 버튼 · 시험 일정 · 코딩테스트 로고)은 자기 칸 안에서 가운데로 모은다. 순위 카드는 오른쪽 그대로 */
 .home-top .hero {
   flex: 1;
   min-width: 0;
   padding: 0;
-  text-align: center;
+  text-align: left;
 }
-.home-top .hero p { margin-left: auto; margin-right: auto; }
-.home-top .home-cta,
-.home-top .goal-strip,
-.home-top .home-outside { justify-content: center; }
+/* 소개 칸에서 시험 일정 줄만 가운데에 둔다 */
+.home-top .goal-strip { justify-content: center; }
 
 .home-top .hero p {
   word-break: keep-all;
