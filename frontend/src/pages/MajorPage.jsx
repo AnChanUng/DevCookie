@@ -46,6 +46,15 @@ export default function MajorPage() {
         ))}
       </div>
 
+      <div className="section-title">문제로 확인하기</div>
+      <div className="exam-sections">
+        <Link to="/major/spring" className="exam-section duel-room">
+          <span className="t">Spring · JPA</span>
+          <span className="d">스프링 코어 · 웹 MVC · JPA · 부트</span>
+          <span className="d">60문제 · 60분 · 4지선다</span>
+        </Link>
+      </div>
+
       {note && (
         <div className="note-viewer">
           <div className="note-viewer-bar">

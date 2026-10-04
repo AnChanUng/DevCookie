@@ -12,11 +12,9 @@
   z-index: 100;
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  background: rgba(246, 248, 252, 0.78);
+  background: var(--header-bg);
   border-bottom: 1px solid var(--border-color);
 }
-
-:root[data-theme='dark'] .header { background: rgba(15, 22, 38, 0.82); }
 
 /* 화면 모드(화이트 / 다크) 전환 버튼 */
 .theme-toggle {
@@ -35,6 +33,45 @@
   transition: var(--transition);
 }
 .theme-toggle:hover { border-color: var(--accent-blue); transform: scale(1.08); }
+
+/* 화면 모드 고르기: 버튼 아래로 펼쳐지는 색 견본 */
+.theme-pick { position: relative; flex: none; }
+.theme-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 120;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  box-shadow: var(--card-shadow-hover);
+}
+.theme-menu button {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  width: 54px;
+  padding: 6px 0;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: none;
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.theme-menu button:hover { background: var(--bg-secondary); }
+.theme-menu button.on { border-color: var(--accent-blue); color: var(--accent-blue); }
+.theme-menu i {
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgba(128, 128, 128, 0.35);
+  border-radius: 50%;
+}
 
 .header-inner {
   max-width: 1128px;
@@ -2808,7 +2845,6 @@
 }
 .today-cs-head span { font-size: 0.84rem; font-weight: 800; color: var(--text-primary); }
 .today-cs p { font-size: 0.78rem; line-height: 1.6; color: var(--text-secondary); word-break: keep-all; }
-.today-cs a { display: inline-block; margin-top: 4px; font-size: 0.74rem; font-weight: 700; color: var(--accent-blue); }
 /* 화면이 좁으면 가운데 칸을 제목 · 순위 아래 줄로 내려 가로로 편다 */
 @media (max-width: 1199px) {
   .home-top { flex-wrap: wrap; }

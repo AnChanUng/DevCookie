@@ -37,6 +37,7 @@ function App() {
           <Route path="stats" element={<StatsPage />} />
           <Route path="interview" element={<InterviewPracticePage />} />
           <Route path="major" element={<MajorPage />} />
+          <Route path="major/:company" element={<ExamCompanyPage />} />
           <Route path="major-exam" element={<MajorExamPage />} />
           <Route path="exam" element={<ExamListPage />} />
           <Route path="exam/category/:category" element={<ExamListPage />} />

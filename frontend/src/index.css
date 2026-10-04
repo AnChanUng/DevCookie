@@ -42,8 +42,54 @@
   --transition-bounce: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* 다크 모드: 머리말의 화면 모드 버튼으로 고른다. 색은 변수만 바꾸고, 변수로 못 바꾸는 곳만 아래에서 따로 덮는다 */
-:root[data-theme='dark'] {
+/* 화면 모드: 머리말의 버튼으로 고른다 (화이트 · 크림 · 민트 · 딤 · 다크 · 블랙).
+   색은 변수만 바꾼다. 어두운 계열(딤 · 다크 · 블랙)은 data-mode='dark'가 함께 붙고, 아래 블록이 그 공통 값(다크 기준)이다 */
+:root {
+  --header-bg: rgba(246, 248, 252, 0.78);
+}
+
+:root[data-theme='sepia'] {
+  --bg-primary: #FFFBF2;
+  --bg-secondary: #F6EFE0;
+  --bg-tertiary: #EBE2CF;
+  --bg-mesh-1: #F3E7CF;
+  --bg-mesh-2: #F6E3D3;
+  --bg-mesh-3: #EFE8D2;
+  --text-primary: #3B2F20;
+  --text-secondary: #6B5B45;
+  --text-tertiary: #A08E74;
+  --text-quaternary: #CDBFA6;
+  --border-color: rgba(120, 96, 60, 0.18);
+  --accent-blue: #B4662A;
+  --accent-blue-hover: #9A531D;
+  --accent-blue-light: rgba(180, 102, 42, 0.1);
+  --accent-blue-glow: rgba(180, 102, 42, 0.25);
+  --gradient-primary: linear-gradient(135deg, #B4662A 0%, #C97F3C 50%, #D99A58 100%);
+  --gradient-hero: linear-gradient(135deg, #9A531D 0%, #C2702C 45%, #D98E4A 100%);
+  --glass-bg: rgba(255, 251, 242, 0.78);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --card-shadow-glow: 0 8px 32px rgba(180, 102, 42, 0.14), 0 2px 8px rgba(180, 102, 42, 0.08);
+  --header-bg: rgba(246, 239, 224, 0.82);
+}
+
+:root[data-theme='mint'] {
+  --bg-secondary: #EFF8F4;
+  --bg-tertiary: #DDEFE7;
+  --bg-mesh-1: #DDF3EA;
+  --bg-mesh-2: #E3F4F8;
+  --bg-mesh-3: #E6F6E3;
+  --accent-blue: #0E9F77;
+  --accent-blue-hover: #0B8463;
+  --accent-blue-light: rgba(14, 159, 119, 0.1);
+  --accent-blue-glow: rgba(14, 159, 119, 0.25);
+  --gradient-primary: linear-gradient(135deg, #0B8463 0%, #0E9F77 50%, #17B890 100%);
+  --gradient-hero: linear-gradient(135deg, #0B8463 0%, #0E9F77 45%, #0891B2 100%);
+  --card-shadow-glow: 0 8px 32px rgba(14, 159, 119, 0.14), 0 2px 8px rgba(14, 159, 119, 0.08);
+  --header-bg: rgba(239, 248, 244, 0.82);
+}
+
+:root[data-mode='dark'] {
+  --header-bg: rgba(15, 22, 38, 0.82);
   color-scheme: dark;
   --bg-primary: #1B2537;
   --bg-secondary: #0F1626;
@@ -75,6 +121,39 @@
   --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.45), 0 4px 12px rgba(0, 0, 0, 0.3);
   --card-shadow-glow: 0 8px 32px rgba(129, 136, 247, 0.2), 0 2px 8px rgba(129, 136, 247, 0.12);
 }
+
+:root[data-theme='dim'] {
+  --bg-primary: #2C313C;
+  --bg-secondary: #22262F;
+  --bg-tertiary: #3A4150;
+  --bg-mesh-1: #262B3A;
+  --bg-mesh-2: #2B283A;
+  --bg-mesh-3: #24303A;
+  --text-primary: #E3E7EE;
+  --text-secondary: #B3BBC9;
+  --text-tertiary: #8791A3;
+  --text-quaternary: #5C6677;
+  --glass-bg: rgba(44, 49, 60, 0.8);
+  --header-bg: rgba(34, 38, 47, 0.85);
+}
+
+:root[data-theme='black'] {
+  --bg-primary: #121316;
+  --bg-secondary: #000000;
+  --bg-tertiary: #1F2126;
+  --bg-mesh-1: #06060A;
+  --bg-mesh-2: #0B0813;
+  --bg-mesh-3: #04090D;
+  --text-primary: #EDEDED;
+  --text-secondary: #B4B4B4;
+  --text-tertiary: #7C7C7C;
+  --text-quaternary: #4C4C4C;
+  --border-color: rgba(255, 255, 255, 0.14);
+  --glass-bg: rgba(18, 19, 22, 0.86);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --header-bg: rgba(0, 0, 0, 0.85);
+}
+
 
 * {
   margin: 0;

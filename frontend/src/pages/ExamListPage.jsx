@@ -118,8 +118,8 @@ function CompanyList({ category }) {
 
       {groups.map(g => (
         <section key={g.kind} className="exam-group">
-          {!category.plain && <div className="section-title">{g.icon} {g.group} <span className="exam-group-count">{g.items.length}곳</span></div>}
-          {!category.plain && <p className="exam-lede">{g.detail}</p>}
+          <div className="section-title">{g.icon} {g.group} <span className="exam-group-count">{g.items.length}곳</span></div>
+          <p className="exam-lede">{g.detail}</p>
           <div className="exam-company-grid compact">
             {g.items.map(c => <CompanyCard key={c.key} company={c} />)}
           </div>
