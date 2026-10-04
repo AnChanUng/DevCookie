@@ -37,6 +37,10 @@ public class DuelPlayer {
     @Column(nullable = false)
     private int answered;
 
+    // 문제별 정오답. 푼 순서대로 맞으면 1, 틀리면 0 (예: "1011"). 복기 화면에서 쓴다
+    @Column(length = 30)
+    private String marks;
+
     @Column(nullable = false)
     private boolean done;
 

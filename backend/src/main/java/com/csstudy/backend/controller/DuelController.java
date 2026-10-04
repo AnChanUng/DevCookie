@@ -105,7 +105,11 @@ public class DuelController {
         Integer score = number(body.get("score"), total);
         Integer answered = number(body.get("answered"), total);
         Integer seconds = number(body.get("seconds"), 24 * 60 * 60);
-        if (visitorId == null || score == null || answered == null || seconds == null || score > answered) {
+        // 문제별 정오답은 보내지 않아도 되지만, 보냈다면 답한 수 · 맞힌 수와 맞아야 한다
+        String marks = body.get("marks") instanceof String m && m.matches("[01]*") ? m : null;
+        boolean marksOk = marks == null || (answered != null && score != null
+                && marks.length() == answered && marks.chars().filter(ch -> ch == '1').count() == score);
+        if (visitorId == null || score == null || answered == null || seconds == null || score > answered || !marksOk) {
             return ResponseEntity.badRequest().body(Map.of("error", "진행 상황을 확인해 주세요."));
         }
         String nickname = VisitorProfileService.nickname(body.get("nickname"));
@@ -122,6 +126,7 @@ public class DuelController {
             player.setScore(score);
             player.setAnswered(answered);
             player.setSeconds(seconds);
+            if (marks != null) player.setMarks(marks);
             player.setDone(Boolean.TRUE.equals(body.get("done")) && answered == total);
             player.setUpdatedAt(Instant.now());
             try {
@@ -140,6 +145,8 @@ public class DuelController {
                 .thenComparingInt(DuelPlayer::getSeconds)
                 .thenComparing(DuelPlayer::getId));
         List<Map<String, Object>> rows = new ArrayList<>();
+        // 아직 풀고 있는 사람에게는 문제별 정오답을 보여 주지 않는다
+        boolean reveal = visitorId != null && players.stream().anyMatch(p -> p.getVisitorId().equals(visitorId) && p.isDone());
         for (DuelPlayer p : players) {
             Map<String, Object> row = new LinkedHashMap<>();
             row.put("nickname", p.getNickname());
@@ -148,6 +155,7 @@ public class DuelController {
             row.put("done", p.isDone());
             row.put("seconds", p.getSeconds());
             row.put("me", p.getVisitorId().equals(visitorId));
+            row.put("marks", reveal && p.isDone() ? p.getMarks() : null);
             rows.add(row);
         }
         return rows;

@@ -100,6 +100,27 @@ class DuelTest {
     }
 
     @Test
+    void perQuestionMarksAreShownOnlyToPlayersWhoFinished() throws Exception {
+        String code = create(List.of("a:1", "a:2", "a:3"));
+        Map<String, Object> done = new HashMap<>(Map.of("visitorId", "v-a", "nickname", "수달", "score", 2, "answered", 3, "done", true, "seconds", 20, "marks", "101"));
+        mvc.perform(put("/api/v1/duels/" + code + "/players").contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(done)))
+                .andExpect(jsonPath("$.players[0].marks").value("101"));
+        Map<String, Object> playing = new HashMap<>(Map.of("visitorId", "v-b", "nickname", "여우", "score", 1, "answered", 1, "done", false, "seconds", 5, "marks", "1"));
+        mvc.perform(put("/api/v1/duels/" + code + "/players").contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(playing)))
+                .andExpect(status().isOk());
+
+        // 아직 푸는 사람과 구경하는 사람에게는 가린다
+        mvc.perform(get("/api/v1/duels/" + code).header("X-Visitor-Id", "v-b")).andExpect(jsonPath("$.players[0].marks").doesNotExist());
+        mvc.perform(get("/api/v1/duels/" + code)).andExpect(jsonPath("$.players[0].marks").doesNotExist());
+        mvc.perform(get("/api/v1/duels/" + code).header("X-Visitor-Id", "v-a")).andExpect(jsonPath("$.players[0].marks").value("101"));
+
+        // 맞힌 수와 맞지 않는 정오답은 받지 않는다
+        Map<String, Object> wrong = new HashMap<>(Map.of("visitorId", "v-c", "nickname", "판다", "score", 3, "answered", 3, "done", true, "seconds", 9, "marks", "100"));
+        mvc.perform(put("/api/v1/duels/" + code + "/players").contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(wrong)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void badInputIsRejected() throws Exception {
         mvc.perform(post("/api/v1/duels").contentType(MediaType.APPLICATION_JSON)
                 .content(json.writeValueAsString(Map.of("questionIds", List.of("only-one")))))
