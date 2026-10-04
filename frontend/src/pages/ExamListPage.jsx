@@ -48,6 +48,12 @@ function CategoryPicker() {
           </Link>
         ))}
         <ComilCard />
+        {/* 문제 수는 문제은행 데이터를 다 읽어야 나오므로 여기서는 세지 않는다 */}
+        <Link to="/topics" className="exam-company-card exam-category-card">
+          <span className="exam-category-name">주제별 통합</span>
+          <span className="exam-company-meta">기업 구분 없이 과목별로 모아 풀기</span>
+          <span className="exam-category-count">8개 과목 · 20문제씩</span>
+        </Link>
       </div>
 
       <ProgressBackup />

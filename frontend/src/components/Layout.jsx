@@ -38,7 +38,7 @@ export default function Layout() {
               <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
                 홈
               </Link>
-              <Link to="/exam" className={location.pathname.startsWith('/exam') || location.pathname === '/computer-general' ? 'active' : ''}>
+              <Link to="/exam" className={location.pathname.startsWith('/exam') || location.pathname === '/computer-general' || location.pathname === '/topics' ? 'active' : ''}>
                 기업별 기출
               </Link>
               <Link to="/ncs" className={location.pathname === '/ncs' ? 'active' : ''}>
@@ -54,10 +54,16 @@ export default function Layout() {
                 통계
               </Link>
             </nav>
-            <div className="theme-toggle" role="group" aria-label="화면 모드">
-              <button type="button" className={theme === 'light' ? 'on' : ''} onClick={() => setTheme('light')} title="화이트 모드">☀️<span> 화이트</span></button>
-              <button type="button" className={theme === 'dark' ? 'on' : ''} onClick={() => setTheme('dark')} title="다크 모드">🌙<span> 다크</span></button>
-            </div>
+            {/* 지금 모드의 아이콘을 보여 주고, 누르면 반대 모드로 바꾼다 */}
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              title={theme === 'dark' ? '화이트 모드로 바꾸기' : '다크 모드로 바꾸기'}
+              aria-label={theme === 'dark' ? '화이트 모드로 바꾸기' : '다크 모드로 바꾸기'}
+            >
+              {theme === 'dark' ? '🌙' : '☀️'}
+            </button>
             <StudyCount />
           </div>
         </div>

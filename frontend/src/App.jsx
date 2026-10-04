@@ -14,6 +14,7 @@ const MajorExamPage = lazy(() => import('./pages/MajorExamPage'));
 const ExamListPage = lazy(() => import('./pages/ExamListPage'));
 const ExamCompanyPage = lazy(() => import('./pages/ExamCompanyPage'));
 const ComputerGeneralPage = lazy(() => import('./pages/ComputerGeneralPage'));
+const TopicPage = lazy(() => import('./pages/TopicPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
 const NcsPage = lazy(() => import('./pages/NcsPage'));
@@ -44,6 +45,7 @@ function App() {
           <Route path="aptitude/daou/cospro" element={<CosProPage />} />
           <Route path="aptitude/daou/cospro/:pid" element={<CosProPage />} />
           <Route path="computer-general" element={<ComputerGeneralPage />} />
+          <Route path="topics" element={<TopicPage />} />
           <Route path="ncs" element={<NcsPage />} />
           <Route path="search" element={<SearchPage />} />
           <Route path="weak" element={<WeakPage />} />
