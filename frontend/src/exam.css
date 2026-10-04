@@ -1783,3 +1783,124 @@ a.exam-search-bank:hover { color: var(--accent-blue); }
 :root[data-theme='dark'] .exam-mode.mark .exam-mode-go,
 :root[data-theme='dark'] .exam-mark:hover { color: #F2C94C; }
 :root[data-theme='dark'] .exam-code { background: #0B1220; }
+
+/* ===== 코테 풀이 모아보기 (/algo) ===== */
+/* 코드를 나란히 보려면 폭이 필요해서 문제 풀이 화면처럼 본문 폭을 벗어나 넓게 쓴다 */
+@media (min-width: 900px) {
+  .algo {
+    position: relative;
+    left: 50%;
+    width: min(1200px, calc(100vw - 96px));
+    margin-left: calc(min(1200px, calc(100vw - 96px)) / -2);
+  }
+  .algo-body { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 20px; align-items: start; }
+  .algo-side { position: sticky; top: 76px; max-height: calc(100vh / var(--ui-zoom) - 96px); }
+}
+.algo-body { margin-bottom: 40px; }
+.algo-side {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--bg-primary);
+  box-shadow: var(--card-shadow);
+}
+.algo-side input {
+  padding: 8px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+}
+.algo-side ul { list-style: none; overflow-y: auto; min-height: 0; max-height: 260px; }
+@media (min-width: 900px) { .algo-side ul { max-height: none; } }
+.algo-side li button {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+}
+.algo-side li button:hover { background: var(--bg-secondary); }
+.algo-side li button.on { background: var(--accent-blue-light); }
+.algo-side .t { display: block; font-size: 0.82rem; font-weight: 700; overflow-wrap: anywhere; }
+.algo-side .d { display: block; font-size: 0.7rem; color: var(--text-tertiary); }
+.algo-none { padding: 14px 10px; font-size: 0.8rem; color: var(--text-tertiary); }
+
+.algo-main { min-width: 0; }
+.algo-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; margin-bottom: 10px; }
+.algo-title h2 { font-size: 1.15rem; font-weight: 800; overflow-wrap: anywhere; }
+.algo-title a { font-size: 0.8rem; font-weight: 700; color: var(--accent-blue); }
+.algo-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.algo-chip {
+  padding: 4px 11px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.algo-chip small { margin-left: 5px; font-size: 0.68rem; font-weight: 500; color: var(--text-tertiary); }
+.algo-chip.on { border-color: var(--accent-blue); background: var(--accent-blue); color: #fff; }
+.algo-chip.on small { color: rgba(255, 255, 255, 0.8); }
+
+.algo-view { display: grid; gap: 14px; align-items: start; }
+@media (min-width: 900px) {
+  .algo-view.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .algo-view.all { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.algo-sol {
+  min-width: 0;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  overflow: hidden;
+}
+.algo-sol-head { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-bottom: 1px solid var(--border-color); }
+.algo-sol-head b { font-size: 0.9rem; }
+.algo-sol-head span { flex: 1; font-size: 0.72rem; color: var(--text-tertiary); }
+.algo-memo {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.algo-code {
+  margin: 0;
+  padding: 12px 0;
+  background: #1B2436;
+  color: #E8ECF3;
+  font-family: ui-monospace, Consolas, "D2Coding", monospace;
+  font-size: 0.76rem;
+  line-height: 1.55;
+  letter-spacing: 0;
+  tab-size: 4;
+  overflow: auto;
+  counter-reset: ln;
+}
+:root[data-theme='dark'] .algo-code { background: #0B1220; }
+.algo-view.all .algo-code { max-height: 440px; }
+.algo-code span { display: block; padding-right: 14px; white-space: pre; }
+.algo-code span::before {
+  counter-increment: ln;
+  content: counter(ln);
+  display: inline-block;
+  width: 40px;
+  margin-right: 12px;
+  text-align: right;
+  color: #5B6B86;
+  user-select: none;
+}
