@@ -73,13 +73,14 @@ function CategoryPicker() {
 // 컴퓨터일반은 회사가 아니라 문제은행 하나지만, 기출문제라 분류 카드와 나란히 둔다
 function ComilCard() {
   const s = summary(COMIL);
+  const areas = Object.values(COMIL.sections).filter(sec => !sec.extra);
   return (
     <Link to="/computer-general" className="exam-company-card exam-category-card">
       <span className="exam-category-name">컴퓨터일반</span>
       <span className="exam-company-meta">전산직 9급 컴퓨터일반 기출</span>
-      <span className="exam-category-names">{Object.values(COMIL.sections).map(s => s.name).join(' · ')}</span>
+      <span className="exam-category-names">{areas.map(a => a.name).join(' · ')}</span>
       <span className="exam-tag">
-        {Object.keys(COMIL.sections).length}개 영역 · {allQuestions(COMIL).length}문항{s?.attempts ? ` · 응시 ${s.attempts}회 · 오답 ${s.wrong}문제` : ''}
+        {areas.length}개 영역 · {allQuestions(COMIL).length}문항{s?.attempts ? ` · 응시 ${s.attempts}회 · 오답 ${s.wrong}문제` : ''}
       </span>
     </Link>
   );
