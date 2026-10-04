@@ -11,6 +11,13 @@ const MENUS = [
   { to: '/major', tone: 'pink', tag: '요약노트', title: '필기이론', desc: '자격증 요약노트 열람과 다운로드' },
 ];
 
+// 이 사이트 밖의 준비 자료. 새 탭으로 연다
+const OUTSIDE = [
+  { href: 'https://www.codetree.ai/ko/frequent-problems', label: '코드트리 기출 빈출 문제' },
+  { href: 'https://school.programmers.co.kr/learn/challenges?order=acceptance_desc&levels=2%2C3&languages=java', label: '프로그래머스 Lv.2~3 (Java)' },
+  { href: 'https://jungol.co.kr/', label: '정올(JUNGOL)' },
+];
+
 export default function Home() {
   return (
     <div className="fade-in home">
@@ -43,6 +50,13 @@ export default function Home() {
             <span className="home-menu-desc">{m.desc}</span>
             <span className="home-menu-go">바로가기 →</span>
           </Link>
+        ))}
+      </div>
+
+      <div className="home-outside">
+        <span className="home-outside-label">코딩테스트</span>
+        {OUTSIDE.map(o => (
+          <a key={o.href} href={o.href} target="_blank" rel="noopener noreferrer" className="home-outside-link">{o.label} ↗</a>
         ))}
       </div>
 
