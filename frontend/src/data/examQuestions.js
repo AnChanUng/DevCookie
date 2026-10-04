@@ -25,6 +25,7 @@ import { HUG_SECTIONS, HUG_QUESTIONS } from './hugQuestions';
 import { KSFC_SECTIONS, KSFC_QUESTIONS } from './ksfcQuestions';
 import { KCIS_SECTIONS, KCIS_QUESTIONS } from './kcisQuestions';
 import { KINFA_SECTIONS, KINFA_QUESTIONS } from './kinfaQuestions';
+import { SPRING_SECTIONS, SPRING_QUESTIONS } from './springQuestions';
 import { BOK_SECTIONS, BOK_QUESTIONS } from './bokQuestions';
 import { KSD_SECTIONS, KSD_QUESTIONS } from './ksdQuestions';
 import { KDIC_SECTIONS, KDIC_QUESTIONS } from './kdicQuestions';
@@ -155,6 +156,8 @@ export const SOURCE_KINDS = {
 export const EXAM_CATEGORIES = [
   { key: "finance", name: "금융공기업", desc: "금융공기업 · 금융권 IT직무 필기" },
   { key: "public", name: "공기업", desc: "일반 공기업 전산직 전공필기" },
+  // plain: 기업이 아니라 기술 과목이라, 목록에서 복기·예상 문제집 안내를 붙이지 않는다
+  { key: "stack", name: "개발 스택", desc: "Spring · JPA 기술 면접 · 필기 대비", unit: "과목", plain: true },
   // hub가 있는 분류는 기업별 기출이 아니라 그 이름의 상단 메뉴(/ssafy)에 모아 보여 준다
   { key: "major", name: "전공필기", desc: "SSAFY 과목평가 · 객관식 · 단답형 · 서술형", unit: "과목", hub: "ssafy" },
   { key: "monthly", name: "월말평가", desc: "SSAFY 월말평가 서술형 (구현 문제 제외)", unit: "과목", hub: "ssafy" },
@@ -375,6 +378,12 @@ export const COMPANIES = [
     source: { kind: "recall", label: "2024 하반기 복기문제", file: "공기업 필기/2024_하반기_BNK_IT직무_필기복기.pdf" },
     questions: BNK_QUESTIONS, sections: BNK_SECTIONS, minutes: 40,
     lede: "금융·경제·경영 기초상식 15문제, 직무기초소양(NCS) 15문제. 총 30문제, 40분, 4지선다. 2024 하반기 IT직무 응시 후기의 키워드 정리(예금자보호, CD, 롱숏펀드, 레그테크, 환헤지, 재정환율, 피셔 방정식, MR=MC, BCG 등)와 NCS 기록 유형을 바탕으로 새로 만든 문제입니다. 코딩테스트(SQL·알고리즘)는 포함하지 않습니다.",
+  },
+  {
+    key: "spring", category: "stack", abbr: "Spring", name: "Spring · JPA", meta: "코어 · 웹 · JPA · 부트 60문제 · 60분 · 4지선다", ready: true,
+    source: { kind: "predicted", label: "자체 제작 문제", detail: "사이트의 스프링 이론 글과 기술 면접에서 자주 나오는 주제를 바탕으로 새로 만든 문제입니다. Spring Boot 3 / Spring 6 동작 기준입니다." },
+    questions: SPRING_QUESTIONS, sections: SPRING_SECTIONS, minutes: 60,
+    lede: "스프링 코어 15문제, 웹 MVC·시큐리티 15문제, JPA·트랜잭션 18문제, 스프링 부트·테스트·설계 12문제. 총 60문제, 60분, 4지선다. IoC·DI, 빈 스코프, AOP, MVC 요청 흐름, 필터·인터셉터·AOP 구분, 영속성 컨텍스트, N+1과 fetch join, OSIV, @Transactional 전파·롤백 규칙과 프록시 내부 호출, 자동 설정과 슬라이스 테스트를 다룹니다. 개념 문제에 코드를 읽고 동작 결과를 예측하는 문제 16개를 섞었습니다.",
   },
   {
     key: "ssafyalgo", category: "major", abbr: "SSAFY", name: "SSAFY 알고리즘 과목평가", meta: "객관식 21 · 단답형 9 · 서술형 2 × 2회 + 기초 다지기 30문제 · 60분", ready: true,
