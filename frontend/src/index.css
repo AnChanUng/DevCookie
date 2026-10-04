@@ -42,6 +42,40 @@
   --transition-bounce: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* 다크 모드: 머리말의 화면 모드 버튼으로 고른다. 색은 변수만 바꾸고, 변수로 못 바꾸는 곳만 아래에서 따로 덮는다 */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg-primary: #1B2537;
+  --bg-secondary: #0F1626;
+  --bg-tertiary: #2A364C;
+  --bg-mesh-1: #161F3D;
+  --bg-mesh-2: #1D1838;
+  --bg-mesh-3: #10263A;
+  --text-primary: #E5EAF3;
+  --text-secondary: #AAB5C8;
+  --text-tertiary: #7F8CA5;
+  --text-quaternary: #52607A;
+  --border-color: rgba(148, 163, 184, 0.2);
+  --accent-blue: #8188F7;
+  --accent-blue-hover: #6C73F0;
+  --accent-blue-light: rgba(129, 136, 247, 0.16);
+  --accent-blue-glow: rgba(129, 136, 247, 0.35);
+  --accent-green: #34D399;
+  --accent-green-light: rgba(52, 211, 153, 0.14);
+  --accent-orange: #FBBF24;
+  --accent-orange-light: rgba(251, 191, 36, 0.14);
+  --accent-red: #F87171;
+  --accent-red-light: rgba(248, 113, 113, 0.15);
+  --accent-purple: #A78BFA;
+  --accent-purple-light: rgba(167, 139, 250, 0.16);
+  --gradient-card: linear-gradient(135deg, rgba(129, 136, 247, 0.07) 0%, rgba(167, 139, 250, 0.07) 100%);
+  --glass-bg: rgba(27, 37, 55, 0.78);
+  --glass-border: rgba(148, 163, 184, 0.16);
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.45), 0 4px 12px rgba(0, 0, 0, 0.3);
+  --card-shadow-glow: 0 8px 32px rgba(129, 136, 247, 0.2), 0 2px 8px rgba(129, 136, 247, 0.12);
+}
+
 * {
   margin: 0;
   padding: 0;
