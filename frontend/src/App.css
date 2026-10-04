@@ -2871,11 +2871,11 @@ a.goal-exam:hover { border-color: var(--accent-blue); }
 
 .goal-title { font-weight: 700; color: var(--text-primary); }
 
-/* 시험 일정 아래의 코딩테스트 사이트 로고 */
-.home-outside { display: flex; gap: 8px; margin-top: 10px; }
-.home-outside a { display: block; line-height: 0; opacity: 0.75; transition: var(--transition); }
-.home-outside a:hover { opacity: 1; transform: translateY(-2px); }
-.home-outside img { display: block; border-radius: 7px; background: #fff; }
+/* 머리말의 코딩테스트 사이트 로고 */
+.header-outside { flex: none; display: flex; align-items: center; gap: 6px; }
+.header-outside a { display: block; line-height: 0; opacity: 0.75; transition: var(--transition); }
+.header-outside a:hover { opacity: 1; transform: translateY(-1px); }
+.header-outside img { display: block; border-radius: 6px; background: #fff; }
 
 .goal-dday {
   font-weight: 800;

@@ -9,6 +9,13 @@ import StudyCount from './StudyCount';
 // 카오스 고양이 챗봇은 잠시 숨겨 둔다. true로 바꾸면 다시 나온다
 const SHOW_CHAOS_CHAT = false;
 
+// 이 사이트 밖의 코딩테스트 준비 사이트. 머리말에 로고만 작게 두고 새 탭으로 연다 (로고 파일은 public/outside/)
+const OUTSIDE = [
+  { href: 'https://www.codetree.ai/ko/frequent-problems', label: '코드트리 기출 빈출 문제', logo: '/outside/codetree.png' },
+  { href: 'https://school.programmers.co.kr/learn/challenges?order=acceptance_desc&levels=2%2C3&languages=java', label: '프로그래머스', logo: '/outside/programmers.png' },
+  { href: 'https://jungol.co.kr/', label: '정올', logo: '/outside/jungol.png' },
+];
+
 export default function Layout() {
   const location = useLocation();
   // 화면 모드는 index.html에서 먼저 적용해 두고, 여기서는 바꿀 때만 반영하고 기억한다
@@ -54,6 +61,13 @@ export default function Layout() {
                 통계
               </Link>
             </nav>
+            <div className="header-outside">
+              {OUTSIDE.map(o => (
+                <a key={o.href} href={o.href} target="_blank" rel="noopener noreferrer" title={o.label} aria-label={o.label}>
+                  <img src={o.logo} alt="" width="20" height="20" />
+                </a>
+              ))}
+            </div>
             {/* 지금 모드의 아이콘을 보여 주고, 누르면 반대 모드로 바꾼다 */}
             <button
               type="button"
