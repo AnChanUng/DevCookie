@@ -32,15 +32,19 @@ export default function Home() {
             <Link to="/weak" className="home-cta-btn">내 약점 보기</Link>
           </div>
           <StudyGoal />
+        </div>
+        {/* 오른쪽 칸: 순위 카드와 그 아래 코딩테스트 사이트 로고 */}
+        <div className="home-side">
+          <SolveRank />
           <div className="home-outside">
+            <span className="goal-label">코딩테스트</span>
             {OUTSIDE.map(o => (
               <a key={o.href} href={o.href} target="_blank" rel="noopener noreferrer" title={o.label} aria-label={o.label}>
-                <img src={o.logo} alt="" width="24" height="24" loading="lazy" />
+                <img src={o.logo} alt="" width="22" height="22" loading="lazy" />
               </a>
             ))}
           </div>
         </div>
-        <SolveRank />
       </div>
 
       <div className="home-menu">
