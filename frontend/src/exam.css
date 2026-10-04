@@ -45,21 +45,14 @@
 }
 
 .exam-category-card {
-  padding: 30px 26px 24px;
-  gap: 10px;
+  padding: 26px 24px;
+  gap: 6px;
 }
 
 .exam-category-name {
   font-size: 1.45rem;
   font-weight: 800;
   color: var(--text-primary);
-}
-
-.exam-category-names {
-  font-size: 0.82rem;
-  line-height: 1.5;
-  word-break: keep-all;
-  color: var(--text-tertiary);
 }
 
 .exam-company-abbr {
@@ -273,12 +266,6 @@
   color: var(--accent-green);
   font-size: 0.7rem;
   font-weight: 700;
-}
-
-.exam-category-mix {
-  font-size: 0.76rem;
-  color: var(--text-secondary);
-  font-weight: 600;
 }
 
 .exam-sync {
