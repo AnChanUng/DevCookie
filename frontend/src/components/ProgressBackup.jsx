@@ -4,13 +4,15 @@ import { mergeProgress, syncAllProgress } from '../hooks/useExamProgress';
 import { account, onAccountChange, signIn, signOut } from '../sync';
 
 const localKey = (company) => `exam-progress:${company}`;
+// 백업·동기화 대상. 주제별 통합 문제집은 문제은행 목록에 없지만 기록은 따로 쌓이므로 함께 챙긴다
+const KEYS = [...BANKS.map(b => b.key), 'topics'];
 
 function readAll() {
   const out = {};
-  for (const c of BANKS) {
+  for (const key of KEYS) {
     try {
-      const raw = localStorage.getItem(localKey(c.key));
-      if (raw) out[c.key] = JSON.parse(raw);
+      const raw = localStorage.getItem(localKey(key));
+      if (raw) out[key] = JSON.parse(raw);
     } catch {
       /* skip unreadable entry */
     }
@@ -36,7 +38,7 @@ function ProgressSync() {
   const [msg, setMsg] = useState('');
 
   const syncAll = async () => {
-    const n = await syncAllProgress(BANKS.map(b => b.key));
+    const n = await syncAllProgress(KEYS);
     setMsg(n ? `${n}개 문제은행 기록을 서버와 맞췄습니다.` : '아직 맞출 풀이 기록이 없습니다.');
   };
   const run = async (job) => {
@@ -104,7 +106,7 @@ export default function ProgressBackup() {
       if (parsed?.app !== 'cs-exam-progress' || !parsed.progress) throw new Error('format');
       let merged = 0;
       for (const [key, incoming] of Object.entries(parsed.progress)) {
-        if (!BANKS.some(c => c.key === key)) continue;
+        if (!KEYS.includes(key)) continue;
         const k = localKey(key);
         let current = null;
         try { current = JSON.parse(localStorage.getItem(k)); } catch { /* treat as empty */ }
@@ -114,7 +116,7 @@ export default function ProgressBackup() {
         merged++;
       }
       setMsg(`${merged}개 문제은행 기록을 합쳤습니다.`);
-      if (account()) syncAllProgress(BANKS.map(b => b.key)).catch(() => {});
+      if (account()) syncAllProgress(KEYS).catch(() => {});
     } catch {
       setMsg('이 사이트에서 내려받은 백업 파일이 아닙니다.');
     } finally {

@@ -4,6 +4,7 @@ import { COMPANIES, CPP_GROUPS, EXAM_CATEGORIES, SOURCE_KINDS } from '../data/ex
 import { track } from '../track';
 import ReportButton from '../components/ReportButton';
 import TheoryLink from '../components/TheoryLink';
+import SimilarQuestion from '../components/SimilarQuestion';
 import { useExamProgress, recordAnswer, isMarked, toggleMark } from '../hooks/useExamProgress';
 import { account } from '../sync';
 
@@ -96,7 +97,7 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
   // 회차가 없는 은행은 문제은행 전체가 모의고사 한 회분이다
   const hasSets = SETS.length > 0;
   const examCount = company.draw ? Object.values(company.draw).reduce((n, c) => n + c, 0) : Q.length;
-  const examSets = hasSets ? SETS : [{ name: '모의고사', sub: company.draw ? `문제은행 ${Q.length}문항에서 실제 출제 비율대로 출제` : '실제 시험의 영역 순서 그대로 출제', kind: mainKind }];
+  const examSets = hasSets ? SETS : [{ name: '모의고사', sub: company.examSub || (company.draw ? `문제은행 ${Q.length}문항에서 실제 출제 비율대로 출제` : '실제 시험의 영역 순서 그대로 출제'), kind: mainKind }];
 
   const wrongIds = ALL.filter(q => data.stats[q.id]?.last === 'w').map(q => q.id);
   const everWrongIds = ALL.filter(q => (data.stats[q.id]?.w || 0) > 0).map(q => q.id);
@@ -109,6 +110,14 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
     const rank = (q) => { const s = data.stats[q.id]; return !s ? 0 : s.last === 'w' ? 1 : 2; };
     return Object.entries(company.draw).flatMap(([sec, n]) =>
       shuffle(Q.filter(q => q.sec === sec)).sort((x, y) => rank(x) - rank(y)).slice(0, n).map(q => q.id));
+  };
+
+  // 문제가 많은 은행(practiceSize)은 영역별 연습을 조금씩 끊어서 낸다. 안 푼 문제 → 틀린 문제 → 맞힌 문제 순
+  const practiceIds = (qs) => {
+    const ids = shuffle(qs.map(q => q.id));
+    if (!company.practiceSize) return ids;
+    const rank = (id) => { const s = data.stats[id]; return !s ? 0 : s.last === 'w' ? 1 : 2; };
+    return ids.sort((x, y) => rank(x) - rank(y)).slice(0, company.practiceSize);
   };
 
   const start = (mode, ids, sec) => {
@@ -370,10 +379,10 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
           const done = qs.filter(q => data.stats[q.id]).length;
           const right = qs.filter(q => data.stats[q.id]?.last === 'r').length;
           return (
-            <button key={k} className="exam-section" onClick={() => start('practice', shuffle(qs.map(q => q.id)), k)}>
+            <button key={k} className="exam-section" onClick={() => start('practice', practiceIds(qs), k)}>
               <span className="t">{s.name}</span>
               <span className="d">{s.sub}</span>
-              <span className="d">{qs.length}문제 · 최근 정답 {right}/{done}</span>
+              <span className="d">{qs.length}문제{company.practiceSize ? ` 중 ${company.practiceSize}문제씩` : ''} · 최근 정답 {right}/{done}</span>
               <span className="bar"><i style={{ width: `${qs.length ? Math.round(right / qs.length * 100) : 0}%` }} /></span>
             </button>
           );
@@ -618,6 +627,7 @@ function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractic
             {q.kind && <ModelAnswer q={q} />}
             <div>{q.e}</div>
             <TheoryLink key={q.id} q={q} />
+            {!q.kind && !isRight(q, sel) && <SimilarQuestion key={`s${q.id}`} q={q} />}
           </div>
         )}
         <div className="exam-actions">

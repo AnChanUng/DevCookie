@@ -36,7 +36,7 @@
 
 .exam-category-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 }
 
@@ -202,6 +202,23 @@
   border-color: var(--accent-blue);
   box-shadow: var(--card-shadow-glow);
 }
+
+/* 틀린 직후 같은 주제 문제 한 번 더 */
+.exam-similar-bar { margin-top: 10px; }
+.exam-similar {
+  margin-top: 12px;
+  padding: 14px 16px;
+  border: 1px dashed var(--accent-blue);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-weight: 400;
+}
+.exam-similar-head { margin-bottom: 8px; font-size: 0.76rem; font-weight: 800; color: var(--accent-blue); }
+.exam-similar-head span { margin-left: 6px; font-weight: 600; color: var(--text-tertiary); }
+.exam-similar .exam-qtext { font-size: 0.95rem; }
+.exam-similar-result { margin-top: 10px; font-size: 0.82rem; font-weight: 800; }
+.exam-similar-ex { margin-top: 4px; font-size: 0.86rem; line-height: 1.65; color: var(--text-secondary); }
 
 /* 해설 아래의 이론 보기 · 상세 설명 */
 .exam-theory { margin-top: 12px; }
