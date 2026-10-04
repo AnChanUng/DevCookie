@@ -2840,7 +2840,8 @@
 }
 .home-top .hero p { margin-left: auto; margin-right: auto; }
 .home-top .home-cta,
-.home-top .goal-strip { justify-content: center; }
+.home-top .goal-strip,
+.home-top .home-outside { justify-content: center; }
 
 .home-top .hero p {
   word-break: keep-all;
@@ -2876,8 +2877,7 @@ a.goal-exam:hover { border-color: var(--accent-blue); }
 .goal-title { font-weight: 700; color: var(--text-primary); }
 
 /* 시험 일정 아래의 코딩테스트 사이트 로고 */
-.home-side { flex: none; display: flex; flex-direction: column; gap: 10px; }
-.home-outside { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding-right: 6px; }
+.home-outside { display: flex; gap: 8px; margin-top: 10px; }
 .home-outside a { display: block; line-height: 0; opacity: 0.75; transition: var(--transition); }
 .home-outside a:hover { opacity: 1; transform: translateY(-2px); }
 .home-outside img { display: block; border-radius: 7px; background: #fff; }
