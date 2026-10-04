@@ -54,6 +54,16 @@ function CategoryPicker() {
           <span className="exam-company-meta">기업 구분 없이 과목별로 모아 풀기</span>
           <span className="exam-category-count">8개 과목 · 20문제씩</span>
         </Link>
+        <Link to="/calc" className="exam-company-card exam-category-card">
+          <span className="exam-category-name">계산 무한 연습</span>
+          <span className="exam-company-meta">숫자가 매번 바뀌는 계산 문제 · 그림 해설</span>
+          <span className="exam-category-count">스케줄링 · 페이지 교체 · 서브넷 등 19종</span>
+        </Link>
+        <Link to="/duel" className="exam-company-card exam-category-card">
+          <span className="exam-category-name">대결</span>
+          <span className="exam-company-meta">같은 10문제로 친구와, 또는 여럿이 겨루기</span>
+          <span className="exam-category-count">1:1 · 단체전</span>
+        </Link>
       </div>
 
       <ProgressBackup />

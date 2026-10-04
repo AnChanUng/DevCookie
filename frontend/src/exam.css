@@ -1988,3 +1988,55 @@ a.exam-search-bank:hover { color: var(--accent-blue); }
 .exam-section.duel-room { text-decoration: none; }
 /* 사람이 많으면 점수판이 길어지므로 안에서 스크롤한다 */
 .duel-board ol { max-height: 360px; overflow-y: auto; }
+
+/* ===== 계산 문제 해설의 그림(시뮬레이터) ===== */
+.sim {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-weight: 400;
+}
+.sim-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 12px; }
+.sim-bar b { font-size: 0.84rem; }
+.sim-bar span { flex: 1; font-size: 0.74rem; color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
+.sim-note { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 10px; font-size: 0.78rem; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.sim-note i { display: inline-block; width: 9px; height: 9px; margin-right: 5px; border-radius: 3px; }
+.sim-note .done { color: var(--text-primary); font-weight: 700; }
+
+.sim-gantt { position: relative; height: 38px; border-radius: 8px; background: var(--bg-tertiary); overflow: hidden; }
+.sim-gantt .seg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: grid;
+  place-items: center;
+  border-right: 2px solid var(--bg-primary);
+  color: #fff;
+  font-size: 0.76rem;
+  font-weight: 800;
+  animation: simIn 0.25s ease-out;
+}
+@keyframes simIn { from { opacity: 0; transform: scaleX(0.6); } to { opacity: 1; transform: none; } }
+.sim-axis { position: relative; height: 18px; margin-top: 3px; }
+.sim-axis span { position: absolute; transform: translateX(-50%); font-size: 0.7rem; color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
+
+.sim-frames-wrap { overflow-x: auto; }
+.sim-frames { border-collapse: collapse; font-size: 0.8rem; font-variant-numeric: tabular-nums; }
+.sim-frames th { padding: 4px 10px 4px 0; text-align: left; font-size: 0.72rem; font-weight: 700; color: var(--text-tertiary); white-space: nowrap; }
+.sim-frames td { width: 30px; height: 28px; border: 1px solid var(--border-color); text-align: center; }
+.sim-frames td.ref { border: 0; font-weight: 800; }
+.sim-frames td.cur { color: var(--accent-blue); }
+.sim-frames td.dim { opacity: 0.3; }
+.sim-frames td.in { background: var(--accent-red-light); color: var(--accent-red); font-weight: 800; }
+.sim-frames td.fault { border: 0; color: var(--accent-red); font-weight: 800; }
+.sim-frames tr:last-child td { border: 0; }
+
+.sim-disk { display: block; width: 100%; max-width: 640px; height: auto; }
+.sim-disk .guide { stroke: var(--border-color); stroke-dasharray: 3 4; }
+.sim-disk .trail { fill: none; stroke: var(--accent-blue); stroke-width: 2; }
+.sim-disk .dot { fill: var(--text-tertiary); }
+.sim-disk .head { fill: var(--accent-blue); }
+.sim-disk text { font-size: 11px; fill: var(--text-secondary); font-variant-numeric: tabular-nums; }
