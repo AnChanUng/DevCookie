@@ -28,6 +28,10 @@ public class Duel {
     @Column(name = "question_ids", nullable = false, columnDefinition = "TEXT")
     private String questionIds;
 
+    // 이 방에서 "한 판 더"로 열린 다음 방. 누가 먼저 눌렀든 모두 같은 방으로 간다
+    @Column(name = "next_code", length = 8)
+    private String nextCode;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 }

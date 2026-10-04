@@ -21,6 +21,18 @@ const shuffle = (arr) => {
   return a;
 };
 
+// 상대와의 전적. 방마다 상대 닉네임별 결과(w·l·d)를 이 브라우저에 적어 두고 닉네임 기준으로 합친다
+const RECORD_KEY = 'duel:record';
+function loadRecord() {
+  try { return JSON.parse(localStorage.getItem(RECORD_KEY)) || {}; } catch { return {}; }
+}
+function tallyOf(record, nickname) {
+  const t = { w: 0, l: 0, d: 0 };
+  for (const room of Object.values(record)) if (room[nickname]) t[room[nickname]]++;
+  return t;
+}
+const tallyText = (t) => [t.w && `${t.w}승`, t.l && `${t.l}패`, t.d && `${t.d}무`].filter(Boolean).join(' ');
+
 // /duel 은 방 만들기, /duel/:code 는 그 방에서 같은 문제를 풀고 점수를 겨루는 화면
 export default function DuelPage() {
   const { code } = useParams();
@@ -86,6 +98,10 @@ function Room({ code }) {
   const [picked, setPicked] = useState(null);
   const [done, setDone] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [invite, setInvite] = useState(''); // 채팅방에 올린 결과 안내
+  const [record, setRecord] = useState(loadRecord);
+  const [rematching, setRematching] = useState(false);
+  const navigate = useNavigate();
   const startedAt = useRef(0);
   const link = `${window.location.origin}/duel/${code}`;
   const headers = { 'X-Visitor-Id': me.visitorId };
@@ -106,7 +122,7 @@ function Room({ code }) {
           setDone(mine.done || mine.answered >= questions.length);
           startedAt.current = Date.now() - mine.seconds * 1000;
         }
-        setRoom({ questions, players: data.players });
+        setRoom({ questions, players: data.players, nextCode: data.nextCode });
         setStatus('ready');
       })
       .catch(err => { if (alive) setStatus(err?.response?.status === 404 ? 'missing' : 'error'); });
@@ -119,12 +135,31 @@ function Room({ code }) {
     if (status !== 'ready') return undefined;
     const timer = setInterval(() => {
       api.get(`/duels/${code}`, { headers, timeout: 8000 })
-        .then(({ data }) => setRoom(r => (r ? { ...r, players: data.players } : r)))
+        .then(({ data }) => setRoom(r => (r ? { ...r, players: data.players, nextCode: data.nextCode } : r)))
         .catch(() => { /* 잠깐 끊겨도 다음 차례에 다시 받는다 */ });
     }, 3000);
     return () => clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, code]);
+
+  // 나와 상대가 모두 끝냈으면 이 방의 승패를 한 번 적어 둔다. 점수판 순서(맞힌 수 → 걸린 시간)가 곧 순위다
+  useEffect(() => {
+    const players = room?.players || [];
+    const mine = players.find(p => p.me);
+    if (!mine?.done) return;
+    const result = {};
+    for (const p of players) {
+      if (p.me || !p.done) continue;
+      result[p.nickname] = p.score === mine.score && p.seconds === mine.seconds ? 'd'
+        : (mine.score > p.score || (mine.score === p.score && mine.seconds < p.seconds)) ? 'w' : 'l';
+    }
+    if (!Object.keys(result).length) return;
+    const saved = loadRecord();
+    if (JSON.stringify(saved[code]) === JSON.stringify(result)) return;
+    const next = { ...saved, [code]: result };
+    try { localStorage.setItem(RECORD_KEY, JSON.stringify(next)); } catch { /* storage unavailable */ }
+    setRecord(next);
+  }, [room, code]);
 
   const report = (nextScore, answered, finished) => {
     const seconds = Math.floor((Date.now() - startedAt.current) / 1000);
@@ -166,6 +201,30 @@ function Room({ code }) {
     if (idx + 1 >= total) setDone(true);
     setIdx(idx + 1);
   };
+  // 사이트 채팅방에 초대 글을 올린다. 채팅은 글 속의 /duel/방번호 를 참가 버튼으로 바꿔 보여 준다
+  const postInvite = async () => {
+    const secs = new Set(room.questions.map(x => x.sec));
+    const subject = secs.size === 1 ? TOPICS.sections[[...secs][0]].name : '전체 과목';
+    setInvite('올리는 중…');
+    try {
+      await api.post('/lounge/messages', { ...me, text: `⚔️ ${subject} ${total}문제 대결 열었어요. 같이 풀어요! /duel/${code}` }, { timeout: 20000 });
+      setInvite('채팅방에 올렸습니다.');
+    } catch (err) {
+      setInvite(err?.response?.data?.error || '올리지 못했습니다. 잠시 뒤에 다시 눌러 주세요.');
+    }
+  };
+  // 같은 과목에서 새 문제를 뽑아 다음 방을 연다. 상대가 먼저 열었으면 그 방으로 간다
+  const rematch = async () => {
+    setRematching(true);
+    const secs = new Set(room.questions.map(x => x.sec));
+    const pool = TOPICS.questions.filter(x => secs.has(x.sec) && !room.questions.includes(x));
+    try {
+      const { data } = await api.post(`/duels/${code}/rematch`, { questionIds: shuffle(pool).slice(0, total).map(x => x.id) }, SLOW);
+      navigate(`/duel/${data.code}`);
+    } catch {
+      setRematching(false);
+    }
+  };
   const copy = async () => {
     try { await navigator.clipboard.writeText(link); setCopied(true); } catch { setCopied(false); }
     setTimeout(() => setCopied(false), 1500);
@@ -179,7 +238,7 @@ function Room({ code }) {
         {room.players.map((p, i) => (
           <li key={i} className={p.me ? 'me' : ''}>
             <span className="no">{i + 1}</span>
-            <span className="nick">{p.nickname}{p.me && <em>나</em>}</span>
+            <span className="nick">{p.nickname}{p.me && <em>나</em>}{!p.me && tallyText(tallyOf(record, p.nickname)) && <small>{tallyText(tallyOf(record, p.nickname))}</small>}</span>
             <span className="st">{p.done ? fmt(p.seconds) : `${p.answered}/${total}`}</span>
             <b>{p.score}</b>
           </li>
@@ -189,6 +248,8 @@ function Room({ code }) {
         <span>친구에게 보낼 링크</span>
         <code>{link}</code>
         <button type="button" className="exam-btn sm" onClick={copy}>{copied ? '복사됨' : '링크 복사'}</button>
+        <button type="button" className="exam-btn sm primary" onClick={postInvite}>채팅방에 올리기</button>
+        {invite && <span className="duel-invite-msg">{invite}</span>}
       </div>
     </aside>
   );
@@ -200,6 +261,12 @@ function Room({ code }) {
         <h1>대결 방 {code}</h1>
         <p>{total}문제 · 맞힌 수가 같으면 빨리 끝낸 사람이 위로 갑니다 · 내 이름: {me.nickname}</p>
       </div>
+      {room.nextCode && !(started && done) && (
+        <div className="exam-resume">
+          <div className="exam-resume-text"><strong>재대결 방이 열렸습니다</strong><span>이 방을 끝낸 사람이 새 문제로 한 판 더를 열었습니다.</span></div>
+          <Link className="exam-btn primary" to={`/duel/${room.nextCode}`}>참가하기</Link>
+        </div>
+      )}
       <div className="exam-quiz-body">
         <div className="exam-quiz-main">
           {!started && (
@@ -250,8 +317,13 @@ function Room({ code }) {
           {started && done && (
             <div className="exam-qcard duel-ready">
               <div className="exam-score"><span className="big">{score}</span><span className="of">/ {total}문제</span></div>
-              <p>다 풀었습니다. 상대가 끝내면 오른쪽 점수판에 순위가 정해집니다.</p>
-              <Link className="exam-btn" to="/duel">새 대결 만들기</Link>
+              <p>다 풀었습니다. 상대가 끝내면 점수판에 순위가 정해지고, 상대 이름 옆에 지금까지의 전적이 쌓입니다.</p>
+              <div className="exam-actions">
+                {room.nextCode
+                  ? <Link className="exam-btn primary" to={`/duel/${room.nextCode}`}>열린 재대결 방으로 →</Link>
+                  : <button type="button" className="exam-btn primary" disabled={rematching} onClick={rematch}>{rematching ? '여는 중…' : '같은 사람들과 한 판 더'}</button>}
+                <Link className="exam-btn" to="/duel">새 대결 만들기</Link>
+              </div>
             </div>
           )}
         </div>
