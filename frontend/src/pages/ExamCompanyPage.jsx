@@ -3,6 +3,7 @@ import { Link, Navigate, useParams } from 'react-router-dom';
 import { COMPANIES, CPP_GROUPS, EXAM_CATEGORIES, SOURCE_KINDS } from '../data/examQuestions';
 import { track } from '../track';
 import ReportButton from '../components/ReportButton';
+import TheoryLink from '../components/TheoryLink';
 import { useExamProgress, recordAnswer, isMarked, toggleMark } from '../hooks/useExamProgress';
 import { account } from '../sync';
 
@@ -515,6 +516,17 @@ function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractic
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isExam]);
 
+  // 키보드로 풀기: 숫자로 보기를 고르고 방향키·Enter로 문제를 넘긴다. 답을 적는 칸에서는 끼어들지 않는다
+  const keyRef = useRef(() => {});
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.ctrlKey || e.metaKey || e.altKey || ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
+      keyRef.current(e);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
   const q = byId[ids[idx]];
   const total = ids.length;
   const answered = Object.keys(answers).length;
@@ -536,6 +548,12 @@ function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractic
     const t = texts[q.id] || '';
     if (q.kind === 'short' && t.trim() && q.acc?.some(x => normAns(x) === normAns(t))) choose('r');
     else setPeeked(p => ({ ...p, [q.id]: true }));
+  };
+
+  keyRef.current = (e) => {
+    if (!q.kind && /^[1-5]$/.test(e.key) && Number(e.key) <= q.o.length) { e.preventDefault(); choose(Number(e.key) - 1); }
+    else if (e.key === 'ArrowRight' || (e.key === 'Enter' && e.target.tagName !== 'BUTTON')) { if (idx < total - 1) setIdx(idx + 1); }
+    else if (e.key === 'ArrowLeft') { if (idx > 0) setIdx(idx - 1); }
   };
 
   return (
@@ -599,6 +617,7 @@ function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractic
             <div className="lab">{q.kind ? (isRight(q, sel) ? '정답' : '오답') : sel === q.a ? '정답' : `오답 · 정답은 ${CIRC[q.a]}`}</div>
             {q.kind && <ModelAnswer q={q} />}
             <div>{q.e}</div>
+            <TheoryLink key={q.id} q={q} />
           </div>
         )}
         <div className="exam-actions">
@@ -623,6 +642,7 @@ function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractic
             return <button key={id} className={cls} onClick={() => setIdx(i)}>{i + 1}</button>;
           })}
         </div>
+        <div className="exam-keyhint">키보드: 숫자 1~{q.o?.length || 4} 보기 선택 · ← → 문제 이동</div>
       </aside>
       </div>
     </div>
@@ -720,6 +740,7 @@ export function ReviewCard({ q, a, extra, sections, marked, onMark }) {
         </div>
       )}
       <div className="ex">{q.e}</div>
+      <TheoryLink q={q} />
       <ReportButton q={q} />
     </div>
   );
