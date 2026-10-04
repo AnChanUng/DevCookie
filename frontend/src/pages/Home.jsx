@@ -25,6 +25,7 @@ export default function Home() {
           <div className="home-cta">
             <Link to="/exam" className="home-cta-btn primary">기출 풀러 가기 →</Link>
             <Link to="/weak" className="home-cta-btn">내 약점 보기</Link>
+            <Link to="/duel" className="home-cta-btn">1:1 대결</Link>
           </div>
           <StudyGoal />
         </div>
