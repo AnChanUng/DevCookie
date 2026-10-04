@@ -1084,6 +1084,20 @@
 .exam-backup-text { display: flex; flex-direction: column; gap: 3px; flex: 1 1 280px; font-size: 0.82rem; color: var(--text-secondary); }
 .exam-backup-text strong { color: var(--text-primary); font-size: 0.9rem; }
 .exam-backup-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.exam-sync-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.exam-sync-form input {
+  width: 130px;
+  padding: 7px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+}
+@media (max-width: 640px) {
+  .exam-sync-form { flex-basis: 100%; }
+  .exam-sync-form input { flex: 1 1 120px; font-size: 16px; }
+}
 .exam-backup-msg { flex-basis: 100%; font-size: 0.8rem; color: var(--accent-blue); }
 
 /* ===== 관리자 (Admin) ===== */
