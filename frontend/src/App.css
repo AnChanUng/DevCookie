@@ -2837,8 +2837,6 @@
   padding: 0;
   text-align: left;
 }
-/* 소개 칸에서 시험 일정 줄만 가운데에 둔다 */
-.home-top .goal-strip { justify-content: center; }
 
 .home-top .hero p {
   word-break: keep-all;
