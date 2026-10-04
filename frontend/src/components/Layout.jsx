@@ -58,7 +58,7 @@ export default function Layout() {
               <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
                 홈
               </Link>
-              <Link to="/exam" className={location.pathname.startsWith('/exam') || location.pathname === '/computer-general' || location.pathname === '/topics' ? 'active' : ''}>
+              <Link to="/exam" className={location.pathname.startsWith('/exam') || location.pathname === '/computer-general' || location.pathname === '/topics' || location.pathname === '/calc' ? 'active' : ''}>
                 기업별 기출
               </Link>
               <Link to="/ncs" className={location.pathname === '/ncs' ? 'active' : ''}>

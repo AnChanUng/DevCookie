@@ -17,6 +17,7 @@ const ComputerGeneralPage = lazy(() => import('./pages/ComputerGeneralPage'));
 const TopicPage = lazy(() => import('./pages/TopicPage'));
 const AlgoPage = lazy(() => import('./pages/AlgoPage'));
 const DuelPage = lazy(() => import('./pages/DuelPage'));
+const CalcPage = lazy(() => import('./pages/CalcPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
 const NcsPage = lazy(() => import('./pages/NcsPage'));
@@ -49,6 +50,7 @@ function App() {
           <Route path="computer-general" element={<ComputerGeneralPage />} />
           <Route path="topics" element={<TopicPage />} />
           <Route path="algo" element={<AlgoPage />} />
+          <Route path="calc" element={<CalcPage />} />
           <Route path="duel" element={<DuelPage />} />
           <Route path="duel/:code" element={<DuelPage />} />
           <Route path="ncs" element={<NcsPage />} />
