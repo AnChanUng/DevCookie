@@ -37,6 +37,7 @@ import { NHIS_SECTIONS, NHIS_QUESTIONS } from './nhisQuestions';
 import { LH_SECTIONS, LH_QUESTIONS } from './lhQuestions';
 import { NHFIRE_SECTIONS, NHFIRE_QUESTIONS, NHFIRE_SETS } from './nhfireQuestions';
 import { IBKDT_SECTIONS, IBKDT_QUESTIONS, IBKDT_SETS } from './ibkDigitalQuestions';
+import { IBK_BIGDATA } from './ibkBigdata';
 import { IBKIT_SECTIONS, IBKIT_QUESTIONS, IBKIT_SETS } from './ibkItQuestions';
 import { HF_CPP_QUESTIONS } from './hfCppQuestions';
 import { COMIL as COMIL_BANK } from './comilQuestions';
@@ -290,10 +291,10 @@ export const COMPANIES = [
     lede: "NCS 직업기초능력(의사소통·수리·문제해결·자료해석·명제논리) 40문제, 직무수행능력 35문제(경제학 12 · 재무관리 8 · 회계 8 · 경영·금융상식 7). 총 75문제, 120분, 4지선다. 출제 구성만 참고해 새로 만든 문제입니다.",
   },
   {
-    key: "ibkdt", category: "finance", abbr: "IBK 디지털", name: "IBK기업은행 디지털", meta: "직무수행(디지털) 30문제 × 3회 · 45분 · 4지선다", ready: true,
+    key: "ibkdt", category: "finance", abbr: "IBK 디지털", name: "IBK기업은행 디지털", meta: "직무수행(디지털) 30문제 × 3회 · 45분 · 4지선다 · 빅데이터 집중 80문제", ready: true,
     source: { kind: "predicted" },
-    questions: IBKDT_QUESTIONS, sections: IBKDT_SECTIONS, minutes: 45,
-    sets: IBKDT_SETS,
+    questions: IBKDT_QUESTIONS, sections: { ...IBKDT_SECTIONS, ...IBK_BIGDATA.sections }, minutes: 45,
+    sets: IBKDT_SETS, units: IBK_BIGDATA,
     lede: "데이터베이스 9문제, 빅데이터·AI 모델링 9문제, 전산학 8문제, 블록체인·디지털금융 시사 4문제. 한 회 30문제, 45분, 4지선다로 3회분을 준비했습니다. 필기 구성(직업기초 40 + 직무수행 35 = 객관식 30 · 주관식 5, 120분)과 디지털 분야 공개 출제범위(데이터베이스 · 빅데이터 · 인공지능 모델링 · 블록체인 · 전산학 · 시사)를 반영해 새로 만든 예상문제입니다. 실제 시험의 주관식 5문항은 포함하지 않았습니다.",
   },
   {
