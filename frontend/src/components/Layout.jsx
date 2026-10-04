@@ -9,12 +9,25 @@ import StudyCount from './StudyCount';
 // 카오스 고양이 챗봇은 잠시 숨겨 둔다. true로 바꾸면 다시 나온다
 const SHOW_CHAOS_CHAT = false;
 
-// 이 사이트 밖의 코딩테스트 준비 사이트. 머리말에 로고만 작게 두고 새 탭으로 연다 (로고 파일은 public/outside/)
+// 이 사이트 밖의 코딩테스트 준비 사이트. 로고만 작게 두고 새 탭으로 연다 (로고 파일은 public/outside/).
+// 넓은 화면에서는 화면 맨 왼쪽에 세로로, 좁은 화면에서는 자리가 없어 머리말 메뉴 줄에 가로로 놓는다
 const OUTSIDE = [
   { href: 'https://www.codetree.ai/ko/frequent-problems', label: '코드트리 기출 빈출 문제', logo: '/outside/codetree.png' },
   { href: 'https://school.programmers.co.kr/learn/challenges?order=acceptance_desc&levels=2%2C3&languages=java', label: '프로그래머스', logo: '/outside/programmers.png' },
   { href: 'https://jungol.co.kr/', label: '정올', logo: '/outside/jungol.png' },
 ];
+
+function OutsideLinks({ className }) {
+  return (
+    <div className={className}>
+      {OUTSIDE.map(o => (
+        <a key={o.href} href={o.href} target="_blank" rel="noopener noreferrer" title={o.label} aria-label={o.label}>
+          <img src={o.logo} alt="" width="22" height="22" />
+        </a>
+      ))}
+    </div>
+  );
+}
 
 export default function Layout() {
   const location = useLocation();
@@ -61,13 +74,7 @@ export default function Layout() {
                 통계
               </Link>
             </nav>
-            <div className="header-outside">
-              {OUTSIDE.map(o => (
-                <a key={o.href} href={o.href} target="_blank" rel="noopener noreferrer" title={o.label} aria-label={o.label}>
-                  <img src={o.logo} alt="" width="20" height="20" />
-                </a>
-              ))}
-            </div>
+            <OutsideLinks className="outside-links in-header" />
             {/* 지금 모드의 아이콘을 보여 주고, 누르면 반대 모드로 바꾼다 */}
             <button
               type="button"
@@ -82,6 +89,8 @@ export default function Layout() {
           </div>
         </div>
       </header>
+      {/* 머리말은 흐림 효과 때문에 고정 위치의 기준이 되므로, 세로 줄은 머리말 밖에 둔다 */}
+      <OutsideLinks className="outside-links rail" />
 
       <main className="container">
         <Suspense fallback={<div className="loading"><div className="loading-spinner" />불러오는 중...</div>}>

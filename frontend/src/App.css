@@ -2871,11 +2871,24 @@ a.goal-exam:hover { border-color: var(--accent-blue); }
 
 .goal-title { font-weight: 700; color: var(--text-primary); }
 
-/* 머리말의 코딩테스트 사이트 로고 */
-.header-outside { flex: none; display: flex; align-items: center; gap: 6px; }
-.header-outside a { display: block; line-height: 0; opacity: 0.75; transition: var(--transition); }
-.header-outside a:hover { opacity: 1; transform: translateY(-1px); }
-.header-outside img { display: block; border-radius: 6px; background: #fff; }
+/* 코딩테스트 사이트 로고: 넓은 화면은 맨 왼쪽 세로 줄, 좁은 화면은 머리말 메뉴 줄 */
+.outside-links { display: flex; align-items: center; gap: 8px; }
+.outside-links a { display: block; line-height: 0; opacity: 0.7; transition: var(--transition); }
+.outside-links a:hover { opacity: 1; transform: scale(1.12); }
+.outside-links img { display: block; border-radius: 6px; background: #fff; }
+.outside-links.rail {
+  position: fixed;
+  left: 14px;
+  top: 50%;
+  z-index: 30;
+  flex-direction: column;
+  transform: translateY(-50%);
+}
+.outside-links.in-header { display: none; flex: none; gap: 6px; }
+@media (max-width: 900px) {
+  .outside-links.rail { display: none; }
+  .outside-links.in-header { display: flex; }
+}
 
 .goal-dday {
   font-weight: 800;
