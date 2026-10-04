@@ -7,6 +7,7 @@ import TheoryLink from '../components/TheoryLink';
 import SimilarQuestion from '../components/SimilarQuestion';
 import { useExamProgress, recordAnswer, isMarked, toggleMark } from '../hooks/useExamProgress';
 import { account } from '../sync';
+import { examFor } from '../schedule';
 
 const CIRC = ['①', '②', '③', '④', '⑤'];
 
@@ -261,6 +262,11 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
     );
   }
 
+  // 첫 화면의 시험 일정에 이 문제집이 걸려 있으면 남은 날로 하루 목표를 계산해 보여 준다
+  const goal = examFor(window.location.pathname);
+  const unseen = ALL.filter(q => !data.stats[q.id]).length;
+  const plan = goal && { ...goal, unseen, perDay: Math.ceil(unseen / Math.max(goal.left, 1)) };
+
   const exams = data.history.filter(h => h.mode === 'exam' || h.mode === 'set');
   const best = exams.reduce((b, h) => (!b || h.score > b.score ? h : b), null);
   const last = exams.at(-1);
@@ -290,6 +296,17 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
   return (
     <div className="fade-in">
       {header(company.name)}
+      {plan && (
+        <div className="exam-plan">
+          <b>{plan.name} {plan.left === 0 ? 'D-DAY' : `D-${plan.left}`}</b>
+          <span>
+            {plan.unseen > 0
+              ? `아직 안 푼 문제 ${plan.unseen}개 · 시험 전까지 다 보려면 하루 ${plan.perDay}문제`
+              : '이 문제집의 문제를 모두 한 번씩 풀었습니다'}
+            {wrongIds.length > 0 && ` · 다시 풀 오답 ${wrongIds.length}개`}
+          </span>
+        </div>
+      )}
       {saved && (
         <div className="exam-resume">
           <div className="exam-resume-text">
