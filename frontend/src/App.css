@@ -2822,6 +2822,24 @@
   cursor: pointer;
 }
 .today-cs-x:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+/* 접어 둔 오늘의 CS: 같은 자리에 작은 버튼으로 남아 다시 펼칠 수 있다 */
+.today-cs-fold {
+  align-self: flex-start;
+  margin: 0 6px 6px;
+  padding: 4px 11px;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-full);
+  background: var(--glass-bg);
+  color: var(--text-tertiary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.today-cs-fold:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
 /* 화면이 좁으면 가운데 칸을 제목 · 순위 아래 줄로 내려 가로로 편다 */
 @media (max-width: 1199px) {
   .home-top { flex-wrap: wrap; }

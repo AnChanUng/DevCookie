@@ -56,26 +56,29 @@ function today() {
 }
 
 // 첫 화면 위쪽 가운데에 말풍선으로 뜨는 "오늘의 CS". 화면 위에 떠 있어서 다른 요소의 자리를 밀지 않고,
-// 닫으면 그날은 다시 뜨지 않는다
+// 닫으면 작은 버튼으로 접히고, 그 버튼을 누르면 언제든 다시 펼쳐진다
 export default function TodayCs() {
   const [{ date, days }] = useState(today);
   const [closed, setClosed] = useState(() => {
     try { return localStorage.getItem(KEY) === date; } catch { return false; }
   });
-  if (closed) return null;
-
   const fact = FACTS[days % FACTS.length];
-  const close = () => {
-    setClosed(true);
-    try { localStorage.setItem(KEY, date); } catch { /* storage unavailable */ }
+  // 접어 둔 상태는 그날 동안 기억한다. 다음 날에는 새 내용으로 다시 펼쳐져 나온다
+  const toggle = (next) => {
+    setClosed(next);
+    try { if (next) localStorage.setItem(KEY, date); else localStorage.removeItem(KEY); } catch { /* storage unavailable */ }
   };
+
+  if (closed) {
+    return <button type="button" className="today-cs-fold" onClick={() => toggle(false)}>오늘의 CS · {fact.t} 펼치기</button>;
+  }
 
   return (
     <aside className="today-cs" role="note">
-      <button type="button" className="today-cs-x" onClick={close} aria-label="오늘의 CS 닫기">✕</button>
+      <button type="button" className="today-cs-x" onClick={() => toggle(true)} aria-label="오늘의 CS 접기">✕</button>
       <div className="today-cs-head"><b>오늘의 CS</b><span>{fact.t}</span></div>
       <p>{fact.s}</p>
-      {fact.to && <Link to={`/question/${fact.to}`} onClick={close}>이론 보기 →</Link>}
+      {fact.to && <Link to={`/question/${fact.to}`}>이론 보기 →</Link>}
     </aside>
   );
 }
