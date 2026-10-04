@@ -92,7 +92,7 @@ function nyquist() {
 /* ===================== 운영체제 ===================== */
 
 // 스케줄링 한 판을 돌려 간트 차트 조각과 프로세스별 종료 시각을 구한다
-function runSchedule(procs, algo, quantum) {
+export function runSchedule(procs, algo, quantum) {
   const n = procs.length;
   const left = procs.map(p => p.burst);
   const finish = Array(n).fill(0);
@@ -160,7 +160,7 @@ function scheduling() {
 }
 
 // 페이지 교체 한 판. 단계마다 프레임 모습과 부재 여부를 남긴다
-function runPaging(refs, frames, algo) {
+export function runPaging(refs, frames, algo) {
   let mem = [];
   const loaded = new Map(); // 들어온 순서 (FIFO)
   const used = new Map(); // 마지막으로 쓴 시점 (LRU)
@@ -207,7 +207,7 @@ function pageReplacement() {
 }
 
 // 디스크 스케줄링 한 판. 헤드가 지나간 위치를 순서대로 돌려준다
-function runDisk(start, queue, algo, max) {
+export function runDisk(start, queue, algo, max) {
   const path = [start];
   if (algo === 'FCFS') path.push(...queue);
   else if (algo === 'SSTF') {

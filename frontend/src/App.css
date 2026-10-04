@@ -2844,7 +2844,61 @@
   font-weight: 800;
 }
 .today-cs-head span { font-size: 0.84rem; font-weight: 800; color: var(--text-primary); }
-.today-cs p { font-size: 0.78rem; line-height: 1.6; color: var(--text-secondary); word-break: keep-all; }
+.today-cs-body { display: block; font-size: 0.78rem; line-height: 1.6; color: var(--text-secondary); word-break: keep-all; }
+.today-cs-more { display: block; margin-top: 4px; font-size: 0.7rem; font-weight: 700; color: var(--accent-blue); }
+button.today-cs { display: block; width: auto; font: inherit; cursor: pointer; transition: var(--transition); }
+button.today-cs:hover { border-color: var(--accent-blue); transform: translateY(-2px); }
+
+/* 오늘의 CS 확인 문제 창: 화면 위에 덮어 띄운다 */
+.today-quiz-back {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.45);
+}
+.today-quiz {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: min(86vh, 760px);
+  overflow-y: auto;
+  padding: 20px 22px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  box-shadow: var(--card-shadow-hover);
+}
+.today-quiz-x { position: absolute; top: 12px; right: 12px; width: 28px; height: 28px; border: 0; border-radius: 50%; background: none; color: var(--text-tertiary); cursor: pointer; }
+.today-quiz-x:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+.today-quiz-sum { margin: 6px 0 4px; font-size: 0.84rem; line-height: 1.65; color: var(--text-secondary); word-break: keep-all; }
+.today-quiz-note { margin-top: 14px; font-size: 0.82rem; color: var(--text-tertiary); }
+.today-quiz-q { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-color); }
+.today-quiz-qt { display: flex; gap: 8px; margin-bottom: 8px; font-size: 0.92rem; font-weight: 700; line-height: 1.5; }
+.today-quiz-qt b { flex: none; color: var(--accent-blue); }
+.today-quiz-q ul { list-style: none; display: grid; gap: 6px; }
+.today-quiz-q li button {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.86rem;
+  line-height: 1.5;
+  text-align: left;
+  cursor: pointer;
+}
+.today-quiz-q li button span { flex: none; color: var(--text-tertiary); }
+.today-quiz-q li button:hover:not(:disabled) { border-color: var(--accent-blue); background: var(--accent-blue-light); }
+.today-quiz-q li button:disabled { cursor: default; }
+.today-quiz-q li button.right { border-color: var(--accent-green); background: var(--accent-green-light); }
+.today-quiz-q li button.wrong { border-color: var(--accent-red); background: var(--accent-red-light); }
+.today-quiz-ex { margin-top: 8px; font-size: 0.82rem; line-height: 1.65; color: var(--text-secondary); }
 /* 화면이 좁으면 가운데 칸을 제목 · 순위 아래 줄로 내려 가로로 편다 */
 @media (max-width: 1199px) {
   .home-top { flex-wrap: wrap; }

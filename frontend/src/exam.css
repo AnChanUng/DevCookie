@@ -744,8 +744,8 @@
 }
 
 .exam-code {
-  background: #1B2436;
-  color: #E8ECF3;
+  background: var(--code-bg);
+  color: var(--code-text);
   font-family: ui-monospace, Consolas, "D2Coding", monospace;
   font-size: 0.84rem;
   line-height: 1.55;
@@ -1798,7 +1798,6 @@ a.exam-search-bank:hover { color: var(--accent-blue); }
 :root[data-mode='dark'] .exam-mode.mark .exam-mode-count b,
 :root[data-mode='dark'] .exam-mode.mark .exam-mode-go,
 :root[data-mode='dark'] .exam-mark:hover { color: #F2C94C; }
-:root[data-mode='dark'] .exam-code { background: #0B1220; }
 
 /* ===== 코테 풀이 모아보기 (/algo) ===== */
 /* 코드를 나란히 보려면 폭이 필요해서 문제 풀이 화면처럼 본문 폭을 벗어나 넓게 쓴다 */
@@ -1897,8 +1896,8 @@ a.exam-search-bank:hover { color: var(--accent-blue); }
 .algo-code {
   margin: 0;
   padding: 12px 0;
-  background: #1B2436;
-  color: #E8ECF3;
+  background: var(--code-bg);
+  color: var(--code-text);
   font-family: ui-monospace, Consolas, "D2Coding", monospace;
   font-size: 0.76rem;
   line-height: 1.55;
@@ -1907,17 +1906,16 @@ a.exam-search-bank:hover { color: var(--accent-blue); }
   overflow: auto;
   counter-reset: ln;
 }
-:root[data-mode='dark'] .algo-code { background: #0B1220; }
 .algo-view.all .algo-code { max-height: 440px; }
-.algo-code span { display: block; padding-right: 14px; white-space: pre; }
-.algo-code span::before {
+.algo-code > span { display: block; padding-right: 14px; white-space: pre; }
+.algo-code > span::before {
   counter-increment: ln;
   content: counter(ln);
   display: inline-block;
   width: 40px;
   margin-right: 12px;
   text-align: right;
-  color: #5B6B86;
+  color: var(--code-ln);
   user-select: none;
 }
 
@@ -2040,3 +2038,10 @@ a.exam-search-bank:hover { color: var(--accent-blue); }
 .sim-disk .dot { fill: var(--text-tertiary); }
 .sim-disk .head { fill: var(--accent-blue); }
 .sim-disk text { font-size: 11px; fill: var(--text-secondary); font-variant-numeric: tabular-nums; }
+
+/* 코드 색 입히기 (components/Code.jsx). 색은 화면 모드마다 index.css의 --code-* 변수가 정한다 */
+.tk-kw { color: var(--code-kw); font-weight: 600; }
+.tk-str { color: var(--code-str); }
+.tk-num { color: var(--code-num); }
+.tk-com { color: var(--code-com); font-style: italic; }
+.tk-ann { color: var(--code-ann); }

@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
+import Code from '../components/Code';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import api from '../api';
 import { track } from '../track';
@@ -198,7 +199,7 @@ function Solve({ problem }) {
               <div className="lab">해설</div>
               <p>{problem.explain}</p>
               <div className="lab">모범답안</div>
-              <pre className="exam-code">{problem.answer}</pre>
+              <Code code={problem.answer} />
             </div>
           )}
         </section>

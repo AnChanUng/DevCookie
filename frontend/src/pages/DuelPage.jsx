@@ -5,6 +5,7 @@ import { TOPICS } from '../data/topicBank';
 import { myNickname } from '../nickname';
 import { recordAnswer, useExamProgress } from '../hooks/useExamProgress';
 import { visitorId } from '../track';
+import Code from '../components/Code';
 
 const CIRC = ['①', '②', '③', '④', '⑤'];
 const SIZE = 10;
@@ -315,7 +316,7 @@ function Room({ code }) {
                     <td />
                     <td colSpan={reviewers.length + 1}>
                       {x.ctx && <div className="exam-ctx">{x.ctx}</div>}
-                      {x.code && <pre className="exam-code">{x.code}</pre>}
+                      {x.code && <Code code={x.code} />}
                       <div className="ans">정답 {CIRC[x.a]} {x.o[x.a]}</div>
                       <div className="ex">{x.e}</div>
                     </td>
@@ -384,7 +385,7 @@ function Room({ code }) {
                   <span className="exam-chip">{q.topic}</span>
                 </div>
                 {q.ctx && <div className="exam-ctx">{q.ctx}</div>}
-                {q.code && <pre className="exam-code">{q.code}</pre>}
+                {q.code && <Code code={q.code} />}
                 <p className="exam-qtext">{q.q}</p>
                 <ul className="exam-opts">
                   {q.o.map((opt, i) => {

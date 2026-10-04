@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { TOPICS } from '../data/topicBank';
 import { theoryFor } from '../theory';
+import Code from './Code';
 
 const CIRC = ['①', '②', '③', '④', '⑤'];
 const baseTopic = (q) => (q.topic || '').split(' · ')[0];
@@ -37,7 +38,7 @@ export default function SimilarQuestion({ q }) {
       <div className="exam-similar-head">같은 주제 문제 {at + 1} / {pool.length} <span>{s.topic}</span></div>
       {s.ctx && <div className="exam-ctx">{s.ctx}</div>}
       <div className="exam-qtext">{s.q}</div>
-      {s.code && <pre className="exam-code">{s.code}</pre>}
+      {s.code && <Code code={s.code} />}
       <ul className="exam-opts">
         {s.o.map((opt, i) => {
           let cls = 'exam-opt';
