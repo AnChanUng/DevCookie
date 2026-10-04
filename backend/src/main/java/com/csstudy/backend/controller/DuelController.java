@@ -43,19 +43,39 @@ public class DuelController {
 
     @PostMapping
     public ResponseEntity<?> create(@RequestBody Map<String, Object> body) throws JsonProcessingException {
-        if (!(body.get("questionIds") instanceof List<?> raw) || raw.size() < MIN_QUESTIONS || raw.size() > MAX_QUESTIONS) {
-            return ResponseEntity.badRequest().body(Map.of("error", "문제는 " + MIN_QUESTIONS + "~" + MAX_QUESTIONS + "개여야 합니다."));
+        List<String> ids = questionIds(body);
+        if (ids == null) return ResponseEntity.badRequest().body(Map.of("error", "문제 번호를 확인해 주세요. " + MIN_QUESTIONS + "~" + MAX_QUESTIONS + "개여야 합니다."));
+        return ResponseEntity.ok(Map.of("code", open(ids).getCode()));
+    }
+
+    // 끝난 방에서 "한 판 더"를 누르면 새 방을 열어 이어 준다. 이미 열려 있으면 그 방을 돌려준다
+    @PostMapping("/{code}/rematch")
+    public ResponseEntity<?> rematch(@PathVariable String code, @RequestBody Map<String, Object> body) throws JsonProcessingException {
+        Optional<Duel> found = duelRepository.findByCode(code.toUpperCase());
+        if (found.isEmpty()) return ResponseEntity.notFound().build();
+        Duel duel = found.get();
+        if (duel.getNextCode() == null) {
+            List<String> ids = questionIds(body);
+            if (ids == null) return ResponseEntity.badRequest().body(Map.of("error", "문제 번호를 확인해 주세요."));
+            duel.setNextCode(open(ids).getCode());
+            duelRepository.save(duel);
         }
+        return ResponseEntity.ok(Map.of("code", duel.getNextCode()));
+    }
+
+    private Duel open(List<String> ids) throws JsonProcessingException {
+        return duelRepository.save(Duel.builder().code(newCode()).questionIds(json.writeValueAsString(ids)).createdAt(Instant.now()).build());
+    }
+
+    // 쓸 수 없는 목록이면 null
+    private static List<String> questionIds(Map<String, Object> body) {
+        if (!(body.get("questionIds") instanceof List<?> raw) || raw.size() < MIN_QUESTIONS || raw.size() > MAX_QUESTIONS) return null;
         List<String> ids = new ArrayList<>();
         for (Object o : raw) {
-            if (!(o instanceof String s) || s.isBlank() || s.length() > 60) {
-                return ResponseEntity.badRequest().body(Map.of("error", "문제 번호를 확인해 주세요."));
-            }
+            if (!(o instanceof String s) || s.isBlank() || s.length() > 60) return null;
             ids.add(s);
         }
-        String code = newCode();
-        duelRepository.save(Duel.builder().code(code).questionIds(json.writeValueAsString(ids)).createdAt(Instant.now()).build());
-        return ResponseEntity.ok(Map.of("code", code));
+        return ids;
     }
 
     // 방문자 ID를 헤더로 주면 순위표에서 본인 줄을 표시해 준다
@@ -69,6 +89,7 @@ public class DuelController {
         out.put("code", duel.getCode());
         out.put("questionIds", json.readValue(duel.getQuestionIds(), new TypeReference<List<String>>() {}));
         out.put("players", board(duel.getCode(), visitorId));
+        out.put("nextCode", duel.getNextCode());
         return ResponseEntity.ok(out);
     }
 

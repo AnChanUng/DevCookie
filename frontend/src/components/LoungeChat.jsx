@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../api';
 import { visitorId } from '../track';
 import { NICKNAME_MAX, cleanNickname, myNickname, saveNickname, savedNickname } from '../nickname';
@@ -6,6 +7,13 @@ import { NICKNAME_MAX, cleanNickname, myNickname, saveNickname, savedNickname } 
 const POLL_OPEN = 3000;
 const POLL_CLOSED = 30000;
 const TEXT_MAX = 200;
+
+// 대결 초대 글에 든 /duel/방번호 는 누르면 바로 들어가는 참가 버튼으로 보여 준다
+function ChatText({ text }) {
+  const m = text.match(/^(.*?)\s*\/duel\/([A-Za-z0-9]{6})\b(.*)$/s);
+  if (!m) return text;
+  return <>{m[1]} <Link to={`/duel/${m[2].toUpperCase()}`} className="lounge-join">참가하기 →</Link>{m[3]}</>;
+}
 const KEEP = 200;
 const SEEN_KEY = 'lounge:seen';
 
@@ -141,7 +149,7 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
         {messages.map(m => (
           <div key={m.id} className={`lounge-msg${m.visitor === me ? ' mine' : ''}`}>
             <span className="lounge-meta">{m.visitor === me ? '나' : m.nickname} · {fmtAt(m.at)}</span>
-            <span className="lounge-bubble">{m.text}</span>
+            <span className="lounge-bubble"><ChatText text={m.text} /></span>
           </div>
         ))}
       </div>

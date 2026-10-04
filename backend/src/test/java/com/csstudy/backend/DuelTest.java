@@ -83,6 +83,23 @@ class DuelTest {
     }
 
     @Test
+    void rematchOpensOneNextRoomForEveryone() throws Exception {
+        String code = create(List.of("a:1", "a:2", "a:3"));
+        String body = json.writeValueAsString(Map.of("questionIds", List.of("b:1", "b:2", "b:3")));
+        String first = json.readTree(mvc.perform(post("/api/v1/duels/" + code + "/rematch").contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString()).get("code").asText();
+        // 두 번째로 누른 사람의 문제 목록은 버리고 먼저 열린 방으로 보낸다
+        String other = json.writeValueAsString(Map.of("questionIds", List.of("c:1", "c:2", "c:3")));
+        mvc.perform(post("/api/v1/duels/" + code + "/rematch").contentType(MediaType.APPLICATION_JSON).content(other))
+                .andExpect(jsonPath("$.code").value(first));
+
+        mvc.perform(get("/api/v1/duels/" + code)).andExpect(jsonPath("$.nextCode").value(first));
+        mvc.perform(get("/api/v1/duels/" + first))
+                .andExpect(jsonPath("$.questionIds[0]").value("b:1"))
+                .andExpect(jsonPath("$.nextCode").doesNotExist());
+    }
+
+    @Test
     void badInputIsRejected() throws Exception {
         mvc.perform(post("/api/v1/duels").contentType(MediaType.APPLICATION_JSON)
                 .content(json.writeValueAsString(Map.of("questionIds", List.of("only-one")))))
