@@ -203,6 +203,30 @@
   box-shadow: var(--card-shadow-glow);
 }
 
+/* 해설 아래의 이론 보기 · 상세 설명 */
+.exam-theory { margin-top: 12px; }
+.exam-theory-bar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.exam-theory-bar a.exam-btn { text-decoration: none; color: var(--accent-blue); border-color: var(--accent-blue); }
+.exam-theory-body {
+  margin-top: 10px;
+  max-height: 420px;
+  overflow: auto;
+  padding: 14px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.86rem;
+  font-weight: 400;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.exam-keyhint { display: none; }
+@media (min-width: 900px) {
+  .exam-keyhint { display: block; margin-top: 12px; font-size: 0.72rem; color: var(--text-tertiary); }
+}
+
 /* 풀던 문제 이어풀기 안내 */
 .exam-resume {
   display: flex;

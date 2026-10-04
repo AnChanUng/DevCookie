@@ -58,7 +58,8 @@ function collect() {
     }
 
     marks += Object.values(saved.marks || {}).filter(m => m?.on).length;
-    if (bankSeen) {
+    // 아직 손대지 않은 문제은행도 넣어서 전체 진도를 한눈에 보게 한다
+    if (bank.ready !== false) {
       banks.push({
         key: bank.key, name: bank.name, seen: bankSeen, total: questions.length,
         percent: rate(bankC, bankW), open: bankOpen,
@@ -74,7 +75,7 @@ function collect() {
     areas: [...areas.values()].sort(byWeakest),
     // 한 번만 푼 주제는 정답률이 0% 아니면 100%라 판단에 쓸 수 없어 2회 이상만 본다
     topics: [...topics.values()].filter(t => t.c + t.w >= 2).sort(byWeakest).slice(0, 15),
-    banks: banks.sort((a, b) => b.open - a.open),
+    banks: banks.sort((a, b) => b.open - a.open || b.seen - a.seen),
   };
 }
 
@@ -177,18 +178,20 @@ export default function WeakPage() {
         </>
       )}
 
-      <div className="section-title">문제은행별 현황</div>
+      <div className="section-title">문제은행별 진도</div>
+      <p className="exam-lede">전체 {s.banks.length}개 문제은행 중 {s.banks.filter(b => b.seen).length}개를 풀기 시작했습니다. 아직 시작하지 않은 문제은행도 함께 보여 줍니다.</p>
       <div className="exam-table-wrap">
         <table className="exam-table admin-table">
-          <thead><tr><th>문제은행</th><th>푼 문제</th><th>정답률</th><th>틀린 상태</th><th>바로 가기</th></tr></thead>
+          <thead><tr><th>문제은행</th><th>푼 문제</th><th className="admin-barcol">진도</th><th>정답률</th><th>틀린 상태</th><th>바로 가기</th></tr></thead>
           <tbody>
             {s.banks.map(b => (
               <tr key={b.key}>
                 <td>{b.name}</td>
                 <td className="num">{b.seen} / {b.total}</td>
-                <td className="num">{b.percent}%</td>
-                <td className="num">{b.open}</td>
-                <td><Link className="exam-btn sm" to={b.to}>{b.open ? '오답 다시 풀기' : '이어서 풀기'}</Link></td>
+                <td className="admin-barcol"><span className="admin-bar"><i style={{ width: `${Math.round(b.seen / b.total * 100)}%` }} /></span></td>
+                <td className="num">{b.seen ? `${b.percent}%` : '–'}</td>
+                <td className="num">{b.seen ? b.open : '–'}</td>
+                <td><Link className="exam-btn sm" to={b.to}>{!b.seen ? '시작하기' : b.open ? '오답 다시 풀기' : '이어서 풀기'}</Link></td>
               </tr>
             ))}
           </tbody>
