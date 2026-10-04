@@ -2869,6 +2869,53 @@
 
 a.goal-exam:hover { border-color: var(--accent-blue); }
 
+.goal-none { font-size: 0.76rem; color: var(--text-tertiary); }
+.goal-edit {
+  padding: 3px 9px;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-full);
+  background: none;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+.goal-edit:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+
+/* 시험 일정 편집 */
+.goal-editor {
+  display: grid;
+  gap: 6px;
+  max-width: 560px;
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  text-align: left;
+}
+.goal-row { display: grid; grid-template-columns: minmax(0, 1.1fr) 132px minmax(0, 1.2fr) 28px; gap: 6px; }
+.goal-row input,
+.goal-row select {
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.8rem;
+}
+.goal-del { border: 0; border-radius: 8px; background: none; color: var(--text-tertiary); cursor: pointer; }
+.goal-del:hover { background: var(--accent-red-light); color: var(--accent-red); }
+.goal-editor-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 2px; }
+.goal-editor-foot span { font-size: 0.72rem; color: var(--text-tertiary); }
+@media (max-width: 640px) {
+  .goal-row { grid-template-columns: minmax(0, 1fr) 132px 28px; }
+  .goal-row select { grid-column: 1 / -1; grid-row: 2; }
+  .goal-row input, .goal-row select { font-size: 16px; }
+}
+
 .goal-title { font-weight: 700; color: var(--text-primary); }
 
 /* 코딩테스트 사이트 로고: 넓은 화면은 맨 왼쪽 세로 줄, 좁은 화면은 머리말 메뉴 줄 */

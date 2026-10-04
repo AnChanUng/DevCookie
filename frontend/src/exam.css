@@ -244,6 +244,22 @@
   .exam-keyhint { display: block; margin-top: 12px; font-size: 0.72rem; color: var(--text-tertiary); }
 }
 
+/* 시험 일정에 걸린 문제집의 하루 목표 */
+.exam-plan {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--accent-blue);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+}
+.exam-plan b { font-size: 0.9rem; color: var(--accent-blue); font-variant-numeric: tabular-nums; }
+.exam-plan span { font-size: 0.82rem; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+
 /* 풀던 문제 이어풀기 안내 */
 .exam-resume {
   display: flex;
