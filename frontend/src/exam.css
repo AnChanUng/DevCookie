@@ -1791,14 +1791,14 @@ a.exam-search-bank:hover { color: var(--accent-blue); }
 }
 
 /* ===== 다크 모드에서 변수로 바꿀 수 없는 색 ===== */
-:root[data-theme='dark'] .exam-book.has.mark,
-:root[data-theme='dark'] .exam-mode.mark .exam-mode-icon,
-:root[data-theme='dark'] .exam-mark.on { background: rgba(224, 168, 0, 0.18); border-color: rgba(224, 168, 0, 0.5); color: #F2C94C; }
-:root[data-theme='dark'] .exam-book.has.mark .n,
-:root[data-theme='dark'] .exam-mode.mark .exam-mode-count b,
-:root[data-theme='dark'] .exam-mode.mark .exam-mode-go,
-:root[data-theme='dark'] .exam-mark:hover { color: #F2C94C; }
-:root[data-theme='dark'] .exam-code { background: #0B1220; }
+:root[data-mode='dark'] .exam-book.has.mark,
+:root[data-mode='dark'] .exam-mode.mark .exam-mode-icon,
+:root[data-mode='dark'] .exam-mark.on { background: rgba(224, 168, 0, 0.18); border-color: rgba(224, 168, 0, 0.5); color: #F2C94C; }
+:root[data-mode='dark'] .exam-book.has.mark .n,
+:root[data-mode='dark'] .exam-mode.mark .exam-mode-count b,
+:root[data-mode='dark'] .exam-mode.mark .exam-mode-go,
+:root[data-mode='dark'] .exam-mark:hover { color: #F2C94C; }
+:root[data-mode='dark'] .exam-code { background: #0B1220; }
 
 /* ===== 코테 풀이 모아보기 (/algo) ===== */
 /* 코드를 나란히 보려면 폭이 필요해서 문제 풀이 화면처럼 본문 폭을 벗어나 넓게 쓴다 */
@@ -1907,7 +1907,7 @@ a.exam-search-bank:hover { color: var(--accent-blue); }
   overflow: auto;
   counter-reset: ln;
 }
-:root[data-theme='dark'] .algo-code { background: #0B1220; }
+:root[data-mode='dark'] .algo-code { background: #0B1220; }
 .algo-view.all .algo-code { max-height: 440px; }
 .algo-code span { display: block; padding-right: 14px; white-space: pre; }
 .algo-code span::before {
