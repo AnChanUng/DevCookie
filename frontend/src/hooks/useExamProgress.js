@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { account, fetchRemote, pushRemote, pushRemoteNow } from '../sync';
 
 // marks: 북마크. 오답 기록(stats)과 별도로 저장해 한쪽이 유실돼도 다시 풀 문제를 찾을 수 있게 한다
 const EMPTY = { stats: {}, history: [], marks: {}, updatedAt: 0 };
-// 기록은 이 브라우저의 로컬 저장소에만 둔다. 예전 계정별 키(`:userId` 접미사)는 첫 로드 때 흡수한다
+// 기록은 이 브라우저의 로컬 저장소에 두고, 동기화 계정에 로그인했으면 서버에도 함께 올린다.
+// 예전 계정별 키(`:userId` 접미사)는 첫 로드 때 흡수한다
 const localKey = (company, userId) => (userId ? `exam-progress:${company}:${userId}` : `exam-progress:${company}`);
 
 function readLocal(company, userId) {
@@ -66,6 +68,37 @@ function absorbAccountRecords(company) {
   return merged;
 }
 
+const hasRecords = (d) => !!d && (Object.keys(d.stats || {}).length > 0 || (d.history || []).length > 0 || Object.keys(d.marks || {}).length > 0);
+const sameRecords = (a, b) => JSON.stringify([a?.stats || {}, a?.history || [], a?.marks || {}]) === JSON.stringify([b?.stats || {}, b?.history || [], b?.marks || {}]);
+
+// 서버 기록을 받아 이 브라우저 기록과 합치고, 합친 결과가 서버와 다르면 다시 올린다. 합친 기록을 돌려준다
+export async function syncProgress(company, { wait = false } = {}) {
+  const remote = await fetchRemote(company);
+  const local = readLocal(company, null);
+  const merged = remote ? mergeProgress(local, { ...EMPTY, ...remote }) : local;
+  if (!sameRecords(merged, local)) writeLocal(company, null, merged);
+  if (hasRecords(merged) && !sameRecords(merged, remote)) {
+    if (wait) await pushRemoteNow(company, merged);
+    else pushRemote(company, merged, 0);
+  }
+  return merged;
+}
+
+// 모든 문제은행을 한꺼번에 맞춘다. 서버에 무리가 가지 않게 몇 개씩 나눠 부른다
+export async function syncAllProgress(companies) {
+  let done = 0;
+  const queue = [...companies];
+  const worker = async () => {
+    while (queue.length) {
+      const key = queue.shift();
+      const merged = await syncProgress(key, { wait: true });
+      if (hasRecords(merged)) done++;
+    }
+  };
+  await Promise.all(Array.from({ length: 4 }, worker));
+  return done;
+}
+
 export function useExamProgress(company) {
   const [state, setState] = useState(() => ({ company, data: absorbAccountRecords(company) }));
   if (state.company !== company) setState({ company, data: absorbAccountRecords(company) });
@@ -77,7 +110,20 @@ export function useExamProgress(company) {
     const next = { ...(typeof updater === 'function' ? updater(latest.current) : updater), updatedAt: Date.now() };
     latest.current = next;
     writeLocal(company, null, next);
+    pushRemote(company, next);
     setState(prev => (prev.company === company ? { ...prev, data: next } : prev));
+  }, [company]);
+
+  // 로그인해 있으면 이 문제은행을 열 때 다른 기기에서 푼 기록을 받아 합친다
+  useEffect(() => {
+    if (!account()) return undefined;
+    let alive = true;
+    syncProgress(company).then(merged => {
+      if (!alive || sameRecords(merged, latest.current)) return;
+      latest.current = merged;
+      setState(prev => (prev.company === company ? { ...prev, data: merged } : prev));
+    }).catch(() => { /* 서버에 닿지 않으면 이 브라우저 기록으로 계속한다 */ });
+    return () => { alive = false; };
   }, [company]);
 
   return { data, save };

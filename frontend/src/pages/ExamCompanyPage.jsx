@@ -4,6 +4,7 @@ import { COMPANIES, CPP_GROUPS, EXAM_CATEGORIES, SOURCE_KINDS } from '../data/ex
 import { track } from '../track';
 import ReportButton from '../components/ReportButton';
 import { useExamProgress, recordAnswer, isMarked, toggleMark } from '../hooks/useExamProgress';
+import { account } from '../sync';
 
 const CIRC = ['①', '②', '③', '④', '⑤'];
 
@@ -171,7 +172,9 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
         </div>
       )}
       <h1>{title}</h1>
-      <div className="exam-sync local"><i />이 브라우저에 저장됨 · 기업별 기출문제 목록에서 JSON으로 백업할 수 있습니다</div>
+      {account()
+        ? <div className="exam-sync cloud"><i />{account().nickname} 계정에 동기화됨 · 다른 기기에서도 같은 기록을 봅니다</div>
+        : <div className="exam-sync local"><i />이 브라우저에 저장됨 · 기업별 기출문제 목록에서 로그인하면 다른 기기와 동기화됩니다</div>}
     </div>
   );
 
