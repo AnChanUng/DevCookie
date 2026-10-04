@@ -11,13 +11,6 @@ const MENUS = [
   { to: '/major', tone: 'pink', tag: '요약노트', title: '필기이론', desc: '자격증 요약노트 열람과 다운로드' },
 ];
 
-// 이 사이트 밖의 코딩테스트 준비 사이트. 로고만 작게 두고 새 탭으로 연다 (로고 파일은 public/outside/)
-const OUTSIDE = [
-  { href: 'https://www.codetree.ai/ko/frequent-problems', label: '코드트리 기출 빈출 문제', logo: '/outside/codetree.png' },
-  { href: 'https://school.programmers.co.kr/learn/challenges?order=acceptance_desc&levels=2%2C3&languages=java', label: '프로그래머스', logo: '/outside/programmers.png' },
-  { href: 'https://jungol.co.kr/', label: '정올', logo: '/outside/jungol.png' },
-];
-
 export default function Home() {
   return (
     <div className="fade-in home">
@@ -32,13 +25,6 @@ export default function Home() {
             <Link to="/weak" className="home-cta-btn">내 약점 보기</Link>
           </div>
           <StudyGoal />
-          <div className="home-outside">
-            {OUTSIDE.map(o => (
-              <a key={o.href} href={o.href} target="_blank" rel="noopener noreferrer" title={o.label} aria-label={o.label}>
-                <img src={o.logo} alt="" width="24" height="24" loading="lazy" />
-              </a>
-            ))}
-          </div>
         </div>
         <SolveRank />
       </div>
