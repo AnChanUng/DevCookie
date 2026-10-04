@@ -5,7 +5,6 @@ import { track } from '../track';
 import ChaosChat from './ChaosChat';
 import StudyAmbience from './StudyAmbience';
 import StudyCount from './StudyCount';
-import TodayCs from './TodayCs';
 
 // 카오스 고양이 챗봇은 잠시 숨겨 둔다. true로 바꾸면 다시 나온다
 const SHOW_CHAOS_CHAT = false;
@@ -95,8 +94,6 @@ export default function Layout() {
       </header>
       {/* 머리말은 흐림 효과 때문에 고정 위치의 기준이 되므로, 세로 줄은 머리말 밖에 둔다 */}
       <OutsideLinks className="outside-links rail" />
-      {/* 첫 화면에서만 뜨는 말풍선. 화면 전환 효과(transform) 안에 두면 고정 위치가 어긋나서 본문 밖에 둔다 */}
-      {location.pathname === '/' && <TodayCs />}
 
       <main className="container">
         <Suspense fallback={<div className="loading"><div className="loading-spinner" />불러오는 중...</div>}>

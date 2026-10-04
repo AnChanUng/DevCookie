@@ -2763,37 +2763,39 @@
   background: var(--accent-blue-light);
 }
 
-/* 첫 화면의 "오늘의 CS": 위쪽 가운데에 뜨는 말풍선. 화면 위에 떠 있어 다른 요소의 자리를 밀지 않는다 */
+/* 첫 화면 가운데 칸: 제목과 순위 카드 사이. 위에 오늘의 CS 말풍선, 아래에 이어서 하기 카드 */
+.home-mid { flex: none; width: 270px; display: flex; flex-direction: column; gap: 0; }
+.home-mid:empty { display: none; }
+
+/* "오늘의 CS" 말풍선. 꼬리가 아래의 이어서 하기 카드를 가리키고, 카드 위로 살짝 겹친다 */
 .today-cs {
-  position: fixed;
-  top: 76px;
-  /* 왼쪽의 큰 제목을 가리지 않게 가운데에서 조금 오른쪽으로 둔다 */
-  left: calc(50% + 80px);
-  z-index: 40;
-  width: min(360px, calc(100vw - 32px));
-  padding: 12px 34px 12px 16px;
+  position: relative;
+  z-index: 2;
+  margin: 0 6px -8px;
+  padding: 12px 30px 12px 14px;
   border: 1px solid var(--border-color);
   border-radius: 16px;
   background: var(--bg-primary);
   box-shadow: var(--card-shadow-hover);
-  transform: translateX(-50%);
+  text-align: left;
   animation: todayCsIn 0.35s ease-out;
 }
-/* 말풍선 꼬리 */
+.today-cs:last-child { margin-bottom: 0; }
 .today-cs::after {
   content: '';
   position: absolute;
-  left: 50%;
+  left: 28px;
   bottom: -7px;
   width: 12px;
   height: 12px;
   border-right: 1px solid var(--border-color);
   border-bottom: 1px solid var(--border-color);
   background: var(--bg-primary);
-  transform: translateX(-50%) rotate(45deg);
+  transform: rotate(45deg);
 }
-@keyframes todayCsIn { from { opacity: 0; transform: translate(-50%, -8px); } to { opacity: 1; transform: translateX(-50%); } }
-.today-cs-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.today-cs:last-child::after { display: none; }
+@keyframes todayCsIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+.today-cs-head { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; margin-bottom: 4px; }
 .today-cs-head b {
   flex: none;
   padding: 2px 9px;
@@ -2803,8 +2805,8 @@
   font-size: 0.7rem;
   font-weight: 800;
 }
-.today-cs-head span { font-size: 0.86rem; font-weight: 800; color: var(--text-primary); }
-.today-cs p { font-size: 0.8rem; line-height: 1.6; color: var(--text-secondary); word-break: keep-all; }
+.today-cs-head span { font-size: 0.84rem; font-weight: 800; color: var(--text-primary); }
+.today-cs p { font-size: 0.78rem; line-height: 1.6; color: var(--text-secondary); word-break: keep-all; }
 .today-cs a { display: inline-block; margin-top: 4px; font-size: 0.74rem; font-weight: 700; color: var(--accent-blue); }
 .today-cs-x {
   position: absolute;
@@ -2820,26 +2822,24 @@
   cursor: pointer;
 }
 .today-cs-x:hover { background: var(--bg-tertiary); color: var(--text-primary); }
-/* 화면이 좁아 제목과 겹칠 때는 오른쪽 순위 카드 위의 빈자리로 옮긴다 */
+/* 화면이 좁으면 가운데 칸을 제목 · 순위 아래 줄로 내려 가로로 편다 */
 @media (max-width: 1199px) {
-  .today-cs { left: auto; right: 16px; width: min(330px, calc(100vw - 32px)); transform: none; animation-name: todayCsInFlat; }
-  .today-cs::after { left: 70%; }
+  .home-top { flex-wrap: wrap; }
+  .home-mid { order: 3; width: 100%; max-width: 420px; }
 }
-@keyframes todayCsInFlat { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
-/* 폰에서는 위쪽이 제목으로 꽉 차므로 아래쪽에 띄운다 */
 @media (max-width: 640px) {
-  .today-cs { top: auto; bottom: 110px; right: 16px; left: 16px; width: auto; }
-  .today-cs::after { display: none; }
+  .home-mid { order: 0; max-width: none; }
 }
 
 /* 첫 화면의 "이어서 하기" */
 .home-continue {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 12px;
   max-width: 100%;
-  margin-top: 22px;
-  padding: 10px 14px 10px 16px;
+  position: relative;
+  z-index: 1;
+  padding: 16px 14px 12px 16px;
   border: 1px solid var(--accent-blue);
   border-radius: var(--radius-md);
   background: var(--accent-blue-light);
@@ -2847,12 +2847,11 @@
   transition: var(--transition);
 }
 .home-continue:hover { transform: translateY(-2px); box-shadow: var(--card-shadow-glow); }
-.home-continue-text { display: flex; flex-direction: column; min-width: 0; }
+.home-continue-text { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 .home-continue-text small { font-size: 0.7rem; font-weight: 800; color: var(--accent-blue); }
 .home-continue-text b { font-size: 0.92rem; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .home-continue-text span { font-size: 0.76rem; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
 .home-continue-go { flex: none; font-size: 0.82rem; font-weight: 800; color: var(--accent-blue); }
-.home-continue + .home-cta { margin-top: 14px; }
 
 .home-cta {
   display: flex;
@@ -2908,7 +2907,7 @@
 .home-top {
   display: flex;
   align-items: center;
-  gap: 48px;
+  gap: 28px;
   padding: 56px 0 40px;
 }
 
