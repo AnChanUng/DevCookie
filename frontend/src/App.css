@@ -2763,6 +2763,28 @@
   background: var(--accent-blue-light);
 }
 
+/* 첫 화면의 "이어서 하기" */
+.home-continue {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 100%;
+  margin-top: 22px;
+  padding: 10px 14px 10px 16px;
+  border: 1px solid var(--accent-blue);
+  border-radius: var(--radius-md);
+  background: var(--accent-blue-light);
+  text-align: left;
+  transition: var(--transition);
+}
+.home-continue:hover { transform: translateY(-2px); box-shadow: var(--card-shadow-glow); }
+.home-continue-text { display: flex; flex-direction: column; min-width: 0; }
+.home-continue-text small { font-size: 0.7rem; font-weight: 800; color: var(--accent-blue); }
+.home-continue-text b { font-size: 0.92rem; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.home-continue-text span { font-size: 0.76rem; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.home-continue-go { flex: none; font-size: 0.82rem; font-weight: 800; color: var(--accent-blue); }
+.home-continue + .home-cta { margin-top: 14px; }
+
 .home-cta {
   display: flex;
   flex-wrap: wrap;
