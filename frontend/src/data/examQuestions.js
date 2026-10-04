@@ -39,14 +39,17 @@ import { NHFIRE_SECTIONS, NHFIRE_QUESTIONS, NHFIRE_SETS } from './nhfireQuestion
 import { IBKDT_SECTIONS, IBKDT_QUESTIONS, IBKDT_SETS } from './ibkDigitalQuestions';
 import { IBKIT_SECTIONS, IBKIT_QUESTIONS, IBKIT_SETS } from './ibkItQuestions';
 import { HF_CPP_QUESTIONS } from './hfCppQuestions';
-import { COMIL } from './comilQuestions';
+import { COMIL as COMIL_BANK } from './comilQuestions';
+import { COMIL_UNITS } from './comilUnits';
 import { NCS } from './ncsQuestions';
 import { HF_RECALL_2026B } from './hfRecall2026bQuestions';
 import { SSAFY_ALGO_SECTIONS, SSAFY_ALGO_QUESTIONS, SSAFY_ALGO_SETS } from './ssafyAlgoQuestions';
 import { DAOU_SECTIONS, DAOU_QUESTIONS, DAOU_SETS } from './daouQuestions';
 import { SSAFY_MONTHLY_SECTIONS, SSAFY_MONTHLY_QUESTIONS, SSAFY_MONTHLY_SETS } from './ssafyMonthlyQuestions';
 export { HF_CPP_QUESTIONS, CPP_GROUPS } from './hfCppQuestions';
-export { COMIL, NCS };
+export { NCS };
+// 컴퓨터일반은 모의고사 문제은행에 단원별 문제집을 붙인다. 단원은 모의고사 영역과 따로 센다(extra)
+export const COMIL = { ...COMIL_BANK, sections: { ...COMIL_BANK.sections, ...COMIL_UNITS.sections }, units: COMIL_UNITS };
 
 export const SECTIONS = {
   cs:  {name:'전산학일반', short:'전산', sub:'OS · 컴퓨터구조 · 정보보호 · SW공학 · 자료구조', count:36},

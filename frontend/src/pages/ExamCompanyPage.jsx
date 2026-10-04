@@ -684,7 +684,8 @@ function ReviewList({ items, sections, defaultFilter, marks, onMark }) {
 function WrongBook({ Q, ids, stats, sections, marks, onMark }) {
   const [filter, setFilter] = useState('all');
   if (!ids.length) return <div className="empty"><div className="empty-icon">📋</div>아직 틀린 문제가 없습니다. 모의고사나 영역별 연습을 먼저 풀어보세요.</div>;
-  const tabs = [['all', '전체'], ...Object.entries(sections).map(([k, v]) => [k, v.name])];
+  const has = new Set(Q.filter(q => ids.includes(q.id)).map(q => q.sec)); // 문제가 있는 영역만 탭으로 낸다
+  const tabs = [['all', '전체'], ...Object.entries(sections).filter(([k]) => has.has(k)).map(([k, v]) => [k, v.name])];
   const qs = Q.filter(q => ids.includes(q.id) && (filter === 'all' || q.sec === filter))
     .sort((x, y) => stats[y.id].w - stats[x.id].w);
   return (
@@ -714,7 +715,8 @@ function WrongBook({ Q, ids, stats, sections, marks, onMark }) {
 function MarkBook({ Q, ids, stats, sections, marks, onMark }) {
   const [filter, setFilter] = useState('all');
   if (!ids.length) return <div className="empty"><div className="empty-icon">☆</div>아직 북마크한 문제가 없습니다. 문제를 풀다가 ☆ 버튼을 눌러 표시해 두세요.</div>;
-  const tabs = [['all', '전체'], ...Object.entries(sections).map(([k, v]) => [k, v.name])];
+  const has = new Set(Q.filter(q => ids.includes(q.id)).map(q => q.sec)); // 문제가 있는 영역만 탭으로 낸다
+  const tabs = [['all', '전체'], ...Object.entries(sections).filter(([k]) => has.has(k)).map(([k, v]) => [k, v.name])];
   const qs = Q.filter(q => ids.includes(q.id) && (filter === 'all' || q.sec === filter))
     .sort((x, y) => (marks[y.id]?.at || 0) - (marks[x.id]?.at || 0));
   return (
