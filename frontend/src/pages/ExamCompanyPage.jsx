@@ -486,8 +486,10 @@ function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractic
   };
 
   return (
-    <div className="fade-in">
+    <div className="fade-in exam-quiz">
       {header(title)}
+      <div className="exam-quiz-body">
+      <div className="exam-quiz-main">
       <div className="exam-qhead">
         <span className="prog">{idx + 1} / {total}</span>
         <span className="prog">답변 {answered}</span>
@@ -555,14 +557,20 @@ function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractic
           <button className="exam-btn ghost" onClick={() => { if (confirm('진행 중인 풀이를 종료할까요? 답변한 문제만 기록됩니다.')) onFinish(quiz, answers, true); }}>그만두기</button>
         </div>
       </div>
+      </div>
 
-      <div className="exam-gridnav">
-        {ids.map((id, i) => {
-          let cls = 'gn';
-          if (i === idx) cls += ' cur';
-          if (answers[id] !== undefined) cls += isRight(byId[id], answers[id]) ? ' r' : ' w';
-          return <button key={id} className={cls} onClick={() => setIdx(i)}>{i + 1}</button>;
-        })}
+      {/* 넓은 화면에서는 문제 옆에 붙어 따라오고, 좁은 화면에서는 문제 아래로 내려간다 */}
+      <aside className="exam-quiz-side">
+        <div className="exam-quiz-side-title">문제 번호 <span>{answered} / {total} 답변</span></div>
+        <div className="exam-gridnav">
+          {ids.map((id, i) => {
+            let cls = 'gn';
+            if (i === idx) cls += ' cur';
+            if (answers[id] !== undefined) cls += isRight(byId[id], answers[id]) ? ' r' : ' w';
+            return <button key={id} className={cls} onClick={() => setIdx(i)}>{i + 1}</button>;
+          })}
+        </div>
+      </aside>
       </div>
     </div>
   );
