@@ -1756,3 +1756,13 @@ a.exam-search-bank:hover { color: var(--accent-blue); }
   .cos-problem { padding: 18px 16px; }
   .cos-editor { min-height: 360px; font-size: 0.8rem; }
 }
+
+/* ===== 다크 모드에서 변수로 바꿀 수 없는 색 ===== */
+:root[data-theme='dark'] .exam-book.has.mark,
+:root[data-theme='dark'] .exam-mode.mark .exam-mode-icon,
+:root[data-theme='dark'] .exam-mark.on { background: rgba(224, 168, 0, 0.18); border-color: rgba(224, 168, 0, 0.5); color: #F2C94C; }
+:root[data-theme='dark'] .exam-book.has.mark .n,
+:root[data-theme='dark'] .exam-mode.mark .exam-mode-count b,
+:root[data-theme='dark'] .exam-mode.mark .exam-mode-go,
+:root[data-theme='dark'] .exam-mark:hover { color: #F2C94C; }
+:root[data-theme='dark'] .exam-code { background: #0B1220; }

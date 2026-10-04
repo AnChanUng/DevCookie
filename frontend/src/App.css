@@ -16,6 +16,34 @@
   border-bottom: 1px solid var(--border-color);
 }
 
+:root[data-theme='dark'] .header { background: rgba(15, 22, 38, 0.82); }
+
+/* 화면 모드(화이트 / 다크) 선택 */
+.theme-toggle {
+  flex: none;
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  background: var(--glass-bg);
+}
+.theme-toggle button {
+  border: 0;
+  background: none;
+  padding: 5px 11px;
+  border-radius: var(--radius-full);
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.theme-toggle button.on { background: var(--accent-blue); color: #fff; }
+@media (max-width: 640px) {
+  .theme-toggle button { padding: 5px 8px; }
+  .theme-toggle button span { display: none; }
+}
+
 .header-inner {
   max-width: 1128px;
   display: flex;
@@ -496,28 +524,6 @@
 }
 
 /* 헤더 맨 오른쪽의 코드 타자 연습 버튼. 따로 배포된 외부 사이트로 나간다 */
-.typing-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  flex: none;
-  padding: 6px 13px;
-  border-radius: var(--radius-full);
-  font-size: 0.8rem;
-  font-weight: 800;
-  color: #fff;
-  background: var(--gradient-primary);
-  box-shadow: 0 4px 14px var(--accent-blue-glow);
-  white-space: nowrap;
-  transition: var(--transition);
-}
-
-.typing-link:hover {
-  color: #fff;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px var(--accent-blue-glow);
-}
-
 .user-info {
   display: flex;
   align-items: center;
@@ -3073,6 +3079,9 @@ a.goal-exam:hover { border-color: var(--accent-blue); }
   opacity: 0.5;
   transition: var(--transition);
 }
+
+/* 오락실 옆에 나란히 놓는 작은 바깥 링크 */
+.typing-door { left: 54px; }
 
 .arcade-door:hover {
   opacity: 1;

@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { warmUpBackend } from '../api';
 import { track } from '../track';
@@ -11,6 +11,14 @@ const SHOW_CHAOS_CHAT = false;
 
 export default function Layout() {
   const location = useLocation();
+  // 화면 모드는 index.html에서 먼저 적용해 두고, 여기서는 바꿀 때만 반영하고 기억한다
+  const [theme, setThemeState] = useState(() => (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'));
+  const setTheme = (next) => {
+    setThemeState(next);
+    if (next === 'dark') document.documentElement.dataset.theme = 'dark';
+    else delete document.documentElement.dataset.theme;
+    try { localStorage.setItem('theme', next); } catch { /* storage unavailable */ }
+  };
 
   // 첫 화면이 뜨는 동안 잠들어 있던 서버를 깨워 두면 이후 요청이 바로 온다
   useEffect(() => { warmUpBackend(); }, []);
@@ -46,11 +54,11 @@ export default function Layout() {
                 통계
               </Link>
             </nav>
+            <div className="theme-toggle" role="group" aria-label="화면 모드">
+              <button type="button" className={theme === 'light' ? 'on' : ''} onClick={() => setTheme('light')} title="화이트 모드">☀️<span> 화이트</span></button>
+              <button type="button" className={theme === 'dark' ? 'on' : ''} onClick={() => setTheme('dark')} title="다크 모드">🌙<span> 다크</span></button>
+            </div>
             <StudyCount />
-            {/* 코드 타자 연습은 따로 배포된 외부 사이트라 새 탭으로 연다 */}
-            <a href="https://ssafy-code-race.onrender.com/" target="_blank" rel="noopener noreferrer" className="typing-link" title="코딩으로 타자 연습하러 가기">
-              <span aria-hidden="true">⌨️</span>코딩 타자 연습
-            </a>
           </div>
         </div>
       </header>

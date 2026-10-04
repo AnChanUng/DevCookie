@@ -48,6 +48,8 @@ export default function Home() {
 
       {/* 오락실은 SPA 밖의 정적 페이지라 Link가 아니라 일반 링크로 연다 */}
       <a href="/arcade/" className="arcade-door">오락실</a>
+      {/* 코드 타자 연습은 따로 배포된 외부 사이트라 새 탭으로 연다 */}
+      <a href="https://ssafy-code-race.onrender.com/" target="_blank" rel="noopener noreferrer" className="arcade-door typing-door">코딩 타자 연습</a>
       {/* 오른쪽 아래 도크: 위에서부터 멘탈 기르기, 오늘의 운세 */}
       <div className="home-dock">
         <MentalTraining />

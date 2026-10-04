@@ -5,6 +5,10 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>전산학 전공필기 준비</title>
+    <!-- 저장해 둔 화면 모드(화이트 / 다크)를 첫 그림 전에 적용해 깜빡임을 막는다 -->
+    <script>
+      try { if (localStorage.getItem('theme') === 'dark') document.documentElement.dataset.theme = 'dark'; } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>
