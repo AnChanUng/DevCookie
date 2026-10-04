@@ -250,7 +250,6 @@
 
 .exam-kind.recall { color: var(--accent-green); }
 .exam-kind.predicted { color: var(--accent-blue); }
-.exam-mode.primary .exam-kind { color: #fff; }
 
 /* 목록 화면: 복기 / 예상 그룹 */
 .exam-group { margin-bottom: 30px; }
@@ -358,9 +357,6 @@
   margin-bottom: 28px;
 }
 
-/* 모의고사는 한 줄을 다 쓰고, 그 아래에 오답과 북마크 다시 풀기가 나란히 온다 */
-.exam-modes .exam-mode.primary { grid-column: 1 / -1; }
-
 .exam-mode {
   position: relative;
   overflow: hidden;
@@ -463,40 +459,6 @@
 .exam-mode:hover:not(:disabled) .exam-mode-go {
   transform: translateX(4px);
 }
-
-/* 실전 모의고사: 화면에서 가장 먼저 눈에 들어와야 하는 카드 */
-.exam-mode.primary {
-  background: var(--gradient-primary);
-  color: #fff;
-  border-color: transparent;
-  box-shadow: 0 12px 32px rgba(99, 102, 241, 0.28);
-}
-
-.exam-mode.primary::before,
-.exam-mode.primary::after {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  pointer-events: none;
-}
-
-.exam-mode.primary::before { width: 220px; height: 220px; right: -70px; top: -90px; }
-.exam-mode.primary::after { width: 140px; height: 140px; right: 60px; bottom: -90px; }
-
-.exam-mode.primary > span { position: relative; z-index: 1; }
-
-.exam-mode.primary:hover:not(:disabled) {
-  border-color: transparent;
-  box-shadow: 0 18px 40px rgba(99, 102, 241, 0.38);
-}
-
-.exam-mode.primary .exam-mode-icon { background: rgba(255, 255, 255, 0.2); color: #fff; }
-.exam-mode.primary .exam-mode-count { color: rgba(255, 255, 255, 0.8); }
-.exam-mode.primary .exam-mode-count b,
-.exam-mode.primary .exam-mode-go { color: #fff; }
-.exam-mode.primary .d { color: rgba(255, 255, 255, 0.88); }
-.exam-mode.primary .exam-mode-chip { background: rgba(255, 255, 255, 0.18); color: #fff; }
 
 /* 오답 다시 풀기: 풀 문제가 남아 있으면 붉은 기운으로 알려 준다 */
 .exam-mode.wrong .exam-mode-icon { background: var(--accent-red-light); color: var(--accent-red); }

@@ -35,7 +35,7 @@ const fmtDate = (ts) => {
   return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 };
 const modeLabel = (sections, mode, sec, sets) =>
-  mode === 'exam' ? '실전 모의고사'
+  mode === 'exam' ? '모의고사'
     : mode === 'set' ? sets?.find(s => s.key === sec)?.name || '회차별 모의고사'
     : mode === 'wrong' ? '오답 다시 풀기'
     : mode === 'marked' ? '북마크 다시 풀기'
@@ -77,21 +77,14 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
   const byId = useMemo(() => Object.fromEntries(ALL.map(q => [q.id, q])), [ALL]);
   const { data, save } = useExamProgress(company.key);
   const [view, setView] = useState({ name: 'home' });
-  // draw가 있으면 모의고사를 문제은행 전체가 아니라 영역별 출제 비율만큼 뽑아서 구성한다
-  const examCount = company.draw ? Object.values(company.draw).reduce((n, c) => n + c, 0) : Q.length;
+  // 회차가 없는 은행은 문제은행 전체가 모의고사 한 회분이다
+  const hasSets = SETS.length > 0;
+  const examSets = hasSets ? SETS : [{ name: '모의고사', sub: '실제 시험의 영역 순서 그대로 출제', kind: mainKind }];
 
   const wrongIds = ALL.filter(q => data.stats[q.id]?.last === 'w').map(q => q.id);
   const everWrongIds = ALL.filter(q => (data.stats[q.id]?.w || 0) > 0).map(q => q.id);
   const markedIds = ALL.filter(q => isMarked(data, q.id)).map(q => q.id);
   const onMark = (qid) => save(prev => ({ ...prev, marks: toggleMark(prev.marks, qid) }));
-
-  // 안 푼 문제 → 마지막에 틀린 문제 → 맞힌 문제 순으로 우선해서 뽑는다
-  const examIds = () => {
-    if (!company.draw) return Q.map(q => q.id);
-    const rank = (q) => { const s = data.stats[q.id]; return !s ? 0 : s.last === 'w' ? 1 : 2; };
-    return Object.entries(company.draw).flatMap(([sec, n]) =>
-      shuffle(Q.filter(q => q.sec === sec)).sort((x, y) => rank(x) - rank(y)).slice(0, n).map(q => q.id));
-  };
 
   const start = (mode, ids, sec) => {
     if (!ids.length) return;
@@ -229,22 +222,21 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
     );
   }
 
-  const exams = data.history.filter(h => h.mode === 'exam');
-  const best = exams.length ? Math.max(...exams.map(h => h.score)) : null;
-  const last = exams.length ? exams[exams.length - 1].score : null;
+  const exams = data.history.filter(h => h.mode === 'exam' || h.mode === 'set');
+  const best = exams.reduce((b, h) => (!b || h.score > b.score ? h : b), null);
+  const last = exams.at(-1);
 
-  // 복기 회차와 예상 회차가 나뉜 은행은 이 구역을 맨 위에 둔다
-  const setsBlock = SETS.length > 0 && (
+  const setsBlock = (
     <>
-      <div className="section-title">회차별 모의고사</div>
-      <p className="exam-lede">실제 시험과 같은 문항 수·영역 구성으로 묶은 고정 세트입니다. {splitSets && '복기 기반 회차는 응시 후기에 복원된 문항을 따라 만들었고, 예상문제 회차는 같은 경향으로 새로 만든 문제입니다. '}실전 모의고사가 문제은행에서 매번 새로 뽑는 것과 달리, 각 회차는 같은 문제를 같은 순서로 출제하므로 회차 간 점수를 비교할 수 있습니다.</p>
+      <div className="section-title">{hasSets ? '회차별 모의고사' : '모의고사'}</div>
+      {hasSets && <p className="exam-lede">실제 시험과 같은 문항 수·영역 구성으로 묶은 고정 세트입니다. {splitSets && '복기 기반 회차는 응시 후기에 복원된 문항을 따라 만들었고, 예상문제 회차는 같은 경향으로 새로 만든 문제입니다. '}각 회차는 같은 문제를 같은 순서로 출제하므로 다시 풀었을 때 점수를 비교할 수 있습니다.</p>}
       <div className="exam-sections">
-        {SETS.map(s => {
-          const qs = Q.filter(q => q.set === s.key);
+        {examSets.map(s => {
+          const qs = hasSets ? Q.filter(q => q.set === s.key) : Q;
           const done = qs.filter(q => data.stats[q.id]).length;
           const right = qs.filter(q => data.stats[q.id]?.last === 'r').length;
           return (
-            <button key={s.key} className="exam-section" onClick={() => start('set', qs.map(q => q.id), s.key)}>
+            <button key={s.name} className="exam-section" onClick={() => start(hasSets ? 'set' : 'exam', qs.map(q => q.id), s.key)}>
               <span className="t">{s.name}<Kind kind={s.kind} /></span>
               <span className="d">{s.sub}</span>
               <span className="d">{qs.length}문제 · {company.minutes}분 · 최근 정답 {right}/{done}</span>
@@ -290,29 +282,16 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
         </>
       )}
 
-      {splitSets && setsBlock}
+      {setsBlock}
 
       <div className="exam-stats">
         <StatTile k="모의고사 응시" v={exams.length} unit="회" />
-        <StatTile k="최고 점수" v={best ?? '–'} of={examCount} />
-        <StatTile k="최근 점수" v={last ?? '–'} of={examCount} />
+        <StatTile k="최고 점수" v={best?.score ?? '–'} of={best?.total ?? Q.length} />
+        <StatTile k="최근 점수" v={last?.score ?? '–'} of={last?.total ?? Q.length} />
         <StatTile k="현재 오답" v={wrongIds.length} unit="문제" />
       </div>
 
       <div className="exam-modes">
-        <button className="exam-mode primary" onClick={() => start('exam', examIds())}>
-          <span className="exam-mode-head">
-            <span className="exam-mode-icon" aria-hidden="true">⏱</span>
-            <span className="exam-mode-count"><b>{examCount}</b>문항</span>
-          </span>
-          <span className="t">실전 모의고사<Kind kind={mainKind} /></span>
-          <span className="d">{company.draw ? `${splitSets ? '복기 기반 회차와 예상문제 회차를 합친 ' : ''}문제은행 ${Q.length}문항에서 실제 출제 비율대로 뽑아 냅니다.` : '실제 시험의 영역 순서 그대로 출제합니다.'} 고르면 바로 정답과 해설이 나옵니다.</span>
-          <span className="exam-mode-foot">
-            <span className="exam-mode-chip">{company.minutes}분 타이머</span>
-            <span className="exam-mode-chip">즉시 채점</span>
-            <span className="exam-mode-go">시작하기 →</span>
-          </span>
-        </button>
         <button className={`exam-mode wrong${wrongIds.length ? '' : ' empty'}`} disabled={!wrongIds.length} onClick={() => start('wrong', shuffle(wrongIds))}>
           <span className="exam-mode-head">
             <span className="exam-mode-icon" aria-hidden="true">{wrongIds.length ? '↺' : '✓'}</span>
@@ -340,8 +319,6 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
           </span>
         </button>
       </div>
-
-      {!splitSets && setsBlock}
 
       <div className="section-title">영역별 연습<Kind kind={mainKind} /></div>
       <div className="exam-sections">
