@@ -3,6 +3,7 @@ import StudyGoal from '../components/StudyGoal';
 import DailyFortune from '../components/DailyFortune';
 import MentalTraining from '../components/MentalTraining';
 import SolveRank from '../components/SolveRank';
+import ContinueCard from '../components/ContinueCard';
 
 const MENUS = [
   { to: '/exam', tone: 'indigo', tag: '전공필기', title: '기업별 기출문제', desc: '금융공기업, 공기업, 컴퓨터일반 기출 모의고사' },
@@ -20,6 +21,7 @@ export default function Home() {
           <span className="home-eyebrow">공기업 IT직무</span>
           <h1>전산학 전공필기 준비</h1>
           <p>기출 기반 모의고사로 풀고, 틀린 문제는 다시 풉니다.</p>
+          <ContinueCard />
           <div className="home-cta">
             <Link to="/exam" className="home-cta-btn primary">기출 풀러 가기 →</Link>
             <Link to="/weak" className="home-cta-btn">내 약점 보기</Link>

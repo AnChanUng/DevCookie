@@ -82,7 +82,6 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
   const ALL = useMemo(() => [...Q, ...CPP, ...(RECALL?.questions || []), ...(UNITS?.questions || [])], [Q, CPP, RECALL, UNITS]); // 오답노트·오답 다시 풀기 범위
   const byId = useMemo(() => Object.fromEntries(ALL.map(q => [q.id, q])), [ALL]);
   const { data, save } = useExamProgress(company.key);
-  const [view, setView] = useState({ name: 'home' });
   // 풀던 문제는 새로고침하거나 탭을 닫아도 이어서 풀 수 있게 문제은행마다 한 건씩 저장해 둔다
   const RESUME_KEY = `exam-resume:${company.key}`;
   const [saved, setSaved] = useState(() => {
@@ -93,7 +92,20 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
       return null;
     }
   });
-  const saveResume = (state) => { try { localStorage.setItem(RESUME_KEY, JSON.stringify(state)); } catch { /* 저장 공간이 없으면 이어풀기만 포기한다 */ } };
+  // 첫 화면의 "이어서 하기"로 들어오면(?resume=1) 안내를 거치지 않고 풀던 문제를 바로 연다
+  const [view, setView] = useState(() => (saved && new URLSearchParams(window.location.search).has('resume')
+    ? { name: 'quiz', mode: saved.mode, sec: saved.sec, ids: saved.ids, resume: saved }
+    : { name: 'home' }));
+  // 첫 화면은 문제 데이터를 읽지 않으므로, 거기서 보여 줄 이름 · 주소 · 풀이 종류를 함께 적어 둔다
+  const saveResume = (state) => {
+    try {
+      localStorage.setItem(RESUME_KEY, JSON.stringify({ ...state, name: company.name, to: window.location.pathname, label: label(state.mode, state.sec), at: Date.now() }));
+    } catch { /* 저장 공간이 없으면 이어풀기만 포기한다 */ }
+  };
+  // 마지막으로 연 문제집. 풀던 문제가 없을 때 첫 화면이 이쪽으로 이어 준다
+  useEffect(() => {
+    try { localStorage.setItem('exam:last', JSON.stringify({ name: company.name, to: window.location.pathname, at: Date.now() })); } catch { /* 무시 */ }
+  }, [company]);
   const clearResume = () => { try { localStorage.removeItem(RESUME_KEY); } catch { /* 무시 */ } setSaved(null); };
   // 회차가 없는 은행은 문제은행 전체가 모의고사 한 회분이다
   const hasSets = SETS.length > 0;
