@@ -2835,24 +2835,8 @@
   flex: 1;
   min-width: 0;
   padding: 0;
-  text-align: center;
+  text-align: left;
 }
-.home-top .hero p { margin-left: auto; margin-right: auto; }
-.home-top .home-cta { justify-content: center; }
-
-/* 시험 일정과 코딩테스트 사이트를 가운데 한 줄로 */
-.home-strip {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 4px 22px;
-  margin-top: 22px;
-}
-.home-strip .goal-strip { margin-top: 0; justify-content: center; }
-
-.home-rank { display: flex; justify-content: center; padding: 12px 0 40px; }
-.home-rank .solve-rank { width: min(560px, 100%); }
 
 .home-top .hero p {
   word-break: keep-all;
@@ -2888,7 +2872,7 @@ a.goal-exam:hover { border-color: var(--accent-blue); }
 .goal-title { font-weight: 700; color: var(--text-primary); }
 
 /* 시험 일정 아래의 코딩테스트 사이트 로고 */
-.home-outside { display: inline-flex; gap: 8px; }
+.home-outside { display: flex; gap: 8px; margin-top: 10px; }
 .home-outside a { display: block; line-height: 0; opacity: 0.75; transition: var(--transition); }
 .home-outside a:hover { opacity: 1; transform: translateY(-2px); }
 .home-outside img { display: block; border-radius: 7px; background: #fff; }

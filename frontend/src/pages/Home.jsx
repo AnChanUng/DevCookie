@@ -21,30 +21,26 @@ const OUTSIDE = [
 export default function Home() {
   return (
     <div className="fade-in home">
-      {/* 소개는 가운데에 두고, 그 아래 한 줄에 시험 일정과 코딩테스트 사이트를 나란히 놓는다 */}
+      {/* 왼쪽은 소개와 시험 일정, 오른쪽은 문제 많이 푼 사람 순위 */}
       <div className="home-top">
         <div className="hero">
           <span className="home-eyebrow">공기업 IT직무</span>
           <h1>전산학 전공필기 준비</h1>
-          <p>전공필기 · NCS · 인적성을 기출 기반 모의고사로 풀고, 틀린 문제는 다시 풉니다.</p>
+          <p>기출 기반 모의고사로 풀고, 틀린 문제는 다시 풉니다.</p>
           <div className="home-cta">
             <Link to="/exam" className="home-cta-btn primary">기출 풀러 가기 →</Link>
             <Link to="/weak" className="home-cta-btn">내 약점 보기</Link>
           </div>
-          <div className="home-strip">
-            <StudyGoal />
-            <div className="goal-strip">
-              <span className="goal-label">코딩테스트</span>
-              <span className="home-outside">
-                {OUTSIDE.map(o => (
-                  <a key={o.href} href={o.href} target="_blank" rel="noopener noreferrer" title={o.label} aria-label={o.label}>
-                    <img src={o.logo} alt="" width="24" height="24" loading="lazy" />
-                  </a>
-                ))}
-              </span>
-            </div>
+          <StudyGoal />
+          <div className="home-outside">
+            {OUTSIDE.map(o => (
+              <a key={o.href} href={o.href} target="_blank" rel="noopener noreferrer" title={o.label} aria-label={o.label}>
+                <img src={o.logo} alt="" width="24" height="24" loading="lazy" />
+              </a>
+            ))}
           </div>
         </div>
+        <SolveRank />
       </div>
 
       <div className="home-menu">
@@ -62,11 +58,6 @@ export default function Home() {
             <span className="home-menu-go">바로가기 →</span>
           </Link>
         ))}
-      </div>
-
-      {/* 문제 많이 푼 사람 순위는 메뉴 아래 가운데에 둔다 */}
-      <div className="home-rank">
-        <SolveRank />
       </div>
 
       {/* 코드 타자 연습은 따로 배포된 외부 사이트라 새 탭으로 연다 */}
