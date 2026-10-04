@@ -11,7 +11,7 @@ const REPORT_KINDS = { answer: '정답 오류', typo: '오타', explain: '해설
 const MODES = { exam: '모의고사', set: '회차별 모의고사', unit: '단원별 문제집', practice: '영역별 연습', wrong: '오답 다시 풀기', marked: '북마크 다시 풀기', cpp: 'C++ 문제집', recall: '응시 후기 복원 문제' };
 
 const PAGE_NAMES = {
-  '/': '홈', '/exam': '기업별 기출문제', '/computer-general': '컴퓨터일반', '/topics': '주제별 통합', '/algo': '코테 풀이', '/major': '필기이론',
+  '/': '홈', '/exam': '기업별 기출문제', '/computer-general': '컴퓨터일반', '/topics': '주제별 통합', '/algo': '코테 풀이', '/duel': '1:1 대결', '/major': '필기이론',
   '/major-exam': '필기이론 문제', '/stats': '통계', '/search': '문제 검색', '/ncs': 'NCS', '/interview': '면접 연습', '/ssafy': 'SSAFY',
   ...Object.fromEntries(EXAM_CATEGORIES.map(c => [`/exam/category/${c.key}`, `기업별 기출 · ${c.name}`])),
   ...Object.fromEntries(COMPANIES.map(c => [companyPath(c), c.name])),
