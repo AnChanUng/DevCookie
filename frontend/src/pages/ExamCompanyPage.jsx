@@ -4,6 +4,9 @@ import { COMPANIES, CPP_GROUPS, EXAM_CATEGORIES, SOURCE_KINDS } from '../data/ex
 import { track } from '../track';
 import ReportButton from '../components/ReportButton';
 import TheoryLink from '../components/TheoryLink';
+import Code from '../components/Code';
+import Simulator from '../components/Simulator';
+import { simFor, tagBank } from '../questionSim';
 import SimilarQuestion from '../components/SimilarQuestion';
 import { useExamProgress, recordAnswer, isMarked, toggleMark } from '../hooks/useExamProgress';
 import { account } from '../sync';
@@ -80,7 +83,10 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
   const mainKind = splitSets ? 'mixed' : RECALL ? 'predicted' : null;
   const label = (mode, sec) => (mode === 'recall' && RECALL ? RECALL.title : modeLabel(SECTIONS, mode, sec, SETS));
   const ALL = useMemo(() => [...Q, ...CPP, ...(RECALL?.questions || []), ...(UNITS?.questions || [])], [Q, CPP, RECALL, UNITS]); // 오답노트·오답 다시 풀기 범위
-  const byId = useMemo(() => Object.fromEntries(ALL.map(q => [q.id, q])), [ALL]);
+  const byId = useMemo(() => {
+    tagBank(company.key, ALL); // 그림 해설을 찾을 때 쓸 문제은행 표시
+    return Object.fromEntries(ALL.map(q => [q.id, q]));
+  }, [ALL, company.key]);
   const { data, save } = useExamProgress(company.key);
   // 풀던 문제는 새로고침하거나 탭을 닫아도 이어서 풀 수 있게 문제은행마다 한 건씩 저장해 둔다
   const RESUME_KEY = `exam-resume:${company.key}`;
@@ -655,6 +661,7 @@ function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractic
             <div className="lab">{q.kind ? (isRight(q, sel) ? '정답' : '오답') : sel === q.a ? '정답' : `오답 · 정답은 ${CIRC[q.a]}`}</div>
             {q.kind && <ModelAnswer q={q} />}
             <div>{q.e}</div>
+            <QuestionSim key={`g${q.id}`} q={q} />
             <TheoryLink key={q.id} q={q} />
             {!q.kind && !isRight(q, sel) && <SimilarQuestion key={`s${q.id}`} q={q} />}
           </div>
@@ -718,11 +725,17 @@ function CodingEntry({ coding }) {
   );
 }
 
+// 스케줄링 · 페이지 교체 · 디스크 문제 가운데 숫자를 옮겨 둔 것은 해설을 그림으로도 보여 준다
+function QuestionSim({ q }) {
+  const sim = simFor(q);
+  return sim ? <Simulator sim={sim} /> : null;
+}
+
 function QuestionBody({ q, className = 'exam-qtext' }) {
   return (
     <>
       {q.ctx && <div className="exam-ctx"><Rich text={q.ctx} /></div>}
-      {q.code && <pre className="exam-code">{q.code}</pre>}
+      {q.code && <Code code={q.code} />}
       <p className={className}><Rich text={q.q} /></p>
     </>
   );
@@ -779,6 +792,7 @@ export function ReviewCard({ q, a, extra, sections, marked, onMark }) {
         </div>
       )}
       <div className="ex">{q.e}</div>
+      <QuestionSim q={q} />
       <TheoryLink q={q} />
       <ReportButton q={q} />
     </div>

@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { CodeTokens } from '../components/Code';
+import { tokenLines } from '../codeTokens';
 
 // 반에서 같이 푼 알고리즘 문제의 풀이를 문제별로 모아 본다.
 // 풀이 묶음은 크기가 커서 번들에 넣지 않고 public/algo/algo100.json 을 화면을 열 때 받아 온다.
@@ -102,7 +104,7 @@ export default function AlgoPage() {
                   <button type="button" className="exam-btn sm" onClick={() => copy(s)}>{copied === s.by ? '복사됨' : '복사'}</button>
                 </div>
                 {s.memo && <p className="algo-memo">{s.memo}</p>}
-                <pre className="algo-code">{s.code.split('\n').map((line, n) => <span key={n}>{line || ' '}</span>)}</pre>
+                <pre className="algo-code">{tokenLines(s.code).map((line, n) => <span key={n}>{line.length ? <CodeTokens tokens={line} /> : ' '}</span>)}</pre>
               </section>
             ))}
           </div>
