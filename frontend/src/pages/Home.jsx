@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import StudyGoal from '../components/StudyGoal';
 import DailyFortune from '../components/DailyFortune';
@@ -14,6 +15,7 @@ const MENUS = [
 ];
 
 export default function Home() {
+  const [more, setMore] = useState(false);
   return (
     <div className="fade-in home">
       {/* 왼쪽은 소개와 시험 일정, 오른쪽은 문제 많이 푼 사람 순위 */}
@@ -54,12 +56,13 @@ export default function Home() {
         ))}
       </div>
 
-      {/* 코드 타자 연습은 따로 배포된 외부 사이트라 새 탭으로 연다 */}
-      <a href="https://ssafy-code-race.onrender.com/" target="_blank" rel="noopener noreferrer" className="arcade-door">코딩 타자 연습</a>
-      {/* 오른쪽 아래 도크: 위에서부터 멘탈 기르기, 오늘의 운세 */}
-      <div className="home-dock">
+      {/* 왼쪽 아래 도크: 위에서부터 멘탈 기르기, 오늘의 운세, 코딩 타자 연습. 좁은 화면에서는 숨겨 두고 "더보기"를 눌러야 맨 아래에 한 줄로 나온다 */}
+      <div className={`home-dock ${more ? 'open' : ''}`}>
+        <button type="button" className="home-dock-more" onClick={() => setMore(m => !m)} aria-expanded={more}>{more ? '접기' : '더보기'}</button>
         <MentalTraining />
         <DailyFortune />
+        {/* 코드 타자 연습은 따로 배포된 외부 사이트라 새 탭으로 연다 */}
+        <a href="https://ssafy-code-race.onrender.com/" target="_blank" rel="noopener noreferrer" className="arcade-door"><span aria-hidden="true">⌨️</span>코딩 타자 연습</a>
       </div>
     </div>
   );
