@@ -26,6 +26,10 @@ public class VisitorSolved {
     @Column(nullable = false)
     private int count;
 
+    // 동기화 계정에 로그인한 기기면 그 계정. 같은 계정의 기기들은 순위에서 한 사람으로 합친다
+    @Column(name = "user_id")
+    private Long userId;
+
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 }

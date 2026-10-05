@@ -179,5 +179,25 @@ class LoungeAndRankTest {
                 .andExpect(jsonPath("$.top[0].me").value(true))
                 .andExpect(jsonPath("$.top[1].count").value(8));
         mvc.perform(get("/api/v1/rank/solved")).andExpect(status().isOk()).andExpect(jsonPath("$.me").doesNotExist());
+
+        // 같은 계정으로 로그인한 폰과 PC는 한 줄로 합쳐지고, 더 큰 쪽 숫자와 계정 닉네임이 나간다
+        String token = json.readTree(mvc.perform(post("/api/v1/auth/register").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"nickname\":\"rank-account\",\"password\":\"pw1234\"}"))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString()).get("token").asText();
+        mvc.perform(put("/api/v1/rank/solved").contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .content("{\"visitorId\":\"rank-visitor-pc\",\"count\":300}"))
+                .andExpect(status().isOk());
+        mvc.perform(put("/api/v1/rank/solved").contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .content("{\"visitorId\":\"rank-visitor-phone\",\"count\":250}"))
+                .andExpect(status().isOk());
+        mvc.perform(get("/api/v1/rank/solved").header("X-Visitor-Id", "rank-visitor-phone"))
+                .andExpect(jsonPath("$.top[0].count").value(300))
+                .andExpect(jsonPath("$.top[0].nickname").value("rank-account"))
+                .andExpect(jsonPath("$.top[0].me").value(true))
+                .andExpect(jsonPath("$.top[1].count").value(120))
+                .andExpect(jsonPath("$.account").value(true))
+                .andExpect(jsonPath("$.me.rank").value(1));
     }
 }

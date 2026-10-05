@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import api from '../api';
 import { visitorId } from '../track';
 import { NICKNAME_MAX, cleanNickname, saveNickname, savedNickname } from '../nickname';
+import { BANKS } from '../data/examQuestions';
+import { syncAllProgress } from '../hooks/useExamProgress';
+import { account } from '../sync';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
 const MAX_RETRIES = 10;
@@ -25,6 +28,21 @@ function solvedCount() {
   return count;
 }
 
+// 로그인해 있으면 다른 기기에서 푼 기록을 모두 받아 온다. 문제은행을 하나씩 열지 않아도 푼 문제 수가 맞게 나온다.
+// 문제은행 수만큼 서버를 부르므로 한동안은 다시 하지 않는다
+const SYNC_KEYS = [...BANKS.map(b => b.key), 'topics'];
+const SYNC_AT = 'sync:all-at';
+const SYNC_EVERY_MS = 10 * 60 * 1000;
+
+function pullOtherDevices() {
+  if (!account()) return null;
+  try {
+    if (Date.now() - Number(sessionStorage.getItem(SYNC_AT) || 0) < SYNC_EVERY_MS) return null;
+    sessionStorage.setItem(SYNC_AT, String(Date.now()));
+  } catch { /* storage unavailable */ }
+  return syncAllProgress(SYNC_KEYS);
+}
+
 // 문제를 많이 푼 사람 순위. 지금까지 푼 문제 수를 서버에 알리고 순위를 받아 온다
 export default function SolveRank() {
   const [rank, setRank] = useState(null);
@@ -39,10 +57,12 @@ export default function SolveRank() {
     let timer;
     const id = visitorId();
     const count = solvedCount();
+    // 로그인한 기기는 계정을 함께 알려, 같은 계정의 다른 기기와 순위에서 한 줄로 합쳐지게 한다
+    const token = account()?.token;
     // 내 문제 수를 먼저 알린 뒤 순위를 받는다. 잠든 서버가 깨어나는 동안에도 기다렸다가 보여 준다
     const load = (attempt) => {
       const report = id && count > 0
-        ? api.put('/rank/solved', { visitorId: id, count }, { timeout: 180000 }).catch(() => {})
+        ? api.put('/rank/solved', { visitorId: id, count }, { headers: token ? { Authorization: `Bearer ${token}` } : {}, timeout: 180000 }).catch(() => {})
         : Promise.resolve();
       report
         .then(() => api.get('/rank/solved', { headers: id ? { 'X-Visitor-Id': id } : {}, timeout: 180000 }))
@@ -55,6 +75,8 @@ export default function SolveRank() {
         });
     };
     load(0);
+    // 다른 기기 기록을 받아 푼 문제 수가 달라졌으면 순위를 다시 받는다
+    pullOtherDevices()?.then(() => { if (!stale && solvedCount() !== count) setTick(t => t + 1); }).catch(() => {});
     return () => { stale = true; clearTimeout(timer); };
   }, [tick]);
 
@@ -115,9 +137,11 @@ export default function SolveRank() {
               ? <>내 닉네임 <b>{rank.nickname}</b></>
               : me ? <>익명 닉네임 <b>{me.nickname}</b></> : '닉네임을 정하지 않으면 익명 닉네임으로 나옵니다.'}
           </span>
-          <button type="button" onClick={() => { setDraft(rank.nickname || savedNickname()); setNaming(true); }}>
-            {rank.nickname ? '바꾸기' : '닉네임 정하기'}
-          </button>
+          {!rank.account && (
+            <button type="button" onClick={() => { setDraft(rank.nickname || savedNickname()); setNaming(true); }}>
+              {rank.nickname ? '바꾸기' : '닉네임 정하기'}
+            </button>
+          )}
         </div>
       ))}
     </aside>
