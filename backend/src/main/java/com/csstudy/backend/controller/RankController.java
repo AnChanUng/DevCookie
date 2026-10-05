@@ -1,9 +1,13 @@
 package com.csstudy.backend.controller;
 
+import com.csstudy.backend.entity.User;
 import com.csstudy.backend.entity.VisitorSolved;
 import com.csstudy.backend.repository.UsageEventRepository;
+import com.csstudy.backend.repository.UserRepository;
 import com.csstudy.backend.repository.VisitorSolvedRepository;
+import com.csstudy.backend.service.AuthService;
 import com.csstudy.backend.service.VisitorProfileService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -24,13 +28,16 @@ public class RankController {
     // 사이트의 문제를 다 풀어도 넘지 못할 값. 터무니없는 숫자가 순위에 오르지 않게 막는다
     private static final int MAX_SOLVED = 3000;
 
-    private record Solver(String visitorId, long count) {}
+    // account: 동기화 계정으로 묶인 줄이면 그 계정의 닉네임, 아니면 null
+    private record Solver(String visitorId, long count, String account) {}
 
     private record Board(List<Solver> ranked, Map<String, Integer> rankOf, Instant at) {}
 
     private final UsageEventRepository usageEventRepository;
     private final VisitorSolvedRepository solvedRepository;
     private final VisitorProfileService profileService;
+    private final UserRepository userRepository;
+    private final AuthService authService;
 
     private volatile Board cached;
 
@@ -50,29 +57,34 @@ public class RankController {
         for (int i = 0; i < top.size(); i++) {
             Solver s = top.get(i);
             Map<String, Object> row = row(s, i + 1, nicknames.get(s.visitorId()));
-            row.put("me", s.visitorId().equals(visitorId));
+            row.put("me", myRank != null && myRank == i + 1);
             rows.add(row);
         }
 
         Map<String, Object> out = new LinkedHashMap<>();
         out.put("top", rows);
-        out.put("me", myRank == null ? null : row(board.ranked().get(myRank - 1), myRank, nicknames.get(visitorId)));
-        // 직접 정한 닉네임만 돌려준다. 정한 적이 없으면 null
-        out.put("nickname", visitorId == null ? null : nicknames.get(visitorId));
+        Solver mine = myRank == null ? null : board.ranked().get(myRank - 1);
+        out.put("me", mine == null ? null : row(mine, myRank, nicknames.get(visitorId)));
+        // 직접 정한 닉네임만 돌려준다. 정한 적이 없으면 null. 계정으로 묶인 기기는 계정 닉네임이 나간다
+        out.put("nickname", mine != null && mine.account() != null ? mine.account() : visitorId == null ? null : nicknames.get(visitorId));
+        out.put("account", mine != null && mine.account() != null);
         return out;
     }
 
     // 브라우저에 남은 풀이 기록에서 센 "한 번이라도 푼 문제 수"를 받아 둔다
     @PutMapping("/rank/solved")
-    public ResponseEntity<?> report(@RequestBody Map<String, Object> body) {
+    public ResponseEntity<?> report(@RequestBody Map<String, Object> body, HttpServletRequest request) {
         String visitorId = body.get("visitorId") instanceof String s && !s.isBlank() && s.length() <= 40 ? s.trim() : null;
         Integer count = body.get("count") instanceof Number n && n.intValue() >= 0 && n.intValue() <= MAX_SOLVED ? n.intValue() : null;
         if (visitorId == null || count == null) return ResponseEntity.badRequest().build();
 
         VisitorSolved solved = solvedRepository.findByVisitorId(visitorId)
                 .orElseGet(() -> VisitorSolved.builder().visitorId(visitorId).count(-1).build());
-        if (solved.getCount() != count) {
+        // 로그인한 기기면 계정에 묶어 둔다. 로그아웃한 뒤에도 같은 사람이므로 묶음은 그대로 둔다
+        Long userId = authService.currentUser(request).map(User::getId).orElse(solved.getUserId());
+        if (solved.getCount() != count || !Objects.equals(solved.getUserId(), userId)) {
             solved.setCount(count);
+            solved.setUserId(userId);
             solved.setUpdatedAt(Instant.now());
             try {
                 solvedRepository.save(solved);
@@ -100,7 +112,7 @@ public class RankController {
     private static Map<String, Object> row(Solver s, int rank, String nickname) {
         Map<String, Object> row = new LinkedHashMap<>();
         row.put("rank", rank);
-        row.put("nickname", nickname != null ? nickname : VisitorProfileService.anonymous(s.visitorId()));
+        row.put("nickname", s.account() != null ? s.account() : nickname != null ? nickname : VisitorProfileService.anonymous(s.visitorId()));
         row.put("count", s.count());
         return row;
     }
@@ -116,14 +128,37 @@ public class RankController {
         Map<String, Long> counts = new HashMap<>();
         usageEventRepository.solvedCounts().forEach(r -> counts.merge((String) r[0], ((Number) r[2]).longValue(), Long::sum));
         // 브라우저가 알려 준 값이 있으면 그것이 정확하므로 그 값을 쓴다
-        solvedRepository.findAll().forEach(v -> counts.put(v.getVisitorId(), (long) v.getCount()));
+        // 같은 계정으로 로그인한 기기들은 한 줄로 합친다. 기기끼리 기록을 맞추므로 더하지 않고 가장 큰 값을 쓴다
+        Map<Long, List<String>> devices = new HashMap<>();
+        solvedRepository.findAll().forEach(v -> {
+            counts.put(v.getVisitorId(), (long) v.getCount());
+            if (v.getUserId() != null) devices.computeIfAbsent(v.getUserId(), k -> new ArrayList<>()).add(v.getVisitorId());
+        });
+        Map<Long, String> accounts = new HashMap<>();
+        userRepository.findAllById(devices.keySet()).forEach(u -> accounts.put(u.getId(), u.getNickname()));
 
         List<Solver> ranked = new ArrayList<>();
-        counts.forEach((visitorId, count) -> { if (count > 0) ranked.add(new Solver(visitorId, count)); });
+        Map<String, Solver> solverOf = new HashMap<>();
+        devices.forEach((userId, ids) -> {
+            if (!accounts.containsKey(userId)) return;   // 지워진 계정의 기기는 따로 센다
+            ids.sort(Comparator.naturalOrder());
+            long best = ids.stream().mapToLong(counts::get).max().orElse(0);
+            Solver s = new Solver(ids.get(0), best, accounts.get(userId));
+            ids.forEach(id -> { solverOf.put(id, s); counts.remove(id); });
+            if (best > 0) ranked.add(s);
+        });
+        counts.forEach((visitorId, count) -> {
+            if (count <= 0) return;
+            Solver s = new Solver(visitorId, count, null);
+            solverOf.put(visitorId, s);
+            ranked.add(s);
+        });
         ranked.sort(Comparator.comparingLong(Solver::count).reversed().thenComparing(Solver::visitorId));
 
+        Map<Solver, Integer> place = new IdentityHashMap<>();
+        for (int i = 0; i < ranked.size(); i++) place.put(ranked.get(i), i + 1);
         Map<String, Integer> rankOf = new HashMap<>();
-        for (int i = 0; i < ranked.size(); i++) rankOf.put(ranked.get(i).visitorId(), i + 1);
+        solverOf.forEach((visitorId, s) -> { if (place.containsKey(s)) rankOf.put(visitorId, place.get(s)); });
         board = new Board(ranked, rankOf, Instant.now());
         cached = board;
         return board;
