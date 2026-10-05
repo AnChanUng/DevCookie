@@ -2045,3 +2045,23 @@ a.exam-search-bank:hover { color: var(--accent-blue); }
 .tk-num { color: var(--code-num); }
 .tk-com { color: var(--code-com); font-style: italic; }
 .tk-ann { color: var(--code-ann); }
+
+/* ===== 좁은 화면 다듬기 ===== */
+@media (max-width: 640px) {
+  .exam-category-grid { gap: 10px; }
+  .exam-category-card { padding: 18px; gap: 4px; }
+  .exam-category-name { font-size: 1.15rem; }
+  /* 표는 칸이 접히지 않게 두고 옆으로 넘겨 본다 */
+  .exam-table th, .exam-table .exam-btn.sm { white-space: nowrap; }
+}
+@media (max-width: 640px) {
+  /* 이론노트 카드: 다른 화면의 여백 규칙이 겹쳐 키가 커지던 것을 걷어 낸다 */
+  .note-open { gap: 10px; padding: 12px 14px; }
+  .note-open .note-body { padding: 0; line-height: 1.45; }
+  .note-icon { font-size: 1.3rem; }
+  .note-dl { padding: 0 12px; }
+  /* 문제 풀이 화면: 첫 문제가 한 화면에 들어오게 윗부분을 줄인다 */
+  .exam-quiz .page-header { padding: 14px 0 10px; }
+  .exam-quiz .page-header h1 { font-size: 1.25rem; margin-bottom: 4px; }
+  .exam-quiz .exam-sync { display: none; }
+}
