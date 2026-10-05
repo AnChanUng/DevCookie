@@ -43,7 +43,17 @@ public class RankController {
 
     // 방문자 ID를 헤더로 주면 본인 순위도 함께 돌려준다
     @GetMapping("/rank/solved")
-    public Map<String, Object> solved(@RequestHeader(value = "X-Visitor-Id", required = false) String visitorId) {
+    public Map<String, Object> solved(@RequestHeader(value = "X-Visitor-Id", required = false) String visitorId,
+                                      HttpServletRequest request) {
+        // 로그인한 기기가 순위를 볼 때도 계정에 묶는다. 문제 수를 알리는 요청을 놓쳤어도 여기서 합쳐진다
+        if (visitorId != null) {
+            authService.currentUser(request).map(User::getId).ifPresent(userId ->
+                    solvedRepository.findByVisitorId(visitorId).filter(v -> !userId.equals(v.getUserId())).ifPresent(v -> {
+                        v.setUserId(userId);
+                        solvedRepository.save(v);
+                        cached = null;
+                    }));
+        }
         Board board = board();
         List<Solver> top = board.ranked().subList(0, Math.min(TOP, board.ranked().size()));
         Integer myRank = visitorId == null ? null : board.rankOf().get(visitorId);

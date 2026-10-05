@@ -65,7 +65,7 @@ export default function SolveRank() {
         ? api.put('/rank/solved', { visitorId: id, count }, { headers: token ? { Authorization: `Bearer ${token}` } : {}, timeout: 180000 }).catch(() => {})
         : Promise.resolve();
       report
-        .then(() => api.get('/rank/solved', { headers: id ? { 'X-Visitor-Id': id } : {}, timeout: 180000 }))
+        .then(() => api.get('/rank/solved', { headers: { ...(id ? { 'X-Visitor-Id': id } : {}), ...(token ? { Authorization: `Bearer ${token}` } : {}) }, timeout: 180000 }))
         .then(res => { if (!stale) setRank(res.data); })
         .catch(() => {
           if (stale) return;
@@ -144,6 +144,10 @@ export default function SolveRank() {
           )}
         </div>
       ))}
+      {/* 로그인하지 않은 기기는 순위에 따로 나온다. 같은 계정으로 로그인하면 한 줄로 합쳐진다 */}
+      {rank && me && !rank.account && !account() && (
+        <p className="solve-rank-empty">폰과 PC가 따로 나오나요? <Link to="/exam">같은 계정으로 로그인</Link>하면 합쳐집니다.</p>
+      )}
     </aside>
   );
 }
