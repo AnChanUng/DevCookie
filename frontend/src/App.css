@@ -4178,3 +4178,28 @@ a.goal-exam:hover { border-color: var(--accent-blue); }
   .mental-stamp, .mental-envelope, .mental-badge, .mental-reveal, .mental-steps i { animation: none; }
   .env-flap, .env-letter, .env-letter-title, .env-letter-sub { transition-duration: 0.01s; transition-delay: 0s; }
 }
+
+/* ===== 좁은 화면 다듬기: 헤더 메뉴 · 첫 화면 버튼 · 메뉴 카드 ===== */
+@media (max-width: 640px) {
+  /* 메뉴가 오른쪽 로고에 뚝 잘려 보이지 않게, 끝을 흐리게 해서 옆으로 더 넘길 수 있음을 알린다 */
+  .nav-links {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
+    padding-right: 14px;
+  }
+  .header-right { gap: 8px; }
+  .outside-links.in-header { gap: 5px; }
+  .outside-links.in-header img { width: 22px; height: 22px; }
+
+  /* 버튼 셋이 한 줄에 나란히 서게 한다 */
+  .home-cta { flex-wrap: nowrap; gap: 8px; margin-top: 20px; }
+  .home-cta-btn { flex: 1 1 0; padding: 12px 8px; font-size: 0.86rem; text-align: center; white-space: nowrap; }
+  .home-cta-btn.primary { flex: 1.5 1 0; }
+
+  /* 메뉴 카드는 두 칸으로 작게 */
+  .home-menu { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .home-menu-item { gap: 6px; padding: 14px; }
+  .home-menu-title { font-size: 1rem; }
+  .home-menu-desc { font-size: 0.74rem; line-height: 1.5; }
+  .home-menu-go { display: none; }
+}
