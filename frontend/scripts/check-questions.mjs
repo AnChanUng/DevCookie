@@ -23,6 +23,13 @@ for (const bank of BANKS) {
     if (!q.sec) note(label, q.id, '영역(sec)이 없습니다.');
     else if (!sections[q.sec]) note(label, q.id, `영역 '${q.sec}'이(가) sections에 없습니다.`);
 
+    if (q.kind) {
+      if (!['short', 'essay'].includes(q.kind)) note(label, q.id, '지원하지 않는 주관식 종류입니다.');
+      if (!q.ans?.trim()) note(label, q.id, '모범답안이 없습니다.');
+      if (q.kind === 'essay' && (!Array.isArray(q.pts) || !q.pts.length || q.pts.some(p => !p?.trim()))) note(label, q.id, '서술형 채점 포인트가 없습니다.');
+      if (q.kind === 'short' && (!Array.isArray(q.acc) || !q.acc.length)) note(label, q.id, '단답형 허용 답안이 없습니다.');
+      continue;
+    }
     if (!Array.isArray(q.o)) { note(label, q.id, '보기(o)가 배열이 아닙니다.'); continue; }
     if (q.o.length < 4 || q.o.length > 5) note(label, q.id, `보기가 ${q.o.length}개입니다. 4개나 5개여야 합니다.`);
     if (q.o.some(o => typeof o !== 'string' || !o.trim())) note(label, q.id, '빈 보기가 있습니다.');

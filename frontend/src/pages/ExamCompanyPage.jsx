@@ -3,7 +3,7 @@ import { Link, Navigate, useParams } from 'react-router-dom';
 import { COMPANIES, CPP_GROUPS, EXAM_CATEGORIES, SOURCE_KINDS } from '../data/examQuestions';
 import { track } from '../track';
 import ReportButton from '../components/ReportButton';
-import TheoryLink from '../components/TheoryLink';
+import QuestionExplanation from '../components/QuestionExplanation';
 import Code from '../components/Code';
 import Simulator from '../components/Simulator';
 import { simFor, tagBank } from '../questionSim';
@@ -662,7 +662,7 @@ function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractic
             {q.kind && <ModelAnswer q={q} />}
             <div>{q.e}</div>
             <QuestionSim key={`g${q.id}`} q={q} />
-            <TheoryLink key={q.id} q={q} />
+            <QuestionExplanation key={q.id} q={q} />
             {!q.kind && !isRight(q, sel) && <SimilarQuestion key={`s${q.id}`} q={q} />}
           </div>
         )}
@@ -793,7 +793,7 @@ export function ReviewCard({ q, a, extra, sections, marked, onMark }) {
       )}
       <div className="ex">{q.e}</div>
       <QuestionSim q={q} />
-      <TheoryLink q={q} />
+      <QuestionExplanation q={q} />
       <ReportButton q={q} />
     </div>
   );

@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "check:questions": "node --import ./scripts/extensionless-loader.mjs scripts/check-questions.mjs",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:explanations": "node --import ./scripts/extensionless-loader.mjs scripts/check-explanations.mjs"
   },
   "dependencies": {
     "axios": "^1.14.0",

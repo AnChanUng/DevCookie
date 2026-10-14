@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { TOPICS } from '../data/topicBank';
 import { theoryFor } from '../theory';
 import Code from './Code';
+import QuestionExplanation from './QuestionExplanation';
 
 const CIRC = ['①', '②', '③', '④', '⑤'];
 const baseTopic = (q) => (q.topic || '').split(' · ')[0];
@@ -55,7 +56,7 @@ export default function SimilarQuestion({ q }) {
       {done && (
         <>
           <div className="exam-similar-result">{picked === s.a ? '정답' : `오답 · 정답은 ${CIRC[s.a]}`}</div>
-          <div className="exam-similar-ex">{s.e}</div>
+          <div className="exam-similar-ex">{s.e}<QuestionExplanation q={s} /></div>
           {at < pool.length - 1 && (
             <div className="exam-similar-bar">
               <button type="button" className="exam-btn sm" onClick={() => { setAt(at + 1); setPicked(null); }}>하나 더</button>

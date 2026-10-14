@@ -1,3 +1,4 @@
+import { PEARL_QUESTIONS, PEARL_SECTIONS } from './pearlQuestions';
 // HF(한국주택금융공사) IT직무 전공필기 대비 자체 제작 문제 60문항 (5지선다)
 // 2021~2026 응시 후기에서 반복 언급된 주제를 기준으로 구성. 실제 시험 문항의 복제가 아님.
 import { IBK_SECTIONS, IBK_QUESTIONS } from './ibkQuestions';
@@ -97,7 +98,7 @@ export const HF_QUESTIONS = [
 {id:'cs33',sec:'cs',topic:'자료구조·힙',q:'배열로 표현된 최대 힙 [50, 30, 40, 10, 20]에 60을 삽입한 후의 배열 상태는?',o:['[60, 50, 40, 10, 20, 30]','[50, 60, 40, 10, 20, 30]','[50, 30, 60, 10, 20, 40]','[60, 50, 30, 10, 20, 40]','[60, 30, 50, 10, 20, 40]'],a:4,e:'60을 끝(인덱스 5)에 넣으면 부모는 인덱스 2(40). 60>40 교환 → [50,30,60,10,20,40]. 부모 인덱스 0(50)과 비교, 60>50 교환 → [60,30,50,10,20,40].'},
 {id:'cs34',sec:'cs',topic:'자료구조·해시',q:'해시 충돌 해결 기법 중 개방 주소법(Open Addressing)에 해당하지 않는 것은?',o:['선형 조사(Linear Probing)','이차 조사(Quadratic Probing)','이중 해싱(Double Hashing)','체이닝(Separate Chaining)','무작위 조사(Random Probing)'],a:3,e:'체이닝은 같은 버킷의 원소를 연결 리스트로 묶는 폐쇄 주소법(분리 연결법)이다. 개방 주소법은 테이블 내 다른 빈 슬롯을 탐사하며, 선형 조사는 1차 군집(primary clustering) 문제가 있다.'},
 {id:'cs35',sec:'cs',topic:'알고리즘·최단 경로',q:'단일 출발점 최단 경로 알고리즘 중 음의 가중치 간선이 있는 그래프에서도 사용할 수 있는 것은?',o:['다익스트라(Dijkstra)','프림(Prim)','벨만-포드(Bellman-Ford)','크루스칼(Kruskal)','A* 알고리즘'],a:2,e:'벨만-포드는 O(VE)로 음의 간선을 허용하고 음의 사이클도 탐지한다. 다익스트라는 음의 간선이 있으면 오답을 낼 수 있다. 프림·크루스칼은 최소 신장 트리 알고리즘이다.'},
-{id:'cs36',sec:'cs',topic:'자료구조·스택',q:'중위 표기식 A + B * C − D 를 후위 표기식으로 변환한 결과는?',o:['A B C * + D −','A B + C * D −','A B C + * D −','A B C * D − +','+ A * B C − D'],a:0,e:'연산자 우선순위: * 가 +, − 보다 높고 +, − 는 같은 순위(좌결합). A + (B*C) − D → (A + BC*) − D → ABC*+ − D → ABC*+D−. ⑤는 전위 표기식이다.'},
+{id:'cs36',sec:'cs',topic:'자료구조·스택',q:'중위 표기식 A + B * C − D 를 후위 표기식으로 변환한 결과는?',o:['A B C * + D −','A B + C * D −','A B C + * D −','A B C * D − +','+ A * B C − D'],a:0,e:'연산자 우선순위: * 가 +, − 보다 높고 +, − 는 같은 순위(좌결합). A + (B*C) − D → (A + BC*) − D → ABC*+ − D → ABC*+D−. ⑤는 연산자가 피연산자 앞에 섞여 있어 올바른 후위 표기식이 아니다.'},
 /* ===== 데이터베이스·네트워크 12 ===== */
 {id:'db01',sec:'dbn',topic:'DB·JOIN',q:'테이블 A의 id 값이 {1, 2, 3}이고 테이블 B의 a_id 값이 {1, 1, 4}일 때, 다음 SQL의 결과 행 수는?',code:'SELECT *\nFROM A LEFT OUTER JOIN B\n  ON A.id = B.a_id;',o:['2','3','4','5','6'],a:2,e:'LEFT OUTER JOIN은 왼쪽(A) 테이블의 모든 행을 유지한다. id=1은 B의 두 행과 매칭(2행), id=2, id=3은 매칭 없이 NULL로 1행씩 → 총 4행. INNER JOIN이면 2행, FULL OUTER JOIN이면 B의 4까지 포함해 5행.'},
 {id:'db02',sec:'dbn',topic:'DB·커서',q:'SQL 커서(Cursor)의 사용 순서로 옳은 것은?',o:['OPEN → DECLARE → FETCH → CLOSE','DECLARE → FETCH → OPEN → CLOSE','DECLARE → OPEN → FETCH → CLOSE','OPEN → FETCH → DECLARE → CLOSE','FETCH → DECLARE → OPEN → CLOSE'],a:2,e:'커서는 질의 결과 집합을 한 행씩 처리하기 위한 포인터다. DECLARE로 선언, OPEN으로 질의 실행 및 결과 집합 생성, FETCH로 한 행씩 읽기, CLOSE로 자원 해제한다.'},
@@ -154,6 +155,7 @@ export const SOURCE_KINDS = {
 
 // 기업별 기출문제 첫 화면의 분류. 회사마다 category로 어느 쪽에 들어갈지 정한다
 export const EXAM_CATEGORIES = [
+  { key: "tech", name: "IT·게임 기업", desc: "웹 백엔드 CS · 프로그래밍 대비" },
   { key: "finance", name: "금융공기업", desc: "금융공기업 · 금융권 IT직무 필기" },
   { key: "public", name: "공기업", desc: "일반 공기업 전산직 전공필기" },
   // 기업 문제집이 아닌 기술 과목 문제집. 기업별 기출이 아니라 필기이론 화면(/major)에 모아 보여 준다
@@ -169,6 +171,13 @@ export const hubOf = (company) => EXAM_CATEGORIES.find(c => c.key === company.ca
 export const companyPath = (company) => `/${hubOf(company) || 'exam'}/${company.key}`;
 
 export const COMPANIES = [
+  {
+    key: 'pearl', category: 'tech', abbr: '펄어비스', name: '펄어비스 웹 백엔드', ready: true,
+    meta: '자체 예상 50문항 · 객관식 40 + 서술형 10 · 연습 70분',
+    source: { kind: 'predicted', label: '자체 제작 예상문제', detail: '사용자가 제공한 준비 범위를 바탕으로 만든 학습용 문제입니다. 실제 기출이나 공식 시험 구성의 복원이 아니며, 문항 수와 70분은 연습용 설정입니다.' },
+    questions: PEARL_QUESTIONS, sections: PEARL_SECTIONS, minutes: 70,
+    lede: '웹·네트워크, DB, 운영체제·동시성, 자료구조·알고리즘, C#·객체지향을 각 10문항씩 연습합니다. 객관식 40문항과 서술형 10문항으로 구성했고 SQL·C# 코드 읽기와 실무 상황 판단을 포함했습니다. 각 문제에서 정답 이유와 함정을 바로 확인할 수 있습니다. 서술형은 모범답안과 채점 포인트를 보고 직접 채점합니다. 시간이 부족하면 영역별 연습부터 시작하세요.',
+  },
   {
     key: "hf", category: "finance", abbr: "HF", name: "한국주택금융공사", meta: "전공필기 60문제 · 80분 · 5지선다 · C++ 집중 48문제 · 2026 하반기 복원 41문제", ready: true,
     source: { kind: "recall", label: "2026 하반기 복기문제", detail: "2026 하반기 전공필기 응시 후기를 바탕으로 복원한 41문제가 바로 아래에 있습니다. 그 밑의 모의고사와 영역별 연습, C++ 집중 문제집은 출제범위를 반영해 새로 만든 예상문제입니다." },
