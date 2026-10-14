@@ -31,7 +31,7 @@ function NotesWorkspace({ user }) {
   return (
     <div className="cs-notes">
       <header className="notes-heading">
-        <div><h1>전공노트</h1><p>9과목 · 100개 주제 · Spring 제외</p></div>
+        <div><h1>전공노트</h1><p>9과목 · 100개 주제</p></div>
         <div className="notes-progress"><strong>학습 완료 {completed} / {entries.length}</strong><progress value={completed} max={entries.length} aria-label="전공노트 학습 완료" /></div>
         <Link to="/account">내 계정 →</Link>
       </header>
