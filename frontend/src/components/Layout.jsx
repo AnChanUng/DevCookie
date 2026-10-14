@@ -92,9 +92,6 @@ export default function Layout() {
               <Link to="/major" className={location.pathname.startsWith('/major') ? 'active' : ''}>
                 필기이론
               </Link>
-              <Link to="/stats" className={location.pathname === '/stats' ? 'active' : ''}>
-                통계
-              </Link>
             </nav>
             <OutsideLinks className="outside-links in-header" />
             {/* 지금 모드의 아이콘을 보여 주고, 누르면 색 견본이 펼쳐진다 */}
@@ -113,6 +110,7 @@ export default function Layout() {
               )}
             </div>
             <StudyCount />
+            <Link to="/account" className={`account-nav-link${location.pathname === "/account" ? " active" : ""}`}>내 계정</Link>
           </div>
         </div>
       </header>

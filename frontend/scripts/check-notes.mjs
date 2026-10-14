@@ -1,58 +1,94 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
 import React from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
-import { MemoryRouter } from 'react-router-dom';
 import TestRenderer, { act } from 'react-test-renderer';
+import { MemoryRouter } from 'react-router-dom';
 import { createServer } from 'vite';
-import { CS_NOTES } from '../src/data/csNotes.js';
 
-const entries = CS_NOTES.flatMap(section => section.items);
-assert.equal(new Set(CS_NOTES.map(s => s.id)).size, CS_NOTES.length);
-assert.ok(CS_NOTES.find(s => s.id === 'database')?.items.length >= 15);
-for (const section of CS_NOTES) {
-  assert.equal(new Set(section.items.map(e => e.title)).size, section.items.length);
-  for (const entry of section.items) {
-    assert.ok(entry.title && entry.answer.length > 30 && entry.detail.length > 30);
-    assert.doesNotMatch(JSON.stringify(entry), /spring|스프링/i);
-  }
-}
+const values = new Map();
+globalThis.localStorage = { getItem: k => values.get(k) ?? null, setItem: (k,v) => values.set(k,String(v)), removeItem: k => values.delete(k) };
+globalThis.window = new EventTarget();
+globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+const oldError = console.error;
+const errors=[];
+console.error=(...args)=>{if(String(args[0]).startsWith('react-test-renderer is deprecated'))return;errors.push(args.join(' '));oldError(...args);};
 const server = await createServer({ server: { middlewareMode: true, hmr: false }, appType: 'custom' });
 let view;
+const text = node => typeof node === 'string' ? node : (node?.children || []).map(text).join('');
+const settle = () => new Promise(resolve => setImmediate(resolve));
 try {
+  const { default: api } = await server.ssrLoadModule('/src/api.js');
   const { default: Page } = await server.ssrLoadModule('/src/pages/CsNotesPage.jsx');
-  const element = path => React.createElement(MemoryRouter, { initialEntries: [path] }, React.createElement(Page));
-  if (!process.argv.includes('--hash')) {
-  const html = renderToStaticMarkup(element('/notes'));
-  assert.equal((html.match(/<article /g) || []).length, entries.length);
-  assert.doesNotMatch(html, /<details|<iframe| hidden[=> ]/);
-  const ids = [...html.matchAll(/ id="([^"]+)"/g)].map(m => m[1]);
-  assert.equal(new Set(ids).size, ids.length, 'All rendered IDs must be unique');
-  for (const [, target] of html.matchAll(/href="#([^"]+)"/g)) assert.ok(ids.includes(target), target);
-  for (const entry of entries) {
-    // React performs HTML escaping; compare the same escaped text representation.
-    for (const value of [entry.title, entry.answer, entry.detail]) {
-      const escaped = renderToStaticMarkup(React.createElement('p', null, value)).slice(3, -4);
-      assert.ok(html.includes(escaped), `Missing visible content: ${entry.title}`);
+  const { default: Account } = await server.ssrLoadModule('/src/pages/AccountPage.jsx');
+  const { CS_NOTES } = await server.ssrLoadModule('/src/data/csNotes.js');
+  const { mergeNotes } = await server.ssrLoadModule('/src/hooks/useNotesProgress.js');
+  const { ACCOUNT_BANKS, summarizeAccount } = await server.ssrLoadModule('/src/accountRecords.js');
+  const entries = CS_NOTES.flatMap(s => s.items);
+  assert.equal(entries.length,100);assert.equal(new Set(entries.map(e=>e.id)).size,100);
+  const remote = { alice: {}, bob: {} }; const requests=[];
+  let failPut=false, holdGet=null;
+  api.defaults.adapter = async config => {
+    const token=config.headers.Authorization?.replace('Bearer ','');
+    assert.ok(token === 'alice' || token === 'bob');
+    requests.push({ token, method:config.method, url:config.url });
+    if(holdGet && config.method==='get') await holdGet;
+    if(config.method==='put') {
+      if(failPut) throw new Error('offline');
+      remote[token][config.url]=JSON.parse(config.data).data;
     }
-  }
-  // Separate processes keep React's SSR and interaction renderers isolated.
-  execFileSync(process.execPath, [process.argv[1], '--hash'], { stdio: 'inherit' });
-  console.log(`전공노트 검사 통과 — ${CS_NOTES.length}과목 ${entries.length}주제 전체 렌더링, 목차·직접 해시 이동, Spring 제외`);
-  } else {
-  globalThis.IS_REACT_ACT_ENVIRONMENT = true;
-  const scrolled = [];
-  globalThis.document = { getElementById: id => ({ scrollIntoView: () => scrolled.push(id) }) };
-  for (const id of [...CS_NOTES.map(s => s.id), 'note-sources', 'notes-top', 'unknown']) {
-    scrolled.length = 0;
-    await act(() => { view = TestRenderer.create(element(`/notes#${id}`)); });
-    assert.deepEqual(scrolled, id === 'unknown' ? [] : [id]);
-    await act(() => view.unmount());
-    view = undefined;
-  }
-  }
+    return {data:{data:remote[token][config.url] || null},status:200,statusText:'OK',headers:{},config};
+  };
+  const mount = async (Component=Page,path='/notes') => { await act(async()=>{view=TestRenderer.create(React.createElement(MemoryRouter,{initialEntries:[path]},React.createElement(Component)));await settle();}); };
+  const unmount=async()=>{await act(()=>view.unmount());view=null;};
+  const login=async token=>{await act(async()=>{if(token)localStorage.setItem('sync:account',JSON.stringify({nickname:token,token}));else localStorage.removeItem('sync:account');window.dispatchEvent(new Event('sync:change'));await settle();});};
+  const choose=async title=>{await act(()=>view.root.findAllByType('button').find(b=>text(b)===title).props.onClick());};
+  const checkbox=id=>view.root.findAllByType('input').find(n=>n.props['aria-label']===`${entries.find(e=>e.id===id).title} 학습 완료`);
+  await mount();
+  assert.equal(view.root.findAllByType('article').length,0,'Answers must initially be hidden');
+  assert.equal(view.root.findByProps({'aria-label':'전공노트 질문 목록'}).findAllByType('li').length,100);
+  assert.ok(checkbox(entries[0].id).props.disabled);
+  await choose(entries[0].title);
+  assert.ok(text(view.toJSON()).includes(entries[0].answer));
+  assert.ok(!text(view.toJSON()).includes(entries[1].answer));
+  await login('alice');
+  await act(async()=>{await checkbox(entries[0].id).props.onChange();});
+  assert.ok(checkbox(entries[0].id).props.checked);
+  assert.ok(view.root.findAllByType('li').find(n=>text(n)===entries[0].title).props.className.includes('is-done'));
+  assert.ok(JSON.parse(remote.alice['/exam/progress/cs-notes-v1']).completed[entries[0].id].done);
+  await unmount();await mount();assert.ok(checkbox(entries[0].id).props.checked,'Reload retains completion');
+  await login('bob');assert.equal(checkbox(entries[0].id).props.checked,false,'Accounts stay isolated');
+  await login('alice');
+  failPut=true;
+  await act(async()=>{await checkbox(entries[0].id).props.onChange();});
+  assert.equal(checkbox(entries[0].id).props.checked,false);
+  assert.ok(text(view.toJSON()).includes('서버 연결에 실패'));
+  failPut=false;
+  await act(async()=>{await view.root.findAllByType('button').find(b=>text(b)==='다시 저장').props.onClick();});
+  assert.equal(JSON.parse(remote.alice['/exam/progress/cs-notes-v1']).completed[entries[0].id].done,false,'Unchecked tombstone persists');
+  await act(()=>view.root.findByProps({'aria-label':'질문 검색'}).props.onChange({target:{value:'존재하지않는질문'}}));
+  assert.ok(text(view.toJSON()).includes('조건에 맞는 질문이 없습니다'));
+  await unmount();await mount(Page,`/notes#${entries[50].id}`);
+  assert.ok(text(view.toJSON()).includes(entries[50].answer),'Direct question links reveal the intended answer');
+  assert.equal(mergeNotes({x:{done:true,at:1}},{x:{done:false,at:2}}).x.done,false);
+  // A request started under A must never be sent with B credentials after switching.
+  let release;holdGet=new Promise(r=>{release=r;});
+  let saving;
+  await act(async()=>{saving=checkbox(entries[0].id).props.onChange();await settle();});
+  await login('bob');
+  await act(async()=>{release();holdGet=null;await saving;await settle();});
+  assert.equal(checkbox(entries[0].id).props.checked,false);
+  assert.ok(JSON.parse(remote.alice['/exam/progress/cs-notes-v1']).completed[entries[0].id].done);
+  await unmount();
+  const bank=ACCOUNT_BANKS.find(b=>b.key==='pearl');const q=bank.questions[0];
+  remote.alice[`/exam/progress/${bank.key}`]=JSON.stringify({stats:{[q.id]:{c:2,w:1,last:'w',at:1000}}});
+  const totals=summarizeAccount({[bank.key]:{stats:{[q.id]:{c:2,w:1,last:'w',at:1000}}}});
+  assert.equal(totals.rows.length,1);assert.equal(totals.attempts,3);assert.equal(totals.correct,2);assert.equal(totals.wrong,1);
+  await login('alice');await mount(Account,'/account');
+  assert.ok(text(view.toJSON()).includes(q.q));
+  assert.ok(text(view.toJSON()).includes('67%'));
+  await login('bob');assert.ok(!text(view.toJSON()).includes(q.q),'Dashboard resets on account switch');
+  assert.equal(errors.length,0,errors.join('\n'));
+  console.log('PASS: hidden answers, 100-question sidebar, selection/search, completion/undo, reload, account isolation, failed-save retry, in-flight account switch, dashboard counts and history.');
 } finally {
-  if (view) await act(() => view.unmount());
-  await server.close();
-  delete globalThis.document;
+  if(view)await act(()=>view.unmount());
+  await server.close();console.error=oldError;
 }

@@ -1,0 +1,18 @@
+.account-page { padding-bottom: 48px; }
+.account-auth, .account-history, .account-notes { border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.account-auth form, .account-actions, .account-filters, .account-record-heading { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.account-auth input, .account-filters > input { padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-primary); color: var(--text-primary); min-width: 0; }
+.account-record-heading { justify-content: space-between; margin: 20px 0; font-size: .85rem; color: var(--text-secondary); }
+.account-metrics { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
+.account-metrics > div { display: grid; gap: 8px; padding: 20px; background: var(--bg-secondary); border-radius: 10px; }
+.account-metrics strong { font-size: 1.65rem; color: var(--accent-blue); }
+.account-metrics span { font-size: .8rem; color: var(--text-secondary); }
+.account-page h2 { font-size: 1.15rem; margin-bottom: 16px; }
+.account-filters { margin-bottom: 16px; font-size: .85rem; }
+.account-question { border-top: 1px solid var(--border-color); padding: 14px 0; overflow-wrap: anywhere; }
+.account-question summary { cursor: pointer; line-height: 1.7; font-size: .9rem; }
+.account-result { color: var(--accent-blue); margin-right: 10px; font-weight: 700; }
+.account-question > div { padding: 12px; background: var(--bg-secondary); font-size: .85rem; line-height: 1.8; }
+.account-page a { color: var(--accent-blue); }
+.account-notes ul { columns: 2; padding-left: 20px; line-height: 1.9; font-size: .85rem; }
+@media(max-width: 640px) { .account-metrics { grid-template-columns: repeat(2, 1fr); } .account-auth input { flex: 1 1 120px; width: 100%; } .account-notes ul { columns: 1; } }
