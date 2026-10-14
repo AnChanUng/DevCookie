@@ -77,6 +77,9 @@ export default function Layout() {
               <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
                 홈
               </Link>
+              <Link to="/notes" className={location.pathname === '/notes' ? 'active' : ''}>
+                전공노트
+              </Link>
               <Link to="/exam" className={location.pathname.startsWith('/exam') || location.pathname === '/computer-general' || location.pathname === '/topics' || location.pathname === '/calc' ? 'active' : ''}>
                 기업별 기출
               </Link>
@@ -85,9 +88,6 @@ export default function Layout() {
               </Link>
               <Link to="/aptitude" className={location.pathname.startsWith('/aptitude') ? 'active' : ''}>
                 인적성
-              </Link>
-              <Link to="/algo" className={location.pathname === '/algo' ? 'active' : ''}>
-                코테 풀이
               </Link>
               <Link to="/major" className={location.pathname.startsWith('/major') ? 'active' : ''}>
                 필기이론
