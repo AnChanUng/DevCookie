@@ -4266,3 +4266,6 @@ a.goal-exam:hover { border-color: var(--accent-blue); }
     overflow-y: auto;
   }
 }
+
+.account-nav-link { white-space: nowrap; font-size: .8rem; font-weight: 700; color: var(--text-primary); text-decoration: none; padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; }
+.account-nav-link.active { color: var(--accent-blue); background: var(--accent-blue-light); }

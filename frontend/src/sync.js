@@ -25,7 +25,12 @@ function setAccount(value) {
 // 로그인 상태가 바뀔 때 화면을 다시 그리게 한다
 export function onAccountChange(listener) {
   window.addEventListener(EVENT, listener);
-  return () => window.removeEventListener(EVENT, listener);
+  const storageChange = event => { if (event.key === KEY || event.key === null) listener(); };
+  window.addEventListener('storage', storageChange);
+  return () => {
+    window.removeEventListener(EVENT, listener);
+    window.removeEventListener('storage', storageChange);
+  };
 }
 
 // 무료 서버가 잠들어 있으면 깨어나는 데 1분쯤 걸려서 넉넉히 기다린다

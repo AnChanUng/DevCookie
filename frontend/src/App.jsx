@@ -7,6 +7,7 @@ import './exam.css';
 
 const CategoryPage = lazy(() => import('./pages/CategoryPage'));
 const QuestionPage = lazy(() => import('./pages/QuestionPage'));
+const AccountPage = lazy(() => import('./pages/AccountPage'));
 const StatsPage = lazy(() => import('./pages/StatsPage'));
 const InterviewPracticePage = lazy(() => import('./pages/InterviewPracticePage'));
 const CsNotesPage = lazy(() => import('./pages/CsNotesPage'));
@@ -35,6 +36,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path="category/:slug" element={<CategoryPage />} />
           <Route path="question/:id" element={<QuestionPage />} />
+          <Route path="account" element={<AccountPage />} />
           <Route path="stats" element={<StatsPage />} />
           <Route path="interview" element={<InterviewPracticePage />} />
           <Route path="notes" element={<CsNotesPage />} />
