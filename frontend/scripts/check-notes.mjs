@@ -6,7 +6,8 @@ import { createServer } from 'vite';
 
 const values = new Map();
 globalThis.localStorage = { getItem: k => values.get(k) ?? null, setItem: (k,v) => values.set(k,String(v)), removeItem: k => values.delete(k) };
-globalThis.window = new EventTarget();
+globalThis.window = Object.assign(new EventTarget(), { location: { href: 'https://test.invalid/notes' } });
+globalThis.document = { getElementById: () => ({ scrollIntoView() {} }) };
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const oldError = console.error;
 const errors=[];
@@ -23,7 +24,7 @@ try {
   const { mergeNotes } = await server.ssrLoadModule('/src/hooks/useNotesProgress.js');
   const { ACCOUNT_BANKS, summarizeAccount } = await server.ssrLoadModule('/src/accountRecords.js');
   const entries = CS_NOTES.flatMap(s => s.items);
-  assert.equal(entries.length,100);assert.equal(new Set(entries.map(e=>e.id)).size,100);
+  assert.equal(entries.length,100);assert.ok(entries.every(e => e.question?.length > 20 && e.question.endsWith('?') || e.question?.endsWith('요.')));assert.equal(new Set(entries.map(e=>e.id)).size,100);
   const remote = { alice: {}, bob: {} }; const requests=[];
   let failPut=false, holdGet=null;
   api.defaults.adapter = async config => {
@@ -42,21 +43,32 @@ try {
   const login=async token=>{await act(async()=>{if(token)localStorage.setItem('sync:account',JSON.stringify({nickname:token,token}));else localStorage.removeItem('sync:account');window.dispatchEvent(new Event('sync:change'));await settle();});};
   const choose=async title=>{await act(()=>view.root.findAllByType('button').find(b=>text(b)===title).props.onClick());};
   const checkbox=id=>view.root.findAllByType('input').find(n=>n.props['aria-label']===`${entries.find(e=>e.id===id).title} 학습 완료`);
+  const showDone = async () => { await act(()=>view.root.findByProps({'aria-label':'완료한 지식 숨기기'}).props.onChange({target:{checked:false}})); };
+  const reveal = async id => { await act(()=>view.root.findByProps({id}).findAllByType('button').find(b=>b.props['aria-controls']).props.onClick()); };
   await mount();
-  assert.equal(view.root.findAllByType('article').length,0,'Answers must initially be hidden');
+  assert.equal(view.root.findAllByType('article').length,100,'All questions appear in the initial list');
+  for(const entry of entries) { assert.ok(text(view.toJSON()).includes(entry.question)); assert.ok(!text(view.toJSON()).includes(entry.answer)); }
+  assert.equal(view.root.findByProps({'aria-label':'완료한 지식 숨기기'}).props.checked,true);
   assert.equal(view.root.findByProps({'aria-label':'전공노트 질문 목록'}).findAllByType('li').length,100);
   assert.ok(checkbox(entries[0].id).props.disabled);
   await choose(entries[0].title);
+  assert.ok(!text(view.toJSON()).includes(entries[0].answer),'Sidebar navigation must not reveal answers');
+  await reveal(entries[0].id);
   assert.ok(text(view.toJSON()).includes(entries[0].answer));
+  await reveal(entries[0].id);
+  assert.ok(!text(view.toJSON()).includes(entries[0].answer),'Answers can be collapsed again');
   assert.ok(!text(view.toJSON()).includes(entries[1].answer));
   await login('alice');
   await act(async()=>{await checkbox(entries[0].id).props.onChange();});
+  assert.equal(checkbox(entries[0].id),undefined,'Completed question is hidden immediately');
+  assert.equal(view.root.findAllByType('article').length,99);
+  await showDone();
   assert.ok(checkbox(entries[0].id).props.checked);
   assert.ok(view.root.findAllByType('li').find(n=>text(n)===entries[0].title).props.className.includes('is-done'));
   assert.ok(JSON.parse(remote.alice['/exam/progress/cs-notes-v1']).completed[entries[0].id].done);
-  await unmount();await mount();assert.ok(checkbox(entries[0].id).props.checked,'Reload retains completion');
+  await unmount();await mount();assert.equal(checkbox(entries[0].id),undefined,'Reload retains hidden completion');await showDone();assert.ok(checkbox(entries[0].id).props.checked);
   await login('bob');assert.equal(checkbox(entries[0].id).props.checked,false,'Accounts stay isolated');
-  await login('alice');
+  await login('alice');await showDone();
   failPut=true;
   await act(async()=>{await checkbox(entries[0].id).props.onChange();});
   assert.equal(checkbox(entries[0].id).props.checked,false);
@@ -67,7 +79,8 @@ try {
   await act(()=>view.root.findByProps({'aria-label':'질문 검색'}).props.onChange({target:{value:'존재하지않는질문'}}));
   assert.ok(text(view.toJSON()).includes('조건에 맞는 질문이 없습니다'));
   await unmount();await mount(Page,`/notes#${entries[50].id}`);
-  assert.ok(text(view.toJSON()).includes(entries[50].answer),'Direct question links reveal the intended answer');
+  assert.ok(!text(view.toJSON()).includes(entries[50].answer),'Direct links must keep answers hidden');
+  await reveal(entries[50].id);assert.ok(text(view.toJSON()).includes(entries[50].answer));
   assert.equal(mergeNotes({x:{done:true,at:1}},{x:{done:false,at:2}}).x.done,false);
   // A request started under A must never be sent with B credentials after switching.
   let release;holdGet=new Promise(r=>{release=r;});
@@ -87,7 +100,7 @@ try {
   assert.ok(text(view.toJSON()).includes('67%'));
   await login('bob');assert.ok(!text(view.toJSON()).includes(q.q),'Dashboard resets on account switch');
   assert.equal(errors.length,0,errors.join('\n'));
-  console.log('PASS: hidden answers, 100-question sidebar, selection/search, completion/undo, reload, account isolation, failed-save retry, in-flight account switch, dashboard counts and history.');
+  console.log('PASS: 100 interview questions visible by default; answers hidden until explicit reveal, sidebar/deep links stay collapsed; completion hides/restores across reload; account isolation, save retries, dashboard and in-flight switching.');
 } finally {
   if(view)await act(()=>view.unmount());
   await server.close();console.error=oldError;
