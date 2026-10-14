@@ -40,12 +40,8 @@ function CategoryPicker() {
       </div>
 
       <div className="exam-category-grid">
-        {EXAM_CATEGORIES.filter(cat => !cat.hub).map(cat => (
-          <Link key={cat.key} to={`/exam/category/${cat.key}`} className="exam-company-card exam-category-card">
-            <span className="exam-category-name">{cat.name}</span>
-            <span className="exam-company-meta">{cat.desc}</span>
-            <span className="exam-category-count">{COMPANIES.filter(c => c.category === cat.key).length}개 {cat.unit || '기업'}</span>
-          </Link>
+        {EXAM_CATEGORIES.filter(cat => !cat.hub && cat.key !== 'tech').map(cat => (
+          <CategoryCard key={cat.key} category={cat} />
         ))}
         <ComilCard />
         {/* 문제 수는 문제은행 데이터를 다 읽어야 나오므로 여기서는 세지 않는다 */}
@@ -59,10 +55,23 @@ function CategoryPicker() {
           <span className="exam-company-meta">숫자가 매번 바뀌는 계산 문제 · 그림 해설</span>
           <span className="exam-category-count">스케줄링 · 페이지 교체 · 서브넷 등 19종</span>
         </Link>
+        {EXAM_CATEGORIES.filter(cat => cat.key === 'tech').map(cat => (
+          <CategoryCard key={cat.key} category={cat} />
+        ))}
       </div>
 
       <ProgressBackup />
     </div>
+  );
+}
+
+function CategoryCard({ category }) {
+  return (
+    <Link to={`/exam/category/${category.key}`} className="exam-company-card exam-category-card">
+      <span className="exam-category-name">{category.name}</span>
+      <span className="exam-company-meta">{category.desc}</span>
+      <span className="exam-category-count">{COMPANIES.filter(c => c.category === category.key).length}개 {category.unit || '기업'}</span>
+    </Link>
   );
 }
 

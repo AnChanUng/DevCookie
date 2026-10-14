@@ -155,7 +155,7 @@ export const SOURCE_KINDS = {
 
 // 기업별 기출문제 첫 화면의 분류. 회사마다 category로 어느 쪽에 들어갈지 정한다
 export const EXAM_CATEGORIES = [
-  { key: "tech", name: "IT·게임 기업", desc: "웹 백엔드 CS · 프로그래밍 대비" },
+  { key: "tech", name: "서비스기업", desc: "웹 백엔드 CS · 프로그래밍 대비" },
   { key: "finance", name: "금융공기업", desc: "금융공기업 · 금융권 IT직무 필기" },
   { key: "public", name: "공기업", desc: "일반 공기업 전산직 전공필기" },
   // 기업 문제집이 아닌 기술 과목 문제집. 기업별 기출이 아니라 필기이론 화면(/major)에 모아 보여 준다
