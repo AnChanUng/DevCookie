@@ -220,25 +220,6 @@
 .exam-similar-result { margin-top: 10px; font-size: 0.82rem; font-weight: 800; }
 .exam-similar-ex { margin-top: 4px; font-size: 0.86rem; line-height: 1.65; color: var(--text-secondary); }
 
-/* 해설 아래의 이론 보기 · 상세 설명 */
-.exam-theory { margin-top: 12px; }
-.exam-theory-bar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-.exam-theory-bar a.exam-btn { text-decoration: none; color: var(--accent-blue); border-color: var(--accent-blue); }
-.exam-theory-body {
-  margin-top: 10px;
-  max-height: 420px;
-  overflow: auto;
-  padding: 14px 16px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-size: 0.86rem;
-  font-weight: 400;
-  line-height: 1.75;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
 .exam-keyhint { display: none; }
 @media (min-width: 900px) {
   .exam-keyhint { display: block; margin-top: 12px; font-size: 0.72rem; color: var(--text-tertiary); }
@@ -2065,3 +2046,7 @@ a.exam-search-bank:hover { color: var(--accent-blue); }
   .exam-quiz .page-header h1 { font-size: 1.25rem; margin-bottom: 4px; }
   .exam-quiz .exam-sync { display: none; }
 }
+
+.exam-explanation { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-color); line-height: 1.8; overflow-wrap: anywhere; }
+.exam-explanation h4 { margin: 0 0 8px; font-size: 14px; }
+.exam-explanation p { margin: 0 0 10px; white-space: pre-wrap; }
