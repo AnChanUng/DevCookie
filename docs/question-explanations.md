@@ -15,6 +15,10 @@
 - `cd frontend && npm run check:questions`
 - `npm run check:explanations` — 해설 누락, 주제별 복사, 변경 문항의 오연결 방지, 50문항 구성, 실제 해설 컴포넌트 SSR 및 HTML 이스케이프
 - `npm run build`
-- `npx eslint src scripts`
+- `npm run check:exam-flow` — React 컴포넌트 상호작용: 전체 50문항 풀이, 이어풀기, 오답 재시도, 모의고사 기록 시점, 시간 만료, 북마크, 분류 경로, 결과 카드 150개 상태, 유사 문제 전환
+- `npm run check:pearl-answers` — SQLite로 SQL 결과·재고 감소·ON/WHERE/NULL 차이 검산, 스택·이진 탐색 경계 검산
+- `npm run lint`
 
-전체 `npm run lint`에는 기존 `public/arcade/breakout/game.js:21`의 미사용 변수 오류 1건이 남아 있다. 브라우저 접근 권한이 거부되어 클릭·모바일 화면 검증은 수행하지 못했다. SSR 검증은 브라우저 상호작용 검증을 대신하지 않는다.
+전체 린트도 통과한다. 기존 breakout 게임의 사용하지 않는 콜백 매개변수만 제거했다. 컴포넌트 상호작용 테스트는 메모리 저장소와 모의 네트워크를 사용하며 실제 계정·서버에 요청하지 않는다.
+
+사용자의 재허용 후에도 브라우저 도구의 저장된 차단 설정이 접근을 거부했다. 따라서 실제 브라우저 클릭·모바일 레이아웃·콘솔 검증은 미실시이며, React/SSR 테스트가 이를 완전히 대신하지는 않는다. 이 환경에는 .NET SDK가 없어 C# 예제의 컴파일·실행 검증은 수행하지 못했고 코드를 검토했다. 빌드의 기존 대형 번들 경고는 남아 있다.
