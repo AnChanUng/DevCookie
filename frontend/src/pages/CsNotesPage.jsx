@@ -1,4 +1,4 @@
-import { useState, useSyncExternalStore } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { CS_NOTES, NOTE_SOURCES } from '../data/csNotes';
 import { account, onAccountChange } from '../sync';
@@ -16,12 +16,19 @@ function NotesWorkspace({ user }) {
   const navigate = useNavigate();
   const [subject, setSubject] = useState('');
   const [query, setQuery] = useState('');
-  const [hideDone, setHideDone] = useState(false);
+  const [hideDone, setHideDone] = useState(true);
+  const [opened, setOpened] = useState({});
   const { data, status, toggle, retry, disabled } = useNotesProgress(user);
   const selected = entries.find(e => e.id === hash.slice(1));
   const completed = entries.filter(e => data[e.id]?.done).length;
-  const visible = entries.filter(e => (!subject || e.section === subject) && (!hideDone || !data[e.id]?.done) && e.title.toLowerCase().includes(query.trim().toLowerCase()));
-  const choose = id => navigate(`/notes#${id}`, { replace: true });
+  const visible = entries.filter(e => (!subject || e.section === subject) && (!hideDone || !data[e.id]?.done) && `${e.title} ${e.question}`.toLowerCase().includes(query.trim().toLowerCase()));
+  const choose = id => {
+    navigate(`/notes#${id}`, { replace: true });
+    document.getElementById(id)?.scrollIntoView({ block: 'start' });
+  };
+  useEffect(() => {
+    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start' });
+  }, [hash]);
   const statusText = {
     guest: '학습 완료 기록은 로그인 후 계정에 저장됩니다.', loading: '계정 기록을 불러오는 중…',
     saving: '계정에 저장하는 중…', saved: '계정에 저장됨',
@@ -41,7 +48,7 @@ function NotesWorkspace({ user }) {
           <div className="notes-filters">
             <input aria-label="질문 검색" placeholder="질문 검색…" value={query} onChange={e => setQuery(e.target.value)} />
             <select aria-label="과목 선택" value={subject} onChange={e => setSubject(e.target.value)}><option value="">전 과목</option>{CS_NOTES.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}</select>
-            <label><input type="checkbox" checked={hideDone} onChange={e => setHideDone(e.target.checked)} /> 완료한 지식 숨기기</label>
+            <label><input type="checkbox" aria-label="완료한 지식 숨기기" checked={hideDone} onChange={e => setHideDone(e.target.checked)} /> 완료한 지식 숨기기</label>
           </div>
           <nav aria-label="전공노트 질문 목록" className="notes-questions">
             {CS_NOTES.map(section => {
@@ -58,13 +65,24 @@ function NotesWorkspace({ user }) {
           </nav>
         </aside>
         <div className="notes-content">
-          {selected ? <article className={`notes-detail-card ${data[selected.id]?.done ? 'is-done' : ''}`} key={selected.id}>
-            <div className="notes-detail-top"><span>{selected.subject}</span><label><input type="checkbox" checked={!!data[selected.id]?.done} disabled={disabled} onChange={() => toggle(selected.id)} /> 충분히 공부했어요</label></div>
-            <h2>{selected.title}</h2>
-            <div className="notes-answer"><h3>핵심 답변</h3><p>{selected.answer}</p></div>
-            <div className="notes-detail"><h3>예시 · 주의점</h3><p>{selected.detail}</p></div>
-            <p className="notes-tip">답을 내 말로 설명할 수 있다면 학습 완료를 체크하세요. 체크는 언제든 해제할 수 있습니다.</p>
-          </article> : <div className="notes-empty notes-welcome"><h2>질문을 선택해 시작하세요</h2><p>왼쪽에서 질문을 누르면 핵심 답변과 예시가 여기에 표시됩니다.</p><p>공부가 끝난 지식은 체크해 두고, 남은 질문에 집중하세요.</p></div>}
+          <p className="notes-list-intro">질문을 보고 먼저 답을 떠올려 보세요. ‘답 보기’를 누르면 해설이 펼쳐집니다. 학습 완료한 질문은 기본 목록에서 숨겨집니다.</p>
+          {selected && hideDone && data[selected.id]?.done && <p className="notes-empty">이 링크의 질문은 학습 완료되어 숨겨져 있습니다. ‘완료한 지식 숨기기’를 해제하면 다시 볼 수 있습니다.</p>}
+          {CS_NOTES.map(section => {
+            const list = visible.filter(e => e.section === section.id);
+            if (!list.length) return null;
+            return <section className="notes-subject" key={section.id} aria-labelledby={`subject-${section.id}`}>
+              <h2 id={`subject-${section.id}`} className="notes-subject-title">{section.title}<small>{list.length}개 질문</small></h2>
+              {list.map(entry => <article id={entry.id} className={`notes-detail-card ${data[entry.id]?.done ? 'is-done' : ''}`} key={entry.id}>
+                <div className="notes-detail-top"><span>{entry.title}</span><label><input type="checkbox" aria-label={`${entry.title} 본문 학습 완료`} checked={!!data[entry.id]?.done} disabled={disabled} onChange={() => toggle(entry.id)} /> 학습 완료</label></div>
+                <h3 className="notes-question">{entry.question}</h3>
+                <button type="button" className="exam-btn sm notes-reveal" aria-expanded={!!opened[entry.id]} aria-controls={`answer-${entry.id}`} onClick={() => setOpened(prev => ({ ...prev, [entry.id]: !prev[entry.id] }))}>{opened[entry.id] ? '답 숨기기' : '답 보기'}</button>
+                <div id={`answer-${entry.id}`} hidden={!opened[entry.id]}>
+                  {opened[entry.id] && <><div className="notes-answer"><h4>핵심 답변</h4><p>{entry.answer}</p></div><div className="notes-detail"><h4>예시 · 주의점</h4><p>{entry.detail}</p></div></>}
+                </div>
+              </article>)}
+            </section>;
+          })}
+          {!visible.length && <div className="notes-empty"><h2>표시할 질문이 없습니다.</h2><p>완료한 지식 숨기기를 해제하거나 검색·과목 조건을 바꿔보세요.</p></div>}
           <details className="notes-sources"><summary>참고 자료</summary><p>참고 글의 준비 범위를 바탕으로 설명과 예시를 새로 작성했습니다.</p><ul>{NOTE_SOURCES.map(s => <li key={s.url}><a href={s.url} target="_blank" rel="noreferrer">{s.title} ↗</a></li>)}</ul></details>
         </div>
       </div>

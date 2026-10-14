@@ -8,8 +8,8 @@ main.container:has(.cs-notes) { max-width: 1600px; width: 100%; padding-inline: 
 .notes-progress progress { width: 180px; height: 6px; accent-color: var(--accent-blue); }
 .notes-save-status { min-height: 28px; color: var(--text-secondary); font-size: .78rem; }
 .notes-save-status button { margin-left: 10px; color: var(--accent-blue); }
-.notes-layout { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 22px; height: calc(100dvh - 210px); min-height: 420px; }
-.notes-index { min-height: 0; display: flex; flex-direction: column; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-primary); overflow: hidden; }
+.notes-layout { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 22px; align-items: start; }
+.notes-index { position: sticky; top: 80px; max-height: calc(100dvh - 100px); min-height: 0; display: flex; flex-direction: column; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-primary); overflow: hidden; }
 .notes-filters { padding: 12px; display: grid; grid-template-columns: 1fr 110px; gap: 8px; border-bottom: 1px solid var(--border-color); }
 .notes-filters > input, .notes-filters select { min-width: 0; width: 100%; padding: 9px 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-secondary); color: var(--text-primary); font: inherit; font-size: .78rem; }
 .notes-filters label { grid-column: 1/-1; font-size: .78rem; color: var(--text-secondary); }
@@ -21,14 +21,14 @@ main.container:has(.cs-notes) { max-width: 1600px; width: 100%; padding-inline: 
 .notes-questions li.is-selected { background: var(--accent-blue-light); box-shadow: inset 3px 0 var(--accent-blue); }
 .notes-questions li:hover { background: var(--bg-secondary); }
 .notes-questions button { flex: 1; text-align: left; padding: 8px 0; border: 0; background: transparent; color: var(--text-primary); cursor: pointer; font: inherit; font-size: .81rem; line-height: 1.5; }
-.notes-questions .is-done button, .notes-detail-card.is-done h2 { text-decoration: line-through; color: var(--text-secondary); }
+.notes-questions .is-done button, .notes-detail-card.is-done .notes-question { text-decoration: line-through; color: var(--text-secondary); }
 .cs-notes input[type=checkbox] { accent-color: var(--accent-blue); width: 16px; height: 16px; flex-shrink: 0; vertical-align: middle; }
-.notes-content { min-width: 0; overflow-y: auto; padding-right: 8px; }
-.notes-detail-card { border: 1px solid var(--border-color); border-radius: 12px; padding: 28px; background: var(--bg-primary); }
+.notes-content { min-width: 0; }
+.notes-detail-card { border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 12px; scroll-margin-top: 100px; background: var(--bg-primary); }
 .notes-detail-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: .8rem; color: var(--accent-blue); }
 .notes-detail-top label { color: var(--text-secondary); cursor: pointer; }
-.notes-detail-card h2 { font-size: clamp(1.2rem, 2vw, 1.7rem); margin: 20px 0 24px; line-height: 1.45; }
-.notes-detail-card h3 { font-size: .8rem; color: var(--accent-blue); margin: 0 0 8px; }
+.notes-detail-card .notes-question { font-size: 1.08rem; color: var(--text-primary); margin: 12px 0; line-height: 1.6; }
+.notes-detail-card h4 { font-size: .8rem; color: var(--accent-blue); margin: 0 0 8px; }
 .notes-answer p, .notes-detail p { font-size: 1rem; line-height: 1.85; word-break: keep-all; overflow-wrap: anywhere; margin: 0; }
 .notes-detail { background: var(--bg-secondary); padding: 20px; border-radius: 8px; margin-top: 24px; }
 .notes-tip { font-size: .78rem; color: var(--text-secondary); line-height: 1.7; margin: 24px 0 0; }
@@ -50,8 +50,15 @@ main.container:has(.cs-notes) { max-width: 1600px; width: 100%; padding-inline: 
   .notes-progress { order: 3; width: 100%; display: flex; align-items: center; }
   .notes-progress progress { flex: 1; }
   .notes-layout { display: flex; flex-direction: column; height: auto; min-height: 0; }
-  .notes-index { height: 32dvh; min-height: 220px; }
+  .notes-index { position: static; height: 32dvh; min-height: 220px; }
   .notes-content { overflow: visible; padding: 0; }
   .notes-answer p, .notes-detail p { font-size: .94rem; }
   .notes-welcome { padding: 24px; }
 }
+
+.notes-list-intro { margin: 0 0 16px; font-size: .83rem; line-height: 1.7; color: var(--text-secondary); }
+.notes-subject { margin-bottom: 28px; }
+.notes-subject-title { display: flex; align-items: center; gap: 12px; font-size: 1.2rem; margin: 0 0 12px; }
+.notes-subject-title small { font-size: .75rem; font-weight: 400; color: var(--text-secondary); }
+.notes-reveal { margin-bottom: 4px; }
+.notes-answer { margin-top: 16px; }
