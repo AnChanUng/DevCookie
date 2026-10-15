@@ -1,4 +1,5 @@
 import { INTERVIEW_NOTES } from './interviewNotes';
+import { reviseNote } from './noteRevisions';
 
 export const CS_NOTES = [...INTERVIEW_NOTES, {
   "id": "bigdata",
@@ -197,12 +198,18 @@ export const CS_NOTES = [...INTERVIEW_NOTES, {
       "answer": "분석 목적에 필요한 항목만 사용하고 식별 가능한 정보의 노출을 줄인다. 접근 권한과 보관 범위를 관리하며 결합 데이터로 개인이 드러날 가능성도 확인한다. 이름만 삭제해도 다른 속성으로 개인을 알아볼 수 있다."
     }
   ]
-}];
+}].map(section => ({ ...section, items: section.items.map(reviseNote) }));
 
 export const NOTE_SOURCES = [
  {title:'ksundong/backend-interview-question · 원문 및 기여자',url:'https://github.com/ksundong/backend-interview-question'},
  {title:'원문 라이선스 표기 · CC BY-NC-SA',url:'https://github.com/ksundong/backend-interview-question/blob/71f0300c379837e2f5666bbe19630a3d3fbc2bb2/README.md#information'},
- {title:'원문에 함께 명시된 CC BY-NC 2.0 KR',url:'https://creativecommons.org/licenses/by-nc/2.0/kr/'}
+ {title:'원문에 함께 명시된 CC BY-NC 2.0 KR',url:'https://creativecommons.org/licenses/by-nc/2.0/kr/'},
+ {title:'보완 참고 · Database System Concepts — 관계형 설계',url:'https://www.db-book.com/slides-dir/PDF-dir/ch7.pdf'},
+ {title:'보완 참고 · PostgreSQL 트랜잭션 격리',url:'https://www.postgresql.org/docs/18/transaction-iso.html'},
+ {title:'보완 참고 · Java 언어 명세',url:'https://docs.oracle.com/javase/specs/jls/se21/html/index.html'},
+ {title:'보완 참고 · Spring 트랜잭션 전파',url:'https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative/tx-propagation.html'},
+ {title:'보완 참고 · Python 데이터 모델',url:'https://docs.python.org/3/reference/datamodel.html'},
+ {title:'보완 참고 · OWASP 비밀번호 저장',url:'https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html'}
 ];
 
 // Keep historical records without applying completion to different source questions.

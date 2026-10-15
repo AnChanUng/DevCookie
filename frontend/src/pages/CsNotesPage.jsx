@@ -66,7 +66,7 @@ function NotesWorkspace({ user }) {
           </nav>
         </aside>
         <div className="notes-content">
-          <p className="notes-list-intro">출처: <a href="https://github.com/ksundong/backend-interview-question" target="_blank" rel="noreferrer">ksundong/backend-interview-question 및 기여자</a> · CC BY-NC-SA(원문 표기). 선택한 문답을 원문 그대로 수록했습니다. ‘답 보기’로 확인하고 학습 완료를 체크하세요. 빅데이터는 별도 보충 문답입니다.</p>
+          <p className="notes-list-intro">출처: <a href="https://github.com/ksundong/backend-interview-question" target="_blank" rel="noreferrer">ksundong/backend-interview-question 및 기여자</a> · CC BY-NC-SA(원문 표기). 오류·빈 답변은 ‘보완 답변’으로 구분했습니다. ‘답 보기’로 확인하고 학습 완료를 체크하세요. 빅데이터는 별도 보충 문답입니다.</p>
           {selected && hideDone && data[selected.id]?.done && <p className="notes-empty">이 링크의 질문은 학습 완료되어 숨겨져 있습니다. ‘완료한 지식 숨기기’를 해제하면 다시 볼 수 있습니다.</p>}
           {CS_NOTES.map(section => {
             const list = visible.filter(e => e.section === section.id);
@@ -84,7 +84,7 @@ function NotesWorkspace({ user }) {
             </section>;
           })}
           {!visible.length && <div className="notes-empty"><h2>표시할 질문이 없습니다.</h2><p>완료한 지식 숨기기를 해제하거나 검색·과목 조건을 바꿔보세요.</p></div>}
-          <details className="notes-sources"><summary>출처 · 이용 조건</summary><p>원문 저작자: ksundong 및 저장소 기여자. 원문은 CC BY-NC-SA로 명시하며 CC BY-NC 2.0 KR 링크도 함께 제공합니다. 이식한 문답은 저작자표시·비영리·동일조건으로 제공합니다. 변경 사항은 요청한 항목 제외, 질문별 분리와 화면 서식 적용입니다. 답변이 비어 있던 항목은 임의로 채우지 않았습니다.</p><ul>{NOTE_SOURCES.map(s => <li key={s.title}><a href={s.url} target="_blank" rel="noreferrer">{s.title} ↗</a></li>)}</ul></details>
+          <details className="notes-sources"><summary>출처 · 이용 조건</summary><p>원문 저작자: ksundong 및 저장소 기여자. 원문은 CC BY-NC-SA로 명시하며 CC BY-NC 2.0 KR 링크도 함께 제공합니다. 이식·보완한 문답은 저작자표시·비영리·동일조건으로 제공합니다. 요청한 항목 제외, 질문별 분리와 서식 적용에 더해 2026.10.15에 기술적 오류 정정·빈 답변 작성·예시 보충을 진행했습니다. 보완 답변은 원문 저자의 답변과 구분하며 제목 옆 ‘원문’에서 변경 전 내용을 볼 수 있습니다.</p><ul>{NOTE_SOURCES.map(s => <li key={s.title}><a href={s.url} target="_blank" rel="noreferrer">{s.title} ↗</a></li>)}</ul></details>
         </div>
       </div>
     </div>
