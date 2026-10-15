@@ -4269,8 +4269,3 @@ a.goal-exam:hover { border-color: var(--accent-blue); }
 
 .account-nav-link { white-space: nowrap; font-size: .8rem; font-weight: 700; color: var(--text-primary); text-decoration: none; padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; }
 .account-nav-link.active { color: var(--accent-blue); background: var(--accent-blue-light); }
-
-.home-practice-links { margin: 28px 0; padding: 18px 20px; border-top: 1px solid var(--border-color); }
-.home-practice-links h2 { font-size: .9rem; margin: 0 0 12px; color: var(--text-secondary); }
-.home-practice-links > div { display: flex; gap: 12px 24px; flex-wrap: wrap; }
-.home-practice-links a { color: var(--accent-blue); font-size: .85rem; }

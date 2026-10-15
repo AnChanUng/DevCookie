@@ -25,6 +25,14 @@
 | 보안 기초 | 10 | 보안 목표, 인증·인가, 해시·비밀번호·서명, XSS·CSRF·SQL 삽입·DoS |
 | 객체지향·소프트웨어공학 | 27 | 객체지향·SOLID, 책임 분리, 요구사항, 테스트·회귀·리팩토링 |
 | Java | 18 | 대표 자료형·컬렉션, 박싱, Stream·JVM·GC |
+| 빅데이터 | 32 | 기업은행 대비 데이터 수집·전처리, 분산 저장·처리, 통계, 학습·평가, 금융 데이터 사례 |
+
+Java는 유지하고 빅데이터를 추가해 총 11과목 240문항으로 구성했다. IBK 채용프로세스의 디지털·IT 분야에 빅데이터가 포함된 것을 확인했다. 세부 키워드는 기본기 학습용으로 선별한 것이며 공식 세부 출제 목록이나 기출문제가 아니다. Hadoop·Spark 공식 문서와 scikit-learn 평가 문서를 대조했다. 제품 설정이나 수식 유도보다 개념 구분에 집중한다.
+
+- https://ibk.incruit.com/jobinfo/ibk_prosess.html
+- https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/HdfsDesign.html
+- https://spark.apache.org/docs/latest/rdd-programming-guide.html
+- https://scikit-learn.org/stable/modules/cross_validation.html
 
 제외: Spring/JPA 등의 프레임워크, 웹 요청의 전 과정을 길게 설명하는 질문, 제품 설정 절차, 세부 비용 산정 공식·도구명·공격명 암기, 분산 시스템 종합 설계. 빈칸 채우기나 소스 본문 복사는 하지 않는다.
 
