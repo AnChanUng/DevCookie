@@ -3354,7 +3354,7 @@ a.goal-exam:hover { border-color: var(--accent-blue); }
 .home-dock {
   position: fixed;
   left: 12px;
-  bottom: 32px;
+  bottom: 22px;
   z-index: 30;
   display: flex;
   flex-direction: column;

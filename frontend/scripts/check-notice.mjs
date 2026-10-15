@@ -33,17 +33,17 @@ try {
   await act(()=>view.root.findAllByType('button').find(b=>text(b)==='닫기').props.onClick());
   assert.equal(modal.open,false);
   saveExams([]);
-  await act(()=>view.root.findAllByType('button').find(b=>text(b).startsWith('공지사항')).props.onClick());
+  await act(()=>view.unmount());
+  await act(()=>{view=TestRenderer.create(React.createElement(Notice),{createNodeMock: el => el.type==='dialog' ? modal : null});});
   assert.equal(modal.open,true);
   await act(()=>view.root.findAllByType('button').find(b=>text(b)==='다시 보지 않기').props.onClick());
   assert.equal(modal.open,false);
   await act(()=>view.unmount());
   await act(()=>{view=TestRenderer.create(React.createElement(Notice),{createNodeMock: el => el.type==='dialog' ? modal : null});});
   assert.equal(modal.open,false,'Dismissal survives remount');
-  await act(()=>view.root.findAllByType('button').find(b=>text(b)==='공지사항').props.onClick());
-  assert.equal(modal.open,true,'Manual opening still works');
+  assert.ok(!view.root.findAllByType('button').some(b=>text(b)==='공지사항'),'No separate notice launcher');
   assert.equal(errors.length,0,errors.join('\n'));
-  console.log('PASS: Compact notice content, close/reopen, persistent dismissal; schedule date regressions. Visual layout requires browser verification.');
+  console.log('PASS: Automatic notice, close, persistent dismissal, no launcher; schedule date regressions. Visual layout requires browser verification.');
 } finally {
   if(view) await act(()=>view.unmount());
   await server.close();
