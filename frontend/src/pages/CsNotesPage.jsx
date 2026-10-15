@@ -16,7 +16,7 @@ function NotesWorkspace({ user }) {
   const navigate = useNavigate();
   const [subject, setSubject] = useState('');
   const [query, setQuery] = useState('');
-  const [hideDone, setHideDone] = useState(true);
+  const [hideDone, setHideDone] = useState(false);
   const [opened, setOpened] = useState({});
   const { data, status, toggle, retry, disabled } = useNotesProgress(user);
   const selected = entries.find(e => e.id === hash.slice(1));

@@ -62,7 +62,7 @@ try {
   await mount();
   assert.equal(view.root.findAllByType('article').length,entries.length,'All questions appear in the initial list');
   for(const entry of entries) { assert.ok(text(view.toJSON()).includes(entry.question)); assert.ok(!text(view.toJSON()).includes(entry.answer)); }
-  assert.equal(view.root.findByProps({'aria-label':'완료한 지식 숨기기'}).props.checked,true);
+  assert.equal(view.root.findByProps({'aria-label':'완료한 지식 숨기기'}).props.checked,false);
   assert.equal(view.root.findByProps({'aria-label':'전공노트 질문 목록'}).findAllByType('li').length,entries.length);
   assert.ok(checkbox(entries[0].id).props.disabled);
   await choose(entries[0].title);
@@ -82,10 +82,10 @@ try {
   await reveal(bigdata.items[0].id);
   assert.ok(text(view.toJSON()).includes(bigdata.items[0].answer));
   await act(async()=>{await checkbox(bigdata.items[0].id).props.onChange();});
-  assert.equal(checkbox(bigdata.items[0].id),undefined);
+  assert.equal(checkbox(bigdata.items[0].id).props.checked,true,'Completed items remain visible by default');
   assert.ok(JSON.parse(remote.alice['/exam/progress/cs-notes-v1']).completed[bigdata.items[0].id].done);
   await unmount();await mount();
-  assert.equal(checkbox(bigdata.items[0].id),undefined,'Big data completion survives reload');
+  assert.equal(checkbox(bigdata.items[0].id).props.checked,true,'Reload shows saved completion');
   await showDone();
   await act(async()=>{await checkbox(bigdata.items[0].id).props.onChange();});
   await act(()=>view.root.findByProps({'aria-label':'완료한 지식 숨기기'}).props.onChange({target:{checked:true}}));
@@ -96,7 +96,7 @@ try {
   assert.ok(checkbox(entries[0].id).props.checked);
   assert.ok(view.root.findAllByType('li').find(n=>text(n)===entries[0].title).props.className.includes('is-done'));
   assert.ok(JSON.parse(remote.alice['/exam/progress/cs-notes-v1']).completed[entries[0].id].done);
-  await unmount();await mount();assert.equal(checkbox(entries[0].id),undefined,'Reload retains hidden completion');await showDone();assert.ok(checkbox(entries[0].id).props.checked);
+  await unmount();await mount();assert.equal(view.root.findByProps({'aria-label':'완료한 지식 숨기기'}).props.checked,false);assert.ok(checkbox(entries[0].id).props.checked,'Reload displays completed items');
   await login('bob');assert.equal(checkbox(entries[0].id).props.checked,false,'Accounts stay isolated');
   await login('alice');await showDone();
   failPut=true;
