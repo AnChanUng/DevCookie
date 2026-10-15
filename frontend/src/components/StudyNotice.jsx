@@ -23,6 +23,10 @@ export default function StudyNotice() {
           <li>컴퓨터일반 100제</li>
           <li>예상문제집</li>
         </ol>
+        <div className="study-notice-update">
+          <time dateTime="2026-10-15">2026.10.15</time>
+          <p>면접·전공필기 대비, 키워드별 답변을 준비하는 <strong>전공노트</strong>가 추가되었습니다.</p>
+        </div>
         <div className="study-notice-actions">
           <button className="study-notice-dismiss" type="button" onClick={dismiss}>다시 보지 않기</button>
           <button className="study-notice-confirm" type="button" autoFocus onClick={() => dialog.current.close()}>닫기</button>
