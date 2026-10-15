@@ -15,7 +15,6 @@ export default function StudyNotice() {
   };
   return (
     <>
-      <button className="study-notice-open" type="button" onClick={() => dialog.current.showModal()}>공지사항</button>
       <dialog className="study-notice" ref={dialog} aria-labelledby="study-notice-title">
         <span className="study-notice-label">공지사항</span>
         <h2 id="study-notice-title">문제집 풀이 우선순위</h2>
