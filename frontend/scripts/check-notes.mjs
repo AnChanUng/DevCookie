@@ -27,9 +27,14 @@ try {
   const legacy = migrateNotesCompletion({'architecture-02':{done:true,at:1}});
   assert.equal(legacy[entries[0].id].done,true);
   assert.equal(migrateNotesCompletion({...legacy,[entries[0].id]:{done:false,at:2}})[entries[0].id].done,false);
-  assert.equal(entries.length,119);assert.ok(entries.every(e => e.question?.endsWith('?') && e.answer.length > 10 && e.answer.length < 240));assert.equal(new Set(entries.map(e=>e.id)).size,entries.length);
+  assert.equal(entries.length,208);assert.ok(entries.every(e => e.question?.endsWith('?') && e.answer.length > 10 && e.answer.length < 240));assert.equal(new Set(entries.map(e=>e.id)).size,entries.length);
   for (const title of ['LinkedHashMap','LSP','LRU·LFU·MFU','정규화','인덱스','JVM','GC','CORS']) assert.ok(entries.some(e=>e.title===title),title);
   assert.ok(!entries.some(e=>/웹.*전체|URL 입력|CAP|샤딩|WAL/.test(e.question+e.title)));
+  const required = ['core-architecture-cpu','core-architecture-float','core-architecture-encoding','core-architecture-endian','core-architecture-raid','core-os-kernel','core-os-system-call','core-os-ipc','core-os-filesystem','core-structures-collision','core-structures-balanced','core-algorithms-dp','core-network-ethernet','core-network-media','core-network-nic','core-network-hub-switch','core-network-ip','core-network-subnet','core-network-classful','core-network-private','core-network-dhcp','core-network-icmp','core-network-arp','core-network-congestion','core-network-tcp-state','core-web-url','core-web-message','core-web-status','core-web-headers','core-web-cookie','core-web-cache','core-web-negotiation','core-web-proxy','core-web-load-balance','core-web-availability','core-web-scaling','core-database-dbms','core-database-keys','core-database-erd','core-database-ddl','core-database-null','core-database-group','core-database-commit','core-database-isolation','core-database-nosql','core-security-xss','core-security-csrf','core-security-sqli','core-design-unit-test','core-design-box-test'];
+  for(const id of required) assert.ok(entries.some(e=>e.id===id), 'Missing core concept: '+id);
+  assert.equal(CS_NOTES.length,10);
+  for(const s of CS_NOTES) assert.equal(new Set(s.items.map(e=>e.title)).size,s.items.length,'Duplicate concept in '+s.id);
+
   const remote = { alice: {}, bob: {} }; const requests=[];
   let failPut=false, holdGet=null;
   api.defaults.adapter = async config => {

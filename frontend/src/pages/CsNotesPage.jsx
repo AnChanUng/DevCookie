@@ -83,7 +83,7 @@ function NotesWorkspace({ user }) {
             </section>;
           })}
           {!visible.length && <div className="notes-empty"><h2>표시할 질문이 없습니다.</h2><p>완료한 지식 숨기기를 해제하거나 검색·과목 조건을 바꿔보세요.</p></div>}
-          <details className="notes-sources"><summary>참고 자료</summary><p>참고 글의 CS 키워드를 기준으로 기본기 확인용 문답을 새로 작성했습니다. 복합 흐름과 심화 설계는 덜어내고, DB는 기초 개념을 보충했습니다.</p><ul>{NOTE_SOURCES.map(s => <li key={s.url}><a href={s.url} target="_blank" rel="noreferrer">{s.title} ↗</a></li>)}</ul></details>
+          <details className="notes-sources"><summary>참고 자료</summary><p>컴퓨터과학 교재의 개념도와 정보처리기사 요약노트를 함께 참고해 핵심 기본기를 선별했습니다. 문답은 새로 작성했으며, 세부 암기·설정법·긴 종합 설명은 제외했습니다.</p><ul>{NOTE_SOURCES.map(s => <li key={s.title}>{s.url ? <a href={s.url} target="_blank" rel="noreferrer">{s.title} ↗</a> : s.title}</li>)}</ul></details>
         </div>
       </div>
     </div>
