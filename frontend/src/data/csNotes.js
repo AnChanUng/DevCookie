@@ -1305,6 +1305,186 @@ export const CS_NOTES = [
         "title": "GC",
         "question": "GC는 무엇을 자동으로 처리하나요?",
         "answer": "더 이상 도달할 수 없는 객체가 차지한 메모리를 회수합니다. 프로그램이 참조를 계속 보관하면 불필요한 객체라도 수거되지 않을 수 있습니다."
+      },
+      {
+        "id": "core-language-types",
+        "title": "기본형·참조형",
+        "question": "Java의 기본형과 참조형은 무엇이 다른가요?",
+        "answer": "기본형은 숫자·문자·논리값을 직접 나타내고 참조형은 객체를 가리키는 참조 또는 null을 나타냅니다. 기본형은 byte, short, int, long, float, double, char, boolean의 8개이며 String과 배열은 참조형입니다."
+      },
+      {
+        "id": "core-language-initialization",
+        "title": "필드·지역 변수 초기화",
+        "question": "필드와 지역 변수의 초기화 규칙은 어떻게 다른가요?",
+        "answer": "필드와 배열 원소에는 타입에 따라 0, false, null 등의 기본값이 주어집니다. 메서드 안의 지역 변수는 사용 전에 값이 대입되어야 합니다. 선언만 한 지역 변수를 읽으면 컴파일 오류가 납니다."
+      },
+      {
+        "id": "core-language-casting",
+        "title": "형변환",
+        "question": "자동 형변환과 명시적 형변환은 어떻게 다른가요?",
+        "answer": "int를 long으로 바꾸는 것처럼 허용된 확대 변환은 자동으로 이루어집니다. double을 int로 줄이는 변환은 명시적 캐스팅이 필요하며 소수 부분이나 범위 밖 정보가 손실될 수 있습니다. 확대 변환도 int→float처럼 정밀도를 잃을 수 있습니다."
+      },
+      {
+        "id": "core-language-division",
+        "title": "정수 나눗셈·오버플로",
+        "question": "정수 나눗셈과 정수 오버플로는 어떻게 동작하나요?",
+        "answer": "5 / 2는 정수 연산이므로 2입니다. 실수 결과가 필요하면 연산 전에 한쪽을 실수로 바꿉니다. int·long 연산이 범위를 넘으면 일반적으로 예외 없이 값이 넘칩니다. 결과를 long에 담아도 이미 int로 계산했다면 복구되지 않습니다."
+      },
+      {
+        "id": "core-language-short-circuit",
+        "title": "단락 평가",
+        "question": "&&와 ||의 단락 평가는 무엇인가요?",
+        "answer": "&&는 왼쪽이 false이면, ||는 왼쪽이 true이면 오른쪽을 평가하지 않습니다. 따라서 obj != null && obj.isValid()처럼 null 여부를 먼저 확인할 수 있습니다. boolean에 &나 |를 사용하면 양쪽을 모두 평가합니다."
+      },
+      {
+        "id": "core-language-equality",
+        "title": "==·equals",
+        "question": "==와 equals는 무엇을 비교하나요?",
+        "answer": "기본형의 ==는 값을 비교하고 참조형의 ==는 같은 객체를 가리키는지 비교합니다. equals는 논리적 동등성을 표현하는 메서드이며 클래스가 재정의할 수 있습니다. String은 내용을 비교하지만 Object의 기본 equals는 참조 동일성을 비교합니다."
+      },
+      {
+        "id": "core-language-hash-contract",
+        "title": "equals·hashCode 규약",
+        "question": "equals를 재정의하면 hashCode도 함께 재정의해야 하는 이유는 무엇인가요?",
+        "answer": "equals가 true인 두 객체는 같은 hashCode를 반환해야 합니다. HashMap·HashSet이 이 규약을 사용하기 때문입니다. 해시값이 같다고 반드시 같은 객체나 같은 값은 아니며 equals로도 비교해야 합니다."
+      },
+      {
+        "id": "core-language-string",
+        "title": "String 불변성",
+        "question": "String이 불변이라는 말은 무슨 뜻인가요?",
+        "answer": "한 번 만들어진 String 객체의 내용은 바뀌지 않습니다. 문자열을 이어 붙이거나 replace를 호출해도 원본 내용이 수정되는 것이 아니라 결과 문자열을 얻습니다. 변수가 다른 String을 가리키도록 재대입되는 것과 구분해야 합니다."
+      },
+      {
+        "id": "core-language-builder",
+        "title": "StringBuilder·StringBuffer",
+        "question": "StringBuilder와 StringBuffer는 언제 사용하나요?",
+        "answer": "둘 다 내용을 변경할 수 있어 반복적으로 문자열을 조립할 때 사용합니다. StringBuilder는 메서드 동기화를 제공하지 않고 StringBuffer는 제공합니다. 한 스레드 안에서 조립할 때는 보통 StringBuilder를 사용합니다."
+      },
+      {
+        "id": "core-language-constructor",
+        "title": "생성자·기본 생성자",
+        "question": "생성자는 무엇이고 기본 생성자는 언제 만들어지나요?",
+        "answer": "생성자는 객체 생성 시 초기화를 담당하며 클래스 이름과 같고 반환 타입을 쓰지 않습니다. 생성자를 하나도 선언하지 않았을 때만 컴파일러가 기본 생성자를 제공합니다. 직접 매개변수 생성자를 만들면 기본 생성자는 자동으로 추가되지 않습니다."
+      },
+      {
+        "id": "core-language-this-super",
+        "title": "this·super",
+        "question": "this와 super는 무엇을 가리키나요?",
+        "answer": "this는 현재 객체를 가리키며 필드와 매개변수 이름을 구분할 때도 사용합니다. super는 상위 클래스의 멤버에 접근할 때 사용합니다. this(...)는 같은 클래스의 다른 생성자, super(...)는 상위 클래스의 생성자를 호출합니다."
+      },
+      {
+        "id": "core-language-access",
+        "title": "접근 제어자",
+        "question": "public, protected, 접근 제어자 생략, private은 어떻게 다른가요?",
+        "answer": "public은 어디서나, private은 선언한 클래스 내부에서 접근하는 것이 기본입니다. 생략하면 같은 패키지에서 접근할 수 있습니다. protected는 같은 패키지와 다른 패키지의 하위 클래스에서 허용되지만, 후자는 접근 대상 참조에도 제약이 있습니다."
+      },
+      {
+        "id": "core-language-static",
+        "title": "static·인스턴스 멤버",
+        "question": "static 멤버와 인스턴스 멤버는 어떻게 다른가요?",
+        "answer": "static 멤버는 개별 객체가 아니라 클래스에 속하고 인스턴스 멤버는 객체마다 존재합니다. static 메서드에는 this가 없으므로 인스턴스 멤버에 접근하려면 객체 참조가 필요합니다. static 필드를 바꾸면 이를 공유하는 코드에 영향을 줍니다."
+      },
+      {
+        "id": "core-language-final",
+        "title": "final",
+        "question": "변수, 메서드, 클래스에 붙인 final은 각각 무엇을 제한하나요?",
+        "answer": "final 변수는 한 번 대입한 뒤 재대입할 수 없고 final 메서드는 오버라이딩할 수 없으며 final 클래스는 상속할 수 없습니다. final 참조 변수도 가리키는 객체 내부가 가변이면 그 내용은 바뀔 수 있습니다."
+      },
+      {
+        "id": "core-language-abstract-interface",
+        "title": "추상 클래스·인터페이스",
+        "question": "Java의 추상 클래스와 인터페이스는 어떻게 다른가요?",
+        "answer": "추상 클래스는 인스턴스 상태·생성자·구현을 공유할 수 있고 클래스 상속은 하나만 가능합니다. 인터페이스는 타입의 계약을 정의하며 여러 개를 구현할 수 있습니다. 인터페이스에도 default·static 메서드처럼 구현이 있는 메서드를 둘 수 있습니다."
+      },
+      {
+        "id": "core-language-dispatch",
+        "title": "업캐스팅·다운캐스팅",
+        "question": "업캐스팅과 다운캐스팅은 실제 객체를 바꾸나요?",
+        "answer": "캐스팅은 객체 자체를 바꾸지 않고 참조를 어떤 타입으로 다루는지 바꿉니다. 하위 객체를 상위 타입으로 다루는 업캐스팅은 자동으로 가능합니다. 다운캐스팅은 실제 객체가 그 타입과 호환되어야 하며 잘못하면 ClassCastException이 발생합니다."
+      },
+      {
+        "id": "core-language-pass-value",
+        "title": "값에 의한 전달",
+        "question": "Java에서 객체를 메서드에 넘기는 것도 값에 의한 전달인가요?",
+        "answer": "항상 값에 의한 전달입니다. 객체는 참조값의 복사본을 전달하므로 같은 객체의 내부 상태는 수정할 수 있습니다. 하지만 매개변수에 다른 객체를 재대입해도 호출한 쪽 변수의 참조는 바뀌지 않습니다."
+      },
+      {
+        "id": "core-language-null",
+        "title": "null·NullPointerException",
+        "question": "NullPointerException은 언제 발생하나요?",
+        "answer": "null인 참조로 인스턴스 메서드나 필드에 접근하는 경우 발생합니다. null인 Integer를 int로 언박싱할 때도 발생합니다. 값이 없을 수 있는지 확인하고 의미 있는 기본값·예외 처리 등을 선택해야 합니다."
+      },
+      {
+        "id": "core-language-exceptions",
+        "title": "Checked·Unchecked 예외",
+        "question": "Checked 예외와 Unchecked 예외는 어떻게 다른가요?",
+        "answer": "Checked 예외는 잡아서 처리하거나 throws로 선언해야 합니다. RuntimeException 계열과 Error 계열은 Unchecked이므로 그 의무가 없습니다. 둘 다 실행 중 발생할 수 있으며 Checked는 컴파일 시 처리 여부를 검사한다는 뜻입니다."
+      },
+      {
+        "id": "core-language-throw",
+        "title": "throw·throws",
+        "question": "throw와 throws는 각각 어디에 사용하나요?",
+        "answer": "throw는 코드 안에서 예외 객체를 실제로 던지는 구문입니다. throws는 메서드 선언에 붙여 호출자에게 전달할 수 있는 예외 타입을 알립니다. throws를 쓴다고 그 메서드가 반드시 예외를 던지는 것은 아닙니다."
+      },
+      {
+        "id": "core-language-finally",
+        "title": "try·catch·finally",
+        "question": "try, catch, finally는 어떤 역할을 하나요?",
+        "answer": "try는 예외가 날 수 있는 코드를 실행하고 catch는 맞는 타입의 예외를 처리합니다. finally는 정상 종료나 예외·return 시에도 일반적으로 실행되어 정리에 사용됩니다. JVM 종료 같은 경우까지 무조건 실행을 보장하지는 않습니다."
+      },
+      {
+        "id": "core-language-resources",
+        "title": "try-with-resources",
+        "question": "try-with-resources는 어떤 문제를 줄여 주나요?",
+        "answer": "AutoCloseable을 구현한 자원을 선언하면 블록을 나갈 때 close를 자동 호출해 자원 누수를 줄입니다. 파일·네트워크 같은 자원을 정리할 때 사용합니다. GC가 객체 메모리를 회수하는 것과 자원 닫기는 별개의 작업입니다."
+      },
+      {
+        "id": "core-language-generics",
+        "title": "제네릭",
+        "question": "제네릭은 왜 사용하나요?",
+        "answer": "List<String>처럼 사용할 타입을 매개변수로 지정해 재사용성과 컴파일 시 타입 안전성을 높입니다. 값을 꺼낼 때 불필요한 캐스팅도 줄어듭니다. List<int>는 사용할 수 없고 List<Integer>처럼 참조형을 사용해야 합니다."
+      },
+      {
+        "id": "core-language-comparison",
+        "title": "Comparable·Comparator",
+        "question": "Comparable과 Comparator는 어떻게 다른가요?",
+        "answer": "Comparable은 클래스 자신이 compareTo로 자연 순서를 정의합니다. Comparator는 별도의 비교 기준을 제공해 같은 타입을 여러 방식으로 정렬하게 합니다. 결과의 음수·0·양수로 순서를 나타내며 정수 뺄셈 비교는 오버플로를 주의해야 합니다."
+      },
+      {
+        "id": "core-language-priority",
+        "title": "PriorityQueue",
+        "question": "PriorityQueue는 어떤 원소부터 꺼내나요?",
+        "answer": "자연 순서나 Comparator 기준으로 가장 앞선 원소를 먼저 꺼냅니다. 기본 정수 큐는 작은 값부터 나옵니다. 전체 원소가 정렬된 순서로 순회되는 것은 아니며, 정렬된 순서로 꺼내려면 poll을 반복합니다."
+      },
+      {
+        "id": "core-language-copy",
+        "title": "얕은 복사·깊은 복사",
+        "question": "참조 대입, 얕은 복사, 깊은 복사는 어떻게 다른가요?",
+        "answer": "참조 대입은 같은 객체를 함께 가리킵니다. 얕은 복사는 바깥 객체를 새로 만들지만 내부 객체 참조를 공유합니다. 깊은 복사는 필요한 내부 객체도 복사해 상태를 분리합니다. 새 ArrayList<>(기존리스트)는 원소 객체까지 복사하지 않습니다."
+      },
+      {
+        "id": "core-language-lambda",
+        "title": "람다·함수형 인터페이스",
+        "question": "람다는 어떤 인터페이스에 사용할 수 있나요?",
+        "answer": "추상 메서드가 하나인 함수형 인터페이스의 동작을 표현할 때 사용합니다. Runnable이나 Predicate 등이 예입니다. default·static 메서드는 여러 개 있어도 됩니다. 람다에서 캡처하는 지역 변수는 final이거나 사실상 final이어야 합니다."
+      },
+      {
+        "id": "core-language-optional",
+        "title": "Optional",
+        "question": "Optional은 무엇을 표현하나요?",
+        "answer": "값이 있을 수도 없을 수도 있음을 표현하는 컨테이너로, 주로 메서드 반환값에 사용합니다. map·orElse 등으로 부재 상황을 처리할 수 있습니다. 비어 있을 때 get을 호출하면 예외가 나므로 null 문제를 자동으로 모두 해결하지는 않습니다."
+      },
+      {
+        "id": "core-language-enum",
+        "title": "enum",
+        "question": "enum은 문자열 상수와 비교해 어떤 장점이 있나요?",
+        "answer": "허용되는 값을 정해진 상수 집합으로 제한하는 타입입니다. 상태를 문자열로 다룰 때 생기는 오타나 잘못된 값 전달을 컴파일 시 줄일 수 있습니다. enum에는 필드와 메서드도 정의할 수 있습니다."
+      },
+      {
+        "id": "core-language-jdk",
+        "title": "JDK·바이트코드",
+        "question": "Java 소스는 어떻게 실행되고 JDK는 무엇을 제공하나요?",
+        "answer": "javac가 .java 소스를 .class 바이트코드로 컴파일하고 JVM이 이를 실행합니다. JDK는 컴파일러 등 개발 도구와 실행에 필요한 구성 요소를 제공합니다. 바이트코드는 특정 CPU의 기계어와 구분됩니다."
       }
     ]
   },
@@ -1544,6 +1724,21 @@ export const NOTE_SOURCES = [
   {
     "title": "scikit-learn · 학습 데이터 분리와 평가",
     "url": "https://scikit-learn.org/stable/modules/cross_validation.html",
+    "kind": "reference"
+  },
+  {
+    "title": "Oracle Java · 타입·변수와 기본 문법",
+    "url": "https://docs.oracle.com/javase/specs/jls/se21/html/index.html",
+    "kind": "reference"
+  },
+  {
+    "title": "Oracle Java · 메서드 인자 전달",
+    "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/arguments.html",
+    "kind": "reference"
+  },
+  {
+    "title": "Oracle Java · equals·hashCode 규약",
+    "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html",
     "kind": "reference"
   }
 ];

@@ -22,11 +22,12 @@ export function saveExams(exams) {
 }
 
 // 오늘부터 그날까지 남은 날 수. 지났으면 음수, 날짜가 비어 있으면 null
-export function daysLeft(date) {
-  const day = new Date(`${date}T00:00:00`);
-  if (Number.isNaN(day.getTime())) return null;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+export function daysLeft(date, now = new Date()) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+  const day = Date.parse(`${date}T00:00:00Z`);
+  if (!Number.isFinite(day) || new Date(day).toISOString().slice(0, 10) !== date) return null;
+  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(now).map(p => [p.type, p.value]));
+  const today = Date.parse(`${parts.year}-${parts.month}-${parts.day}T00:00:00Z`);
   return Math.round((day - today) / 86400000);
 }
 
