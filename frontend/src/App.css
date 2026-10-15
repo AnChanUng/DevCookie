@@ -446,6 +446,13 @@
   letter-spacing: -0.03em;
   color: var(--text-primary);
 }
+.solve-rank-toggle { padding: 0; border: 0; background: transparent; font: inherit; color: inherit; cursor: pointer; text-align: left; }
+.solve-rank-toggle small { font-size: .65rem; font-weight: 500; color: var(--accent-blue); white-space: nowrap; }
+.solve-rank-toggle:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 4px; }
+.solve-rank-total { margin: 12px 0; font-size: .85rem; color: var(--text-primary); }
+.solve-rank-total strong { color: var(--accent-blue); }
+.solve-rank-total small { display: block; margin-top: 4px; font-size: .66rem; color: var(--text-secondary); }
+.solve-rank-expanded { max-height: min(60dvh, 560px); overflow-y: auto; }
 
 .solve-rank-head span {
   flex: none;

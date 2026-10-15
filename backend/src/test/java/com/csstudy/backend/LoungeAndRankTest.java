@@ -202,5 +202,19 @@ class LoungeAndRankTest {
                 .andExpect(jsonPath("$.top[1].count").value(120))
                 .andExpect(jsonPath("$.account").value(true))
                 .andExpect(jsonPath("$.me.rank").value(1));
+        // Totals include everyone, with linked phone/PC counted once. Default stays top five.
+        for (int i = 1; i <= 4; i++) {
+            mvc.perform(put("/api/v1/rank/solved").contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"visitorId\":\"rank-visitor-extra-" + i + "\",\"count\":" + i + "}"))
+                    .andExpect(status().isOk());
+        }
+        mvc.perform(get("/api/v1/rank/solved"))
+                .andExpect(jsonPath("$.top.length()").value(5))
+                .andExpect(jsonPath("$.totalSolvers").value(7))
+                .andExpect(jsonPath("$.totalSolved").value(438));
+        mvc.perform(get("/api/v1/rank/solved").param("all", "true"))
+                .andExpect(jsonPath("$.top.length()").value(7))
+                .andExpect(jsonPath("$.top[6].count").value(1))
+                .andExpect(jsonPath("$.totalSolved").value(438));
     }
 }
