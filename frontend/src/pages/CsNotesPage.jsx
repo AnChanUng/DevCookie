@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { CS_NOTES, NOTE_SOURCES } from '../data/csNotes';
 import { account, onAccountChange } from '../sync';
 import useNotesProgress from '../hooks/useNotesProgress';
+import NoteAnswer from '../components/NoteAnswer';
 import './CsNotesPage.css';
 
 const entries = CS_NOTES.flatMap(s => s.items.map(e => ({ ...e, subject: s.title, section: s.id })));
@@ -38,7 +39,7 @@ function NotesWorkspace({ user }) {
   return (
     <div className="cs-notes">
       <header className="notes-heading">
-        <div><h1>전공노트</h1><p>{CS_NOTES.length}과목 · {entries.length}개 기본 키워드</p></div>
+        <div><h1>전공노트</h1><p>{CS_NOTES.length}과목 · {entries.length}개 질문</p></div>
         <div className="notes-progress"><strong>학습 완료 {completed} / {entries.length}</strong><progress value={completed} max={entries.length} aria-label="전공노트 학습 완료" /></div>
         <Link to="/account">내 계정 →</Link>
       </header>
@@ -65,7 +66,7 @@ function NotesWorkspace({ user }) {
           </nav>
         </aside>
         <div className="notes-content">
-          <p className="notes-list-intro">키워드의 뜻과 기본 차이를 알고 있는지 짧게 확인하세요. ‘답 보기’로 기본 답을 확인하고, 아는 항목은 학습 완료로 체크하세요.</p>
+          <p className="notes-list-intro">출처: <a href="https://github.com/ksundong/backend-interview-question" target="_blank" rel="noreferrer">ksundong/backend-interview-question 및 기여자</a> · CC BY-NC-SA(원문 표기). 선택한 문답을 원문 그대로 수록했습니다. ‘답 보기’로 확인하고 학습 완료를 체크하세요. 빅데이터는 별도 보충 문답입니다.</p>
           {selected && hideDone && data[selected.id]?.done && <p className="notes-empty">이 링크의 질문은 학습 완료되어 숨겨져 있습니다. ‘완료한 지식 숨기기’를 해제하면 다시 볼 수 있습니다.</p>}
           {CS_NOTES.map(section => {
             const list = visible.filter(e => e.section === section.id);
@@ -73,17 +74,17 @@ function NotesWorkspace({ user }) {
             return <section className="notes-subject" key={section.id} aria-labelledby={`subject-${section.id}`}>
               <h2 id={`subject-${section.id}`} className="notes-subject-title">{section.title}<small>{list.length}개 질문</small></h2>
               {list.map(entry => <article id={entry.id} className={`notes-detail-card ${data[entry.id]?.done ? 'is-done' : ''}`} key={entry.id}>
-                <div className="notes-detail-top"><span>{entry.title}</span><label><input type="checkbox" aria-label={`${entry.title} 본문 학습 완료`} checked={!!data[entry.id]?.done} disabled={disabled} onChange={() => toggle(entry.id)} /> 학습 완료</label></div>
+                <div className="notes-detail-top"><span>{entry.sourceUrl ? section.title : entry.title}</span><label><input type="checkbox" aria-label={`${entry.title} 본문 학습 완료`} checked={!!data[entry.id]?.done} disabled={disabled} onChange={() => toggle(entry.id)} /> 학습 완료</label></div>
                 <h3 className="notes-question">{entry.question}</h3>
                 <button type="button" className="exam-btn sm notes-reveal" aria-expanded={!!opened[entry.id]} aria-controls={`answer-${entry.id}`} onClick={() => setOpened(prev => ({ ...prev, [entry.id]: !prev[entry.id] }))}>{opened[entry.id] ? '답 숨기기' : '답 보기'}</button>
                 <div id={`answer-${entry.id}`} hidden={!opened[entry.id]}>
-                  {opened[entry.id] && <><div className="notes-answer"><h4>핵심 답변</h4><p>{entry.answer}</p></div>{entry.detail && <div className="notes-detail"><h4>예시 · 주의점</h4><p>{entry.detail}</p></div>}</>}
+                  {opened[entry.id] && <NoteAnswer entry={entry} />}
                 </div>
               </article>)}
             </section>;
           })}
           {!visible.length && <div className="notes-empty"><h2>표시할 질문이 없습니다.</h2><p>완료한 지식 숨기기를 해제하거나 검색·과목 조건을 바꿔보세요.</p></div>}
-          <details className="notes-sources"><summary>참고 자료</summary><p>컴퓨터과학 교재의 개념도와 정보처리기사 요약노트를 함께 참고해 핵심 기본기를 선별했습니다. 문답은 새로 작성했으며, 세부 암기·설정법·긴 종합 설명은 제외했습니다.</p><ul>{NOTE_SOURCES.map(s => <li key={s.title}>{s.url ? <a href={s.url} target="_blank" rel="noreferrer">{s.title} ↗</a> : s.title}</li>)}</ul></details>
+          <details className="notes-sources"><summary>출처 · 이용 조건</summary><p>원문 저작자: ksundong 및 저장소 기여자. 원문은 CC BY-NC-SA로 명시하며 CC BY-NC 2.0 KR 링크도 함께 제공합니다. 이식한 문답은 저작자표시·비영리·동일조건으로 제공합니다. 변경 사항은 요청한 항목 제외, 질문별 분리와 화면 서식 적용입니다. 답변이 비어 있던 항목은 임의로 채우지 않았습니다.</p><ul>{NOTE_SOURCES.map(s => <li key={s.title}><a href={s.url} target="_blank" rel="noreferrer">{s.title} ↗</a></li>)}</ul></details>
         </div>
       </div>
     </div>

@@ -24,20 +24,20 @@ try {
   const { mergeNotes } = await server.ssrLoadModule('/src/hooks/useNotesProgress.js');
   const { ACCOUNT_BANKS, summarizeAccount } = await server.ssrLoadModule('/src/accountRecords.js');
   const entries = CS_NOTES.flatMap(s => s.items);
-  const legacy = migrateNotesCompletion({'architecture-02':{done:true,at:1}});
-  assert.equal(legacy[entries[0].id].done,true);
-  assert.equal(migrateNotesCompletion({...legacy,[entries[0].id]:{done:false,at:2}})[entries[0].id].done,false);
-  assert.equal(entries.length,270);assert.ok(entries.every(e => e.question?.endsWith('?') && e.answer.length > 10 && e.answer.length < 240));assert.equal(new Set(entries.map(e=>e.id)).size,entries.length);
-  for (const title of ['LinkedHashMap','LSP','LRU·LFU·MFU','정규화','인덱스','JVM','GC','CORS']) assert.ok(entries.some(e=>e.title===title),title);
-  assert.ok(!entries.some(e=>/웹.*전체|URL 입력|CAP|샤딩|WAL/.test(e.question+e.title)));
-  const required = ['core-architecture-cpu','core-architecture-float','core-architecture-encoding','core-architecture-endian','core-architecture-raid','core-os-kernel','core-os-system-call','core-os-ipc','core-os-filesystem','core-structures-collision','core-structures-balanced','core-algorithms-dp','core-network-ethernet','core-network-media','core-network-nic','core-network-hub-switch','core-network-ip','core-network-subnet','core-network-classful','core-network-private','core-network-dhcp','core-network-icmp','core-network-arp','core-network-congestion','core-network-tcp-state','core-web-url','core-web-message','core-web-status','core-web-headers','core-web-cookie','core-web-cache','core-web-negotiation','core-web-proxy','core-web-load-balance','core-web-availability','core-web-scaling','core-database-dbms','core-database-keys','core-database-erd','core-database-ddl','core-database-null','core-database-group','core-database-commit','core-database-isolation','core-database-nosql','core-security-xss','core-security-csrf','core-security-sqli','core-design-unit-test','core-design-box-test'];
-  for(const id of required) assert.ok(entries.some(e=>e.id===id), 'Missing core concept: '+id);
-  assert.equal(CS_NOTES.length,11);
-  assert.equal(CS_NOTES.find(s=>s.id==='language').items.length,48,'Java fundamentals expanded');
-  for(const title of ['기본형·참조형','==·equals','static·인스턴스 멤버','final','값에 의한 전달','Checked·Unchecked 예외','제네릭']) assert.ok(entries.some(e=>e.title===title),title);
+  const historical={'architecture-02':{done:true,at:1}};
+  assert.deepEqual(migrateNotesCompletion(historical),historical);
+  assert.equal(migrateNotesCompletion(historical)[entries[0].id],undefined);
+  assert.equal(entries.length,169);
+  assert.equal(new Set(entries.map(e=>e.id)).size,entries.length);
+  assert.ok(entries.every(e=>e.question && e.answer));
+  assert.ok(!CS_NOTES.some(s=>['커뮤니케이션','기타','개인의 역량','최신기술에 관심이 있는지'].includes(s.title)));
+  assert.equal(CS_NOTES.find(s=>s.title==='Spring').items.length,18);
+  assert.equal(CS_NOTES.find(s=>s.title==='JPA').items.length,4);
+  const java=CS_NOTES.find(s=>s.title==='Java');
+  assert.equal(java.items.length,25);
   const bigdata=CS_NOTES.find(s=>s.id==='bigdata');
   assert.equal(bigdata.items.length,32);
-  for(const s of CS_NOTES) assert.equal(new Set(s.items.map(e=>e.title)).size,s.items.length,'Duplicate concept in '+s.id);
+  const answerVisible = id => view.root.findByProps({id:'answer-'+id}).props.hidden === false;
 
   const remote = { alice: {}, bob: {} }; const requests=[];
   let failPut=false, holdGet=null;
@@ -61,22 +61,22 @@ try {
   const reveal = async id => { await act(()=>view.root.findByProps({id}).findAllByType('button').find(b=>b.props['aria-controls']).props.onClick()); };
   await mount();
   assert.equal(view.root.findAllByType('article').length,entries.length,'All questions appear in the initial list');
-  for(const entry of entries) { assert.ok(text(view.toJSON()).includes(entry.question)); assert.ok(!text(view.toJSON()).includes(entry.answer)); }
+  for(const entry of entries) { assert.ok(text(view.toJSON()).includes(entry.question)); assert.ok(!answerVisible(entry.id)); }
   assert.equal(view.root.findByProps({'aria-label':'완료한 지식 숨기기'}).props.checked,false);
   assert.equal(view.root.findByProps({'aria-label':'전공노트 질문 목록'}).findAllByType('li').length,entries.length);
   assert.ok(checkbox(entries[0].id).props.disabled);
   await choose(entries[0].title);
-  assert.ok(!text(view.toJSON()).includes(entries[0].answer),'Sidebar navigation must not reveal answers');
+  assert.ok(!answerVisible(entries[0].id),'Sidebar navigation must not reveal answers');
   await reveal(entries[0].id);
-  assert.ok(text(view.toJSON()).includes(entries[0].answer));
+  assert.ok(answerVisible(entries[0].id));
   await reveal(entries[0].id);
-  assert.ok(!text(view.toJSON()).includes(entries[0].answer),'Answers can be collapsed again');
-  assert.ok(!text(view.toJSON()).includes(entries[1].answer));
+  assert.ok(!answerVisible(entries[0].id),'Answers can be collapsed again');
+  assert.ok(!answerVisible(entries[1].id));
   await login('alice');
-  await act(()=>view.root.findByProps({'aria-label':'과목 선택'}).props.onChange({target:{value:'language'}}));
-  assert.equal(view.root.findAllByType('article').length,48);
-  await reveal('core-language-pass-value');
-  assert.ok(text(view.toJSON()).includes(entries.find(e=>e.id==='core-language-pass-value').answer));
+  await act(()=>view.root.findByProps({'aria-label':'과목 선택'}).props.onChange({target:{value:java.id}}));
+  assert.equal(view.root.findAllByType('article').length,java.items.length);
+  await reveal(java.items[0].id);
+  assert.ok(answerVisible(java.items[0].id));
   await act(()=>view.root.findByProps({'aria-label':'과목 선택'}).props.onChange({target:{value:'bigdata'}}));
   assert.equal(view.root.findAllByType('article').length,bigdata.items.length);
   await reveal(bigdata.items[0].id);
@@ -109,8 +109,8 @@ try {
   await act(()=>view.root.findByProps({'aria-label':'질문 검색'}).props.onChange({target:{value:'존재하지않는질문'}}));
   assert.ok(text(view.toJSON()).includes('조건에 맞는 질문이 없습니다'));
   await unmount();await mount(Page,`/notes#${entries[50].id}`);
-  assert.ok(!text(view.toJSON()).includes(entries[50].answer),'Direct links must keep answers hidden');
-  await reveal(entries[50].id);assert.ok(text(view.toJSON()).includes(entries[50].answer));
+  assert.ok(!answerVisible(entries[50].id),'Direct links must keep answers hidden');
+  await reveal(entries[50].id);assert.ok(answerVisible(entries[50].id));
   assert.equal(mergeNotes({x:{done:true,at:1}},{x:{done:false,at:2}}).x.done,false);
   // A request started under A must never be sent with B credentials after switching.
   let release;holdGet=new Promise(r=>{release=r;});
