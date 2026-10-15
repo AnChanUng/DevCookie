@@ -38,7 +38,7 @@ function NotesWorkspace({ user }) {
   return (
     <div className="cs-notes">
       <header className="notes-heading">
-        <div><h1>전공노트</h1><p>9과목 · 100개 주제</p></div>
+        <div><h1>전공노트</h1><p>{CS_NOTES.length}과목 · {entries.length}개 기본 키워드</p></div>
         <div className="notes-progress"><strong>학습 완료 {completed} / {entries.length}</strong><progress value={completed} max={entries.length} aria-label="전공노트 학습 완료" /></div>
         <Link to="/account">내 계정 →</Link>
       </header>
@@ -65,7 +65,7 @@ function NotesWorkspace({ user }) {
           </nav>
         </aside>
         <div className="notes-content">
-          <p className="notes-list-intro">질문을 보고 먼저 답을 떠올려 보세요. ‘답 보기’를 누르면 해설이 펼쳐집니다. 학습 완료한 질문은 기본 목록에서 숨겨집니다.</p>
+          <p className="notes-list-intro">키워드의 뜻과 기본 차이를 알고 있는지 짧게 확인하세요. ‘답 보기’로 기본 답을 확인하고, 아는 항목은 학습 완료로 체크하세요.</p>
           {selected && hideDone && data[selected.id]?.done && <p className="notes-empty">이 링크의 질문은 학습 완료되어 숨겨져 있습니다. ‘완료한 지식 숨기기’를 해제하면 다시 볼 수 있습니다.</p>}
           {CS_NOTES.map(section => {
             const list = visible.filter(e => e.section === section.id);
@@ -77,13 +77,13 @@ function NotesWorkspace({ user }) {
                 <h3 className="notes-question">{entry.question}</h3>
                 <button type="button" className="exam-btn sm notes-reveal" aria-expanded={!!opened[entry.id]} aria-controls={`answer-${entry.id}`} onClick={() => setOpened(prev => ({ ...prev, [entry.id]: !prev[entry.id] }))}>{opened[entry.id] ? '답 숨기기' : '답 보기'}</button>
                 <div id={`answer-${entry.id}`} hidden={!opened[entry.id]}>
-                  {opened[entry.id] && <><div className="notes-answer"><h4>핵심 답변</h4><p>{entry.answer}</p></div><div className="notes-detail"><h4>예시 · 주의점</h4><p>{entry.detail}</p></div></>}
+                  {opened[entry.id] && <><div className="notes-answer"><h4>핵심 답변</h4><p>{entry.answer}</p></div>{entry.detail && <div className="notes-detail"><h4>예시 · 주의점</h4><p>{entry.detail}</p></div>}</>}
                 </div>
               </article>)}
             </section>;
           })}
           {!visible.length && <div className="notes-empty"><h2>표시할 질문이 없습니다.</h2><p>완료한 지식 숨기기를 해제하거나 검색·과목 조건을 바꿔보세요.</p></div>}
-          <details className="notes-sources"><summary>참고 자료</summary><p>참고 글의 준비 범위를 바탕으로 설명과 예시를 새로 작성했습니다.</p><ul>{NOTE_SOURCES.map(s => <li key={s.url}><a href={s.url} target="_blank" rel="noreferrer">{s.title} ↗</a></li>)}</ul></details>
+          <details className="notes-sources"><summary>참고 자료</summary><p>참고 글의 CS 키워드를 기준으로 기본기 확인용 문답을 새로 작성했습니다. 복합 흐름과 심화 설계는 덜어내고, DB는 기초 개념을 보충했습니다.</p><ul>{NOTE_SOURCES.map(s => <li key={s.url}><a href={s.url} target="_blank" rel="noreferrer">{s.title} ↗</a></li>)}</ul></details>
         </div>
       </div>
     </div>

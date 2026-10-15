@@ -2,7 +2,7 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 import { Link } from 'react-router-dom';
 import { account, onAccountChange, signIn, signOut } from '../sync';
 import { loadAccountRecords, summarizeAccount } from '../accountRecords';
-import { CS_NOTES } from '../data/csNotes';
+import { CS_NOTES, migrateNotesCompletion } from '../data/csNotes';
 import QuestionExplanation from '../components/QuestionExplanation';
 import './AccountPage.css';
 
@@ -36,7 +36,8 @@ function AccountDashboard({ user }) {
   }
   const { rows, attempts, correct, wrong } = summarizeAccount(result.records);
   const filtered = rows.filter(r => (!wrongOnly || r.last === 'w') && `${r.bank} ${r.title}`.toLowerCase().includes(query.trim().toLowerCase()));
-  const completed = CS_NOTES.flatMap(s => s.items).filter(e => result.records['cs-notes-v1']?.completed?.[e.id]?.done);
+  const noteRecords = migrateNotesCompletion(result.records['cs-notes-v1']?.completed);
+  const completed = CS_NOTES.flatMap(s => s.items).filter(e => noteRecords[e.id]?.done);
   return <div className="account-page fade-in">
     <header className="page-header"><h1>내 계정</h1><p>{user ? `${user.nickname}님의 학습 기록` : '로그인하면 내 계정에 저장된 학습 기록을 볼 수 있습니다.'}</p></header>
     <section className="account-auth">

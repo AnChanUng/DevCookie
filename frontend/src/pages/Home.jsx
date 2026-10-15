@@ -57,6 +57,15 @@ export default function Home() {
         ))}
       </div>
 
+      <section className="home-practice-links" aria-labelledby="practice-links-title">
+        <h2 id="practice-links-title">코딩 연습 사이트</h2>
+        <div>
+          <a href="https://www.codetree.ai/ko/frequent-problems" target="_blank" rel="noopener noreferrer">코드트리 ↗</a>
+          <a href="https://school.programmers.co.kr/learn/challenges?order=acceptance_desc&levels=2%2C3&languages=java" target="_blank" rel="noopener noreferrer">프로그래머스 ↗</a>
+          <a href="https://jungol.co.kr/" target="_blank" rel="noopener noreferrer">정올 ↗</a>
+        </div>
+      </section>
+
       {/* 왼쪽 아래 도크: 위에서부터 멘탈 기르기, 오늘의 운세, 코딩 타자 연습. 좁은 화면에서는 숨겨 두고 "더보기"를 눌러야 맨 아래에 한 줄로 나온다 */}
       <div className={`home-dock ${more ? 'open' : ''}`}>
         <button type="button" className="home-dock-more" onClick={() => setMore(m => !m)} aria-expanded={more}>{more ? '접기' : '더보기'}</button>
