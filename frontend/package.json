@@ -13,13 +13,19 @@
     "check:exam-flow": "node --import ./scripts/extensionless-loader.mjs scripts/check-exam-flow.mjs",
     "check:pearl-answers": "node scripts/check-pearl-answers.mjs",
     "check:notes": "node scripts/check-notes.mjs",
-    "check:notice": "node scripts/check-notice.mjs"
+    "check:notice": "node scripts/check-notice.mjs",
+    "import:notes": "node scripts/import-interview-notes.mjs",
+    "check:imported-notes": "node scripts/check-imported-notes.mjs"
   },
   "dependencies": {
     "axios": "^1.14.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "react-router-dom": "^7.14.0"
+    "react-markdown": "^10.1.0",
+    "react-router-dom": "^7.14.0",
+    "rehype-raw": "^7.0.0",
+    "rehype-sanitize": "^6.0.0",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

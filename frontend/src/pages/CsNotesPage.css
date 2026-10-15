@@ -62,3 +62,13 @@ main.container:has(.cs-notes) { max-width: 1600px; width: 100%; padding-inline: 
 .notes-subject-title small { font-size: .75rem; font-weight: 400; color: var(--text-secondary); }
 .notes-reveal { margin-bottom: 4px; }
 .notes-answer { margin-top: 16px; }
+.notes-markdown { overflow-wrap: anywhere; line-height: 1.8; }
+.notes-markdown p { margin: 0 0 12px; }
+.notes-markdown ul, .notes-markdown ol { padding-left: 24px; margin: 8px 0 14px; }
+.notes-markdown pre { overflow-x: auto; padding: 14px; background: var(--bg-secondary); border-radius: 8px; white-space: pre; }
+.notes-markdown code { font-size: .85em; }
+.notes-markdown table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; }
+.notes-markdown th, .notes-markdown td { border: 1px solid var(--border-color); padding: 8px; }
+.notes-markdown img { max-width: 100%; height: auto; }
+.notes-markdown a, .notes-original, .notes-list-intro a { color: var(--accent-blue); overflow-wrap: anywhere; }
+.notes-original { display: inline-block; margin-top: 12px; font-size: .78rem; }
