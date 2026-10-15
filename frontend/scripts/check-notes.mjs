@@ -20,11 +20,16 @@ try {
   const { default: api } = await server.ssrLoadModule('/src/api.js');
   const { default: Page } = await server.ssrLoadModule('/src/pages/CsNotesPage.jsx');
   const { default: Account } = await server.ssrLoadModule('/src/pages/AccountPage.jsx');
-  const { CS_NOTES } = await server.ssrLoadModule('/src/data/csNotes.js');
+  const { CS_NOTES, migrateNotesCompletion } = await server.ssrLoadModule('/src/data/csNotes.js');
   const { mergeNotes } = await server.ssrLoadModule('/src/hooks/useNotesProgress.js');
   const { ACCOUNT_BANKS, summarizeAccount } = await server.ssrLoadModule('/src/accountRecords.js');
   const entries = CS_NOTES.flatMap(s => s.items);
-  assert.equal(entries.length,100);assert.ok(entries.every(e => e.question?.length > 20 && e.question.endsWith('?') || e.question?.endsWith('요.')));assert.equal(new Set(entries.map(e=>e.id)).size,100);
+  const legacy = migrateNotesCompletion({'architecture-02':{done:true,at:1}});
+  assert.equal(legacy[entries[0].id].done,true);
+  assert.equal(migrateNotesCompletion({...legacy,[entries[0].id]:{done:false,at:2}})[entries[0].id].done,false);
+  assert.equal(entries.length,119);assert.ok(entries.every(e => e.question?.endsWith('?') && e.answer.length > 10 && e.answer.length < 240));assert.equal(new Set(entries.map(e=>e.id)).size,entries.length);
+  for (const title of ['LinkedHashMap','LSP','LRU·LFU·MFU','정규화','인덱스','JVM','GC','CORS']) assert.ok(entries.some(e=>e.title===title),title);
+  assert.ok(!entries.some(e=>/웹.*전체|URL 입력|CAP|샤딩|WAL/.test(e.question+e.title)));
   const remote = { alice: {}, bob: {} }; const requests=[];
   let failPut=false, holdGet=null;
   api.defaults.adapter = async config => {
@@ -46,10 +51,10 @@ try {
   const showDone = async () => { await act(()=>view.root.findByProps({'aria-label':'완료한 지식 숨기기'}).props.onChange({target:{checked:false}})); };
   const reveal = async id => { await act(()=>view.root.findByProps({id}).findAllByType('button').find(b=>b.props['aria-controls']).props.onClick()); };
   await mount();
-  assert.equal(view.root.findAllByType('article').length,100,'All questions appear in the initial list');
+  assert.equal(view.root.findAllByType('article').length,entries.length,'All questions appear in the initial list');
   for(const entry of entries) { assert.ok(text(view.toJSON()).includes(entry.question)); assert.ok(!text(view.toJSON()).includes(entry.answer)); }
   assert.equal(view.root.findByProps({'aria-label':'완료한 지식 숨기기'}).props.checked,true);
-  assert.equal(view.root.findByProps({'aria-label':'전공노트 질문 목록'}).findAllByType('li').length,100);
+  assert.equal(view.root.findByProps({'aria-label':'전공노트 질문 목록'}).findAllByType('li').length,entries.length);
   assert.ok(checkbox(entries[0].id).props.disabled);
   await choose(entries[0].title);
   assert.ok(!text(view.toJSON()).includes(entries[0].answer),'Sidebar navigation must not reveal answers');
@@ -61,7 +66,7 @@ try {
   await login('alice');
   await act(async()=>{await checkbox(entries[0].id).props.onChange();});
   assert.equal(checkbox(entries[0].id),undefined,'Completed question is hidden immediately');
-  assert.equal(view.root.findAllByType('article').length,99);
+  assert.equal(view.root.findAllByType('article').length,entries.length-1);
   await showDone();
   assert.ok(checkbox(entries[0].id).props.checked);
   assert.ok(view.root.findAllByType('li').find(n=>text(n)===entries[0].title).props.className.includes('is-done'));
@@ -100,7 +105,7 @@ try {
   assert.ok(text(view.toJSON()).includes('67%'));
   await login('bob');assert.ok(!text(view.toJSON()).includes(q.q),'Dashboard resets on account switch');
   assert.equal(errors.length,0,errors.join('\n'));
-  console.log('PASS: 100 interview questions visible by default; answers hidden until explicit reveal, sidebar/deep links stay collapsed; completion hides/restores across reload; account isolation, save retries, dashboard and in-flight switching.');
+  console.log('PASS: Basic keyword questions visible by default; answers hidden until explicit reveal, sidebar/deep links stay collapsed; completion hides/restores across reload; account isolation, save retries, dashboard and in-flight switching.');
 } finally {
   if(view)await act(()=>view.unmount());
   await server.close();console.error=oldError;

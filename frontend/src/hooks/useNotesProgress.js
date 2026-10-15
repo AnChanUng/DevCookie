@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import api from '../api';
+import { migrateNotesCompletion } from '../data/csNotes';
 
 const endpoint = '/exam/progress/cs-notes-v1';
 const keyFor = user => `cs-notes:v1:${user.nickname}`;
 function read(user) {
-  try { return JSON.parse(localStorage.getItem(keyFor(user))) || {}; } catch { return {}; }
+  try { return migrateNotesCompletion(JSON.parse(localStorage.getItem(keyFor(user))) || {}); } catch { return {}; }
 }
 function cache(user, data) {
   try { localStorage.setItem(keyFor(user), JSON.stringify(data)); } catch { /* Server remains the durable store. */ }
@@ -33,7 +34,7 @@ export default function useNotesProgress(user) {
     try {
       const response = await api.get(endpoint, config);
       const remote = response.data.data ? JSON.parse(response.data.data).completed || {} : {};
-      let merged = mergeNotes(read(user), remote);
+      let merged = migrateNotesCompletion(mergeNotes(read(user), remote));
       if (id) merged = { ...merged, [id]: { done: !merged[id]?.done, at: Math.max(Date.now(), (merged[id]?.at || 0) + 1) } };
       cache(user, merged);
       if (alive.current) setData(merged);
