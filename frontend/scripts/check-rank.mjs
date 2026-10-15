@@ -1,0 +1,39 @@
+import assert from 'node:assert/strict';
+import React from 'react';
+import TestRenderer, { act } from 'react-test-renderer';
+import { MemoryRouter } from 'react-router-dom';
+import { createServer } from 'vite';
+globalThis.IS_REACT_ACT_ENVIRONMENT=true;
+const values=new Map();
+globalThis.localStorage={getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,String(v))};
+const server=await createServer({server:{middlewareMode:true,hmr:false},appType:'custom'});
+const oldError=console.error;const errors=[];
+console.error=(...a)=>{if(!String(a[0]).startsWith('react-test-renderer is deprecated'))errors.push(a.join(' '));};
+const text=n=>typeof n==='string'?n:(n?.children||[]).map(text).join('');
+let view;
+try {
+ const {default:api}=await server.ssrLoadModule('/src/api.js');
+ const {default:Rank}=await server.ssrLoadModule('/src/components/SolveRank.jsx');
+ const top=Array.from({length:8},(_,i)=>({rank:i+1,nickname:'사용자'+(i+1),count:100-i,me:i===7}));
+ api.defaults.adapter=async config=>{
+  assert.equal(config.params.all,true);
+  return {data:{top,me:top[7],totalSolved:772,totalSolvers:8,account:true,nickname:'사용자8'},status:200,statusText:'OK',headers:{},config};
+ };
+ await act(async()=>{view=TestRenderer.create(React.createElement(MemoryRouter,null,React.createElement(Rank)));await new Promise(r=>setImmediate(r));});
+ assert.equal(view.root.findAllByType('li').length,6,'Top five plus self');
+ assert.ok(text(view.toJSON()).includes('전체 총 772문제 풀이 완료'));
+ const toggle=()=>view.root.findAllByType('button').find(b=>b.props['aria-controls']==='solve-rank-results');
+ await act(()=>toggle().props.onClick());
+ assert.equal(view.root.findAllByType('li').length,8);
+ assert.equal(toggle().props['aria-expanded'],true);
+ await act(()=>toggle().props.onClick());assert.equal(view.root.findAllByType('li').length,6);
+ await act(()=>view.unmount());
+ const {default:Aptitude}=await server.ssrLoadModule('/src/pages/AptitudePage.jsx');
+ await act(()=>{view=TestRenderer.create(React.createElement(MemoryRouter,null,React.createElement(Aptitude)));});
+ const cards=view.root.findAllByType('a').filter(a=>(a.props.className||'').includes('ssafy-card'));
+ assert.equal(cards[0].props.href,'https://cbt.linkareer.com/exam/detail/1231?tab=COMMUNITY');
+ assert.equal(cards[0].props.target,'_blank');
+ assert.ok(text(cards[1]).includes('다우'));
+ assert.equal(errors.length,0,errors.join('\n'));
+ console.log('PASS: Rank expand/collapse, full total, current-user row; SKCT link before Daou.');
+} finally {if(view)await act(()=>view.unmount());await server.close();console.error=oldError;}

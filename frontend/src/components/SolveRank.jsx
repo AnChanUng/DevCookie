@@ -46,6 +46,7 @@ function pullOtherDevices() {
 // 문제를 많이 푼 사람 순위. 지금까지 푼 문제 수를 서버에 알리고 순위를 받아 온다
 export default function SolveRank() {
   const [rank, setRank] = useState(null);
+  const [expanded, setExpanded] = useState(false);
   const [naming, setNaming] = useState(false);
   const [draft, setDraft] = useState('');
   const [error, setError] = useState('');
@@ -65,7 +66,7 @@ export default function SolveRank() {
         ? api.put('/rank/solved', { visitorId: id, count }, { headers: token ? { Authorization: `Bearer ${token}` } : {}, timeout: 180000 }).catch(() => {})
         : Promise.resolve();
       report
-        .then(() => api.get('/rank/solved', { headers: { ...(id ? { 'X-Visitor-Id': id } : {}), ...(token ? { Authorization: `Bearer ${token}` } : {}) }, timeout: 180000 }))
+        .then(() => api.get('/rank/solved', { params: { all: true }, headers: { ...(id ? { 'X-Visitor-Id': id } : {}), ...(token ? { Authorization: `Bearer ${token}` } : {}) }, timeout: 180000 }))
         .then(res => { if (!stale) setRank(res.data); })
         .catch(() => {
           if (stale) return;
@@ -96,15 +97,18 @@ export default function SolveRank() {
 
   // 5위 밖이면 내 기록을 목록 아래에 한 줄 덧붙인다
   const me = rank?.me;
-  const rows = rank ? (me && !rank.top.some(r => r.me) ? [...rank.top, { ...me, me: true }] : rank.top) : [];
+  const visible = rank ? (expanded ? rank.top : rank.top.slice(0, 5)) : [];
+  const rows = me && !visible.some(r => r.me) ? [...visible, { ...me, me: true }] : visible;
 
   return (
     <aside className="solve-rank">
       <div className="solve-rank-head">
-        <h2>🏆 순위</h2>
+        <h2><button className="solve-rank-toggle" type="button" aria-expanded={expanded} aria-controls="solve-rank-results" onClick={() => setExpanded(value => !value)}>🏆 {expanded ? '전체 순위' : '순위'} <small>{expanded ? '접기 ↑' : '전체 보기 ↓'}</small></button></h2>
         <span>지금까지 푼 문제 수</span>
       </div>
+      {rank && Number.isFinite(rank.totalSolved) && <p className="solve-rank-total">전체 총 <strong>{rank.totalSolved.toLocaleString()}</strong>문제 풀이 완료<small>{rank.totalSolvers}명 · 같은 사람의 반복 풀이는 1문제로 집계</small></p>}
 
+      <div id="solve-rank-results" className={expanded ? 'solve-rank-expanded' : undefined}>
       {!rank && <p className="solve-rank-empty">순위를 불러오는 중...</p>}
       {rank && rows.length === 0 && <p className="solve-rank-empty">아직 순위가 없습니다. 첫 번째로 이름을 올려 보세요.</p>}
       {rows.length > 0 && (
@@ -122,6 +126,7 @@ export default function SolveRank() {
       {rank && !me && (
         <p className="solve-rank-empty"><Link to="/exam">한 세트 풀고</Link> 순위에 올라 보세요.</p>
       )}
+      </div>
 
       {rank && (naming ? (
         <form className="solve-rank-nick" onSubmit={save}>

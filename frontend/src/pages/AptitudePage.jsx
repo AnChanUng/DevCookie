@@ -54,7 +54,7 @@ export default function AptitudePage() {
         <div className="ssafy-hero-text">
           <span className="ssafy-eyebrow">인적성검사 · 기업별</span>
           <h1>기업별 인적성검사 대비</h1>
-          <p>기업마다 영역 구성과 시간이 다릅니다. 실제 시험과 같은 문항 수와 제한 시간으로 풀어 보고, 영역별 정답률로 약한 곳을 찾으세요. 한 문제에 1분 안쪽으로 푸는 연습이 핵심입니다.</p>
+          <p>기업별 문제를 풀고 영역별 정답률로 약한 곳을 확인하세요. 사이트 내 문제집은 시간 제한 없이 풀 수 있으며, SKCT와 삼성 GSAT는 외부 CBT로 연결됩니다.</p>
         </div>
         <div className="ssafy-hero-stats">
           <div className="ssafy-stat big"><b>{total}</b><span>전체 문항</span></div>
@@ -77,6 +77,12 @@ export default function AptitudePage() {
       </div>
 
       <div className="ssafy-grid">
+        <a href="https://cbt.linkareer.com/exam/detail/1231?tab=COMMUNITY" target="_blank" rel="noopener noreferrer" className="ssafy-card apt-ext">
+          <div className="ssafy-card-top"><span className="ssafy-tag">SKCT</span><span className="ssafy-time">외부 사이트</span></div>
+          <h2>SKCT</h2>
+          <p className="ssafy-desc">SKCT 대비 연습을 링커리어 CBT에서 진행할 수 있습니다.</p>
+          <div className="ssafy-foot"><div className="ssafy-progress"><div className="ssafy-progress-label">링커리어 CBT에서 새 탭으로 열립니다</div></div><span className="ssafy-go">SKCT 풀러 가기 ↗</span></div>
+        </a>
         {BANKS.map(bank => {
           const qs = allQuestions(bank);
           const p = progress(bank);

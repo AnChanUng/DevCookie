@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { COMPANIES, CPP_GROUPS, EXAM_CATEGORIES, SOURCE_KINDS } from '../data/examQuestions';
 import { track } from '../track';
@@ -35,7 +35,6 @@ const shuffle = (arr) => {
   }
   return a;
 };
-const fmtT = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 const fmtDate = (ts) => {
   const d = new Date(ts);
   const p = (n) => String(n).padStart(2, '0');
@@ -161,13 +160,12 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
       if (ok) { score++; if (q.sec in secScore) secScore[q.sec]++; }
       items.push({ q, a, ok });
     });
-    const elapsed = Math.floor((Date.now() - quiz.startedAt) / 1000);
     if (items.length) {
       const entry = { at: Date.now(), mode: quiz.mode, sec: quiz.sec, score, total: items.length, sections: isExam ? secScore : undefined };
       save(prev => ({ ...prev, stats, history: [...prev.history, entry].slice(-200) }));
-      track('exam', window.location.pathname, quiz.mode, { score, total: items.length, seconds: elapsed });
+      track('exam', window.location.pathname, quiz.mode, { score, total: items.length });
     }
-    setView({ name: 'result', result: { mode: quiz.mode, sec: quiz.sec, score, total: items.length, secScore, items, elapsed } });
+    setView({ name: 'result', result: { mode: quiz.mode, sec: quiz.sec, score, total: items.length, secScore, items } });
     window.scrollTo({ top: 0 });
   };
 
@@ -217,7 +215,6 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
         title={label(view.mode, view.sec)}
         sec={view.sec}
         sections={SECTIONS}
-        minutes={company.minutes}
         ids={view.ids}
         onPractice={recordPractice}
         onFinish={finish}
@@ -236,7 +233,7 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
     return (
       <div className="fade-in">
         {header('채점 결과')}
-        <p className="exam-eyebrow">{label(r.mode, r.sec)} · 소요 {fmtT(r.elapsed)}</p>
+        <p className="exam-eyebrow">{label(r.mode, r.sec)}</p>
         <div className="exam-score"><span className="big">{r.score}</span><span className="of">/ {r.total}문제 · {r.total ? Math.round(r.score / r.total * 100) : 0}%</span></div>
         {(r.mode === 'exam' || r.mode === 'set') && (
           <div className="exam-stats">
@@ -302,7 +299,7 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
             <button key={s.name} className="exam-section" onClick={() => (hasSets ? start('set', qs.map(q => q.id), s.key) : start('exam', examIds()))}>
               <span className="t">{s.name}<Kind kind={s.kind} /></span>
               <span className="d">{s.sub}</span>
-              <span className="d">{hasSets ? qs.length : examCount}문제 · {company.minutes}분 · 최근 정답 {right}/{done}</span>
+              <span className="d">{hasSets ? qs.length : examCount}문제 · 시간 제한 없음 · 최근 정답 {right}/{done}</span>
               <span className="bar"><i style={{ width: `${qs.length ? Math.round(right / qs.length * 100) : 0}%` }} /></span>
             </button>
           );
@@ -331,7 +328,6 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
             <strong>풀던 문제가 있습니다</strong>
             <span>
               {label(saved.mode, saved.sec)} · {Object.keys(saved.answers || {}).length} / {saved.ids.length} 답변
-              {(saved.mode === 'exam' || saved.mode === 'set') && ` · 남은 시간 ${fmtT(Math.max(0, company.minutes * 60 - (saved.elapsed || 0)))}`}
             </span>
           </div>
           <button className="exam-btn primary" onClick={() => { setView({ name: 'quiz', mode: saved.mode, sec: saved.sec, ids: saved.ids, resume: saved }); window.scrollTo({ top: 0 }); }}>이어서 풀기</button>
@@ -509,28 +505,23 @@ function StatTile({ k, v, of, unit }) {
   );
 }
 
-function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractice, onFinish: finishQuiz, resume, onSave, header, marks, onMark }) {
-  const EXAM_SECONDS = minutes * 60;
-  const isExam = mode === 'exam' || mode === 'set'; // 회차 시험도 타이머를 걸고 제출 후 한꺼번에 채점한다
-  // resume이 있으면 저장해 둔 지점에서 이어 간다. 떠나 있던 시간은 타이머에 넣지 않는다
+function Quiz({ byId, stats, mode, sec, title, ids, sections, onPractice, onFinish: finishQuiz, resume, onSave, header, marks, onMark }) {
+  const isExam = mode === 'exam' || mode === 'set'; // 제출 시 통계를 한꺼번에 기록한다
+  // 저장해 둔 문제와 답변에서 이어 간다.
   const [idx, setIdx] = useState(resume?.idx || 0);
   const [answers, setAnswers] = useState(resume?.answers || {});
   const [revealed, setRevealed] = useState(resume?.revealed || {});
   const [texts, setTexts] = useState(resume?.texts || {}); // 단답형·서술형에 적은 답
   const [peeked, setPeeked] = useState(resume?.peeked || {}); // 모범답안을 펼쳐 자가채점을 기다리는 문제
-  const [left, setLeft] = useState(Math.max(0, EXAM_SECONDS - (resume?.elapsed || 0)));
-  const startedAt = useRef(Date.now() - (resume?.elapsed || 0) * 1000);
-  const quiz = { mode, sec, ids, startedAt: startedAt.current };
-  const answersRef = useRef(answers);
-  answersRef.current = answers;
+  const quiz = { mode, sec, ids };
 
   // 답을 고르거나 문제를 넘길 때, 화면을 떠날 때마다 진행 상태를 저장한다. 끝낸 뒤에는 다시 저장하지 않는다
   const finished = useRef(false);
   const saveRef = useRef(() => {});
-  saveRef.current = () => {
+  useLayoutEffect(() => { saveRef.current = () => {
     if (finished.current) return;
-    onSave({ mode, sec, ids, idx, answers, revealed, texts, peeked, elapsed: Math.floor((Date.now() - startedAt.current) / 1000) });
-  };
+    onSave({ mode, sec, ids, idx, answers, revealed, texts, peeked });
+  }; });
   const onFinish = (...args) => { finished.current = true; finishQuiz(...args); };
   useEffect(() => { saveRef.current(); }, [idx, answers, revealed, texts, peeked]);
   useEffect(() => {
@@ -543,22 +534,6 @@ function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractic
       save();
     };
   }, []);
-
-  useEffect(() => {
-    if (!isExam) return;
-    const t = setInterval(() => {
-      const remain = Math.max(0, EXAM_SECONDS - Math.floor((Date.now() - startedAt.current) / 1000));
-      setLeft(remain);
-      if (remain % 10 === 0) saveRef.current(); // 갑자기 꺼져도 남은 시간이 크게 어긋나지 않게 한다
-      if (remain <= 0) {
-        clearInterval(t);
-        alert(`${minutes}분이 종료되었습니다. 자동으로 채점합니다.`);
-        onFinish(quiz, answersRef.current, false);
-      }
-    }, 1000);
-    return () => clearInterval(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isExam]);
 
   // 키보드로 풀기: 숫자로 보기를 고르고 방향키·Enter로 문제를 넘긴다. 답을 적는 칸에서는 끼어들지 않는다
   const keyRef = useRef(() => {});
@@ -594,11 +569,11 @@ function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractic
     else setPeeked(p => ({ ...p, [q.id]: true }));
   };
 
-  keyRef.current = (e) => {
+  useLayoutEffect(() => { keyRef.current = (e) => {
     if (!q.kind && /^[1-5]$/.test(e.key) && Number(e.key) <= q.o.length) { e.preventDefault(); choose(Number(e.key) - 1); }
     else if (e.key === 'ArrowRight' || (e.key === 'Enter' && e.target.tagName !== 'BUTTON')) { if (idx < total - 1) setIdx(idx + 1); }
     else if (e.key === 'ArrowLeft') { if (idx > 0) setIdx(idx - 1); }
-  };
+  }; });
 
   return (
     <div className="fade-in exam-quiz">
@@ -608,7 +583,6 @@ function Quiz({ byId, stats, mode, sec, title, ids, sections, minutes, onPractic
       <div className="exam-qhead">
         <span className="prog">{idx + 1} / {total}</span>
         <span className="prog">답변 {answered}</span>
-        {isExam && <span className={`timer ${left < 300 ? 'low' : ''}`}>{fmtT(left)}</span>}
       </div>
       <div className="exam-pbar"><i style={{ width: `${Math.round(answered / total * 100)}%` }} /></div>
 

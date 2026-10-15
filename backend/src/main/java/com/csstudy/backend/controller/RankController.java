@@ -44,6 +44,7 @@ public class RankController {
     // 방문자 ID를 헤더로 주면 본인 순위도 함께 돌려준다
     @GetMapping("/rank/solved")
     public Map<String, Object> solved(@RequestHeader(value = "X-Visitor-Id", required = false) String visitorId,
+                                      @RequestParam(defaultValue = "false") boolean all,
                                       HttpServletRequest request) {
         // 로그인한 기기가 순위를 볼 때도 계정에 묶는다. 문제 수를 알리는 요청을 놓쳤어도 여기서 합쳐진다
         if (visitorId != null) {
@@ -55,7 +56,7 @@ public class RankController {
                     }));
         }
         Board board = board();
-        List<Solver> top = board.ranked().subList(0, Math.min(TOP, board.ranked().size()));
+        List<Solver> top = all ? board.ranked() : board.ranked().subList(0, Math.min(TOP, board.ranked().size()));
         Integer myRank = visitorId == null ? null : board.rankOf().get(visitorId);
 
         Set<String> ids = new HashSet<>();
@@ -73,6 +74,8 @@ public class RankController {
 
         Map<String, Object> out = new LinkedHashMap<>();
         out.put("top", rows);
+        out.put("totalSolved", board.ranked().stream().mapToLong(Solver::count).sum());
+        out.put("totalSolvers", board.ranked().size());
         Solver mine = myRank == null ? null : board.ranked().get(myRank - 1);
         out.put("me", mine == null ? null : row(mine, myRank, nicknames.get(visitorId)));
         // 직접 정한 닉네임만 돌려준다. 정한 적이 없으면 null. 계정으로 묶인 기기는 계정 닉네임이 나간다

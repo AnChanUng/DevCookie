@@ -74,10 +74,15 @@ try {
  assert.equal(stored(),null);await click(button('제출하고 채점'));
  assert.equal(stored().history[0].score,2);assert.equal(stored().stats.pa41.c,1);
  await act(()=>view.unmount());
- // Empty/timed-out exams still produce explicit unanswered results and clear resume state.
+ // Old time limits no longer submit exams. Only manual submission records results.
  localStorage.clear();seed('exam',['pa01','pa41']);
  await act(()=>{view=TestRenderer.create(React.createElement(MemoryRouter,null,React.createElement(CompanyExam,{company:{...bank,minutes:0}})));});
  await act(async()=>{await new Promise(resolve=>setTimeout(resolve,1100));});
+ assert.equal(stored(),null,'No automatic submission at the former deadline');
+ assert.ok(!view.root.findAllByType('span').some(n=>(n.props.className||'').split(' ').includes('timer')));
+ assert.equal(JSON.parse(localStorage.getItem('exam-resume:pearl')).elapsed,undefined,'Elapsed time is no longer measured');
+ await click(button('다음'));
+ await click(button('제출하고 채점'));
  assert.equal(stored().history[0].score,0);assert.equal(stored().history[0].total,2);
  assert.equal(stored().stats.pa41.last,'w');assert.equal(localStorage.getItem('exam-resume:pearl'),null);
  await act(()=>view.unmount());
