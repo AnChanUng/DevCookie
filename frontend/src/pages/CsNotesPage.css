@@ -71,4 +71,5 @@ main.container:has(.cs-notes) { max-width: 1600px; width: 100%; padding-inline: 
 .notes-markdown th, .notes-markdown td { border: 1px solid var(--border-color); padding: 8px; }
 .notes-markdown img { max-width: 100%; height: auto; }
 .notes-markdown a, .notes-original, .notes-list-intro a { color: var(--accent-blue); overflow-wrap: anywhere; }
-.notes-original { display: inline-block; margin-top: 12px; font-size: .78rem; }
+.notes-original { font-size: inherit; text-underline-offset: 3px; }
+.notes-original:hover { text-decoration: underline; }

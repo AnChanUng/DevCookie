@@ -17,7 +17,9 @@ try {
     if(entry.answerMarkdown) assert.equal(entry.answerMarkdown,body,'Exact source answer: '+entry.id);
     else { empty++; assert.ok(!body.replace(/<[^>]*>/g,'').trim(),'Only empty source answers receive placeholder'); }
     const html=renderToStaticMarkup(React.createElement(Answer,{entry}));
-    assert.ok(html.includes('원문에서 보기'));
+    assert.ok(html.includes(`href="${entry.sourceUrl}"`));
+    assert.ok(html.includes('>원문 답변</a></h4>'));
+    assert.ok(!html.includes('원문에서 보기'));
     if(entry.answerMarkdown.includes('```')) { assert.ok(html.includes('<pre>') && html.includes('<code'),entry.id); code++; }
   }
   assert.ok(empty>0);assert.ok(code>0);
