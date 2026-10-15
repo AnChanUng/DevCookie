@@ -27,13 +27,14 @@ try {
   const legacy = migrateNotesCompletion({'architecture-02':{done:true,at:1}});
   assert.equal(legacy[entries[0].id].done,true);
   assert.equal(migrateNotesCompletion({...legacy,[entries[0].id]:{done:false,at:2}})[entries[0].id].done,false);
-  assert.equal(entries.length,240);assert.ok(entries.every(e => e.question?.endsWith('?') && e.answer.length > 10 && e.answer.length < 240));assert.equal(new Set(entries.map(e=>e.id)).size,entries.length);
+  assert.equal(entries.length,270);assert.ok(entries.every(e => e.question?.endsWith('?') && e.answer.length > 10 && e.answer.length < 240));assert.equal(new Set(entries.map(e=>e.id)).size,entries.length);
   for (const title of ['LinkedHashMap','LSP','LRU·LFU·MFU','정규화','인덱스','JVM','GC','CORS']) assert.ok(entries.some(e=>e.title===title),title);
   assert.ok(!entries.some(e=>/웹.*전체|URL 입력|CAP|샤딩|WAL/.test(e.question+e.title)));
   const required = ['core-architecture-cpu','core-architecture-float','core-architecture-encoding','core-architecture-endian','core-architecture-raid','core-os-kernel','core-os-system-call','core-os-ipc','core-os-filesystem','core-structures-collision','core-structures-balanced','core-algorithms-dp','core-network-ethernet','core-network-media','core-network-nic','core-network-hub-switch','core-network-ip','core-network-subnet','core-network-classful','core-network-private','core-network-dhcp','core-network-icmp','core-network-arp','core-network-congestion','core-network-tcp-state','core-web-url','core-web-message','core-web-status','core-web-headers','core-web-cookie','core-web-cache','core-web-negotiation','core-web-proxy','core-web-load-balance','core-web-availability','core-web-scaling','core-database-dbms','core-database-keys','core-database-erd','core-database-ddl','core-database-null','core-database-group','core-database-commit','core-database-isolation','core-database-nosql','core-security-xss','core-security-csrf','core-security-sqli','core-design-unit-test','core-design-box-test'];
   for(const id of required) assert.ok(entries.some(e=>e.id===id), 'Missing core concept: '+id);
   assert.equal(CS_NOTES.length,11);
-  assert.equal(CS_NOTES.find(s=>s.id==='language').items.length,18,'Java remains available');
+  assert.equal(CS_NOTES.find(s=>s.id==='language').items.length,48,'Java fundamentals expanded');
+  for(const title of ['기본형·참조형','==·equals','static·인스턴스 멤버','final','값에 의한 전달','Checked·Unchecked 예외','제네릭']) assert.ok(entries.some(e=>e.title===title),title);
   const bigdata=CS_NOTES.find(s=>s.id==='bigdata');
   assert.equal(bigdata.items.length,32);
   for(const s of CS_NOTES) assert.equal(new Set(s.items.map(e=>e.title)).size,s.items.length,'Duplicate concept in '+s.id);
@@ -72,6 +73,10 @@ try {
   assert.ok(!text(view.toJSON()).includes(entries[0].answer),'Answers can be collapsed again');
   assert.ok(!text(view.toJSON()).includes(entries[1].answer));
   await login('alice');
+  await act(()=>view.root.findByProps({'aria-label':'과목 선택'}).props.onChange({target:{value:'language'}}));
+  assert.equal(view.root.findAllByType('article').length,48);
+  await reveal('core-language-pass-value');
+  assert.ok(text(view.toJSON()).includes(entries.find(e=>e.id==='core-language-pass-value').answer));
   await act(()=>view.root.findByProps({'aria-label':'과목 선택'}).props.onChange({target:{value:'bigdata'}}));
   assert.equal(view.root.findAllByType('article').length,bigdata.items.length);
   await reveal(bigdata.items[0].id);
