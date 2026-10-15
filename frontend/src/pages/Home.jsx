@@ -28,8 +28,6 @@ export default function Home() {
           <p>기출 기반 모의고사로 풀고, 틀린 문제는 다시 풉니다.</p>
           <div className="home-cta">
             <Link to="/notes" className="home-cta-btn primary">전공노트 →</Link>
-            <Link to="/exam" className="home-cta-btn">기출 풀러 가기 →</Link>
-            <Link to="/weak" className="home-cta-btn">내 약점 보기</Link>
             <Link to="/duel" className="home-cta-btn">대결</Link>
           </div>
           <StudyGoal />
