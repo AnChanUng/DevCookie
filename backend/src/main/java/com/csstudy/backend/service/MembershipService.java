@@ -6,6 +6,7 @@ import com.csstudy.backend.repository.ExamProgressRepository;
 import com.csstudy.backend.repository.VisitorSolvedRepository;
 import com.csstudy.backend.repository.VisitorTierGrantRepository;
 import com.csstudy.backend.repository.UsageEventRepository;
+import com.csstudy.backend.repository.VisitorProfileRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,9 +25,14 @@ public class MembershipService {
     private final VisitorTierGrantRepository grants;
     private final UsageEventRepository usage;
     private final AuthService auth;
+    private final VisitorProfileRepository profiles;
 
     public record Membership(UserTier tier, String tierName, long solvedCount,
-                             UserTier nextTier, Long nextThreshold, long remaining) {}
+                             UserTier nextTier, Long nextThreshold, long remaining, String nickname) {
+        public Membership withNickname(String name) {
+            return new Membership(tier, tierName, solvedCount, nextTier, nextThreshold, remaining, name);
+        }
+    }
 
     public Membership current(HttpServletRequest request) {
         var user = auth.currentUser(request);
@@ -47,7 +53,9 @@ public class MembershipService {
             if (record.isPresent()) count = record.get().getCount();
             else count = usage.solvedCounts().stream().filter(r -> id.equals(r[0])).mapToLong(r -> ((Number)r[2]).longValue()).sum();
         }
-        return describe(base, count);
+        String nickname = id == null || id.isBlank() || id.length() > 40 ? "방문자"
+                : profiles.findByVisitorId(id).map(p -> p.getNickname()).orElseGet(() -> VisitorProfileService.anonymous(id));
+        return describe(base, count).withNickname(nickname);
     }
 
     public void requireGold(HttpServletRequest request) {
@@ -65,7 +73,7 @@ public class MembershipService {
         long saved = progressRepository.findByUserId(user.getId()).stream().mapToLong(p -> count(p.getData())).sum();
         // Reuse the existing rank count for historical/coding progress; devices are merged by max, not sum.
         long reported = solvedRepository.findByUserId(user.getId()).stream().mapToLong(v -> v.getCount()).max().orElse(0);
-        return describe(baseTier(user), Math.max(saved, reported));
+        return describe(baseTier(user), Math.max(saved, reported)).withNickname(user.getNickname());
     }
 
     public static Membership describe(UserTier base, long solved) {
@@ -78,7 +86,7 @@ public class MembershipService {
         if (next == UserTier.SILVER) threshold = 50L;
         else if (next == UserTier.DIAMOND) threshold = 200L;
         else if (next == UserTier.RUBY) threshold = 1000L;
-        return new Membership(tier, tier.label(), count, next, threshold, threshold == null ? 0 : Math.max(0, threshold - count));
+        return new Membership(tier, tier.label(), count, next, threshold, threshold == null ? 0 : Math.max(0, threshold - count), null);
     }
 
     public Map<Long, Long> savedCounts() {

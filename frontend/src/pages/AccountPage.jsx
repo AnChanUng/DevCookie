@@ -1,5 +1,5 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { account, changeNickname, onAccountChange, signIn, signOut } from '../sync';
 import { loadAccountRecords, summarizeAccount } from '../accountRecords';
 import { CS_NOTES, migrateNotesCompletion } from '../data/csNotes';
@@ -8,16 +8,26 @@ import { buildAccountRetry } from '../accountRetry';
 import './AccountPage.css';
 import TierBadge from '../components/TierBadge';
 import { TIER_NAMES, useMembership } from '../membership';
+import { savedNickname, saveNickname } from '../nickname';
+import api from '../api';
+import { visitorId } from '../track';
 
 const snapshot = () => account() ? `${account().token}:${account().nickname}` : '';
 export default function AccountPage() {
   const token = useSyncExternalStore(onAccountChange, snapshot, () => '');
+  const location = useLocation();
+  useEffect(() => {
+    if (location.hash !== '#settings' || typeof document === 'undefined') return;
+    const settings = document.getElementById?.('settings');
+    settings?.scrollIntoView?.({ block: 'start' });
+    settings?.focus?.({ preventScroll: true });
+  }, [location.hash, location.key]);
   return <AccountDashboard key={token} user={token ? account() : null} />;
 }
 function AccountDashboard({ user }) {
   const [form, setForm] = useState({ nickname: '', password: '' });
   const [authBusy, setAuthBusy] = useState(false);
-  const [nicknameDraft, setNicknameDraft] = useState(user?.nickname || '');
+  const [nicknameDraft, setNicknameDraft] = useState(user?.nickname || savedNickname());
   const [message, setMessage] = useState('');
   const [result, setResult] = useState({ records: {}, failed: [] });
   const [loading, setLoading] = useState(true);
@@ -46,7 +56,8 @@ function AccountDashboard({ user }) {
   const completed = CS_NOTES.flatMap(s => s.items).filter(e => noteRecords[e.id]?.done);
   return <div className="account-page fade-in">
     <header className="page-header"><h1>내 계정</h1><p>{user ? `${user.nickname}님의 학습 기록` : '로그인하면 내 계정에 저장된 학습 기록을 볼 수 있습니다.'}</p></header>
-    <section className="account-auth">
+    <section className="account-auth" id="settings" tabIndex={-1}>
+      <h2>본인 설정</h2>
       {user ? <><div className="account-actions"><strong>{user.nickname}</strong><button className="exam-btn sm" disabled={authBusy} onClick={async () => { setAuthBusy(true); await signOut(); }}>로그아웃</button></div>
         <form onSubmit={async e => {
           e.preventDefault(); setAuthBusy(true); setMessage('');
@@ -61,6 +72,17 @@ function AccountDashboard({ user }) {
         <input aria-label="비밀번호" type="password" placeholder="비밀번호" autoComplete="current-password" maxLength={72} value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
         <button className="exam-btn sm primary" disabled={authBusy || !form.nickname.trim() || !form.password}>로그인</button>
         <button type="button" className="exam-btn sm" disabled={authBusy || !form.nickname.trim() || !form.password} onClick={() => authenticate('register')}>새 계정 만들기</button>
+      </form>}
+      {!user && <form onSubmit={async e => {
+        e.preventDefault(); setAuthBusy(true); setMessage('');
+        try {
+          const { data } = await api.put('/profile', { visitorId: visitorId(), nickname: nicknameDraft.trim() });
+          saveNickname(data.nickname); setNicknameDraft(data.nickname); setMessage('방문자 닉네임을 변경했습니다.'); setRevision(v => v + 1);
+        } catch (error) { setMessage(error?.response?.data?.error || '닉네임을 변경하지 못했습니다.'); }
+        finally { setAuthBusy(false); }
+      }}>
+        <input aria-label="방문자 닉네임" placeholder="방문자 닉네임" maxLength={20} value={nicknameDraft} onChange={e => setNicknameDraft(e.target.value)} />
+        <button className="exam-btn sm" disabled={authBusy || !nicknameDraft.trim()}>닉네임 변경</button>
       </form>}
       {message && <p role="alert">{message}</p>}
     </section>

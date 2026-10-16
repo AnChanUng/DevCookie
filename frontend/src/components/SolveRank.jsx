@@ -7,6 +7,7 @@ import { BANKS } from '../data/examQuestions';
 import { syncAllProgress } from '../hooks/useExamProgress';
 import { account, onAccountChange } from '../sync';
 import TierBadge from './TierBadge';
+import TierGuide from './TierGuide';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
 const MAX_RETRIES = 10;
@@ -106,7 +107,7 @@ export default function SolveRank() {
   return (
     <aside className="solve-rank">
       <div className="solve-rank-head">
-        <h2><button className="solve-rank-toggle" type="button" aria-expanded={expanded} aria-controls="solve-rank-results" onClick={() => setExpanded(value => !value)}>🏆 {expanded ? '전체 순위' : '순위'} <small>{expanded ? '접기 ↑' : '전체 보기 ↓'}</small></button></h2>
+        <div className="solve-rank-title"><h2><button className="solve-rank-toggle" type="button" aria-expanded={expanded} aria-controls="solve-rank-results" onClick={() => setExpanded(value => !value)}>🏆 {expanded ? '전체 순위' : '순위'} <small>{expanded ? '접기 ↑' : '전체 보기 ↓'}</small></button></h2><TierGuide /></div>
         <span>지금까지 푼 문제 수</span>
       </div>
       {rank && Number.isFinite(rank.totalSolved) && <p className="solve-rank-total">전체 총 <strong>{rank.totalSolved.toLocaleString()}</strong>문제 풀이 완료<small>{rank.totalSolvers}명 · 같은 사람의 반복 풀이는 1문제로 집계</small></p>}
@@ -119,7 +120,7 @@ export default function SolveRank() {
           {rows.map(r => (
             <li key={r.rank} className={r.me ? 'me' : ''}>
               <span className="solve-rank-no">{MEDALS[r.rank - 1] || r.rank}</span>
-              <span className="solve-rank-name">{r.nickname}<TierBadge tier={r.tier} />{r.me && <em>나</em>}</span>
+              <span className="solve-rank-name"><span className="solve-rank-nickname" title={r.nickname}>{r.nickname}</span><TierBadge tier={r.tier} />{r.me && <em>나</em>}</span>
               <span className="solve-rank-count">{r.count.toLocaleString()}문제</span>
             </li>
           ))}
