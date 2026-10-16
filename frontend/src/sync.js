@@ -40,7 +40,7 @@ const auth = () => ({ headers: { Authorization: `Bearer ${account()?.token}` }, 
 // mode: 'login' | 'register'
 export async function signIn(mode, nickname, password) {
   const { data } = await api.post(`/auth/${mode}`, { nickname, password }, { timeout: 90000, headers: { 'X-Visitor-Id': visitorId() } });
-  setAccount({ nickname: data.nickname, token: data.token });
+  setAccount({ id: data.id, nickname: data.nickname, token: data.token });
 }
 
 export async function changeNickname(nickname) {

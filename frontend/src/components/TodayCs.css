@@ -1,0 +1,9 @@
+.today-cs-daily { min-width: 0; }
+.today-cs-check { display: grid; gap: 8px; margin-top: 10px; }
+.today-cs-check button { white-space: normal; }
+.today-cs-date { color: var(--text-tertiary); font-size: .68rem; }
+.today-cs-questions { margin-top: 12px; }
+.today-cs-questions .today-quiz-qt { font-size: .85rem; }
+.today-cs-questions .today-quiz-q li button { font-size: .8rem; overflow-wrap: anywhere; }
+.today-cs-questions .exam-code { max-width: 100%; font-size: .72rem; }
+.today-cs-context { white-space: pre-wrap; font-size: .8rem; }
