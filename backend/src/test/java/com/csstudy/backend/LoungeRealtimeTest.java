@@ -18,7 +18,7 @@ class LoungeRealtimeTest {
         var repo = mock(LoungeMessageRepository.class);
         var stream = mock(LoungeStreamService.class);
         var controller = new LoungeController(repo, mock(VisitorProfileService.class),
-                mock(PresenceService.class), mock(AdminAuth.class), stream);
+                mock(PresenceService.class), mock(AdminAuth.class), stream, mock(AuthService.class));
         Instant midnight = LocalDate.now(ZoneId.of("Asia/Seoul")).atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
         var yesterday = message(1L, midnight.minusMillis(1), "yesterday");
         var today = message(2L, midnight, "today");
@@ -39,7 +39,7 @@ class LoungeRealtimeTest {
         var repo = mock(LoungeMessageRepository.class);
         var profiles = mock(VisitorProfileService.class);
         var stream = mock(LoungeStreamService.class);
-        var controller = new LoungeController(repo, profiles, mock(PresenceService.class), mock(AdminAuth.class), stream);
+        var controller = new LoungeController(repo, profiles, mock(PresenceService.class), mock(AdminAuth.class), stream, mock(AuthService.class));
         var saved = message(9L, Instant.now(), "hello");
         saved.setClientId("request-1");
         when(repo.findByVisitorIdAndClientId("visitor-1", "request-1")).thenReturn(Optional.of(saved));

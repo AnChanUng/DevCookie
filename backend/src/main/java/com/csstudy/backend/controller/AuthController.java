@@ -4,6 +4,9 @@ import com.csstudy.backend.dto.UserResponse;
 import com.csstudy.backend.entity.User;
 import com.csstudy.backend.repository.UserRepository;
 import com.csstudy.backend.service.AuthService;
+import com.csstudy.backend.service.MembershipService;
+import com.csstudy.backend.entity.UserTier;
+import com.csstudy.backend.service.NicknameService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +23,12 @@ public class AuthController {
 
     private final UserRepository userRepository;
     private final AuthService authService;
+    private final MembershipService membershipService;
+    private final NicknameService nicknames;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody Map<String, String> body) {
+    public ResponseEntity<?> register(@RequestBody Map<String, String> body, HttpServletRequest request) {
         final String nickname = body.getOrDefault("nickname", "").trim();
         final String password = body.getOrDefault("password", "").trim();
 
@@ -35,10 +40,9 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("error", "이미 사용 중인 닉네임입니다."));
         }
 
-        User user = userRepository.save(
-                User.builder().nickname(nickname).password(passwordEncoder.encode(password)).build()
-        );
-        return ResponseEntity.ok(UserResponse.from(user, authService.issueToken(user)));
+        User user = nicknames.register(nickname,passwordEncoder.encode(password),
+                membershipService.visitorBase(request.getHeader("X-Visitor-Id")),request.getHeader("X-Visitor-Id"));
+        return ResponseEntity.ok(UserResponse.from(user, authService.issueToken(user), membershipService.membership(user)));
     }
 
     @PostMapping("/login")
@@ -69,7 +73,20 @@ public class AuthController {
             userRepository.save(user);
         }
 
-        return ResponseEntity.ok(UserResponse.from(user, authService.issueToken(user)));
+        return ResponseEntity.ok(UserResponse.from(user, authService.issueToken(user), membershipService.membership(user)));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> me(HttpServletRequest request) {
+        User user = authService.requireUser(request);
+        return ResponseEntity.ok(Map.of("id", user.getId(), "nickname", user.getNickname(),
+                "membership", membershipService.membership(user)));
+    }
+
+    @PutMapping("/nickname")
+    public ResponseEntity<?> nickname(@RequestBody Map<String,String> body,HttpServletRequest request) {
+        User user=nicknames.rename(authService.requireUser(request),body.get("nickname"),request.getHeader("X-Visitor-Id"));
+        return ResponseEntity.ok(Map.of("nickname",user.getNickname()));
     }
 
     @PostMapping("/logout")

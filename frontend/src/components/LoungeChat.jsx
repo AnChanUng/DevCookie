@@ -1,8 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
 import { visitorId } from '../track';
 import { NICKNAME_MAX, cleanNickname, myNickname, saveNickname, savedNickname } from '../nickname';
+import { account, changeNickname, onAccountChange } from '../sync';
+import { membershipHeaders } from '../membership';
+
+const accountSnapshot = () => `${account()?.token || ''}:${account()?.nickname || ''}`;
 
 const POLL_OPEN = 3000;
 const POLL_CLOSED = 30000;
@@ -30,6 +34,7 @@ const writeSeen = (id) => { try { localStorage.setItem(SEEN_KEY, String(id)); } 
 
 // 접속해 있는 사람들이 함께 쓰는 채팅 창. 닫혀 있을 때도 가끔 새 글을 확인해 헤더에 알림 점을 띄운다
 export default function LoungeChat({ open, online, onClose, onOnline, onUnread }) {
+  const identity = useSyncExternalStore(onAccountChange, accountSnapshot, () => '');
   const [messages, setMessages] = useState([]);
   const [ready, setReady] = useState(false);
   const [text, setText] = useState('');
@@ -40,6 +45,11 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
   const [nickname, setNickname] = useState(savedNickname);
   const [naming, setNaming] = useState(false);
   const [draftName, setDraftName] = useState('');
+  const [participants, setParticipants] = useState([]);
+  const [self, setSelf] = useState('');
+  const [challenging, setChallenging] = useState(false);
+  const [room, setRoom] = useState(null);
+  const displayName = account()?.nickname || nickname;
 
   const lastId = useRef(0);
   const epoch = useRef(null);
@@ -92,6 +102,7 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
       epoch.current = data.epoch;
       take(data.messages, first || reset);
       onOnline(data.online);
+      if (Array.isArray(data.participants)) setParticipants(data.participants);
       setReady(true);
     } catch {
       /* 서버가 잠들어 있거나 끊겼다. 다음 차례에 다시 물어본다 */
@@ -115,6 +126,7 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
         epoch.current = data.epoch;
         take(data.messages, true);
         onOnline(data.online);
+        if (Array.isArray(data.participants)) setParticipants(data.participants);
         setReady(true);
         setStreaming(true);
       } catch { setStreaming(false); }
@@ -122,6 +134,25 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
     source.onerror = () => setStreaming(false); // EventSource reconnects; polling covers the gap.
     return () => { source.close(); setStreaming(false); };
   }, [open, take, onOnline]);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    let active = true;
+    const id = visitorId();
+    const beat = () => {
+      if (document.hidden) return;
+      api.post('/lounge/presence', { visitorId: id, nickname: account()?.nickname || nickname || myNickname() }, { headers: membershipHeaders(), timeout: 20000 })
+        .then(({ data }) => { if (active) { setParticipants(data.participants); setSelf(data.self); } })
+        .catch(error => { if (active && error.response?.status === 409) setError('닉네임이 중복됩니다. 다른 닉네임을 정해 주세요.'); });
+    };
+    beat();
+    const timer = setInterval(beat, 30000);
+    document.addEventListener('visibilitychange', beat);
+    return () => {
+      active = false; clearInterval(timer); document.removeEventListener('visibilitychange', beat);
+      api.delete('/lounge/presence', { data: { visitorId: id }, timeout: 10000 }).catch(() => {});
+    };
+  }, [open, nickname, identity]);
 
   // Clear yesterday's messages at Korean midnight, even with a disconnected server.
   useEffect(() => {
@@ -140,17 +171,17 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
     if (open && list && stick.current) list.scrollTop = list.scrollHeight;
   }, [messages, pending, open, ready]);
 
-  const openNaming = () => { setDraftName(nickname); setNaming(true); };
+  const openNaming = () => { setDraftName(displayName); setNaming(true); };
 
-  const saveName = (e) => {
+  const saveName = async (e) => {
     e.preventDefault();
     const name = cleanNickname(draftName);
     if (!name) return;
-    saveNickname(name);
-    setNickname(name);
-    setNaming(false);
-    // 순위에 나오는 이름도 함께 바뀐다
-    api.put('/profile', { visitorId: visitorId(), nickname: name }).catch(() => {});
+    try {
+      if (account()) await changeNickname(name);
+      else await api.put('/profile', { visitorId: visitorId(), nickname: name });
+      saveNickname(name); setNickname(name); setNaming(false); setError('');
+    } catch (error) { setError(error.response?.data?.error || '닉네임을 변경하지 못했습니다.'); }
   };
 
   const deliver = async message => {
@@ -162,7 +193,7 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
     try {
       const { data } = await api.post('/lounge/messages', {
         visitorId: message.visitorId, nickname: message.nickname, text: message.text, clientId: message.clientId,
-      }, { timeout: 90000 });
+      }, { timeout: 90000, headers: membershipHeaders() });
       stick.current = true;
       take([data], false, false);
     } catch (err) {
@@ -180,7 +211,7 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
     e.preventDefault();
     const body = text.trim(), id = visitorId();
     if (!body || inFlight.current || !id) return;
-    const name = nickname || myNickname();
+    const name = account()?.nickname || nickname || myNickname();
     const message = { clientId: crypto.randomUUID(), visitorId: id, visitor: me, nickname: name,
       text: body, at: new Date().toISOString(), status: 'sending' };
     setNickname(name);
@@ -188,6 +219,24 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
     setPending(prev => [...prev, message]);
     setText('');
     deliver(message);
+  };
+
+  const challenge = async person => {
+    if (challenging || sending) return;
+    setChallenging(true); setError('');
+    try {
+      const { TOPICS } = await import('../data/topicBank');
+      const pool = [...TOPICS.questions];
+      for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+      const { data } = await api.post('/duels', { questionIds: pool.slice(0, 10).map(q => q.id), open: false, title: '채팅 대결' }, { timeout: 90000 });
+      setRoom(data.code);
+      const name = displayName || myNickname();
+      const message = { clientId: crypto.randomUUID(), visitorId: visitorId(), visitor: me, nickname: name,
+        text: `⚔️ ${person.nickname}님, 10문제 대결 신청합니다! /duel/${data.code}`, at: new Date().toISOString(), status: 'sending' };
+      setPending(prev => [...prev, message]);
+      await deliver(message);
+    } catch { setError('대결 방을 만들지 못했습니다. 잠시 후 다시 시도해 주세요.'); }
+    finally { setChallenging(false); }
   };
 
   if (!open) return null;
@@ -201,6 +250,14 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
         </div>
         <button type="button" className="lounge-close" onClick={onClose} aria-label="채팅 닫기">×</button>
       </header>
+
+      <div className="lounge-participants" aria-label="채팅방 접속자">
+        <strong>채팅 참여 중 {participants.length}명</strong>
+        {participants.map(person => <div key={person.id}><span>{person.nickname}{person.id === self ? ' (나)' : ''}</span>
+          {person.id !== self && <button type="button" disabled={!self || challenging || sending} onClick={() => challenge(person)}>대결 신청</button>}
+        </div>)}
+        {room && <Link to={`/duel/${room}`} onClick={onClose}>내 대결 방 입장 →</Link>}
+      </div>
 
       <div className="lounge-list" ref={listRef}
         onScroll={e => { const el = e.currentTarget; stick.current = el.scrollHeight - el.scrollTop - el.clientHeight < 40; }}>
@@ -227,8 +284,8 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
         </form>
       ) : (
         <div className="lounge-name">
-          <span>{nickname ? <>닉네임 <b>{nickname}</b></> : '닉네임은 처음 보낼 때 자동으로 지어집니다.'}</span>
-          <button type="button" onClick={openNaming}>{nickname ? '바꾸기' : '직접 정하기'}</button>
+          <span>{displayName ? <>닉네임 <b>{displayName}</b></> : '닉네임은 처음 보낼 때 자동으로 지어집니다.'}</span>
+          <button type="button" onClick={openNaming}>{displayName ? '바꾸기' : '직접 정하기'}</button>
         </div>
       )}
 

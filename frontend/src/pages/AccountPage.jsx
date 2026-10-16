@@ -1,13 +1,15 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { Link } from 'react-router-dom';
-import { account, onAccountChange, signIn, signOut } from '../sync';
+import { account, changeNickname, onAccountChange, signIn, signOut } from '../sync';
 import { loadAccountRecords, summarizeAccount } from '../accountRecords';
 import { CS_NOTES, migrateNotesCompletion } from '../data/csNotes';
 import QuestionExplanation from '../components/QuestionExplanation';
 import { buildAccountRetry } from '../accountRetry';
 import './AccountPage.css';
+import TierBadge from '../components/TierBadge';
+import { TIER_NAMES, useMembership } from '../membership';
 
-const snapshot = () => account()?.token || '';
+const snapshot = () => account() ? `${account().token}:${account().nickname}` : '';
 export default function AccountPage() {
   const token = useSyncExternalStore(onAccountChange, snapshot, () => '');
   return <AccountDashboard key={token} user={token ? account() : null} />;
@@ -15,6 +17,7 @@ export default function AccountPage() {
 function AccountDashboard({ user }) {
   const [form, setForm] = useState({ nickname: '', password: '' });
   const [authBusy, setAuthBusy] = useState(false);
+  const [nicknameDraft, setNicknameDraft] = useState(user?.nickname || '');
   const [message, setMessage] = useState('');
   const [result, setResult] = useState({ records: {}, failed: [] });
   const [loading, setLoading] = useState(true);
@@ -22,6 +25,7 @@ function AccountDashboard({ user }) {
   const [query, setQuery] = useState('');
   const [wrongOnly, setWrongOnly] = useState(false);
   const [limit, setLimit] = useState(20);
+  const tierStatus = useMembership(revision);
   useEffect(() => {
     const controller = new AbortController();
     loadAccountRecords(user, controller.signal).then(next => {
@@ -43,13 +47,31 @@ function AccountDashboard({ user }) {
   return <div className="account-page fade-in">
     <header className="page-header"><h1>내 계정</h1><p>{user ? `${user.nickname}님의 학습 기록` : '로그인하면 내 계정에 저장된 학습 기록을 볼 수 있습니다.'}</p></header>
     <section className="account-auth">
-      {user ? <div className="account-actions"><strong>{user.nickname}</strong><button className="exam-btn sm" disabled={authBusy} onClick={async () => { setAuthBusy(true); await signOut(); }}>로그아웃</button></div> : <form onSubmit={e => { e.preventDefault(); authenticate('login'); }}>
+      {user ? <><div className="account-actions"><strong>{user.nickname}</strong><button className="exam-btn sm" disabled={authBusy} onClick={async () => { setAuthBusy(true); await signOut(); }}>로그아웃</button></div>
+        <form onSubmit={async e => {
+          e.preventDefault(); setAuthBusy(true); setMessage('');
+          try { await changeNickname(nicknameDraft.trim()); setMessage('닉네임을 변경했습니다. 다음 로그인부터 새 닉네임을 사용해 주세요.'); }
+          catch (error) { setMessage(error?.response?.data?.error || '닉네임을 변경하지 못했습니다.'); }
+          finally { setAuthBusy(false); }
+        }}>
+          <input aria-label="새 닉네임" maxLength={20} value={nicknameDraft} onChange={e => setNicknameDraft(e.target.value)} />
+          <button className="exam-btn sm" disabled={authBusy || !nicknameDraft.trim() || nicknameDraft.trim() === user.nickname}>닉네임 변경</button>
+        </form></> : <form onSubmit={e => { e.preventDefault(); authenticate('login'); }}>
         <input aria-label="닉네임" placeholder="닉네임" autoComplete="username" maxLength={20} value={form.nickname} onChange={e => setForm({ ...form, nickname: e.target.value })} />
         <input aria-label="비밀번호" type="password" placeholder="비밀번호" autoComplete="current-password" maxLength={72} value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
         <button className="exam-btn sm primary" disabled={authBusy || !form.nickname.trim() || !form.password}>로그인</button>
         <button type="button" className="exam-btn sm" disabled={authBusy || !form.nickname.trim() || !form.password} onClick={() => authenticate('register')}>새 계정 만들기</button>
       </form>}
       {message && <p role="alert">{message}</p>}
+    </section>
+    <section className="membership-panel">
+      <h2>내 등급 {tierStatus.membership && <TierBadge tier={tierStatus.membership.tier} />}</h2>
+      {tierStatus.loading ? <p role="status">등급을 불러오는 중…</p> : tierStatus.error ? <p role="alert">등급을 불러오지 못했습니다. 새로고침해 주세요.</p> : <p>
+        누적 {tierStatus.membership.solvedCount.toLocaleString()}문제
+        {tierStatus.membership.nextTier ? ` · ${TIER_NAMES[tierStatus.membership.nextTier]}까지 ${tierStatus.membership.remaining.toLocaleString()}문제` : ' · 최고 등급입니다!'}
+      </p>}
+      <p>브론즈: 기본 방문자 · 실버: 50문제 · 골드: 기존 회원·기존 순위 방문자 · 다이아: 200문제 · 루비: 1,000문제</p>
+      <p>같은 문제의 반복 풀이는 1문제로 집계합니다. 필기이론은 골드 이상 이용할 수 있습니다.</p>
     </section>
     <div className="account-record-heading"><p>{user ? '계정에 저장된 기록' : '현재 브라우저의 비로그인 풀이 기록'} · 문제집별 문항 기준</p><button className="exam-btn sm" disabled={loading} onClick={() => { setLoading(true); setRevision(v => v + 1); }}>새로고침</button></div>
     {loading && <p role="status">학습 기록을 불러오는 중… 서버가 깨어나는 데 시간이 걸릴 수 있습니다.</p>}

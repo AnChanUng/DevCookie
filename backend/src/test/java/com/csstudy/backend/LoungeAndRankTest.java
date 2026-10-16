@@ -96,12 +96,12 @@ class LoungeAndRankTest {
 
     @Test
     void emptyTooLongAndTooFastMessagesAreRejected() throws Exception {
-        say("lounge-visitor-b1", "하나", "   ", "10.1.1.1").andExpect(status().isBadRequest());
+        say("lounge-visitor-b1", "하나검증", "   ", "10.1.1.1").andExpect(status().isBadRequest());
         say("lounge-visitor-b1", "  ", "내용", "10.1.1.1").andExpect(status().isBadRequest());
-        say("lounge-visitor-b1", "하나", "가".repeat(201), "10.1.1.1").andExpect(status().isBadRequest());
+        say("lounge-visitor-b1", "하나검증", "가".repeat(201), "10.1.1.1").andExpect(status().isBadRequest());
 
-        say("lounge-visitor-b1", "하나", "첫 번째", "10.1.1.1").andExpect(status().isOk());
-        say("lounge-visitor-b1", "하나", "바로 또 보냄", "10.1.1.1").andExpect(status().isTooManyRequests());
+        say("lounge-visitor-b1", "하나검증", "첫 번째", "10.1.1.1").andExpect(status().isOk());
+        say("lounge-visitor-b1", "하나검증", "바로 또 보냄", "10.1.1.1").andExpect(status().isTooManyRequests());
     }
 
     @Test

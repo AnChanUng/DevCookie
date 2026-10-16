@@ -1,0 +1,8 @@
+.tier-badge { display: inline-flex; align-items: center; flex-shrink: 0; padding: 3px 8px; margin-left: 6px; border: 1px solid currentColor; border-radius: 6px; font-size: .72rem; font-weight: 700; line-height: 1.5; }
+.tier-bronze { color: #b87942; }
+.tier-silver { color: #8b9db2; }
+.tier-gold { color: #c99710; }
+.tier-diamond { color: #259dcc; }
+.tier-ruby { color: #de4162; }
+.membership-panel { border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; margin-bottom: 20px; line-height: 1.8; }
+.membership-panel p { margin: 8px 0; }

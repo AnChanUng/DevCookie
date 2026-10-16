@@ -25,7 +25,7 @@ public class LoungeMessage {
     @Column(name = "client_id", length = 36)
     private String clientId;
 
-    @Column(nullable = false, length = 12)
+    @Column(nullable = false, length = 20)
     private String nickname;
 
     @Column(nullable = false, length = 200)
