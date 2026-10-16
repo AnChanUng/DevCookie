@@ -3,7 +3,7 @@ import TierBadge from './TierBadge';
 const RULES = [
   ['BRONZE', '신규 방문자·신규 회원의 기본 등급'],
   ['SILVER', '서로 다른 문제 50개 이상 풀이'],
-  ['GOLD', '등급 도입 전에 있던 회원·기존 순위 방문자'],
+  ['GOLD', 'SSAFY 16기 교육생'],
   ['DIAMOND', '서로 다른 문제 200개 이상 풀이'],
   ['RUBY', '서로 다른 문제 1,000개 이상 풀이'],
 ];
