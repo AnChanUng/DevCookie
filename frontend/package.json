@@ -20,7 +20,9 @@
     "check:notice": "node scripts/check-notice.mjs",
     "import:notes": "node scripts/import-interview-notes.mjs",
     "check:imported-notes": "node scripts/check-imported-notes.mjs",
-    "check:revised-notes": "node scripts/check-revised-notes.mjs"
+    "check:revised-notes": "node scripts/check-revised-notes.mjs",
+    "check:promotion-exam": "node --import ./scripts/extensionless-loader.mjs scripts/check-promotion-exam.mjs",
+    "check:promotion-bank": "node --import ./scripts/extensionless-loader.mjs scripts/export-promotion-bank.mjs --check"
   },
   "dependencies": {
     "axios": "^1.14.0",

@@ -7,7 +7,7 @@ import QuestionExplanation from '../components/QuestionExplanation';
 import { buildAccountRetry } from '../accountRetry';
 import './AccountPage.css';
 import TierBadge from '../components/TierBadge';
-import { TIER_NAMES, useMembership } from '../membership';
+import { membershipHeaders, TIER_NAMES, useMembership } from '../membership';
 import { savedNickname, saveNickname } from '../nickname';
 import api from '../api';
 import { visitorId } from '../track';
@@ -35,6 +35,14 @@ function AccountDashboard({ user }) {
   const [query, setQuery] = useState('');
   const [wrongOnly, setWrongOnly] = useState(false);
   const [limit, setLimit] = useState(20);
+  const [badges, setBadges] = useState({ loading: true, values: [], error: false });
+  useEffect(() => {
+    const controller = new AbortController();
+    api.get('/profile/badges', { headers: membershipHeaders(), signal: controller.signal })
+      .then(({ data }) => { if (!controller.signal.aborted) setBadges({ loading: false, values: Array.isArray(data) ? data : [], error: false }); })
+      .catch(() => { if (!controller.signal.aborted) setBadges({ loading: false, values: [], error: true }); });
+    return () => controller.abort();
+  }, [revision]);
   const tierStatus = useMembership(revision);
   useEffect(() => {
     const controller = new AbortController();
@@ -84,13 +92,18 @@ function AccountDashboard({ user }) {
         <input aria-label="방문자 닉네임" placeholder="방문자 닉네임" maxLength={20} value={nicknameDraft} onChange={e => setNicknameDraft(e.target.value)} />
         <button className="exam-btn sm" disabled={authBusy || !nicknameDraft.trim()}>닉네임 변경</button>
       </form>}
+      <div className="personal-badges" aria-label="내 교육생 배지">
+        <h3>개인정보 · 교육생 배지</h3>
+        {badges.loading ? <p role="status">배지를 불러오는 중…</p> : badges.error ? <p role="alert">배지를 불러오지 못했습니다. 새로고침해 주세요.</p>
+          : badges.values.length ? badges.values.map(badge => <span className="cohort-badge" key={badge.name}>🎖 {badge.name}</span>) : <p>부여된 교육생 배지가 없습니다.</p>}
+      </div>
       {message && <p role="alert">{message}</p>}
     </section>
     <section className="membership-panel">
-      <h2>내 등급 {tierStatus.membership && <TierBadge tier={tierStatus.membership.tier} />}</h2>
+      <h2>내 등급 {tierStatus.membership && <TierBadge tier={tierStatus.membership.tier} division={tierStatus.membership.division} />}</h2>
       {tierStatus.loading ? <p role="status">등급을 불러오는 중…</p> : tierStatus.error ? <p role="alert">등급을 불러오지 못했습니다. 새로고침해 주세요.</p> : <p>
         누적 {tierStatus.membership.solvedCount.toLocaleString()}문제
-        {tierStatus.membership.nextTier ? ` · ${TIER_NAMES[tierStatus.membership.nextTier]}까지 ${tierStatus.membership.remaining.toLocaleString()}문제` : ' · 최고 등급입니다!'}
+        {tierStatus.membership.nextTier ? ` · ${tierStatus.membership.nextTierName || TIER_NAMES[tierStatus.membership.nextTier]}까지 ${tierStatus.membership.remaining.toLocaleString()}문제` : ' · 최고 등급입니다!'}
       </p>}
       <p>브론즈: 기본 방문자 · 실버: 50문제 · 골드: SSAFY 16기 교육생 · 다이아: 200문제 · 루비: 1,000문제</p>
       <p>같은 문제의 반복 풀이는 1문제로 집계합니다. 필기이론은 골드 이상 이용할 수 있습니다.</p>

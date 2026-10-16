@@ -10,7 +10,7 @@ import java.time.Instant;
 import java.util.HashSet;
 
 // A durable, one-time snapshot: restarting must never promote future visitors to GOLD.
-@Service @RequiredArgsConstructor
+@Service @RequiredArgsConstructor @org.springframework.core.annotation.Order(10)
 public class MembershipRolloutService implements ApplicationRunner {
     private final MembershipRolloutRepository rollout;
     private final VisitorTierGrantRepository grants;

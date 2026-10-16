@@ -16,6 +16,8 @@ public class NicknameService {
     private final VisitorProfileRepository profiles;
     private final VisitorSolvedRepository solved;
     private final ApplicationEventPublisher events;
+    private final CohortService cohort;
+    private final TierAwardService tierAwards;
     public record Changed(Long userId) {}
     public static String key(String name) { return java.text.Normalizer.normalize(name,java.text.Normalizer.Form.NFKC).replaceAll("\\s+"," ").trim().toLowerCase(Locale.ROOT); }
     public static String validate(String name) {
@@ -28,6 +30,8 @@ public class NicknameService {
         String clean=validate(name);
         User user=users.saveAndFlush(User.builder().nickname(clean).password(password).baseTier(base).build());
         claim(clean,"u:"+user.getId(),visitorId);
+        cohort.attachVisitorAccount(visitorId,user.getId());
+        tierAwards.attachVisitorAccount(visitorId,user.getId());
         return user;
     }
     @Transactional

@@ -104,4 +104,90 @@ class MembershipTest {
                 .content("{\"nickname\":\"guest-name\",\"password\":\"password\"}"))
                 .andExpect(status().isConflict());
     }
+    @Autowired com.csstudy.backend.service.CohortService cohorts;
+    @Autowired CohortMembershipRepository cohortRows;
+
+    @Test void progressiveDivisionBoundariesAndNextTargets() {
+        for (UserTier tier : UserTier.values()) {
+            long[] goals = tier.thresholds();
+            long previousGap = 0;
+            for (int i = 0; i < goals.length; i++) {
+                var current = MembershipService.describe(tier, goals[i]);
+                assertEquals(tier, current.tier());
+                assertEquals(5 - i, current.division());
+                assertEquals(goals[i], current.currentThreshold());
+                if (i > 0) {
+                    assertEquals(6 - i, MembershipService.describe(tier, goals[i] - 1).division());
+                    assertTrue(goals[i] - goals[i-1] > previousGap);
+                    previousGap = goals[i] - goals[i-1];
+                }
+                if (i < 4) {
+                    assertEquals(tier, current.nextTier());
+                    assertEquals(4 - i, current.nextDivision());
+                    assertEquals(goals[i+1], current.nextThreshold());
+                    assertEquals(goals[i+1] - goals[i], current.remaining());
+                }
+            }
+        }
+        var gold = MembershipService.describe(UserTier.GOLD, 125);
+        assertEquals("골드 Ⅱ", gold.tierName());
+        assertEquals("골드 Ⅰ", gold.nextTierName());
+        assertEquals(45, gold.remaining());
+        assertEquals(200, MembershipService.describe(UserTier.GOLD, 199).nextThreshold());
+        assertEquals("다이아 Ⅴ", MembershipService.describe(UserTier.GOLD, 199).nextTierName());
+        var top = MembershipService.describe(UserTier.GOLD, 2300);
+        assertNull(top.nextTier()); assertNull(top.nextDivision()); assertNull(top.nextThreshold());
+        assertEquals(0, top.remaining());
+        assertEquals(0, MembershipService.describe(UserTier.BRONZE, -1).solvedCount());
+    }
+
+    @Test void cohortBadgePersistsAndOnlyOwnPersonalEndpointRevealsIt() throws Exception {
+        var owner = register("badge-owner"); var other = register("badge-other");
+        var user = users.findByNickname("badge-owner").orElseThrow();
+        cohorts.captureUser(user.getId()); cohorts.captureUser(user.getId());
+        cohortRows.flush();
+        var stored = cohortRows.findById("user:" + user.getId()).orElseThrow();
+        assertEquals("SSAFY", stored.getProgram()); assertEquals(16, stored.getGeneration());
+        assertEquals("대전", stored.getCampus()); assertEquals(4, stored.getClassNumber());
+        assertNotNull(stored.getCapturedAt());
+        String token = "Bearer " + owner.path("token").asText();
+        mvc.perform(get("/api/v1/profile/badges").header("Authorization", token))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].name").value("16기 대전 4반"))
+                .andExpect(header().string("Cache-Control", "no-store"));
+        mvc.perform(get("/api/v1/profile/badges").param("userId", user.getId().toString())
+                .header("Authorization", "Bearer " + other.path("token").asText()))
+                .andExpect(content().json("[]"));
+        mvc.perform(get("/api/v1/profile/badges").header("Authorization", "Bearer invalid"))
+                .andExpect(status().isUnauthorized());
+        for (String endpoint : new String[]{"/api/v1/membership", "/api/v1/auth/me", "/api/v1/rank/solved"}) {
+            String response = mvc.perform(get(endpoint).header("Authorization", token)).andExpect(status().isOk())
+                    .andReturn().getResponse().getContentAsString();
+            assertFalse(response.contains("대전")); assertFalse(response.contains("classNumber"));
+            assertFalse(response.contains("capturedAt"));
+        }
+        save(user, 1000);
+        mvc.perform(put("/api/v1/auth/nickname").header("Authorization", token).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"nickname\":\"badge-renamed\"}" )).andExpect(status().isOk());
+        mvc.perform(get("/api/v1/profile/badges").header("Authorization", token))
+                .andExpect(jsonPath("$[0].name").value("16기 대전 4반"));
+        assertTrue(cohortRows.findByUserId(users.findByNickname("badge-other").orElseThrow().getId()).isEmpty());
+    }
+
+    @Test void anonymousBadgeTransfersOnRegistrationWithoutExposingItToAnotherAccount() throws Exception {
+        String id = "cohort-guest";
+        cohorts.captureVisitor(id, null); cohortRows.flush();
+        mvc.perform(get("/api/v1/profile/badges").header("X-Visitor-Id", id))
+                .andExpect(jsonPath("$[0].name").value("16기 대전 4반"));
+        mvc.perform(get("/api/v1/profile/badges").header("X-Visitor-Id", "other-guest"))
+                .andExpect(content().json("[]"));
+        var registration = json.readTree(mvc.perform(post("/api/v1/auth/register").header("X-Visitor-Id", id)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"nickname\":\"cohort-registered\",\"password\":\"test-password\"}"))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+        mvc.perform(get("/api/v1/profile/badges").header("Authorization", "Bearer " + registration.path("token").asText()))
+                .andExpect(jsonPath("$[0].name").value("16기 대전 4반"));
+        mvc.perform(get("/api/v1/profile/badges").header("X-Visitor-Id", id)).andExpect(content().json("[]"));
+        cohorts.attachVisitorAccount(id, -1L);
+        assertNotEquals(-1L, cohortRows.findById("visitor:" + id).orElseThrow().getUserId());
+    }
+
 }
