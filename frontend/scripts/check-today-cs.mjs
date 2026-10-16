@@ -18,11 +18,12 @@ for(const fact of FACTS){
 }
 globalThis.IS_REACT_ACT_ENVIRONMENT=true;
 globalThis.localStorage=memory();globalThis.sessionStorage=memory();
-globalThis.window=Object.assign(new EventTarget(),{location:{href:"http://test.invalid/"}});globalThis.document=new EventTarget();
+globalThis.window=Object.assign(new EventTarget(),{location:{href:"http://test.invalid/"}});globalThis.document=Object.assign(new EventTarget(),{body:{style:{overflow:"auto"}}});
 const server=await createServer({server:{middlewareMode:true,hmr:false},appType:'custom'});
 let view;const original=console.error,errors=[];
 const originalInterval=globalThis.setInterval, originalNow=Date.now;
 let midnightTick;
+let shown=0,closed=0,focused=0;
 globalThis.setInterval=(fn,delay,...args)=>{if(delay===1000)midnightTick=fn;return originalInterval(fn,delay,...args);};
 console.error=(...args)=>{if(!String(args[0]).startsWith('react-test-renderer is deprecated'))errors.push(args.join(' '));};
 const text=n=>typeof n==='string'?n:(n?.children||[]).map(text).join('');
@@ -31,11 +32,13 @@ try{
  const {default:api}=await server.ssrLoadModule('/src/api.js');
  const {buildAccountRetry}=await server.ssrLoadModule('/src/accountRetry.js');
  api.defaults.adapter=async config=>({data:{data:null},status:200,statusText:'OK',headers:{},config});
- const mount=async()=>{await act(async()=>{view=TestRenderer.create(React.createElement(Today));});};
+ const mount=async()=>{await act(async()=>{view=TestRenderer.create(React.createElement(Today), {createNodeMock: element => element.type === "dialog" ? {showModal(){shown++;},close(){closed++;}} : element.props["aria-haspopup"] === "dialog" ? {focus(){focused++;}} : null});});};
  const toggle=()=>view.root.findAllByType('button').find(b=>b.props['aria-controls']);
  await mount();assert.equal(toggle().props['aria-expanded'],false);
  await act(async()=>{toggle().props.onClick();});
  assert.equal(view.root.findAllByProps({className:'today-quiz-q'}).length,5);
+ assert.equal(shown,1);assert.equal(document.body.style.overflow,'hidden');
+ const dialog=view.root.findByType('dialog');assert.ok(dialog.props['aria-labelledby']);
  const today=quizForDay(factForDay(koreanDay()),koreanDay(),TOPICS.questions);
  for(let index=0;index<5;index++){
   const q=today[index],choice=index===0?(q.a+1)%q.o.length:q.a;
@@ -47,7 +50,13 @@ try{
  assert.equal(Object.keys(records.stats).length,5);
  assert.equal(Object.values(records.stats).reduce((sum,s)=>sum+s.c+s.w,0),5,'each question counted once');
  assert.ok(buildAccountRetry({topics:records}).company.questions.some(q=>q.id==='topics:'+today[0].id),'wrong daily question appears in all-bank wrong-note');
- await act(()=>{toggle().props.onClick();});await act(async()=>{toggle().props.onClick();});
+ await act(()=>{view.root.findByProps({'aria-label':'확인 문제 닫기'}).props.onClick();});
+ assert.equal(document.body.style.overflow,'auto');assert.ok(closed>0);assert.ok(focused>0);
+ await act(async()=>{toggle().props.onClick();});
+ let prevented=false;
+ await act(()=>view.root.findByType('dialog').props.onCancel({preventDefault(){prevented=true;}}));
+ assert.ok(prevented);assert.equal(toggle().props['aria-expanded'],false);
+ await act(async()=>{toggle().props.onClick();});
  assert.ok(text(view.toJSON()).includes('5문제 중 4문제 정답'));
  await act(()=>view.unmount());await mount();await act(async()=>{toggle().props.onClick();});
  assert.ok(text(view.toJSON()).includes('5문제 중 4문제 정답'),'answers survive refresh');
