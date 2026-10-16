@@ -23,12 +23,12 @@ export default function Home() {
       {/* 왼쪽은 소개와 시험 일정, 오른쪽은 문제 많이 푼 사람 순위 */}
       <div className="home-top">
         <div className="hero">
-          <span className="home-eyebrow">공기업 IT직무</span>
           <h1>전산학 전공필기 준비</h1>
           <p>기출 기반 모의고사로 풀고, 틀린 문제는 다시 풉니다.</p>
           <div className="home-cta">
             <Link to="/notes" className="home-cta-btn primary">전공노트 →</Link>
             <Link to="/duel" className="home-cta-btn">대결</Link>
+            <Link to="/promotion-exam" className="home-cta-btn">시험</Link>
           </div>
           <StudyGoal />
         </div>
@@ -57,13 +57,11 @@ export default function Home() {
         ))}
       </div>
 
-      {/* 왼쪽 아래 도크: 위에서부터 멘탈 기르기, 오늘의 운세, 코딩 타자 연습. 좁은 화면에서는 숨겨 두고 "더보기"를 눌러야 맨 아래에 한 줄로 나온다 */}
+      {/* 왼쪽 아래 도크: 위에서부터 멘탈 기르기, 오늘의 운세. 좁은 화면에서는 숨겨 두고 "더보기"를 눌러야 맨 아래에 한 줄로 나온다 */}
       <div className={`home-dock ${more ? 'open' : ''}`}>
         <button type="button" className="home-dock-more" onClick={() => setMore(m => !m)} aria-expanded={more}>{more ? '접기' : '더보기'}</button>
         <MentalTraining />
         <DailyFortune />
-        {/* 코드 타자 연습은 따로 배포된 외부 사이트라 새 탭으로 연다 */}
-        <a href="https://ssafy-code-race.onrender.com/" target="_blank" rel="noopener noreferrer" className="arcade-door"><span aria-hidden="true">⌨️</span>코딩 타자 연습</a>
       </div>
     </div>
   );

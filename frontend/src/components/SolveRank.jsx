@@ -119,7 +119,7 @@ export default function SolveRank() {
           {rows.map(r => (
             <li key={r.rank} className={r.me ? 'me' : ''}>
               <span className="solve-rank-no">{MEDALS[r.rank - 1] || r.rank}</span>
-              <span className="solve-rank-name"><span className="solve-rank-nickname" title={r.nickname}>{r.nickname}</span><TierBadge tier={r.tier} />{r.me && <em>나</em>}</span>
+              <span className="solve-rank-name"><span className="solve-rank-nickname" title={r.nickname}>{r.nickname}</span><TierBadge tier={r.tier} division={r.division} />{r.me && <em>나</em>}</span>
               <span className="solve-rank-count">{r.count.toLocaleString()}문제</span>
             </li>
           ))}

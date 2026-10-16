@@ -1,0 +1,9 @@
+.promotion-exam { max-width: 880px; margin: auto; }
+.promotion-question { min-width: 0; margin: 1.25rem 0; padding: 1rem; border: 1px solid var(--border); border-radius: 12px; }
+.promotion-question legend { padding: 0 .4rem; font-weight: 600; font-size: .9rem; }
+.promotion-prompt, .promotion-review p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.promotion-options { display: grid; gap: .5rem; }
+.promotion-options label { display: flex; align-items: baseline; gap: .4rem; padding: .65rem; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; white-space: pre-wrap; }
+.promotion-options .correct { border-color: #16a34a; background: #16a34a18; }
+.promotion-review { margin-top: 1rem; }
+.promotion-result { padding: 1rem; border: 1px solid var(--border); border-radius: 12px; }

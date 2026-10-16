@@ -32,7 +32,7 @@ public class RankController {
     private static final int MAX_SOLVED = 3000;
 
     // account: 동기화 계정으로 묶인 줄이면 그 계정의 닉네임, 아니면 null
-    private record Solver(String visitorId, long count, String account, UserTier baseTier) {}
+    private record Solver(String visitorId, long count, String account, UserTier baseTier, String subjectKey) {}
 
     private record Board(List<Solver> ranked, Map<String, Integer> rankOf, Instant at) {}
 
@@ -132,14 +132,16 @@ public class RankController {
     }
 
     // 닉네임을 정하지 않은 사람은 익명 닉네임으로 나간다
-    private static Map<String, Object> row(Solver s, int rank, String nickname) {
+    private Map<String, Object> row(Solver s, int rank, String nickname) {
         Map<String, Object> row = new LinkedHashMap<>();
         row.put("rank", rank);
         row.put("nickname", s.account() != null ? s.account() : nickname != null ? nickname : VisitorProfileService.anonymous(s.visitorId()));
         row.put("count", s.count());
-        UserTier tier = UserTier.calculate(s.baseTier(), s.count());
+        var status = membershipService.describe(s.baseTier(), s.count(), s.subjectKey());
+        UserTier tier = status.tier();
         row.put("tier", tier);
-        row.put("tierName", tier.label());
+        row.put("tierName", status.tierName());
+        row.put("division", status.division());
         return row;
     }
 
@@ -173,13 +175,13 @@ public class RankController {
             ids.sort(Comparator.naturalOrder());
             long best = Math.max(saved.getOrDefault(userId, 0L), ids.stream().mapToLong(counts::get).max().orElse(0));
             User user = accounts.get(userId);
-            Solver s = new Solver(ids.get(0), best, user.getNickname(), MembershipService.baseTier(user));
+            Solver s = new Solver(ids.get(0), best, user.getNickname(), MembershipService.baseTier(user), "user:" + userId);
             ids.forEach(id -> { solverOf.put(id, s); counts.remove(id); });
             if (best > 0) ranked.add(s);
         });
         counts.forEach((visitorId, count) -> {
             if (count <= 0) return;
-            Solver s = new Solver(visitorId, count, null, visitorTiers.getOrDefault(visitorId, UserTier.BRONZE));
+            Solver s = new Solver(visitorId, count, null, visitorTiers.getOrDefault(visitorId, UserTier.BRONZE), "visitor:" + visitorId);
             solverOf.put(visitorId, s);
             ranked.add(s);
         });

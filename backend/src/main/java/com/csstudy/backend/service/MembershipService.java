@@ -26,11 +26,13 @@ public class MembershipService {
     private final UsageEventRepository usage;
     private final AuthService auth;
     private final VisitorProfileRepository profiles;
+    private final com.csstudy.backend.repository.TierAwardRepository awards;
 
     public record Membership(UserTier tier, String tierName, long solvedCount,
-                             UserTier nextTier, Long nextThreshold, long remaining, String nickname) {
+                             UserTier nextTier, Long nextThreshold, long remaining, String nickname,
+                             int division, Integer nextDivision, String nextTierName, long currentThreshold) {
         public Membership withNickname(String name) {
-            return new Membership(tier, tierName, solvedCount, nextTier, nextThreshold, remaining, name);
+            return new Membership(tier, tierName, solvedCount, nextTier, nextThreshold, remaining, name, division, nextDivision, nextTierName, currentThreshold);
         }
     }
 
@@ -55,7 +57,7 @@ public class MembershipService {
         }
         String nickname = id == null || id.isBlank() || id.length() > 40 ? "방문자"
                 : profiles.findByVisitorId(id).map(p -> p.getNickname()).orElseGet(() -> VisitorProfileService.anonymous(id));
-        return describe(base, count).withNickname(nickname);
+        return describe(base, count, "visitor:" + id).withNickname(nickname);
     }
 
     public void requireGold(HttpServletRequest request) {
@@ -73,20 +75,47 @@ public class MembershipService {
         long saved = progressRepository.findByUserId(user.getId()).stream().mapToLong(p -> count(p.getData())).sum();
         // Reuse the existing rank count for historical/coding progress; devices are merged by max, not sum.
         long reported = solvedRepository.findByUserId(user.getId()).stream().mapToLong(v -> v.getCount()).max().orElse(0);
-        return describe(baseTier(user), Math.max(saved, reported)).withNickname(user.getNickname());
+        return describe(baseTier(user), Math.max(saved, reported), "user:" + user.getId()).withNickname(user.getNickname());
     }
 
-    public static Membership describe(UserTier base, long solved) {
+    public Membership describe(UserTier base, long solved, String subjectKey) {
+        int floor=awards.findById(subjectKey).map(a->a.getTierLevel()).orElse(-1);
+        return describe(base, solved, floor);
+    }
+
+    public static Membership describe(UserTier base, long solved) { return describe(base, solved, -1); }
+
+    public static Membership describe(UserTier base, long solved, int floor) {
         long count = Math.max(0, solved);
         UserTier tier = UserTier.calculate(base, count);
-        UserTier next = tier == UserTier.BRONZE ? UserTier.SILVER :
-                tier == UserTier.SILVER || tier == UserTier.GOLD ? UserTier.DIAMOND :
-                tier == UserTier.DIAMOND ? UserTier.RUBY : null;
-        Long threshold = null;
-        if (next == UserTier.SILVER) threshold = 50L;
-        else if (next == UserTier.DIAMOND) threshold = 200L;
-        else if (next == UserTier.RUBY) threshold = 1000L;
-        return new Membership(tier, tier.label(), count, next, threshold, threshold == null ? 0 : Math.max(0, threshold - count), null);
+        int division = tier.division(count);
+        int natural=tier.ordinal()*5+5-division;
+        if (floor > natural && floor <= 24) {
+            tier=UserTier.values()[floor/5]; division=5-floor%5;
+        }
+        UserTier next;
+        Integer nextDivision;
+        Long threshold;
+        if (division > 1) {
+            next = tier;
+            nextDivision = division - 1;
+            threshold = tier.thresholds()[6 - division];
+        } else {
+            next = switch (tier) {
+                case BRONZE -> UserTier.SILVER;
+                case SILVER, GOLD -> UserTier.DIAMOND;
+                case DIAMOND -> UserTier.RUBY;
+                case RUBY -> null;
+            };
+            nextDivision = next == null ? null : Integer.valueOf(5);
+            threshold = null;
+            if (next == UserTier.SILVER) threshold = 50L;
+            else if (next == UserTier.DIAMOND) threshold = 200L;
+            else if (next == UserTier.RUBY) threshold = 1000L;
+        }
+        return new Membership(tier, tier.displayName(division), count, next, threshold,
+                threshold == null ? 0 : Math.max(0, threshold - count), null, division, nextDivision,
+                next == null ? null : next.displayName(nextDivision), tier.thresholds()[5 - division]);
     }
 
     public Map<Long, Long> savedCounts() {

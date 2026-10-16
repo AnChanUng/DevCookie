@@ -10,9 +10,15 @@ export function membershipHeaders() {
   return { 'X-Visitor-Id': visitorId(), ...(token ? { Authorization: `Bearer ${token}` } : {}) };
 }
 const snapshot = () => account()?.token || '';
+let membershipVersion = 0;
+const membershipListeners = new Set();
+const subscribeMembership = listener => { membershipListeners.add(listener); return () => membershipListeners.delete(listener); };
+const versionSnapshot = () => membershipVersion;
+export function refreshMembership() { membershipVersion++; membershipListeners.forEach(listener => listener()); }
 export function useMembership(revision = 0) {
   const token = useSyncExternalStore(onAccountChange, snapshot, () => '');
-  const [state, setState] = useState({ token, revision, loading: true, membership: null, error: false });
+  const version = useSyncExternalStore(subscribeMembership, versionSnapshot, () => 0);
+  const [state, setState] = useState({ token, revision, version, loading: true, membership: null, error: false });
   useEffect(() => {
     const controller = new AbortController();
     const delays = [2000, 5000, 10000, 20000, 30000];
@@ -20,15 +26,15 @@ export function useMembership(revision = 0) {
     const load = () => api.get('/membership', { headers: membershipHeaders(), signal: controller.signal, timeout: 90000 })
       .then(({ data }) => {
         if (!data || !Object.hasOwn(TIER_NAMES, data.tier)) throw new Error('Invalid membership response');
-        if (!controller.signal.aborted) setState({ token, revision, loading: false, membership: data, error: false });
+        if (!controller.signal.aborted) setState({ token, revision, version, loading: false, membership: data, error: false });
       })
       .catch(() => {
         if (controller.signal.aborted) return;
-        setState({ token, revision, loading: false, membership: null, error: true });
+        setState({ token, revision, version, loading: false, membership: null, error: true });
         if (retries < delays.length) timer = setTimeout(load, delays[retries++]);
       });
     load();
     return () => { controller.abort(); clearTimeout(timer); };
-  }, [token, revision]);
-  return state.token === token && state.revision === revision ? state : { loading: true, membership: null, error: false };
+  }, [token, revision, version]);
+  return state.token === token && state.revision === revision && state.version === version ? state : { loading: true, membership: null, error: false };
 }
