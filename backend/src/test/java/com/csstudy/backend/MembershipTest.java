@@ -42,21 +42,23 @@ class MembershipTest {
         assertEquals(UserTier.BRONZE,MembershipService.describe(UserTier.BRONZE,49).tier());
         assertEquals(UserTier.SILVER,MembershipService.describe(UserTier.BRONZE,50).tier());
         assertEquals(UserTier.SILVER,MembershipService.describe(UserTier.BRONZE,199).tier());
-        assertEquals(UserTier.DIAMOND,MembershipService.describe(UserTier.BRONZE,200).tier());
+        assertEquals(UserTier.DIAMOND,MembershipService.describe(UserTier.BRONZE,300).tier());
         assertEquals(UserTier.DIAMOND,MembershipService.describe(UserTier.GOLD,999).tier());
         assertEquals(UserTier.RUBY,MembershipService.describe(UserTier.GOLD,1000).tier());
         assertEquals(UserTier.GOLD,MembershipService.describe(UserTier.GOLD,0).tier());
+        assertEquals(UserTier.GOLD,MembershipService.describe(UserTier.GOLD,299).tier());
+        assertEquals(UserTier.SILVER,MembershipService.describe(UserTier.BRONZE,299).tier());
         assertEquals(UserTier.GOLD,MembershipService.baseTier(User.builder().build()));
     }
     @Test void accountTierCountsUniqueQuestionsNotAttempts() throws Exception {
         var registered=register("tier-boundary");
         assertEquals("BRONZE",registered.path("membership").path("tier").asText());
         User user=users.findByNickname("tier-boundary").orElseThrow();
-        for(int count:new int[]{49,50,199,200,999,1000}) {
+        for(int count:new int[]{49,50,199,200,299,300,999,1000}) {
             save(user,count);
             var current=membership.membership(user);
             assertEquals(count,current.solvedCount());
-            assertEquals(count>=1000?UserTier.RUBY:count>=200?UserTier.DIAMOND:count>=50?UserTier.SILVER:UserTier.BRONZE,current.tier());
+            assertEquals(count>=1000?UserTier.RUBY:count>=300?UserTier.DIAMOND:count>=50?UserTier.SILVER:UserTier.BRONZE,current.tier());
         }
         mvc.perform(get("/api/v1/auth/me").header("Authorization","Bearer "+registered.path("token").asText()))
                 .andExpect(jsonPath("$.membership.tier").value("RUBY"));
@@ -71,12 +73,19 @@ class MembershipTest {
         mvc.perform(get("/api/v1/theory/notes/sqld-concepts.pdf").header("X-Visitor-Id","existing-anonymous"))
                 .andExpect(status().isOk()).andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PDF))
                 .andExpect(header().string("Cache-Control","no-store"));
+        for (String file : new String[]{"ipe-written-summary.pdf", "ipe-written-review.pdf"}) {
+            mvc.perform(get("/api/v1/theory/notes/" + file).header("X-Visitor-Id", "new-visitor"))
+                    .andExpect(status().isForbidden());
+            mvc.perform(get("/api/v1/theory/notes/" + file).header("X-Visitor-Id", "existing-anonymous"))
+                    .andExpect(status().isOk()).andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PDF))
+                    .andExpect(header().string("Cache-Control", "no-store"));
+        }
         mvc.perform(get("/api/v1/theory/notes/not-allowed.pdf").header("X-Visitor-Id","existing-anonymous"))
                 .andExpect(status().isNotFound());
     }
     @Test void renamePreservesTokenTierAndRecordsAndRejectsDuplicate() throws Exception {
         var a=register("rename-first");register("rename-second");
-        User user=users.findByNickname("rename-first").orElseThrow();save(user,200);
+        User user=users.findByNickname("rename-first").orElseThrow();save(user,300);
         String token="Bearer "+a.path("token").asText();
         mvc.perform(put("/api/v1/auth/nickname").header("Authorization",token).contentType(MediaType.APPLICATION_JSON)
                 .content("{\"nickname\":\"renamed-first\"}"))
@@ -84,7 +93,7 @@ class MembershipTest {
         mvc.perform(get("/api/v1/auth/me").header("Authorization",token))
                 .andExpect(jsonPath("$.id").value(user.getId())).andExpect(jsonPath("$.membership.tier").value("DIAMOND"))
                 .andExpect(jsonPath("$.membership.nickname").value("renamed-first"))
-                .andExpect(jsonPath("$.membership.solvedCount").value(200));
+                .andExpect(jsonPath("$.membership.solvedCount").value(300));
         mvc.perform(put("/api/v1/auth/nickname").header("Authorization",token).contentType(MediaType.APPLICATION_JSON)
                 .content("{\"nickname\":\"RENAME-SECOND\"}"))
                 .andExpect(status().isConflict());
@@ -133,8 +142,8 @@ class MembershipTest {
         assertEquals("골드 Ⅱ", gold.tierName());
         assertEquals("골드 Ⅰ", gold.nextTierName());
         assertEquals(45, gold.remaining());
-        assertEquals(200, MembershipService.describe(UserTier.GOLD, 199).nextThreshold());
-        assertEquals("다이아 Ⅴ", MembershipService.describe(UserTier.GOLD, 199).nextTierName());
+        assertEquals(300, MembershipService.describe(UserTier.GOLD, 299).nextThreshold());
+        assertEquals("다이아 Ⅴ", MembershipService.describe(UserTier.GOLD, 299).nextTierName());
         var top = MembershipService.describe(UserTier.GOLD, 2300);
         assertNull(top.nextTier()); assertNull(top.nextDivision()); assertNull(top.nextThreshold());
         assertEquals(0, top.remaining());

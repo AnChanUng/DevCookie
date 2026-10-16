@@ -22,6 +22,7 @@ public class PromotionExamService {
     private final TierAwardRepository awards;
     private final AuthService auth;
     private final MembershipService membership;
+    private final PromotionNoticeService notices;
     private List<Question> bank;
     private static final Map<String,Integer> DRAW = Map.of("os",6,"net",6,"db",6,"arch",6,"c",2,"java",2,"python",2);
     public record Question(String id,String group,String topic,String q,String code,List<String> o,int a,String e) {}
@@ -92,6 +93,7 @@ public class PromotionExamService {
             int level=current.nextTier().ordinal()*5+5-current.nextDivision();
             award.setTierLevel(Math.max(award.getTierLevel(),level)); awards.save(award);
             name=current.nextTierName();
+            notices.announce(key,current,membership.current(request));
         }
         var result=new Result(correct,30,Math.round(correct*1000.0/30)/10.0,passed,promoted,name,review);
         attempt.setResult(json.writeValueAsString(result)); attempts.save(attempt);

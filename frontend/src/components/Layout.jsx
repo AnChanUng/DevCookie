@@ -6,6 +6,7 @@ import ChaosChat from './ChaosChat';
 import StudyAmbience from './StudyAmbience';
 import StudyCount from './StudyCount';
 import MemberMenu from './MemberMenu';
+import PromotionAnnouncements from './PromotionAnnouncements';
 
 // 카오스 고양이 챗봇은 잠시 숨겨 둔다. true로 바꾸면 다시 나온다
 const SHOW_CHAOS_CHAT = false;
@@ -101,6 +102,7 @@ export default function Layout() {
         </Suspense>
       </main>
 
+      <PromotionAnnouncements />
       <StudyAmbience />
       {SHOW_CHAOS_CHAT && <ChaosChat />}
     </>

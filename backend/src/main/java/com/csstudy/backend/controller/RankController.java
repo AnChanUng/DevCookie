@@ -43,6 +43,7 @@ public class RankController {
     private final AuthService authService;
     private final MembershipService membershipService;
     private final VisitorTierGrantRepository grants;
+    private final com.csstudy.backend.service.PromotionNoticeService notices;
 
     private volatile Board cached;
     @org.springframework.transaction.event.TransactionalEventListener(fallbackExecution = true)
@@ -92,12 +93,15 @@ public class RankController {
     }
 
     // 브라우저에 남은 풀이 기록에서 센 "한 번이라도 푼 문제 수"를 받아 둔다
+    @org.springframework.transaction.annotation.Transactional
     @PutMapping("/rank/solved")
     public ResponseEntity<?> report(@RequestBody Map<String, Object> body, HttpServletRequest request) {
         String visitorId = body.get("visitorId") instanceof String s && !s.isBlank() && s.length() <= 40 ? s.trim() : null;
         Integer count = body.get("count") instanceof Number n && n.intValue() >= 0 && n.intValue() <= MAX_SOLVED ? n.intValue() : null;
         if (visitorId == null || count == null) return ResponseEntity.badRequest().build();
 
+        var account=authService.currentUser(request);
+        var before=account.isPresent()?membershipService.membership(account.get()):membershipService.visitor(visitorId);
         VisitorSolved solved = solvedRepository.findByVisitorId(visitorId)
                 .orElseGet(() -> VisitorSolved.builder().visitorId(visitorId).count(-1).build());
         // 로그인한 기기면 계정에 묶어 둔다. 로그아웃한 뒤에도 같은 사람이므로 묶음은 그대로 둔다
@@ -107,7 +111,9 @@ public class RankController {
             solved.setUserId(userId);
             solved.setUpdatedAt(Instant.now());
             try {
-                solvedRepository.save(solved);
+                solvedRepository.saveAndFlush(solved);
+                var after=account.isPresent()?membershipService.membership(account.get()):membershipService.visitor(visitorId);
+                notices.announce(account.isPresent()?"user:"+account.get().getId():"visitor:"+visitorId,before,after);
                 cached = null;   // 방금 알려 준 숫자가 바로 순위에 보이게 한다
             } catch (DataIntegrityViolationException e) {
                 // 같은 방문자의 요청이 겹쳤다. 먼저 들어간 값을 그대로 둔다

@@ -5,6 +5,8 @@ import { membershipHeaders } from '../membership';
 
 // PDF contents are served only after the backend verifies GOLD access.
 const NOTES = [
+  { file: 'ipe-written-summary.pdf', title: '정보처리기사 필기', desc: '필기 핵심 요약노트 · 전 과목 정리 · 18쪽' },
+  { file: 'ipe-written-review.pdf', title: '정보처리기사 필기 (복습용)', desc: '필기 핵심 요약노트 · 복습용 · 17쪽' },
   { file: 'ipe-silgi-theory.pdf', title: '정보처리기사 실기', desc: '실기 이론편 요약노트 · 서술형 대비'},
   { file: 'sqld-concepts.pdf', title: 'SQLD', desc: '2024 개념 정리 노트 · 데이터 모델링 · SQL 기본 및 활용 · 22쪽'},
   { file: 'bigdata-analyst-summary.pdf', title: '빅데이터분석기사', desc: '2026.02.05 개정판 요약노트 · 필기 전 과목 · 69쪽'},

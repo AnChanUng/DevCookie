@@ -42,7 +42,7 @@ try{
  fail=false;await changeNickname('after');
  assert.deepEqual(JSON.parse(localStorage.getItem('sync:account')),{nickname:'after',token:'same-token'});
  assert.equal(requests.at(-1).headers.Authorization,'Bearer same-token');
- for(const file of ['sqld-concepts.pdf','ipe-silgi-theory.pdf','adsp-summary.pdf','bigdata-analyst-summary.pdf']){
+ for(const file of ['ipe-written-summary.pdf','ipe-written-review.pdf','sqld-concepts.pdf','ipe-silgi-theory.pdf','adsp-summary.pdf','bigdata-analyst-summary.pdf']){
   assert.equal(existsSync(`public/notes/${file}`),false,'no public PDF bypass');
   assert.ok(existsSync(`../backend/src/main/resources/private-notes/${file}`));
  }
