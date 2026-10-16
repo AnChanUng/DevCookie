@@ -110,7 +110,7 @@ public class MembershipService {
             nextDivision = next == null ? null : Integer.valueOf(5);
             threshold = null;
             if (next == UserTier.SILVER) threshold = 50L;
-            else if (next == UserTier.DIAMOND) threshold = 200L;
+            else if (next == UserTier.DIAMOND) threshold = 300L;
             else if (next == UserTier.RUBY) threshold = 1000L;
         }
         return new Membership(tier, tier.displayName(division), count, next, threshold,

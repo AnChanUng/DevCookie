@@ -57,7 +57,7 @@ try {
   await act(() => info().props.onClick());
   assert.equal(info().props['aria-expanded'], true);
   const content = text(view.root.findByProps({ 'aria-label': '티어 등급 기준' }));
-  for (const word of ['브론즈','실버','골드','다이아','루비','50개','200개','1,000개','필기이론']) assert.ok(content.includes(word), word);
+  for (const word of ['브론즈','실버','골드','다이아','루비','50개','300개','1,000개','필기이론']) assert.ok(content.includes(word), word);
   await act(() => info().props.onKeyDown({ key: 'Escape' }));
   assert.equal(view.root.findAllByProps({ 'aria-label': '티어 등급 기준' }).length, 0);
   await act(() => info().props.onClick());

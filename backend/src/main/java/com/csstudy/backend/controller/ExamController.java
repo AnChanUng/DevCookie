@@ -22,6 +22,8 @@ public class ExamController {
 
     private final ExamProgressRepository examProgressRepository;
     private final AuthService authService;
+    private final com.csstudy.backend.service.MembershipService membership;
+    private final com.csstudy.backend.service.PromotionNoticeService notices;
 
     @GetMapping("/progress/{company}")
     public ResponseEntity<?> getProgress(@PathVariable String company, HttpServletRequest request) {
@@ -34,6 +36,7 @@ public class ExamController {
         return ResponseEntity.ok(body);
     }
 
+    @org.springframework.transaction.annotation.Transactional
     @PutMapping("/progress/{company}")
     public ResponseEntity<?> saveProgress(@PathVariable String company, @RequestBody Map<String, Object> body,
                                           HttpServletRequest request) {
@@ -45,10 +48,12 @@ public class ExamController {
             return ResponseEntity.badRequest().body(Map.of("error", "저장 데이터가 너무 큽니다."));
         }
 
+        var before=membership.membership(user);
         ExamProgress progress = examProgressRepository.findByUserIdAndCompany(user.getId(), company)
                 .orElseGet(() -> ExamProgress.builder().user(user).company(company).build());
         progress.setData(data);
-        ExamProgress saved = examProgressRepository.save(progress);
+        ExamProgress saved = examProgressRepository.saveAndFlush(progress);
+        notices.announce("user:"+user.getId(),before,membership.membership(user));
 
         return ResponseEntity.ok(Map.of("company", company, "updatedAt", saved.getUpdatedAt()));
     }

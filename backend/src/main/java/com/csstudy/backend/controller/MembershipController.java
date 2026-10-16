@@ -11,7 +11,7 @@ import java.util.Set;
 @RestController @RequestMapping("/api/v1") @RequiredArgsConstructor
 public class MembershipController {
     private final MembershipService membership;
-    private static final Set<String> NOTES=Set.of("ipe-silgi-theory.pdf","sqld-concepts.pdf","bigdata-analyst-summary.pdf","adsp-summary.pdf");
+    private static final Set<String> NOTES=Set.of("ipe-written-summary.pdf","ipe-written-review.pdf","ipe-silgi-theory.pdf","sqld-concepts.pdf","bigdata-analyst-summary.pdf","adsp-summary.pdf");
     @GetMapping("/membership")
     public MembershipService.Membership membership(HttpServletRequest request) { return membership.current(request); }
     @GetMapping("/theory/notes/{file}")

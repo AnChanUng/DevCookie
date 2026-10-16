@@ -13,7 +13,7 @@ public enum UserTier {
             case BRONZE -> new long[]{0, 5, 12, 25, 45};
             case SILVER -> new long[]{50, 60, 80, 120, 180};
             case GOLD -> new long[]{0, 20, 50, 100, 170};
-            case DIAMOND -> new long[]{200, 250, 350, 550, 850};
+            case DIAMOND -> new long[]{300, 350, 450, 650, 950};
             case RUBY -> new long[]{1000, 1100, 1300, 1700, 2300};
         };
     }
@@ -29,7 +29,7 @@ public enum UserTier {
     }
 
     public static UserTier calculate(UserTier base, long solved) {
-        UserTier earned = solved >= 1000 ? RUBY : solved >= 200 ? DIAMOND : solved >= 50 ? SILVER : BRONZE;
+        UserTier earned = solved >= 1000 ? RUBY : solved >= 300 ? DIAMOND : solved >= 50 ? SILVER : BRONZE;
         return base.ordinal() > earned.ordinal() ? base : earned;
     }
 }
