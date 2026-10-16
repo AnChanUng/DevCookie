@@ -15,10 +15,20 @@ export function useMembership(revision = 0) {
   const [state, setState] = useState({ token, revision, loading: true, membership: null, error: false });
   useEffect(() => {
     const controller = new AbortController();
-    api.get('/membership', { headers: membershipHeaders(), signal: controller.signal, timeout: 90000 })
-      .then(({ data }) => { if (!controller.signal.aborted) setState({ token, revision, loading: false, membership: data, error: false }); })
-      .catch(() => { if (!controller.signal.aborted) setState({ token, revision, loading: false, membership: null, error: true }); });
-    return () => controller.abort();
+    const delays = [2000, 5000, 10000, 20000, 30000];
+    let timer, retries = 0;
+    const load = () => api.get('/membership', { headers: membershipHeaders(), signal: controller.signal, timeout: 90000 })
+      .then(({ data }) => {
+        if (!data || !Object.hasOwn(TIER_NAMES, data.tier)) throw new Error('Invalid membership response');
+        if (!controller.signal.aborted) setState({ token, revision, loading: false, membership: data, error: false });
+      })
+      .catch(() => {
+        if (controller.signal.aborted) return;
+        setState({ token, revision, loading: false, membership: null, error: true });
+        if (retries < delays.length) timer = setTimeout(load, delays[retries++]);
+      });
+    load();
+    return () => { controller.abort(); clearTimeout(timer); };
   }, [token, revision]);
   return state.token === token && state.revision === revision ? state : { loading: true, membership: null, error: false };
 }

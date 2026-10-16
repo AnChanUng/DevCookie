@@ -30,9 +30,13 @@ try{
  fail=true;
  await act(async()=>{view=TestRenderer.create(React.createElement(MemoryRouter,null,React.createElement(Gate,null,'protected-content')));});
  assert.ok(text(view.toJSON()).includes('등급을 확인하지 못했습니다.'));assert.ok(!text(view.toJSON()).includes('protected-content'));
+ fail=false;tier='GOLD';
+ await act(async()=>{await new Promise(resolve=>setTimeout(resolve,2200));});
+ assert.ok(text(view.toJSON()).includes('protected-content'),'temporary API failure recovers without remounting or refreshing');
  await act(()=>view.unmount());view=null;
  const {changeNickname}=await server.ssrLoadModule('/src/sync.js');
  localStorage.setItem('sync:account',JSON.stringify({nickname:'before',token:'same-token'}));
+ fail=true;
  await assert.rejects(changeNickname('duplicate'));
  assert.equal(JSON.parse(localStorage.getItem('sync:account')).nickname,'before');
  fail=false;await changeNickname('after');
