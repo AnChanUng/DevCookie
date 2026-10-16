@@ -23,6 +23,7 @@ export default function TodayCs() {
 function DailyConcept({ day, identity }) {
   const fact = factForDay(day), panelId = useId();
   const [open, setOpen] = useState(false);
+  const trigger = useRef(null);
   const [loaded, setLoaded] = useState({ questions: null, error: false });
   const [retry, setRetry] = useState(0);
   const key = `today-cs:v1:${day}:${identity}`;
@@ -56,11 +57,12 @@ function DailyConcept({ day, identity }) {
     <p className="today-cs-body">{fact.s}</p>
     <div className="today-cs-check">
       <span className="today-cs-date">{dayLabel(day)} · 한국 시간 00시 갱신</span>
-      <button type="button" className="exam-btn sm" aria-expanded={open} aria-controls={panelId} onClick={() => setOpen(value => !value)}>
-        {open ? '확인 문제 접기' : '오늘 배운 내용 확인하기 · 5문제'}
+      <button type="button" className="exam-btn sm" ref={trigger} aria-haspopup="dialog" aria-expanded={open} aria-controls={panelId} onClick={() => setOpen(value => !value)}>
+        오늘 배운 내용 확인하기 · 5문제
       </button>
     </div>
-    {open && <div id={panelId} className="today-cs-questions" aria-label="오늘 배운 내용 확인하기">
+    {open && <QuizDialog id={panelId} fact={fact} date={dayLabel(day)} onClose={() => setOpen(false)} trigger={trigger}>
+      <div className="today-cs-questions" aria-label="오늘 배운 내용 확인하기">
       <p className="today-quiz-note">오늘은 모두가 같은 개념과 문제를 풉니다. 풀이 기록은 주제별 문제집과 오답노트에 반영됩니다.</p>
       {error ? <div role="alert">문제를 불러오지 못했습니다. <button className="exam-btn sm" onClick={() => { setLoaded({ questions: null, error: false }); setRetry(value => value + 1); }}>다시 불러오기</button></div>
         : questions === null ? <p role="status">문제를 불러오는 중…</p> : questions.length === 0 ? <p>이 개념의 확인 문제를 준비 중입니다.</p> : <>
@@ -80,6 +82,34 @@ function DailyConcept({ day, identity }) {
             </div>;
           })}
         </>}
-    </div>}
+    </div></QuizDialog>}
   </section>;
+}
+
+function QuizDialog({ id, fact, date, children, onClose, trigger }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const dialog = ref.current;
+    const opener = trigger.current;
+    const body = document.body;
+    const overflow = body?.style.overflow;
+    dialog?.showModal();
+    if (body) body.style.overflow = 'hidden';
+    return () => {
+      dialog?.close();
+      if (body) body.style.overflow = overflow;
+      opener?.focus();
+    };
+  }, [trigger]);
+  return <dialog id={id} ref={ref} className="today-cs-dialog" aria-labelledby={`${id}-title`} aria-describedby={`${id}-summary`}
+    onCancel={event => { event.preventDefault(); onClose(); }} onClick={event => { if (event.target === event.currentTarget) onClose(); }}>
+    <div className="today-cs-dialog-inner">
+      <header className="today-cs-dialog-header">
+        <div><span className="today-cs-date">{date} · 오늘의 CS</span><h2 id={`${id}-title`}>오늘 배운 내용 확인하기</h2></div>
+        <button type="button" className="exam-btn sm" onClick={onClose} aria-label="확인 문제 닫기">✕ 닫기</button>
+      </header>
+      <h3>{fact.t}</h3><p id={`${id}-summary`} className="today-cs-dialog-summary">{fact.s}</p>
+      {children}
+    </div>
+  </dialog>;
 }
