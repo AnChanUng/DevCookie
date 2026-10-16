@@ -4199,8 +4199,8 @@ a.goal-exam:hover { border-color: var(--accent-blue); }
   .outside-links.in-header { gap: 5px; }
   .outside-links.in-header img { width: 22px; height: 22px; }
 
-  /* 버튼 셋이 한 줄에 나란히 서게 한다 */
-  .home-cta { flex-wrap: nowrap; gap: 8px; margin-top: 20px; }
+  /* 네 개의 학습 버튼을 좁은 화면에서는 두 줄로 배치한다 */
+  .home-cta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 20px; }
   .home-cta-btn { flex: 1 1 0; padding: 12px 8px; font-size: 0.86rem; text-align: center; white-space: nowrap; }
   .home-cta-btn.primary { flex: 1.5 1 0; }
 
