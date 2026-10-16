@@ -70,6 +70,11 @@ export default function ExamCompanyPage() {
 
 // back: 목록으로 돌아가는 링크. 회사별 문제은행이 아닌 곳(컴퓨터일반)에서도 같은 풀이 화면을 쓴다
 export function CompanyExam({ company, back = { to: '/exam', label: '← 기업별 기출문제' } }) {
+  const progress = useExamProgress(company.key);
+  return <CompanyExamWithProgress company={company} back={back} progress={progress} />;
+}
+
+export function CompanyExamWithProgress({ company, back, progress, initialIds }) {
   const Q = company.questions;
   const SECTIONS = company.sections;
   const secKeys = Object.keys(SECTIONS).filter(k => !SECTIONS[k].extra); // 모의고사 채점 영역
@@ -86,7 +91,7 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
     tagBank(company.key, ALL); // 그림 해설을 찾을 때 쓸 문제은행 표시
     return Object.fromEntries(ALL.map(q => [q.id, q]));
   }, [ALL, company.key]);
-  const { data, save } = useExamProgress(company.key);
+  const { data, save } = progress;
   // 풀던 문제는 새로고침하거나 탭을 닫아도 이어서 풀 수 있게 문제은행마다 한 건씩 저장해 둔다
   const RESUME_KEY = `exam-resume:${company.key}`;
   const [saved, setSaved] = useState(() => {
@@ -98,7 +103,9 @@ export function CompanyExam({ company, back = { to: '/exam', label: '← 기업�
     }
   });
   // 첫 화면의 "이어서 하기"로 들어오면(?resume=1) 안내를 거치지 않고 풀던 문제를 바로 연다
-  const [view, setView] = useState(() => (saved && new URLSearchParams(window.location.search).has('resume')
+  const [view, setView] = useState(() => initialIds?.length
+    ? { name: 'quiz', mode: 'practice', ids: initialIds }
+    : (saved && new URLSearchParams(window.location.search).has('resume')
     ? { name: 'quiz', mode: saved.mode, sec: saved.sec, ids: saved.ids, resume: saved }
     : { name: 'home' }));
   // 첫 화면은 문제 데이터를 읽지 않으므로, 거기서 보여 줄 이름 · 주소 · 풀이 종류를 함께 적어 둔다

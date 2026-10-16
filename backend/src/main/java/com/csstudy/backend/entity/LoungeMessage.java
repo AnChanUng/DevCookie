@@ -7,7 +7,7 @@ import java.time.Instant;
 
 // 접속해 있는 사람들이 나누는 채팅 한 줄. 닉네임은 보낸 시점의 것을 그대로 남긴다
 @Entity
-@Table(name = "lounge_messages")
+@Table(name = "lounge_messages", uniqueConstraints = @UniqueConstraint(columnNames = {"visitor_id", "client_id"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,6 +21,9 @@ public class LoungeMessage {
 
     @Column(name = "visitor_id", nullable = false, length = 40)
     private String visitorId;
+
+    @Column(name = "client_id", length = 36)
+    private String clientId;
 
     @Column(nullable = false, length = 12)
     private String nickname;

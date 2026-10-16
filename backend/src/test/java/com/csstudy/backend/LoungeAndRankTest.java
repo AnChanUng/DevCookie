@@ -62,6 +62,22 @@ class LoungeAndRankTest {
     }
 
     @Test
+    void streamPushesNewMessagesWithoutAnotherPoll() throws Exception {
+        var connection = mvc.perform(get("/api/v1/lounge/stream"))
+                .andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.request().asyncStarted())
+                .andReturn();
+        say("stream-visitor-1", "스트림", "sse-live-delivery", "10.8.0.1").andExpect(status().isOk());
+        long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(3);
+        while (!connection.getResponse().getContentAsString().contains("sse-live-delivery") && System.nanoTime() < deadline) {
+            Thread.sleep(10);
+        }
+        String events = connection.getResponse().getContentAsString();
+        org.junit.jupiter.api.Assertions.assertTrue(events.contains("event:messages"));
+        org.junit.jupiter.api.Assertions.assertTrue(events.contains("sse-live-delivery"));
+    }
+
+    @Test
     void messagesAreSharedAndNewOnesComeAfterTheLastSeenId() throws Exception {
         say("lounge-visitor-a1", "하나", "  안녕하세요\n반갑습니다  ", "10.1.0.1")
                 .andExpect(status().isOk())

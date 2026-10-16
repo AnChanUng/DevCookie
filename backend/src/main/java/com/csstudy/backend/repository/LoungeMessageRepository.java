@@ -8,11 +8,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface LoungeMessageRepository extends JpaRepository<LoungeMessage, Long> {
 
     List<LoungeMessage> findByOrderByIdDesc(Pageable pageable);
+    Optional<LoungeMessage> findByVisitorIdAndClientId(String visitorId, String clientId);
 
     @Transactional
     long deleteByCreatedAtBefore(Instant cutoff);

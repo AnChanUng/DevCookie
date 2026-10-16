@@ -11,6 +11,8 @@
     "preview": "vite preview",
     "check:explanations": "node --import ./scripts/extensionless-loader.mjs scripts/check-explanations.mjs",
     "check:exam-flow": "node --import ./scripts/extensionless-loader.mjs scripts/check-exam-flow.mjs",
+    "check:account-retry": "node --import ./scripts/extensionless-loader.mjs scripts/check-account-retry.mjs",
+    "check:lounge-chat": "node --import ./scripts/extensionless-loader.mjs scripts/check-lounge-chat.mjs",
     "check:pearl-answers": "node scripts/check-pearl-answers.mjs",
     "check:notes": "node scripts/check-notes.mjs",
     "check:notice": "node scripts/check-notice.mjs",

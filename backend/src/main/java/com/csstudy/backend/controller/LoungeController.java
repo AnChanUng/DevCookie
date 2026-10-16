@@ -5,6 +5,9 @@ import com.csstudy.backend.repository.LoungeMessageRepository;
 import com.csstudy.backend.service.AdminAuth;
 import com.csstudy.backend.service.PresenceService;
 import com.csstudy.backend.service.VisitorProfileService;
+import com.csstudy.backend.service.LoungeStreamService;
+import org.springframework.http.MediaType;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +21,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,7 +36,7 @@ public class LoungeController {
     private static final int RECENT = 100;
     private static final int TEXT_MAX = 200;
     private static final int ADMIN_LIST = 200;
-    private static final int KEEP_DAYS = 30;
+    private static final ZoneId CHAT_ZONE = ZoneId.of("Asia/Seoul");
     // 한 사람이 연달아 보낼 수 있는 간격과, 한 곳(IP)에서 1분에 보낼 수 있는 수
     private static final Duration MIN_GAP = Duration.ofMillis(1500);
     private static final int PER_IP_PER_MINUTE = 30;
@@ -41,9 +46,11 @@ public class LoungeController {
     private final VisitorProfileService profileService;
     private final PresenceService presenceService;
     private final AdminAuth adminAuth;
+    private final LoungeStreamService streamService;
 
     private final Deque<LoungeMessage> recent = new ArrayDeque<>();
     private boolean loaded;
+    private LocalDate visibleDay = LocalDate.now(CHAT_ZONE);
     // 글이 지워지면 바뀐다. 화면은 이 값이 달라지면 목록을 처음부터 다시 받는다
     private long epoch = System.currentTimeMillis();
 
@@ -51,12 +58,20 @@ public class LoungeController {
     private final Map<String, long[]> sentPerIp = new ConcurrentHashMap<>();
 
     // after를 주면 그 뒤에 올라온 글만, 안 주면 최근 글을 모두 돌려준다
+    @GetMapping(value = "/lounge/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public synchronized SseEmitter stream(jakarta.servlet.http.HttpServletResponse response) {
+        response.setHeader("Cache-Control", "no-cache");
+        response.setHeader("X-Accel-Buffering", "no");
+        return streamService.subscribe(messages(null));
+    }
+
     @GetMapping("/lounge/messages")
     public Map<String, Object> messages(@RequestParam(required = false) Long after) {
         List<Map<String, Object>> rows;
         long currentEpoch;
         synchronized (this) {
             load();
+            rollDay();
             rows = recent.stream().filter(m -> after == null || m.getId() > after).map(LoungeController::row).toList();
             currentEpoch = epoch;
         }
@@ -68,15 +83,21 @@ public class LoungeController {
     }
 
     @PostMapping("/lounge/messages")
-    public ResponseEntity<?> send(@RequestBody Map<String, Object> body, HttpServletRequest request) {
+    public synchronized ResponseEntity<?> send(@RequestBody Map<String, Object> body, HttpServletRequest request) {
         String visitorId = str(body.get("visitorId"), 40);
         String nickname = VisitorProfileService.nickname(body.get("nickname"));
         String text = text(body.get("text"));
+        String clientId = str(body.get("clientId"), 36);
         if (visitorId == null || nickname == null || text == null) {
             return ResponseEntity.badRequest().body(Map.of("error", "닉네임과 내용을 확인해 주세요."));
         }
         if (text.length() > TEXT_MAX) {
             return ResponseEntity.badRequest().body(Map.of("error", TEXT_MAX + "자까지 보낼 수 있습니다."));
+        }
+
+        if (clientId != null) {
+            var existing = messageRepository.findByVisitorIdAndClientId(visitorId, clientId);
+            if (existing.isPresent()) return ResponseEntity.ok(row(existing.get()));
         }
 
         Instant now = Instant.now();
@@ -89,14 +110,16 @@ public class LoungeController {
         LoungeMessage saved;
         synchronized (this) {
             load();
+            rollDay();
             LoungeMessage last = recent.peekLast();
             if (last != null && last.getVisitorId().equals(visitorId) && last.getText().equals(text)) {
                 return ResponseEntity.badRequest().body(Map.of("error", "같은 내용을 연달아 보낼 수 없습니다."));
             }
             saved = messageRepository.save(LoungeMessage.builder()
-                    .visitorId(visitorId).nickname(nickname).text(text).ipHash(ipHash).createdAt(now).build());
+                    .visitorId(visitorId).clientId(clientId).nickname(nickname).text(text).ipHash(ipHash).createdAt(now).build());
             recent.addLast(saved);
             while (recent.size() > RECENT) recent.removeFirst();
+            streamService.publish(messages(null));
         }
         return ResponseEntity.ok(row(saved));
     }
@@ -117,14 +140,24 @@ public class LoungeController {
         synchronized (this) {
             recent.removeIf(m -> m.getId().equals(id));
             epoch++;
+            streamService.publish(messages(null));
         }
         return Map.of("ok", true);
     }
 
-    // 오래된 대화는 매일 새벽에 치운다
-    @Scheduled(cron = "0 0 4 * * *", zone = "Asia/Seoul")
-    public void prune() {
-        messageRepository.deleteByCreatedAtBefore(Instant.now().minus(Duration.ofDays(KEEP_DAYS)));
+    // DB에는 보관하고, 한국시간 자정에 공개 목록만 비운다.
+    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
+    public synchronized void newDay() {
+        rollDay();
+        streamService.publish(messages(null));
+    }
+
+    private void rollDay() {
+        LocalDate today = LocalDate.now(CHAT_ZONE);
+        Instant cutoff = today.atStartOfDay(CHAT_ZONE).toInstant();
+        boolean changed = recent.removeIf(message -> message.getCreatedAt().isBefore(cutoff));
+        if (!today.equals(visibleDay) || changed) epoch++;
+        visibleDay = today;
     }
 
     // 서버가 뜬 뒤 첫 조회 때 한 번만 DB에서 최근 글을 가져온다. synchronized 안에서 부른다
@@ -156,6 +189,7 @@ public class LoungeController {
     private static Map<String, Object> row(LoungeMessage m) {
         Map<String, Object> row = new LinkedHashMap<>();
         row.put("id", m.getId());
+        if (m.getClientId() != null) row.put("clientId", m.getClientId());
         row.put("nickname", m.getNickname());
         row.put("text", m.getText());
         row.put("at", m.getCreatedAt().toString());

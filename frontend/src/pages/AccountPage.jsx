@@ -4,6 +4,7 @@ import { account, onAccountChange, signIn, signOut } from '../sync';
 import { loadAccountRecords, summarizeAccount } from '../accountRecords';
 import { CS_NOTES, migrateNotesCompletion } from '../data/csNotes';
 import QuestionExplanation from '../components/QuestionExplanation';
+import { buildAccountRetry } from '../accountRetry';
 import './AccountPage.css';
 
 const snapshot = () => account()?.token || '';
@@ -35,6 +36,7 @@ function AccountDashboard({ user }) {
     finally { setAuthBusy(false); }
   }
   const { rows, attempts, correct, wrong } = summarizeAccount(result.records);
+  const retryCount = buildAccountRetry(result.records).company.questions.length;
   const filtered = rows.filter(r => (!wrongOnly || r.last === 'w') && `${r.bank} ${r.title}`.toLowerCase().includes(query.trim().toLowerCase()));
   const noteRecords = migrateNotesCompletion(result.records['cs-notes-v1']?.completed);
   const completed = CS_NOTES.flatMap(s => s.items).filter(e => noteRecords[e.id]?.done);
@@ -55,7 +57,10 @@ function AccountDashboard({ user }) {
     <div className="account-metrics">
       {[[rows.length, '풀어본 문항'], [attempts, '총 풀이 횟수'], [attempts ? `${Math.round(correct / attempts * 100)}%` : '—', '누적 정답률'], [wrong, '최근 오답 문항'], [completed.length, '전공노트 완료']].map(([value, label]) => <div key={label}><strong>{loading ? '…' : value}</strong><span>{label}</span></div>)}
     </div>
-    <section className="account-history"><h2>풀었던 문제</h2><div className="account-filters"><input aria-label="풀이 기록 검색" placeholder="문제 또는 문제집 검색" value={query} onChange={e => { setQuery(e.target.value); setLimit(20); }} /><label><input type="checkbox" checked={wrongOnly} onChange={e => { setWrongOnly(e.target.checked); setLimit(20); }} /> 최근 오답만</label></div>
+    <section className="account-history"><h2>풀었던 문제</h2>
+      {!loading && !result.failed.length && retryCount > 0 && <p><Link className="exam-btn primary" to="/account/retry">오답 전체 다시 풀기 ({retryCount}문제)</Link></p>}
+      <p>기업·문제집 구분 없이 한 번이라도 틀린 문제를 모두 다시 풀 수 있습니다.</p>
+      <div className="account-filters"><input aria-label="풀이 기록 검색" placeholder="문제 또는 문제집 검색" value={query} onChange={e => { setQuery(e.target.value); setLimit(20); }} /><label><input type="checkbox" checked={wrongOnly} onChange={e => { setWrongOnly(e.target.checked); setLimit(20); }} /> 최근 오답만</label></div>
       {!loading && !filtered.length && <p>표시할 풀이 기록이 없습니다.</p>}
       {filtered.slice(0, limit).map(row => <details className="account-question" key={row.key}><summary><span className="account-result">{row.last === 'r' ? '정답' : '오답'}</span><span>{row.bank} · {row.title}</span></summary><div><p>총 {row.c + row.w}회 · 정답 {row.c}회 / 오답 {row.w}회{row.at > 0 && ` · 최근 풀이 ${new Date(row.at).toLocaleString('ko-KR')}`}</p>{row.question && <QuestionExplanation q={row.question} />}<Link to={row.path}>해당 문제집 열기 →</Link></div></details>)}
       {filtered.length > limit && <button className="exam-btn" onClick={() => setLimit(n => n + 20)}>20개 더 보기 ({Math.min(limit, filtered.length)}/{filtered.length})</button>}
