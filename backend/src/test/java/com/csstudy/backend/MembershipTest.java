@@ -66,7 +66,8 @@ class MembershipTest {
                 .andExpect(status().isForbidden());
         grants.saveAndFlush(new VisitorTierGrant("existing-anonymous",UserTier.GOLD));
         mvc.perform(get("/api/v1/membership").header("X-Visitor-Id","existing-anonymous"))
-                .andExpect(jsonPath("$.tier").value("GOLD"));
+                .andExpect(jsonPath("$.tier").value("GOLD"))
+                .andExpect(jsonPath("$.nickname").value(com.csstudy.backend.service.VisitorProfileService.anonymous("existing-anonymous")));
         mvc.perform(get("/api/v1/theory/notes/sqld-concepts.pdf").header("X-Visitor-Id","existing-anonymous"))
                 .andExpect(status().isOk()).andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PDF))
                 .andExpect(header().string("Cache-Control","no-store"));
@@ -82,6 +83,7 @@ class MembershipTest {
                 .andExpect(status().isOk()).andExpect(jsonPath("$.nickname").value("renamed-first"));
         mvc.perform(get("/api/v1/auth/me").header("Authorization",token))
                 .andExpect(jsonPath("$.id").value(user.getId())).andExpect(jsonPath("$.membership.tier").value("DIAMOND"))
+                .andExpect(jsonPath("$.membership.nickname").value("renamed-first"))
                 .andExpect(jsonPath("$.membership.solvedCount").value(200));
         mvc.perform(put("/api/v1/auth/nickname").header("Authorization",token).contentType(MediaType.APPLICATION_JSON)
                 .content("{\"nickname\":\"RENAME-SECOND\"}"))

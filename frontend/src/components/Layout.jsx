@@ -5,6 +5,7 @@ import { track } from '../track';
 import ChaosChat from './ChaosChat';
 import StudyAmbience from './StudyAmbience';
 import StudyCount from './StudyCount';
+import MemberMenu from './MemberMenu';
 
 // 카오스 고양이 챗봇은 잠시 숨겨 둔다. true로 바꾸면 다시 나온다
 const SHOW_CHAOS_CHAT = false;
@@ -50,7 +51,7 @@ export default function Layout() {
         <div className="container header-inner">
           <Link to="/" className="logo">
             <span className="logo-dot" />
-            전산학 전공필기 준비
+            <span className="logo-title">전산학 전공필기 준비</span>
           </Link>
           <div className="header-right">
             <nav className="nav-links">
@@ -89,7 +90,7 @@ export default function Layout() {
               )}
             </div>
             <StudyCount />
-            <Link to="/account" className={`account-nav-link${location.pathname === "/account" ? " active" : ""}`}>내 계정</Link>
+            <MemberMenu />
           </div>
         </div>
       </header>

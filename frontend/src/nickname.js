@@ -19,6 +19,14 @@ export function savedNickname() {
 
 export function saveNickname(name) {
   try { localStorage.setItem(KEY, name); } catch { /* storage unavailable */ }
+  window.dispatchEvent(new Event('nickname:change'));
+}
+
+export function onNicknameChange(listener) {
+  window.addEventListener('nickname:change', listener);
+  const changed = event => { if (event.key === KEY || event.key === null) listener(); };
+  window.addEventListener('storage', changed);
+  return () => { window.removeEventListener('nickname:change', listener); window.removeEventListener('storage', changed); };
 }
 
 // 채팅과 순위에 쓸 이름. 정한 적이 없으면 하나 지어서 기억해 둔다

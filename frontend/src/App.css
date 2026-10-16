@@ -421,6 +421,7 @@
 
 /* ===== 첫 화면 오른쪽 위의 문제 많이 푼 사람 순위 ===== */
 .solve-rank {
+  position: relative;
   flex: none;
   width: 330px;
   display: flex;
@@ -454,7 +455,7 @@
 .solve-rank-total small { display: block; margin-top: 4px; font-size: .66rem; color: var(--text-secondary); }
 .solve-rank-expanded { max-height: min(60dvh, 560px); overflow-y: auto; }
 
-.solve-rank-head span {
+.solve-rank-head > span {
   flex: none;
   font-size: 0.72rem;
   font-weight: 600;
@@ -4284,3 +4285,37 @@ a.goal-exam:hover { border-color: var(--accent-blue); }
 .lounge-participants button:disabled { opacity: .5; cursor: default; }
 .lounge-participants a { display: inline-block; margin-top: 8px; color: var(--accent-blue); }
 .note-dl { background: transparent; border-top: 0; border-right: 0; border-bottom: 0; cursor: pointer; font-family: inherit; }
+
+/* Keep tier badges visible while long nicknames truncate. */
+.member-menu { display: inline-flex; align-items: center; gap: 6px; max-width: 220px; min-width: 0; flex-shrink: 0; }
+.member-menu .tier-badge { margin-left: 0; }
+.member-menu-name { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.member-tier-status { color: var(--text-secondary); font-size: .7rem; }
+#settings { scroll-margin-top: 90px; }
+#settings form { margin-top: 12px; }
+.solve-rank-title { display: flex; align-items: center; gap: 8px; }
+.solve-rank-name { display: flex; align-items: center; overflow: visible; }
+.solve-rank-nickname { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.solve-rank-name .tier-badge, .solve-rank-name em { flex-shrink: 0; }
+.tier-guide { position: static; flex-shrink: 0; }
+.tier-guide-toggle { display: grid; place-items: center; width: 25px; height: 25px; padding: 0; border: 1px solid var(--border-color); border-radius: 50%; background: var(--bg-secondary); color: var(--accent-blue); font: inherit; cursor: pointer; }
+.tier-guide-toggle:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 3px; }
+.tier-guide-panel { position: absolute; z-index: 90; top: 54px; left: auto; right: 10px; width: min(310px, calc(100vw - 48px)); max-height: 65dvh; overflow-y: auto; padding: 16px; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-primary); color: var(--text-primary); box-shadow: var(--card-shadow-hover); font-size: .8rem; line-height: 1.65; }
+.tier-guide-panel dl { margin: 12px 0; }
+.tier-guide-panel dl > div { display: grid; grid-template-columns: 70px 1fr; gap: 10px; margin: 8px 0; align-items: start; }
+.tier-guide-panel .tier-badge { margin-left: 0; }
+.tier-guide-panel dd { margin: 0; }
+.tier-guide-panel p { margin: 8px 0; color: var(--text-secondary); font-weight: 400; }
+@media (max-width: 640px) {
+  .member-menu { max-width: 165px; gap: 4px; padding: 6px; }
+  .member-menu-name { max-width: 75px; }
+  .member-menu .tier-badge { padding: 2px 5px; }
+}
+@media (max-width: 640px) {
+  .member-menu { position: absolute; top: 8px; right: 16px; max-width: 150px; }
+  .logo { min-width: 0; max-width: calc(100% - 155px); min-height: 30px; }
+  .logo-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .header-right { width: 100%; }
+  .header-right .nav-links { flex: 1; }
+  .header-right .study-count { position: static; }
+}
