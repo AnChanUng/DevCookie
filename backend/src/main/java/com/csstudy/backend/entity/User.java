@@ -25,6 +25,10 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "base_tier", length = 16)
+    private UserTier baseTier;
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;

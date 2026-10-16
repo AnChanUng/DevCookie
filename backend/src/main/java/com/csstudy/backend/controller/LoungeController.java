@@ -6,6 +6,7 @@ import com.csstudy.backend.service.AdminAuth;
 import com.csstudy.backend.service.PresenceService;
 import com.csstudy.backend.service.VisitorProfileService;
 import com.csstudy.backend.service.LoungeStreamService;
+import com.csstudy.backend.service.AuthService;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,6 +48,7 @@ public class LoungeController {
     private final PresenceService presenceService;
     private final AdminAuth adminAuth;
     private final LoungeStreamService streamService;
+    private final AuthService authService;
 
     private final Deque<LoungeMessage> recent = new ArrayDeque<>();
     private boolean loaded;
@@ -79,13 +81,37 @@ public class LoungeController {
         out.put("messages", rows);
         out.put("epoch", currentEpoch);
         out.put("online", presenceService.count());
+        out.put("participants", presenceService.chatMembers());
         return out;
+    }
+
+    @PostMapping("/lounge/presence")
+    public synchronized ResponseEntity<?> joinChat(@RequestBody Map<String, Object> body, HttpServletRequest request) {
+        String id = str(body.get("visitorId"), 40);
+        if (id == null) return ResponseEntity.badRequest().build();
+        String name = authService.currentUser(request).map(com.csstudy.backend.entity.User::getNickname)
+                .orElseGet(() -> VisitorProfileService.nickname(body.get("nickname")));
+        if (name == null) name = VisitorProfileService.anonymous(id);
+        profileService.remember(id,name,authService.currentUser(request).map(com.csstudy.backend.entity.User::getId).orElse(null));
+        String self = presenceService.joinChat(id, name);
+        if (self == null) return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+        streamService.publish(messages(null));
+        return ResponseEntity.ok(Map.of("self", self, "participants", presenceService.chatMembers()));
+    }
+
+    @DeleteMapping("/lounge/presence")
+    public synchronized Map<String, Object> leaveChat(@RequestBody Map<String, Object> body) {
+        presenceService.leaveChat(str(body.get("visitorId"), 40));
+        streamService.publish(messages(null));
+        return Map.of("ok", true);
     }
 
     @PostMapping("/lounge/messages")
     public synchronized ResponseEntity<?> send(@RequestBody Map<String, Object> body, HttpServletRequest request) {
         String visitorId = str(body.get("visitorId"), 40);
-        String nickname = VisitorProfileService.nickname(body.get("nickname"));
+        var user = authService.currentUser(request);
+        String nickname = user.map(com.csstudy.backend.entity.User::getNickname)
+                .orElseGet(() -> VisitorProfileService.nickname(body.get("nickname")));
         String text = text(body.get("text"));
         String clientId = str(body.get("clientId"), 36);
         if (visitorId == null || nickname == null || text == null) {
@@ -106,7 +132,7 @@ public class LoungeController {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(Map.of("error", "조금 천천히 보내 주세요."));
         }
 
-        profileService.remember(visitorId, nickname);
+        profileService.remember(visitorId, nickname,user.map(com.csstudy.backend.entity.User::getId).orElse(null));
         LoungeMessage saved;
         synchronized (this) {
             load();

@@ -1,4 +1,5 @@
 import api from './api';
+import { visitorId } from './track';
 
 // 기기 간 동기화 계정(닉네임 + 비밀번호). 로그인하지 않아도 사이트는 그대로 쓸 수 있고,
 // 로그인하면 풀이 기록을 서버에 함께 저장해 다른 기기에서 이어서 본다
@@ -38,8 +39,16 @@ const auth = () => ({ headers: { Authorization: `Bearer ${account()?.token}` }, 
 
 // mode: 'login' | 'register'
 export async function signIn(mode, nickname, password) {
-  const { data } = await api.post(`/auth/${mode}`, { nickname, password }, { timeout: 90000 });
+  const { data } = await api.post(`/auth/${mode}`, { nickname, password }, { timeout: 90000, headers: { 'X-Visitor-Id': visitorId() } });
   setAccount({ nickname: data.nickname, token: data.token });
+}
+
+export async function changeNickname(nickname) {
+  const current = account();
+  if (!current) throw new Error('로그인이 필요합니다.');
+  const { data } = await api.put('/auth/nickname', { nickname }, { ...auth(), headers: { ...auth().headers, 'X-Visitor-Id': visitorId() } });
+  if (account()?.token === current.token) setAccount({ ...current, nickname: data.nickname });
+  return data.nickname;
 }
 
 export async function signOut() {

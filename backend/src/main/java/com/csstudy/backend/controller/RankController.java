@@ -1,6 +1,9 @@
 package com.csstudy.backend.controller;
 
 import com.csstudy.backend.entity.User;
+import com.csstudy.backend.entity.UserTier;
+import com.csstudy.backend.service.MembershipService;
+import com.csstudy.backend.repository.VisitorTierGrantRepository;
 import com.csstudy.backend.entity.VisitorSolved;
 import com.csstudy.backend.repository.UsageEventRepository;
 import com.csstudy.backend.repository.UserRepository;
@@ -29,7 +32,7 @@ public class RankController {
     private static final int MAX_SOLVED = 3000;
 
     // account: 동기화 계정으로 묶인 줄이면 그 계정의 닉네임, 아니면 null
-    private record Solver(String visitorId, long count, String account) {}
+    private record Solver(String visitorId, long count, String account, UserTier baseTier) {}
 
     private record Board(List<Solver> ranked, Map<String, Integer> rankOf, Instant at) {}
 
@@ -38,8 +41,12 @@ public class RankController {
     private final VisitorProfileService profileService;
     private final UserRepository userRepository;
     private final AuthService authService;
+    private final MembershipService membershipService;
+    private final VisitorTierGrantRepository grants;
 
     private volatile Board cached;
+    @org.springframework.transaction.event.TransactionalEventListener(fallbackExecution = true)
+    public void profileChanged(com.csstudy.backend.service.NicknameService.Changed event) { cached=null; }
 
     // 방문자 ID를 헤더로 주면 본인 순위도 함께 돌려준다
     @GetMapping("/rank/solved")
@@ -111,13 +118,16 @@ public class RankController {
 
     // 순위에 나올 닉네임을 정한다. 채팅에서 쓰는 이름과 같은 것이다
     @PutMapping("/profile")
-    public ResponseEntity<?> profile(@RequestBody Map<String, Object> body) {
+    public ResponseEntity<?> profile(@RequestBody Map<String, Object> body,HttpServletRequest request) {
         String visitorId = body.get("visitorId") instanceof String s && !s.isBlank() && s.length() <= 40 ? s.trim() : null;
         String nickname = VisitorProfileService.nickname(body.get("nickname"));
         if (visitorId == null || nickname == null) {
             return ResponseEntity.badRequest().body(Map.of("error", "닉네임을 확인해 주세요."));
         }
-        profileService.remember(visitorId, nickname);
+        var user=authService.currentUser(request);
+        if(user.isPresent() && !user.get().getNickname().equals(nickname))
+            return ResponseEntity.badRequest().body(Map.of("error","회원 닉네임은 내 계정에서 변경해 주세요."));
+        profileService.remember(visitorId, nickname,user.map(User::getId).orElse(null));
         return ResponseEntity.ok(Map.of("nickname", nickname));
     }
 
@@ -127,6 +137,9 @@ public class RankController {
         row.put("rank", rank);
         row.put("nickname", s.account() != null ? s.account() : nickname != null ? nickname : VisitorProfileService.anonymous(s.visitorId()));
         row.put("count", s.count());
+        UserTier tier = UserTier.calculate(s.baseTier(), s.count());
+        row.put("tier", tier);
+        row.put("tierName", tier.label());
         return row;
     }
 
@@ -147,22 +160,26 @@ public class RankController {
             counts.put(v.getVisitorId(), (long) v.getCount());
             if (v.getUserId() != null) devices.computeIfAbsent(v.getUserId(), k -> new ArrayList<>()).add(v.getVisitorId());
         });
-        Map<Long, String> accounts = new HashMap<>();
-        userRepository.findAllById(devices.keySet()).forEach(u -> accounts.put(u.getId(), u.getNickname()));
+        Map<Long, User> accounts = new HashMap<>();
+        userRepository.findAllById(devices.keySet()).forEach(u -> accounts.put(u.getId(), u));
+        Map<Long, Long> saved = membershipService.savedCounts();
+        Map<String, UserTier> visitorTiers = new HashMap<>();
+        grants.findAll().forEach(g -> visitorTiers.put(g.getVisitorId(), g.getTier()));
 
         List<Solver> ranked = new ArrayList<>();
         Map<String, Solver> solverOf = new HashMap<>();
         devices.forEach((userId, ids) -> {
             if (!accounts.containsKey(userId)) return;   // 지워진 계정의 기기는 따로 센다
             ids.sort(Comparator.naturalOrder());
-            long best = ids.stream().mapToLong(counts::get).max().orElse(0);
-            Solver s = new Solver(ids.get(0), best, accounts.get(userId));
+            long best = Math.max(saved.getOrDefault(userId, 0L), ids.stream().mapToLong(counts::get).max().orElse(0));
+            User user = accounts.get(userId);
+            Solver s = new Solver(ids.get(0), best, user.getNickname(), MembershipService.baseTier(user));
             ids.forEach(id -> { solverOf.put(id, s); counts.remove(id); });
             if (best > 0) ranked.add(s);
         });
         counts.forEach((visitorId, count) -> {
             if (count <= 0) return;
-            Solver s = new Solver(visitorId, count, null);
+            Solver s = new Solver(visitorId, count, null, visitorTiers.getOrDefault(visitorId, UserTier.BRONZE));
             solverOf.put(visitorId, s);
             ranked.add(s);
         });

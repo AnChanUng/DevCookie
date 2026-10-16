@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import api from '../api';
+import { membershipHeaders } from '../membership';
 
-// 전공필기/ 폴더의 이론노트 PDF. public/notes/ 에 URL에 안전한 이름으로 복사해 둔다
+// PDF contents are served only after the backend verifies GOLD access.
 const NOTES = [
   { file: 'ipe-silgi-theory.pdf', title: '정보처리기사 실기', desc: '실기 이론편 요약노트 · 서술형 대비'},
   { file: 'sqld-concepts.pdf', title: 'SQLD', desc: '2024 개념 정리 노트 · 데이터 모델링 · SQL 기본 및 활용 · 22쪽'},
@@ -11,6 +13,31 @@ const NOTES = [
 
 export default function MajorPage() {
   const [open, setOpen] = useState(null);
+  const [pdf, setPdf] = useState({ file: null, url: null, error: false });
+  const [downloadError, setDownloadError] = useState('');
+  const current = pdf.file === open ? pdf : { url: null, error: false };
+  useEffect(() => {
+    if (!open) return undefined;
+    const controller = new AbortController();
+    let url;
+    api.get(`/theory/notes/${open}`, { headers: membershipHeaders(), responseType: 'blob', signal: controller.signal, timeout: 90000 })
+      .then(({ data }) => {
+        if (controller.signal.aborted) return;
+        url = URL.createObjectURL(data);
+        setPdf({ file: open, url, error: false });
+      }).catch(() => { if (!controller.signal.aborted) setPdf({ file: open, url: null, error: true }); });
+    return () => { controller.abort(); if (url) URL.revokeObjectURL(url); };
+  }, [open]);
+  const download = async n => {
+    setDownloadError('');
+    try {
+      const { data } = await api.get(`/theory/notes/${n.file}`, { headers: membershipHeaders(), responseType: 'blob', timeout: 90000 });
+      const url = URL.createObjectURL(data), link = document.createElement('a');
+      link.href = url; link.download = `${n.title} 요약노트.pdf`;
+      document.body.appendChild(link); link.click(); link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch { setDownloadError('자료를 받지 못했습니다. 등급과 서버 연결을 확인해 주세요.'); }
+  };
 
   const note = NOTES.find(n => n.file === open);
 
@@ -39,12 +66,13 @@ export default function MajorPage() {
               <span className="note-tag">{open === n.file ? '닫기' : '보기'}</span>
             </button>
             {/* download 속성: 뷰어로 열지 않고 제목 그대로 저장한다 */}
-            <a className="note-dl" href={`/notes/${n.file}`} download={`${n.title} 요약노트.pdf`}>
+            <button type="button" className="note-dl" onClick={() => download(n)}>
               ⬇ 저장
-            </a>
+            </button>
           </div>
         ))}
       </div>
+      {downloadError && <p role="alert">{downloadError}</p>}
 
       <div className="section-title">문제로 확인하기</div>
       <div className="exam-sections">
@@ -60,9 +88,10 @@ export default function MajorPage() {
           <div className="note-viewer-bar">
             <strong>{note.title}</strong>
             <span className="spacer" />
-            <a className="exam-btn" href={`/notes/${note.file}`} download={`${note.title} 요약노트.pdf`}>⬇ 다운로드</a>
+            <button className="exam-btn" onClick={() => download(note)}>⬇ 다운로드</button>
           </div>
-          <iframe title={note.title} src={`/notes/${note.file}#navpanes=0&view=FitH`} className="note-frame" />
+          {current.url ? <iframe title={note.title} src={`${current.url}#navpanes=0&view=FitH`} className="note-frame" />
+            : <p role={current.error ? 'alert' : 'status'}>{current.error ? '자료를 불러오지 못했습니다. 등급과 서버 연결을 확인해 주세요.' : '자료를 불러오는 중…'}</p>}
           <p className="note-hint">화면에서 바로 읽거나 다운로드해 보관할 수 있습니다. 일부 모바일 브라우저에서는 PDF가 표시되지 않을 수 있습니다.</p>
         </div>
       )}

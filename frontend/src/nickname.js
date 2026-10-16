@@ -1,7 +1,7 @@
 const KEY = 'lounge:nickname';
 // 오락실 순위판에 쓰던 이름이 있으면 그대로 이어 쓴다
 const ARCADE_KEY = 'arcade:nickname';
-export const NICKNAME_MAX = 10;
+export const NICKNAME_MAX = 20;
 
 const ADJECTIVES = ['졸린', '배고픈', '열공하는', '합격할', '씩씩한', '차분한', '든든한', '느긋한'];
 const ANIMALS = ['수달', '고양이', '판다', '펭귄', '다람쥐', '올빼미', '거북이', '여우'];

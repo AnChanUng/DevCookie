@@ -12,6 +12,10 @@ import java.util.Optional;
 public interface ExamProgressRepository extends JpaRepository<ExamProgress, Long> {
 
     Optional<ExamProgress> findByUserIdAndCompany(Long userId, String company);
+    List<ExamProgress> findByUserId(Long userId);
+
+    @Query("select p.user.id, p.data from ExamProgress p")
+    List<Object[]> dataByUser();
 
     // [사용자 ID, 저장한 문제은행 수, 마지막 저장 시각]
     @Query("select p.user.id, count(p), max(p.updatedAt) from ExamProgress p group by p.user.id")

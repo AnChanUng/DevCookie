@@ -28,9 +28,11 @@ const originalTimeout=setTimeout;
 let midnight;
 try {
  const {default:api}=await server.ssrLoadModule('/src/api.js');
- let deferred;
+ let deferred;let duelRequest;
  const posts=[];
  api.defaults.adapter=async config=>{
+  if(config.url==='/duels'){duelRequest=JSON.parse(config.data);return {data:{code:'ABC234'},status:200,statusText:'OK',headers:{},config};}
+  if(config.url==='/lounge/presence') return {data:{self:'self',participants:[{id:'self',nickname:'나'},{id:'other',nickname:'상대'}]},status:200,statusText:'OK',headers:{},config};
   if(config.method==='post') {posts.push(JSON.parse(config.data));return new Promise((resolve,reject)=>{deferred={resolve:data=>resolve({data,status:200,statusText:'OK',headers:{},config}),reject};});}
   return {data:{messages:[],epoch:1,online:2},status:200,statusText:'OK',headers:{},config};
  };
@@ -69,6 +71,16 @@ try {
  clearTimeout(midnight.id);now+=2000;
  await act(()=>midnight.fn());
  assert.equal(view.root.findAllByProps({className:'lounge-bubble'}).length,0,'yesterday disappears at midnight without waiting for server');
+ const beforeChallenge=posts.length;
+ await act(async()=>{
+  view.root.findAllByType('button').find(b=>text(b)==='대결 신청').props.onClick();
+  for(let i=0;i<400&&posts.length===beforeChallenge;i++)await new Promise(resolve=>originalTimeout(resolve,5));
+ });
+ assert.ok(duelRequest,text(view.toJSON()).slice(-1600));
+ assert.equal(duelRequest.questionIds.length,10);assert.equal(new Set(duelRequest.questionIds).size,10);assert.equal(duelRequest.open,false);
+ assert.ok(posts.at(-1).text.includes('상대님'));assert.ok(posts.at(-1).text.includes('/duel/ABC234'));
+ assert.ok(text(view.toJSON()).includes('내 대결 방 입장'));
+ await act(()=>deferred.resolve({...confirmed,id:3,clientId:posts.at(-1).clientId,text:posts.at(-1).text,at:new Date().toISOString()}));
  await act(()=>stream.onerror());
  await act(()=>view.unmount());view=null;assert.ok(stream.closed);
  assert.deepEqual(errors,[]);

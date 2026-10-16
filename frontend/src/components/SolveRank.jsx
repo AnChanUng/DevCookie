@@ -1,15 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
 import { visitorId } from '../track';
 import { NICKNAME_MAX, cleanNickname, saveNickname, savedNickname } from '../nickname';
 import { BANKS } from '../data/examQuestions';
 import { syncAllProgress } from '../hooks/useExamProgress';
-import { account } from '../sync';
+import { account, onAccountChange } from '../sync';
+import TierBadge from './TierBadge';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
 const MAX_RETRIES = 10;
 const RETRY_DELAY_MS = 5000;
+const identitySnapshot = () => `${account()?.token || ''}:${account()?.nickname || ''}`;
 
 // 이 브라우저에 남은 풀이 기록에서 한 번이라도 푼 문제를 센다. 같은 문제를 여러 번 풀어도 한 문제다
 function solvedCount() {
@@ -45,6 +47,7 @@ function pullOtherDevices() {
 
 // 문제를 많이 푼 사람 순위. 지금까지 푼 문제 수를 서버에 알리고 순위를 받아 온다
 export default function SolveRank() {
+  const identity = useSyncExternalStore(onAccountChange, identitySnapshot, () => '');
   const [rank, setRank] = useState(null);
   const [expanded, setExpanded] = useState(false);
   const [naming, setNaming] = useState(false);
@@ -79,7 +82,7 @@ export default function SolveRank() {
     // 다른 기기 기록을 받아 푼 문제 수가 달라졌으면 순위를 다시 받는다
     pullOtherDevices()?.then(() => { if (!stale && solvedCount() !== count) setTick(t => t + 1); }).catch(() => {});
     return () => { stale = true; clearTimeout(timer); };
-  }, [tick]);
+  }, [tick, identity]);
 
   // 여러 번 다시 받아 봐도 순위를 주지 못하면 자리만 차지하지 않게 비워 둔다
   if (failed && !rank) return null;
@@ -116,7 +119,7 @@ export default function SolveRank() {
           {rows.map(r => (
             <li key={r.rank} className={r.me ? 'me' : ''}>
               <span className="solve-rank-no">{MEDALS[r.rank - 1] || r.rank}</span>
-              <span className="solve-rank-name">{r.nickname}{r.me && <em>나</em>}</span>
+              <span className="solve-rank-name">{r.nickname}<TierBadge tier={r.tier} />{r.me && <em>나</em>}</span>
               <span className="solve-rank-count">{r.count.toLocaleString()}문제</span>
             </li>
           ))}

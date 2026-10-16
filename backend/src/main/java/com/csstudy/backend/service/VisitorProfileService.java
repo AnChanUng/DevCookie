@@ -15,12 +15,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class VisitorProfileService {
 
-    public static final int NICKNAME_MAX = 10;
+    public static final int NICKNAME_MAX = 20;
 
     private static final String[] ADJECTIVES = {"졸린", "배고픈", "열공하는", "합격할", "씩씩한", "차분한", "든든한", "느긋한"};
     private static final String[] ANIMALS = {"수달", "고양이", "판다", "펭귄", "다람쥐", "올빼미", "거북이", "여우"};
 
     private final VisitorProfileRepository profileRepository;
+    private final NicknameService nicknames;
 
     // 닉네임을 정하지 않은 방문자에게 붙이는 이름. 같은 방문자는 늘 같은 이름이 나온다
     public static String anonymous(String visitorId) {
@@ -37,9 +38,14 @@ public class VisitorProfileService {
     }
 
     // 방문자의 닉네임을 기억해 둔다. 이미 같은 이름이면 아무것도 하지 않는다
-    public void remember(String visitorId, String nickname) {
-        VisitorProfile profile = profileRepository.findByVisitorId(visitorId)
+    @org.springframework.transaction.annotation.Transactional
+    public void remember(String visitorId, String nickname) { remember(visitorId,nickname,null); }
+
+    @org.springframework.transaction.annotation.Transactional
+    public void remember(String visitorId, String nickname, Long userId) {
+        VisitorProfile profile = profileRepository.findForNicknameUpdate(visitorId)
                 .orElseGet(() -> VisitorProfile.builder().visitorId(visitorId).build());
+        nicknames.visitor(visitorId,nickname,userId);
         if (nickname.equals(profile.getNickname())) return;
         profile.setNickname(nickname);
         profile.setUpdatedAt(Instant.now());

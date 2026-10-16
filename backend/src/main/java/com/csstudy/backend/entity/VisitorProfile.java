@@ -23,7 +23,7 @@ public class VisitorProfile {
     @Column(name = "visitor_id", nullable = false, length = 40)
     private String visitorId;
 
-    @Column(nullable = false, length = 12)
+    @Column(nullable = false, length = 20)
     private String nickname;
 
     @Column(name = "updated_at", nullable = false)
