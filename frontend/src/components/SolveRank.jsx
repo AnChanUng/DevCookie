@@ -110,7 +110,7 @@ export default function SolveRank() {
         <div className="solve-rank-title"><h2><button className="solve-rank-toggle" type="button" aria-expanded={expanded} aria-controls="solve-rank-results" onClick={() => setExpanded(value => !value)}>🏆 {expanded ? '전체 순위' : '순위'} <small>{expanded ? '접기 ↑' : '전체 보기 ↓'}</small></button></h2><TierGuide /></div>
         <span>지금까지 푼 문제 수</span>
       </div>
-      {rank && Number.isFinite(rank.totalSolved) && <p className="solve-rank-total">전체 총 <strong>{rank.totalSolved.toLocaleString()}</strong>문제 풀이 완료<small>{rank.totalSolvers}명 · 같은 사람의 반복 풀이는 1문제로 집계</small></p>}
+      {rank && Number.isFinite(rank.totalSolved) && <p className="solve-rank-total">전체 총 <strong>{rank.totalSolved.toLocaleString()}</strong>문제 풀이 완료</p>}
 
       <div id="solve-rank-results" className={expanded ? 'solve-rank-expanded' : undefined}>
       {!rank && <p className="solve-rank-empty">순위를 불러오는 중...</p>}
