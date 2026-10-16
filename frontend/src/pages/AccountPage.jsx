@@ -92,7 +92,7 @@ function AccountDashboard({ user }) {
         누적 {tierStatus.membership.solvedCount.toLocaleString()}문제
         {tierStatus.membership.nextTier ? ` · ${TIER_NAMES[tierStatus.membership.nextTier]}까지 ${tierStatus.membership.remaining.toLocaleString()}문제` : ' · 최고 등급입니다!'}
       </p>}
-      <p>브론즈: 기본 방문자 · 실버: 50문제 · 골드: 기존 회원·기존 순위 방문자 · 다이아: 200문제 · 루비: 1,000문제</p>
+      <p>브론즈: 기본 방문자 · 실버: 50문제 · 골드: SSAFY 16기 교육생 · 다이아: 200문제 · 루비: 1,000문제</p>
       <p>같은 문제의 반복 풀이는 1문제로 집계합니다. 필기이론은 골드 이상 이용할 수 있습니다.</p>
     </section>
     <div className="account-record-heading"><p>{user ? '계정에 저장된 기록' : '현재 브라우저의 비로그인 풀이 기록'} · 문제집별 문항 기준</p><button className="exam-btn sm" disabled={loading} onClick={() => { setLoading(true); setRevision(v => v + 1); }}>새로고침</button></div>
