@@ -426,8 +426,8 @@
   width: 330px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 18px 20px;
+  gap: 6px;
+  padding: 12px 14px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
@@ -436,9 +436,9 @@
 
 .solve-rank-head {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
 }
 
 .solve-rank-head h2 {
@@ -450,7 +450,7 @@
 .solve-rank-toggle { padding: 0; border: 0; background: transparent; font: inherit; color: inherit; cursor: pointer; text-align: left; }
 .solve-rank-toggle small { font-size: .65rem; font-weight: 500; color: var(--accent-blue); white-space: nowrap; }
 .solve-rank-toggle:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 4px; }
-.solve-rank-total { margin: 12px 0; font-size: .85rem; color: var(--text-primary); }
+.solve-rank-total { margin: 0; flex-shrink: 0; white-space: nowrap; font-size: .75rem; color: var(--text-secondary); }
 .solve-rank-total strong { color: var(--accent-blue); }
 .solve-rank-total small { display: block; margin-top: 4px; font-size: .66rem; color: var(--text-secondary); }
 .solve-rank-expanded { max-height: min(60dvh, 560px); overflow-y: auto; }
@@ -465,15 +465,15 @@
 .solve-rank-list {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 5px;
+  gap: 3px;
   list-style: none;
 }
 
 .solve-rank-list li {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 10px;
+  gap: 7px;
+  padding: 4px 8px;
   border-radius: var(--radius-sm);
   background: var(--bg-secondary);
   font-size: 0.84rem;
@@ -535,7 +535,7 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   font-size: 0.76rem;
   color: var(--text-secondary);
 }
@@ -3177,7 +3177,7 @@ a.goal-exam:hover { border-color: var(--accent-blue); }
 
   .solve-rank {
     width: auto;
-    padding: 16px;
+    padding: 12px 14px;
   }
 
   /* 메뉴가 늘어난 헤더: 로고 아래 줄에서 가로로 넘겨 본다 */
@@ -4297,6 +4297,7 @@ a.goal-exam:hover { border-color: var(--accent-blue); }
 .solve-rank-name { display: flex; align-items: center; overflow: visible; }
 .solve-rank-nickname { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .solve-rank-name .tier-badge, .solve-rank-name em { flex-shrink: 0; }
+.solve-rank-name .tier-badge { padding: 1px 6px; }
 .tier-guide { position: static; flex-shrink: 0; }
 .tier-guide-toggle { display: grid; place-items: center; width: 25px; height: 25px; padding: 0; border: 1px solid var(--border-color); border-radius: 50%; background: var(--bg-secondary); color: var(--accent-blue); font: inherit; cursor: pointer; }
 .tier-guide-toggle:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 3px; }
