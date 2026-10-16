@@ -7,6 +7,7 @@ import { NICKNAME_MAX, cleanNickname, myNickname, saveNickname, savedNickname } 
 const POLL_OPEN = 3000;
 const POLL_CLOSED = 30000;
 const TEXT_MAX = 200;
+const koreanDay = (at = Date.now()) => new Date(new Date(at).getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
 // 대결 초대 글에 든 /duel/방번호 는 누르면 바로 들어가는 참가 버튼으로 보여 준다
 function ChatText({ text }) {
@@ -34,6 +35,8 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
   const [text, setText] = useState('');
   const [error, setError] = useState('');
   const [sending, setSending] = useState(false);
+  const [pending, setPending] = useState([]);
+  const [streaming, setStreaming] = useState(false);
   const [nickname, setNickname] = useState(savedNickname);
   const [naming, setNaming] = useState(false);
   const [draftName, setDraftName] = useState('');
@@ -43,17 +46,26 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
   const listRef = useRef(null);
   const stick = useRef(true);
   const openRef = useRef(open);
+  const inFlight = useRef(false);
+  const polling = useRef(false);
+  const streamVersion = useRef(0);
+  const acknowledged = useRef(new Set());
   const me = (visitorId() || '').slice(0, 8);
 
   useEffect(() => { openRef.current = open; }, [open]);
 
   // 받은 글을 목록에 합친다. replace면 처음부터 다시 받은 것이다
-  const take = useCallback((rows, replace) => {
+  const take = useCallback((rows, replace, advance = true) => {
     const newest = rows.length ? rows[rows.length - 1].id : (replace ? 0 : lastId.current);
-    lastId.current = replace ? newest : Math.max(lastId.current, newest);
+    if (advance) lastId.current = replace ? newest : Math.max(lastId.current, newest);
+    const confirmed = new Set(rows.map(m => m.clientId).filter(Boolean));
+    for (const id of confirmed) acknowledged.current.add(id);
+    while (acknowledged.current.size > KEEP) acknowledged.current.delete(acknowledged.current.values().next().value);
+    setPending(prev => prev.filter(m => !confirmed.has(m.clientId)));
     setMessages(prev => {
       const have = new Set(replace ? [] : prev.map(m => m.id));
-      return [...(replace ? [] : prev), ...rows.filter(m => !have.has(m.id))].slice(-KEEP);
+      return [...(replace ? [] : prev), ...rows.filter(m => !have.has(m.id))]
+        .filter(m => koreanDay(m.at) === koreanDay()).sort((a, b) => a.id - b.id).slice(-KEEP);
     });
     if (openRef.current) {
       writeSeen(lastId.current);
@@ -67,34 +79,66 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
   }, [onUnread]);
 
   const poll = useCallback(async () => {
-    if (document.hidden) return;
+    if (document.hidden || polling.current) return;
+    polling.current = true;
+    const version = streamVersion.current;
     try {
       const first = epoch.current === null;
       let { data } = await api.get('/lounge/messages', { params: first ? {} : { after: lastId.current } });
       // 관리자가 글을 지웠으면 목록을 통째로 다시 받는다
       const reset = !first && data.epoch !== epoch.current;
       if (reset) ({ data } = await api.get('/lounge/messages'));
+      if (version !== streamVersion.current) return;
       epoch.current = data.epoch;
       take(data.messages, first || reset);
       onOnline(data.online);
       setReady(true);
     } catch {
       /* 서버가 잠들어 있거나 끊겼다. 다음 차례에 다시 물어본다 */
-    }
+    } finally { polling.current = false; }
   }, [take, onOnline]);
 
   useEffect(() => {
     const first = setTimeout(poll, 0);
-    const timer = setInterval(poll, open ? POLL_OPEN : POLL_CLOSED);
+    const timer = setInterval(poll, open && !streaming ? POLL_OPEN : POLL_CLOSED);
     document.addEventListener('visibilitychange', poll);
     return () => { clearTimeout(first); clearInterval(timer); document.removeEventListener('visibilitychange', poll); };
-  }, [open, poll]);
+  }, [open, poll, streaming]);
+
+  useEffect(() => {
+    if (!open || typeof EventSource === 'undefined') return undefined;
+    const source = new EventSource(`${api.defaults.baseURL}/lounge/stream`);
+    source.addEventListener('messages', event => {
+      try {
+        const data = JSON.parse(event.data);
+        streamVersion.current++;
+        epoch.current = data.epoch;
+        take(data.messages, true);
+        onOnline(data.online);
+        setReady(true);
+        setStreaming(true);
+      } catch { setStreaming(false); }
+    });
+    source.onerror = () => setStreaming(false); // EventSource reconnects; polling covers the gap.
+    return () => { source.close(); setStreaming(false); };
+  }, [open, take, onOnline]);
+
+  // Clear yesterday's messages at Korean midnight, even with a disconnected server.
+  useEffect(() => {
+    const nextMidnight = new Date(`${koreanDay()}T00:00:00+09:00`).getTime() + 86400000;
+    const timer = setTimeout(() => {
+      setMessages(prev => prev.filter(m => koreanDay(m.at) === koreanDay()));
+      setPending(prev => prev.filter(m => koreanDay(m.at) === koreanDay()));
+      poll();
+    }, Math.max(1, nextMidnight - Date.now()));
+    return () => clearTimeout(timer);
+  }, [messages, pending, poll]);
 
   // 맨 아래를 보고 있을 때만 새 글을 따라 내려간다
   useEffect(() => {
     const list = listRef.current;
     if (open && list && stick.current) list.scrollTop = list.scrollHeight;
-  }, [messages, open, ready]);
+  }, [messages, pending, open, ready]);
 
   const openNaming = () => { setDraftName(nickname); setNaming(true); };
 
@@ -109,25 +153,41 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
     api.put('/profile', { visitorId: visitorId(), nickname: name }).catch(() => {});
   };
 
-  const send = async (e) => {
-    e.preventDefault();
-    const body = text.trim();
-    const id = visitorId();
-    if (!body || sending || !id) return;
-    const name = nickname || myNickname();
-    setNickname(name);
+  const deliver = async message => {
+    if (inFlight.current) return;
+    inFlight.current = true;
     setSending(true);
     setError('');
+    setPending(prev => prev.map(m => m.clientId === message.clientId ? { ...m, status: 'sending' } : m));
     try {
-      const { data } = await api.post('/lounge/messages', { visitorId: id, nickname: name, text: body }, { timeout: 20000 });
+      const { data } = await api.post('/lounge/messages', {
+        visitorId: message.visitorId, nickname: message.nickname, text: message.text, clientId: message.clientId,
+      }, { timeout: 90000 });
       stick.current = true;
-      take([data], false);
-      setText('');
+      take([data], false, false);
     } catch (err) {
-      setError(err.response?.data?.error || '보내지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      if (!acknowledged.current.has(message.clientId)) {
+        setPending(prev => prev.map(m => m.clientId === message.clientId ? { ...m, status: 'failed' } : m));
+        setError(err.response?.data?.error || '보내지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      }
     } finally {
+      inFlight.current = false;
       setSending(false);
     }
+  };
+
+  const send = e => {
+    e.preventDefault();
+    const body = text.trim(), id = visitorId();
+    if (!body || inFlight.current || !id) return;
+    const name = nickname || myNickname();
+    const message = { clientId: crypto.randomUUID(), visitorId: id, visitor: me, nickname: name,
+      text: body, at: new Date().toISOString(), status: 'sending' };
+    setNickname(name);
+    stick.current = true;
+    setPending(prev => [...prev, message]);
+    setText('');
+    deliver(message);
   };
 
   if (!open) return null;
@@ -152,6 +212,11 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
             <span className="lounge-bubble"><ChatText text={m.text} /></span>
           </div>
         ))}
+        {pending.map(m => <div key={m.clientId} className="lounge-msg mine">
+          <span className="lounge-meta">나 · {m.status === 'failed' ? '전송 실패' : '전송 중…'}</span>
+          <span className="lounge-bubble"><ChatText text={m.text} /></span>
+          {m.status === 'failed' && <button type="button" disabled={sending} onClick={() => deliver(m)}>재시도</button>}
+        </div>)}
       </div>
 
       {naming ? (
@@ -172,7 +237,7 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
         <input value={text} onChange={e => setText(e.target.value)} maxLength={TEXT_MAX} placeholder="메시지를 입력하세요" aria-label="메시지" />
         <button type="submit" disabled={sending || !text.trim()}>보내기</button>
       </form>
-      <p className="lounge-rule">서로 존중하는 대화를 부탁드려요. 부적절한 글은 삭제될 수 있습니다.</p>
+      <p className="lounge-rule">한국시간 00시에 전날 대화가 화면에서 사라집니다. 서로 존중하는 대화를 부탁드려요.</p>
     </section>
   );
 }
