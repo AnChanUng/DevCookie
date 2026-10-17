@@ -1,6 +1,7 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:cs_study;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    # PostgreSQL mode omits the BLOB type Hibernate uses for Donation.data in H2.
+    url: jdbc:h2:mem:cs_study;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;INIT=CREATE DOMAIN IF NOT EXISTS BLOB AS BYTEA
     username: sa
     password:
     driver-class-name: org.h2.Driver
