@@ -8,6 +8,7 @@ import './exam.css';
 
 const PromotionExamPage = lazy(() => import('./pages/PromotionExamPage'));
 const BugHuntPage = lazy(() => import('./pages/BugHuntPage'));
+const TechnicalInterviewPage = lazy(() => import('./pages/TechnicalInterviewPage'));
 const CategoryPage = lazy(() => import('./pages/CategoryPage'));
 const QuestionPage = lazy(() => import('./pages/QuestionPage'));
 const AccountPage = lazy(() => import('./pages/AccountPage'));
@@ -44,6 +45,7 @@ function App() {
           <Route path="account/retry" element={<AccountRetryPage />} />
           <Route path="stats" element={<StatsPage />} />
           <Route path="interview" element={<InterviewPracticePage />} />
+          <Route path="technical-interview" element={<TechnicalInterviewPage />} />
           <Route path="notes" element={<CsNotesPage />} />
           <Route path="major" element={<GoldGate><MajorPage /></GoldGate>} />
           <Route path="major/:company" element={<GoldGate><ExamCompanyPage /></GoldGate>} />

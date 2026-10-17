@@ -25,7 +25,8 @@
     "check:promotion-bank": "node --import ./scripts/extensionless-loader.mjs scripts/export-promotion-bank.mjs --check",
     "check:promotion-announcements": "node --import ./scripts/extensionless-loader.mjs scripts/check-promotion-announcements.mjs",
     "check:today-cs": "node --import ./scripts/extensionless-loader.mjs scripts/check-today-cs.mjs",
-    "check:bug-hunt": "node --import ./scripts/extensionless-loader.mjs scripts/check-bug-hunt.mjs"
+    "check:bug-hunt": "node --import ./scripts/extensionless-loader.mjs scripts/check-bug-hunt.mjs",
+    "check:technical-interview": "node --import ./scripts/extensionless-loader.mjs scripts/check-technical-interview.mjs"
   },
   "dependencies": {
     "axios": "^1.14.0",

@@ -1,0 +1,68 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import React from 'react';
+import TestRenderer, { act } from 'react-test-renderer';
+import { MemoryRouter } from 'react-router-dom';
+import { createServer } from 'vite';
+
+const values = new Map();
+globalThis.localStorage = { getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, String(value)), removeItem: key => values.delete(key) };
+globalThis.window = new EventTarget();
+globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+const server = await createServer({ server: { middlewareMode: true, hmr: false }, appType: 'custom' });
+const errors = [], originalError = console.error;
+console.error = (...args) => { if (!String(args[0]).startsWith('react-test-renderer is deprecated')) errors.push(args.join(' ')); };
+const text = node => typeof node === 'string' ? node : (node?.children || []).map(text).join('');
+let view;
+const click = async label => { const button = view.root.findAllByType('button').find(node => text(node).endsWith(label)); assert.ok(button, label); assert.ok(!button.props.disabled); await act(() => button.props.onClick()); };
+try {
+  const { TECHNICAL_INTERVIEW: questions } = await server.ssrLoadModule('/src/data/technicalInterview.js');
+  assert.equal(questions.length, 152); assert.equal(new Set(questions.map(q => q.id)).size, 152);
+  assert.equal(questions.filter(q => q.source === 'autoever').length, 38);
+  assert.equal(questions.filter(q => q.source === 'aws').length, 114);
+  const sources = { autoever: readFileSync('../면접/오토에버1차.txt', 'utf8'), aws: execFileSync('pdftotext', ['-raw', '../면접/aws_sa_interview_questions_only.pdf', '-'], { encoding: 'utf8' }) };
+  const normalize = value => value.normalize('NFKC').replace(/\s/g, '');
+  for (const q of questions) {
+    assert.ok(normalize(sources[q.source]).includes(normalize(q.question)), `question matches uploaded source: ${q.id}`);
+    assert.ok(q.answer.length > 60 && !/TODO|작성 예정/.test(q.answer));
+    assert.ok(q.followUps.length && q.followUps.every(([question, answer]) => question && answer));
+  }
+  const { default: Page } = await server.ssrLoadModule('/src/pages/TechnicalInterviewPage.jsx');
+  const mount = async () => { await act(async () => { view = TestRenderer.create(React.createElement(MemoryRouter, null, React.createElement(Page))); }); };
+  const unmount = async () => { await act(() => view.unmount()); view = null; };
+  const current = () => view.root.findByProps({ 'aria-label': '선택한 면접 질문' });
+  await mount();
+  assert.equal(view.root.findAllByProps({ className: 'tech-answer' }).length, 0);
+  await act(() => view.root.findByType('select').props.onChange({ target: { value: '데이터베이스' } }));
+  const isolation = questions.find(q => q.id === 'aws-04-06');
+  await click(isolation.question); await click('예시 답변 보기');
+  assert.ok(text(current()).includes('PostgreSQL RR'));
+  await click('이 주제의 꼬리질문 연습 ↓');
+  assert.ok(text(current()).includes('쓰기 직후 Replica에서 값이 안 보이면?'));
+  await act(() => current().findByType('input').props.onChange());
+  assert.ok(JSON.parse(values.get('technical-interview:v1:guest')).includes(isolation.id));
+  await click('다음 질문 →');
+  assert.equal(view.root.findAllByProps({ className: 'tech-answer' }).length, 0, 'new question hides previous answer');
+  await act(() => view.root.findByProps({ className: 'tech-hide' }).findByType('input').props.onChange({ target: { checked: true } }));
+  assert.ok(!view.root.findByProps({ 'aria-label': '기술면접 질문 목록' }).findAllByType('button').some(button => text(button).includes(isolation.question)));
+  const track = view.root.findByProps({ 'aria-label': '면접 자료 선택' }).findAllByType('button')[0];
+  await act(() => track.props.onClick());
+  await click('예시 답변 보기');
+  assert.ok(text(current()).includes('본인의 실제 경험으로 바꿔 주세요'));
+  assert.ok(text(current()).includes('[현재 역할/전공]'));
+  await act(() => view.root.findByProps({ type: 'search' }).props.onChange({ target: { value: '존재하지않는검색결과12345' } }));
+  assert.equal(view.root.findAllByProps({ 'aria-label': '선택한 면접 질문' }).length, 0);
+  assert.ok(text(view.toJSON()).includes('조건에 맞는 질문이 없습니다'));
+  await unmount(); await mount();
+  assert.ok(JSON.parse(values.get('technical-interview:v1:guest')).includes(isolation.id));
+  await act(() => { localStorage.setItem('sync:account', JSON.stringify({ id: 91, nickname: '다른회원', token: 'fixture' })); window.dispatchEvent(new Event('sync:change')); });
+  assert.ok(text(view.toJSON()).includes('연습 0개 완료'), 'completion is separate for another account');
+  await act(() => { localStorage.removeItem('sync:account'); window.dispatchEvent(new Event('sync:change')); });
+  assert.ok(text(view.toJSON()).includes('연습 1개 완료'));
+  await unmount();
+  values.set('technical-interview:v1:guest', 'broken-json');
+  await mount(); assert.ok(text(view.toJSON()).includes('연습 0개 완료')); await unmount();
+  assert.deepEqual(errors, []);
+  console.log('Technical interview passed: all 152 source questions, complete answers, company/topic/search filters, answer hiding, follow-up practice, persisted completion, account isolation, corrupt storage. No live network.');
+} finally { if (view) await act(() => view.unmount()); await server.close(); console.error = originalError; }
