@@ -7,12 +7,12 @@ public enum UserTier {
     UserTier(String label) { this.label = label; }
     public String label() { return label; }
 
-    // Thresholds run from V to I. Each promotion within a tier needs more new questions.
+    // Absolute lifetime solved totals, from V to I; never reset when a base tier is granted.
     public long[] thresholds() {
         return switch (this) {
             case BRONZE -> new long[]{0, 5, 12, 25, 45};
             case SILVER -> new long[]{50, 60, 80, 120, 180};
-            case GOLD -> new long[]{0, 20, 50, 100, 170};
+            case GOLD -> new long[]{0, 30, 60, 100, 200};
             case DIAMOND -> new long[]{300, 350, 450, 650, 950};
             case RUBY -> new long[]{1000, 1100, 1300, 1700, 2300};
         };

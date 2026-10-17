@@ -4307,6 +4307,9 @@ a.goal-exam:hover { border-color: var(--accent-blue); }
 .tier-guide-panel dt { display: flex; align-items: center; gap: 6px; }
 .tier-guide-panel .tier-badge { margin-left: 0; }
 .tier-guide-panel dd { margin: 0; }
+.gold-thresholds { width: 100%; border-collapse: collapse; margin: 12px 0; text-align: left; }
+.gold-thresholds caption { text-align: left; font-weight: 600; }
+.gold-thresholds th, .gold-thresholds td { padding: 3px 8px; border-bottom: 1px solid var(--border-color); }
 .tier-guide-panel p { margin: 8px 0; color: var(--text-secondary); font-weight: 400; }
 @media (max-width: 640px) {
   .member-menu { max-width: 165px; gap: 4px; padding: 6px; }
