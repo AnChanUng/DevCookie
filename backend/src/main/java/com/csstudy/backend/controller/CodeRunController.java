@@ -25,6 +25,7 @@ public class CodeRunController {
     private static final int PER_MINUTE = 15;
 
     private final JavaRunner runner;
+    private final com.csstudy.backend.security.ClientAddress addresses;
     private final Map<String, Deque<Long>> recent = new ConcurrentHashMap<>();
 
     @PostMapping("/code/java")
@@ -43,7 +44,7 @@ public class CodeRunController {
         }
         if (total > MAX_CHARS) return ResponseEntity.badRequest().body(Map.of("error", "코드가 너무 깁니다."));
         if (!files.containsKey("Main.java")) return ResponseEntity.badRequest().body(Map.of("error", "Main.java가 필요합니다."));
-        if (!allow(clientIp(request))) {
+        if (!allow(addresses.resolve(request))) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(Map.of("error", "실행 요청이 너무 잦습니다. 1분 뒤에 다시 시도해 주세요."));
         }
         return ResponseEntity.ok(runner.run(files, "Main"));
@@ -61,10 +62,4 @@ public class CodeRunController {
         return true;
     }
 
-    // Render 같은 프록시 뒤에서는 실제 주소가 X-Forwarded-For의 첫 값으로 온다
-    private static String clientIp(HttpServletRequest request) {
-        String forwarded = request.getHeader("X-Forwarded-For");
-        if (forwarded != null && !forwarded.isBlank()) return forwarded.split(",")[0].trim();
-        return request.getRemoteAddr();
-    }
 }

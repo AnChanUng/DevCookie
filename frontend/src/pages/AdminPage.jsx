@@ -6,13 +6,13 @@ import { COMPANIES, EXAM_CATEGORIES, companyPath } from '../data/examQuestions';
 const KEY = 'admin-key';
 const RANGES = [7, 30, 90];
 const AUTO_SECONDS = 60;
-const TABS = [['overview', '개요'], ['solves', '풀이'], ['visitors', '방문자'], ['reports', '제보'], ['chat', '채팅'], ['accounts', '계정 · 채점'], ['system', '시스템']];
+const TABS = [['overview', '개요'], ['solves', '풀이'], ['visitors', '방문자'], ['security', '보안 · 크롤링'], ['reports', '제보'], ['chat', '채팅'], ['accounts', '계정 · 채점'], ['system', '시스템']];
 const REPORT_KINDS = { answer: '정답 오류', typo: '오타', explain: '해설 문제', etc: '기타' };
 const MODES = { exam: '모의고사', set: '회차별 모의고사', unit: '단원별 문제집', practice: '영역별 연습', wrong: '오답 다시 풀기', marked: '북마크 다시 풀기', cpp: 'C++ 문제집', recall: '응시 후기 복원 문제' };
 
 const PAGE_NAMES = {
   '/': '홈', '/exam': '기업별 기출문제', '/computer-general': '컴퓨터일반', '/topics': '주제별 통합', '/algo': '코테 풀이', '/duel': '대결', '/calc': '계산 문제 무한 연습', '/major': '필기이론',
-  '/major-exam': '필기이론 문제', '/stats': '통계', '/search': '문제 검색', '/ncs': 'NCS', '/interview': '면접 연습', '/ssafy': 'SSAFY',
+  '/major-exam': '필기이론 문제', '/stats': '통계', '/search': '문제 검색', '/ncs': 'NCS', '/interview': '면접 연습', '/technical-interview': '기술면접 준비', '/ssafy': 'SSAFY',
   ...Object.fromEntries(EXAM_CATEGORIES.map(c => [`/exam/category/${c.key}`, `기업별 기출 · ${c.name}`])),
   ...Object.fromEntries(COMPANIES.map(c => [companyPath(c), c.name])),
 };
@@ -89,7 +89,7 @@ export default function AdminPage() {
           setChat(null);
           setError('관리자 키가 올바르지 않습니다.');
         } else if (status === 503) {
-          setError('서버에 ADMIN_KEY 환경변수가 설정되지 않았습니다.');
+          setError('서버의 ADMIN_KEY 설정을 확인해 주세요. 관리자 키는 32자 이상의 무작위 값이어야 합니다.');
         } else {
           setError('서버에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.');
         }
@@ -177,6 +177,7 @@ export default function AdminPage() {
           {tab === 'overview' && <Overview data={data} sys={sys} />}
           {tab === 'solves' && <Solves data={data} />}
           {tab === 'visitors' && <Visitors data={data} />}
+          {tab === 'security' && <SecurityPanel adminKey={key} revision={tick} />}
           {tab === 'reports' && (reports
             ? <Reports reports={reports} adminKey={key} onChange={setReports} />
             : <p className="exam-note">제보 정보를 불러오지 못했습니다. 백엔드 배포가 끝난 뒤 새로고침해 주세요.</p>)}
@@ -189,6 +190,28 @@ export default function AdminPage() {
       )}
     </div>
   );
+}
+
+function SecurityPanel({ adminKey, revision }) {
+  const [events, setEvents] = useState(null);
+  const [error, setError] = useState(false);
+  useEffect(() => {
+    const controller = new AbortController();
+    api.get('/admin/security', { headers: { 'X-Admin-Key': adminKey }, signal: controller.signal, timeout: 90000 })
+      .then(({ data }) => { if (!controller.signal.aborted) { setEvents(data); setError(false); } })
+      .catch(() => { if (!controller.signal.aborted) setError(true); });
+    return () => controller.abort();
+  }, [adminKey, revision]);
+  const reasons = { DECLARED_AUTOMATION: '자동화 도구 표기 · 크롤링 가능성', ADMIN_DENIED: '관리자 접근 거부', PROBE: '민감 경로 탐색', RATE_AUTH: '로그인·가입 과다 요청', RATE_CONTENT: '질문 대량 조회', RATE_CODE: '코드 실행 과다 요청', RATE_CHAT: '챗봇 과다 요청', RATE_GENERAL: 'API 과다 요청' };
+  return <section aria-label="보안 및 크롤링 의심 기록">
+    <h2>보안 · 크롤링 의심 기록</h2>
+    <p className="exam-note">새 백엔드 적용 이후 API 요청 중 탐색·과다 요청·자동화 도구 표기를 기록합니다. 최근 7일, 최신 200건을 표시하며 동일 IP·사유는 분당 한 번 표본으로 남깁니다. IP는 사람의 신원이 아니며, User-Agent도 위조할 수 있습니다.</p>
+    <p className="exam-note">첫 HTML·정적 파일만 가져가는 요청은 Vercel의 프로젝트 Logs에서 경로·IP·User-Agent·요청 빈도를 함께 확인하세요. 과거 미수집 기록은 여기서 복원할 수 없습니다.</p>
+    {error ? <p role="alert">보안 기록을 불러오지 못했습니다. 새 백엔드 배포 후 새로고침해 주세요.</p> : !events ? <p role="status">보안 기록을 불러오는 중…</p> : !events.length ? <p>기록된 의심 요청이 없습니다. 크롤링이 전혀 없었다는 의미는 아닙니다.</p> : <div className="exam-table-wrap"><table className="exam-table admin-table">
+      <thead><tr><th>한국 시간</th><th>IP</th><th>사유</th><th>경로</th><th>응답</th><th>분당 API 요청</th><th>User-Agent</th></tr></thead>
+      <tbody>{events.map(event => <tr key={event.id}><td>{new Date(event.occurredAt).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}</td><td>{event.ip}</td><td>{reasons[event.reason] || event.reason}</td><td>{event.method} {event.path}</td><td>{event.reason === 'DECLARED_AUTOMATION' ? '감지' : event.status}</td><td>{event.requestsInWindow || '—'}</td><td style={{ maxWidth: 280, overflowWrap: 'anywhere' }}>{event.userAgent}</td></tr>)}</tbody>
+    </table></div>}
+  </section>;
 }
 
 function SysMissing() {

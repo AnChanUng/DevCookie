@@ -12,3 +12,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
+app:
+  security:
+    rate-limit-enabled: false
+    min-admin-key-length: 0

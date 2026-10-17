@@ -15,6 +15,7 @@ import java.util.List;
 public class CategoryController {
 
     private final CategoryService categoryService;
+    private final com.csstudy.backend.service.AdminAuth adminAuth;
 
     @GetMapping
     public ResponseEntity<List<CategoryResponse>> getAll() {
@@ -31,7 +32,8 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<CategoryResponse> create(@RequestBody Category category) {
+    public ResponseEntity<CategoryResponse> create(@RequestBody Category category,@RequestHeader(value="X-Admin-Key",required=false) String key) {
+        adminAuth.require(key);
         Category created = categoryService.create(category);
         return ResponseEntity.ok(CategoryResponse.from(created));
     }

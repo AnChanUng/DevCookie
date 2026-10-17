@@ -13,11 +13,16 @@ public class AdminAuth {
 
     @Value("${app.admin-key:}")
     private String adminKey;
+    @Value("${app.security.min-admin-key-length:32}")
+    private int minimumKeyLength = 32;
 
-    // 키를 빈 값으로 둔 서버에서는 관리자 조회가 아예 열리지 않는다. 기본값은 application.yml에 있다
+    // An unset key closes administrator APIs. There is no public fallback credential.
     public void require(String key) {
         if (adminKey == null || adminKey.isBlank()) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "ADMIN_KEY가 설정되지 않았습니다.");
+        }
+        if (adminKey.length() < minimumKeyLength) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "ADMIN_KEY를 32자 이상의 무작위 값으로 설정해 주세요.");
         }
         if (key == null || !MessageDigest.isEqual(
                 key.getBytes(StandardCharsets.UTF_8), adminKey.getBytes(StandardCharsets.UTF_8))) {
