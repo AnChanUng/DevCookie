@@ -7,6 +7,7 @@ import './App.css';
 import './exam.css';
 
 const PromotionExamPage = lazy(() => import('./pages/PromotionExamPage'));
+const BugHuntPage = lazy(() => import('./pages/BugHuntPage'));
 const CategoryPage = lazy(() => import('./pages/CategoryPage'));
 const QuestionPage = lazy(() => import('./pages/QuestionPage'));
 const AccountPage = lazy(() => import('./pages/AccountPage'));
@@ -61,6 +62,7 @@ function App() {
           <Route path="algo" element={<AlgoPage />} />
           <Route path="calc" element={<CalcPage />} />
           <Route path="promotion-exam" element={<PromotionExamPage />} />
+          <Route path="bug-hunt" element={<BugHuntPage />} />
           <Route path="duel" element={<DuelPage />} />
           <Route path="duel/:code" element={<DuelPage />} />
           <Route path="ncs" element={<NcsPage />} />

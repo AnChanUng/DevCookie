@@ -30,6 +30,7 @@ export default function Home() {
             <Link to="/duel" className="home-cta-btn">대결</Link>
             <Link to="/promotion-exam" className="home-cta-btn">시험</Link>
             <Link to="/account/retry" className="home-cta-btn">오답노트</Link>
+            <Link to="/bug-hunt" className="home-cta-btn">🐛 코드 범인 찾기</Link>
           </div>
           <StudyGoal />
         </div>
