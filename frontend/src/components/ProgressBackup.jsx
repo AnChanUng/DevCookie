@@ -5,7 +5,7 @@ import { account, onAccountChange, signIn, signOut } from '../sync';
 
 const localKey = (company) => `exam-progress:${company}`;
 // 백업·동기화 대상. 주제별 통합 문제집은 문제은행 목록에 없지만 기록은 따로 쌓이므로 함께 챙긴다
-const KEYS = [...BANKS.map(b => b.key), 'topics'];
+const KEYS = [...BANKS.map(b => b.key), 'topics', 'bug-hunt'];
 
 function readAll() {
   const out = {};

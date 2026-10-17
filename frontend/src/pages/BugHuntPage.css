@@ -1,0 +1,54 @@
+.bug-hunt { max-width: 900px; margin: 0 auto 4rem; }
+.bug-hunt-kicker { display: block; margin-top: 1.2rem; color: var(--accent-blue); font-size: .72rem; font-weight: 800; letter-spacing: .14em; }
+.bug-hunt-intro { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 1.5rem 0; }
+.bug-hunt-intro > div, .bug-hunt-lobby, .bug-hunt-result, .bug-hunt-case { padding: 22px; border: 1px solid var(--border-color); border-radius: 16px; background: var(--bg-primary); }
+.bug-hunt-intro p, .bug-hunt-lobby p { color: var(--text-secondary); font-size: .88rem; line-height: 1.7; }
+.bug-hunt-step { display: block; color: var(--accent-blue); font-size: .75rem; font-weight: 800; margin-bottom: 10px; }
+.bug-hunt-lobby h2, .bug-hunt-case h2 { font-size: 1.35rem; margin: 0 0 1rem; }
+.bug-hunt-lobby label { display: flex; align-items: center; gap: 12px; }
+.bug-hunt-lobby select { min-height: 42px; max-width: 100%; padding: 8px 12px; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 8px; font: inherit; }
+.bug-hunt-actions, .bug-hunt-submit { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0 12px; }
+.bug-hunt button:focus-visible, .bug-hunt select:focus-visible { outline: 3px solid var(--accent-blue); outline-offset: 3px; }
+.bug-hunt button:disabled { cursor: default; }
+.bug-hunt-record { font-size: .8rem; line-height: 1.6; color: var(--text-secondary); }
+.bug-hunt-round { display: flex; justify-content: space-between; font-size: .9rem; font-weight: 700; }
+.bug-hunt progress { display: block; width: 100%; height: 8px; margin: 12px 0 20px; accent-color: var(--accent-blue); }
+.bug-hunt-tags { display: flex; gap: 6px; margin-bottom: 12px; }
+.bug-hunt-tags span { padding: 3px 9px; border-radius: 6px; background: var(--accent-blue-light); color: var(--accent-blue); font-size: .75rem; font-weight: 600; }
+.bug-hunt-prompt { white-space: pre-wrap; line-height: 1.8; }
+.bug-hunt-fieldset { padding: 0; margin: 24px 0; border: 0; min-width: 0; }
+.bug-hunt-fieldset legend { margin-bottom: 12px; font-weight: 700; font-size: .92rem; }
+.bug-hunt-code { padding: 10px 0; border-radius: 12px; overflow-x: auto; background: var(--code-bg); }
+.bug-hunt-line { display: flex; align-items: baseline; width: 100%; min-width: max-content; min-height: 38px; padding: 7px 14px; gap: 16px; border: 0; border-left: 3px solid transparent; background: transparent; color: var(--code-text); text-align: left; cursor: pointer; }
+.bug-hunt-line code { white-space: pre; font: .86rem/1.6 'Consolas', 'Menlo', monospace; }
+.bug-hunt-line-number { width: 22px; flex-shrink: 0; color: var(--code-ln); font: .78rem monospace; text-align: right; }
+.bug-hunt-line-label { font-size: .7rem; font-weight: 700; color: #86efac; }
+.bug-hunt-line:hover:not(:disabled), .bug-hunt-line.selected { background: #818cf828; border-left-color: #a5b4fc; }
+.bug-hunt-line.correct { background: #22c55e22; border-left-color: #4ade80; }
+.bug-hunt-line.wrong { background: #ef444422; border-left-color: #f87171; }
+.bug-hunt-reasons { display: grid; gap: 9px; }
+.bug-hunt-reasons button { display: flex; align-items: baseline; gap: 10px; padding: 13px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-primary); color: var(--text-primary); text-align: left; font: inherit; font-size: .88rem; line-height: 1.6; cursor: pointer; }
+.bug-hunt-reasons button > span { flex-shrink: 0; color: var(--text-secondary); }
+.bug-hunt-reasons button > b { margin-left: auto; font-size: .75rem; white-space: nowrap; }
+.bug-hunt-reasons button.selected { border-color: var(--accent-blue); background: var(--accent-blue-light); }
+.bug-hunt-reasons button.correct { border-color: var(--accent-green); background: var(--accent-green-light); }
+.bug-hunt-reasons button.wrong { border-color: var(--accent-red); background: var(--accent-red-light); }
+.bug-hunt-hint { flex-basis: 100%; padding: 12px; border-radius: 10px; background: var(--accent-blue-light); color: var(--text-secondary); font-size: .9rem; line-height: 1.7; }
+.bug-hunt-review { padding: 18px; border-radius: 12px; background: var(--bg-secondary); border: 1px solid var(--border-color); line-height: 1.8; font-size: .9rem; }
+.bug-hunt-review.correct { border-color: var(--accent-green); }
+.bug-hunt-review h3, .bug-hunt-review h4 { margin: 0 0 10px; }
+.bug-hunt-review pre { max-width: 100%; overflow-x: auto; }
+.bug-hunt-result .bug-hunt-score { font-size: 3rem; font-weight: 800; color: var(--accent-blue); margin: 20px 0; }
+.bug-hunt-score span { font-size: 1rem; color: var(--text-secondary); }
+.bug-hunt-result ul { list-style: none; padding: 0; }
+.bug-hunt-result li { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border-color); font-size: .9rem; }
+.bug-hunt-result li > span:last-child { white-space: nowrap; color: var(--text-secondary); }
+@media (max-width: 600px) {
+  .bug-hunt-intro { grid-template-columns: 1fr; gap: 8px; }
+  .bug-hunt-intro > div { padding: 14px 16px; }
+  .bug-hunt-intro p { margin: 5px 0 0; }
+  .bug-hunt-step { display: inline; margin-right: 10px; }
+  .bug-hunt-lobby, .bug-hunt-case, .bug-hunt-result { padding: 16px; }
+  .bug-hunt-line { gap: 10px; padding-left: 8px; }
+  .bug-hunt-review { padding: 12px; }
+}

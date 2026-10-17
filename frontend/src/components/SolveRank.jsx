@@ -33,7 +33,7 @@ function solvedCount() {
 
 // 로그인해 있으면 다른 기기에서 푼 기록을 모두 받아 온다. 문제은행을 하나씩 열지 않아도 푼 문제 수가 맞게 나온다.
 // 문제은행 수만큼 서버를 부르므로 한동안은 다시 하지 않는다
-const SYNC_KEYS = [...BANKS.map(b => b.key), 'topics'];
+const SYNC_KEYS = [...BANKS.map(b => b.key), 'topics', 'bug-hunt'];
 const SYNC_AT = 'sync:all-at';
 const SYNC_EVERY_MS = 10 * 60 * 1000;
 

@@ -1,8 +1,9 @@
 import { BANKS, allQuestions, companyPath } from './data/examQuestions';
 import { TOPICS } from './data/topicBank';
+import { BUG_HUNT } from './data/bugHunt';
 import api from './api';
 
-export const ACCOUNT_BANKS = [...BANKS, TOPICS];
+export const ACCOUNT_BANKS = [...BANKS, TOPICS, BUG_HUNT];
 export async function loadAccountRecords(user, signal) {
   const records = {};
   const failed = [];
@@ -37,7 +38,7 @@ export function summarizeAccount(records) {
       const c = Math.max(0, Number(stat.c) || 0), w = Math.max(0, Number(stat.w) || 0);
       if (!(c + w)) continue;
       attempts += c + w; correct += c;
-      rows.push({ key: `${bank.key}:${id}`, question: questions.get(id), title: questions.get(id)?.q || `문항 ${id}`, bank: bank.name, path: bank.key === 'topics' ? '/topics' : bank.key === 'comil' ? '/computer-general' : bank.key === 'ncs' ? '/ncs' : companyPath(bank), c, w, last: stat.last, at: stat.at || 0 });
+      rows.push({ key: `${bank.key}:${id}`, question: questions.get(id), title: questions.get(id)?.q || `문항 ${id}`, bank: bank.name, path: bank.key === 'bug-hunt' ? '/bug-hunt' : bank.key === 'topics' ? '/topics' : bank.key === 'comil' ? '/computer-general' : bank.key === 'ncs' ? '/ncs' : companyPath(bank), c, w, last: stat.last, at: stat.at || 0 });
     }
   }
   rows.sort((a, b) => b.at - a.at || a.key.localeCompare(b.key));
