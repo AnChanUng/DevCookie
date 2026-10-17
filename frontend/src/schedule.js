@@ -1,20 +1,15 @@
 // 필기 시험 일정. 첫 화면에서 직접 고칠 수 있고 이 브라우저에 저장한다.
 // to는 그 시험의 문제은행 주소(없으면 연결 안 함)
-const KEY = 'study:exams';
-
-// 아직 한 번도 고치지 않은 사람에게 보여 줄 기본 일정
-const DEFAULTS = [
-  { name: '기업은행', date: '2026-10-17', to: '/exam/ibk' },
-  { name: '코스콤', date: '2026-10-24', to: '/exam/koscom' },
-  { name: '현대오토에버', date: '2026-10-25' },
-];
+// 기존에 등록된 모든 일정을 초기화한다. 이후 새로 추가한 일정은 유지한다.
+const KEY = 'study:exams:v2';
 
 export function loadExams() {
+  try { localStorage.removeItem('study:exams'); } catch { /* storage unavailable */ }
   try {
     const saved = JSON.parse(localStorage.getItem(KEY));
     if (Array.isArray(saved)) return saved.filter(e => e && typeof e.name === 'string' && typeof e.date === 'string');
-  } catch { /* 저장된 값이 깨졌으면 기본 일정으로 */ }
-  return DEFAULTS;
+  } catch { /* 저장된 값이 깨졌으면 빈 일정으로 */ }
+  return [];
 }
 
 export function saveExams(exams) {
