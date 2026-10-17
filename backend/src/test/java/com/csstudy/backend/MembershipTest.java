@@ -127,7 +127,7 @@ class MembershipTest {
                 assertEquals(goals[i], current.currentThreshold());
                 if (i > 0) {
                     assertEquals(6 - i, MembershipService.describe(tier, goals[i] - 1).division());
-                    assertTrue(goals[i] - goals[i-1] > previousGap);
+                    assertTrue(goals[i] - goals[i-1] >= previousGap);
                     previousGap = goals[i] - goals[i-1];
                 }
                 if (i < 4) {
@@ -141,13 +141,30 @@ class MembershipTest {
         var gold = MembershipService.describe(UserTier.GOLD, 125);
         assertEquals("골드 Ⅱ", gold.tierName());
         assertEquals("골드 Ⅰ", gold.nextTierName());
-        assertEquals(45, gold.remaining());
+        assertEquals(200, gold.nextThreshold());
+        assertEquals(75, gold.remaining());
         assertEquals(300, MembershipService.describe(UserTier.GOLD, 299).nextThreshold());
         assertEquals("다이아 Ⅴ", MembershipService.describe(UserTier.GOLD, 299).nextTierName());
         var top = MembershipService.describe(UserTier.GOLD, 2300);
         assertNull(top.nextTier()); assertNull(top.nextDivision()); assertNull(top.nextThreshold());
         assertEquals(0, top.remaining());
         assertEquals(0, MembershipService.describe(UserTier.BRONZE, -1).solvedCount());
+    }
+
+    @Test void grantedGoldUsesAbsoluteLifetimeTotalsAtEveryBoundary() {
+        long[] totals = {0, 29, 30, 59, 60, 99, 100, 199, 200, 299};
+        int[] divisions = {5, 5, 4, 4, 3, 3, 2, 2, 1, 1};
+        for (int i = 0; i < totals.length; i++) {
+            var tier = MembershipService.describe(UserTier.GOLD, totals[i]);
+            assertEquals(UserTier.GOLD, tier.tier());
+            assertEquals(divisions[i], tier.division(), "lifetime total=" + totals[i]);
+        }
+        var fresh = MembershipService.describe(UserTier.GOLD, 0);
+        assertEquals(30, fresh.nextThreshold()); assertEquals(30, fresh.remaining());
+        var existing = MembershipService.describe(UserTier.GOLD, 30);
+        assertEquals(60, existing.nextThreshold()); assertEquals(30, existing.remaining());
+        assertEquals(UserTier.DIAMOND, MembershipService.describe(UserTier.GOLD, 300).tier());
+        assertEquals(1, MembershipService.describe(UserTier.GOLD, 0, 14).division());
     }
 
     @Test void cohortBadgePersistsAndOnlyOwnPersonalEndpointRevealsIt() throws Exception {

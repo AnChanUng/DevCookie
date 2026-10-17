@@ -21,12 +21,14 @@ try {
   const { default: Menu } = await server.ssrLoadModule('/src/components/MemberMenu.jsx');
   const { default: Rank } = await server.ssrLoadModule('/src/components/SolveRank.jsx');
   const { default: AccountPage } = await server.ssrLoadModule('/src/pages/AccountPage.jsx');
-  let guestName = '기존방문자', fail = false;
+  let guestName = '기존방문자', fail = false, checkingAccount = false;
   const tiers = ['BRONZE','SILVER','GOLD','DIAMOND','RUBY'];
   api.defaults.adapter = async config => {
     if (fail) throw new Error('offline');
     let data;
-    if (config.url === '/membership') data = { tier: config.headers.Authorization ? 'GOLD' : 'SILVER', nickname: config.headers.Authorization ? JSON.parse(localStorage.getItem('sync:account')).nickname : guestName, solvedCount: 50 };
+    if (config.url === '/membership') data = checkingAccount
+      ? { tier: 'GOLD', division: 2, nickname: guestName, solvedCount: 125, nextTier: 'GOLD', nextTierName: '골드 Ⅰ', nextThreshold: 200, remaining: 75 }
+      : { tier: config.headers.Authorization ? 'GOLD' : 'SILVER', nickname: config.headers.Authorization ? JSON.parse(localStorage.getItem('sync:account')).nickname : guestName, solvedCount: 50 };
     else if (config.url === '/profile/badges') data = [{ name: '16기 대전 4반' }];
     else if (config.url === '/auth/nickname') data = { nickname: JSON.parse(config.data).nickname };
     else if (config.url === '/profile') { guestName = JSON.parse(config.data).nickname; data = { nickname: guestName }; }
@@ -58,14 +60,20 @@ try {
   assert.equal(info().props['aria-expanded'], true);
   const content = text(view.root.findByProps({ 'aria-label': '티어 등급 기준' }));
   for (const word of ['브론즈','실버','골드','다이아','루비','50개','300개','1,000개','필기이론']) assert.ok(content.includes(word), word);
+  for (const range of ['0~29', '30~59', '60~99', '100~199', '200~299']) assert.ok(content.includes(range));
+  assert.ok(content.includes('누적 30문제부터 골드 Ⅳ'));
+  assert.ok(content.includes('승급해도 초기화되지 않습니다'));
   await act(() => info().props.onKeyDown({ key: 'Escape' }));
   assert.equal(view.root.findAllByProps({ 'aria-label': '티어 등급 기준' }).length, 0);
   await act(() => info().props.onClick());
   await act(() => view.root.findAllByType('button').find(b => text(b) === '닫기').props.onClick());
   assert.equal(info().props['aria-expanded'], false);
   await unmount();
+  checkingAccount = true;
   await mount(AccountPage);
   assert.ok(text(view.toJSON()).includes('본인 설정'));
+  assert.ok(text(view.toJSON()).includes('누적 125문제'));
+  assert.ok(text(view.toJSON()).includes('골드 Ⅰ 승급 기준: 누적 200문제 이상 · 앞으로 75문제'));
   assert.ok(text(view.root.findByProps({ 'aria-label': '내 교육생 배지' })).includes('16기 대전 4반'));
   const nicknameInput = () => view.root.findByProps({ 'aria-label': '방문자 닉네임' });
   await act(() => nicknameInput().props.onChange({ target: { value: '설정에서변경' } }));
