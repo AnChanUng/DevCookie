@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -25,9 +26,11 @@ public class ContentSyncController {
 
     private final CategoryService categoryService;
     private final QuestionRepository questionRepository;
+    private final com.csstudy.backend.service.AdminAuth adminAuth;
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> sync() {
+    public ResponseEntity<Map<String, Object>> sync(@RequestHeader(value="X-Admin-Key",required=false) String key) {
+        adminAuth.require(key);
         // Try multiple possible content directory locations
         Path contentDir = findContentDir();
         if (contentDir == null) {

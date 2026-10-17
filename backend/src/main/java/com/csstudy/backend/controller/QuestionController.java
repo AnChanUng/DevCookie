@@ -24,6 +24,7 @@ public class QuestionController {
     private final QuestionService questionService;
     private final AuthService authService;
     private final UserProgressService userProgressService;
+    private final com.csstudy.backend.service.AdminAuth adminAuth;
 
     @GetMapping
     public ResponseEntity<List<QuestionResponse>> getAll(HttpServletRequest request) {
@@ -39,20 +40,25 @@ public class QuestionController {
     }
 
     @PostMapping
-    public ResponseEntity<QuestionResponse> create(@Valid @RequestBody QuestionRequest request) {
+    public ResponseEntity<QuestionResponse> create(@Valid @RequestBody QuestionRequest request,
+            @RequestHeader(value="X-Admin-Key",required=false) String key) {
+        adminAuth.require(key);
         Question question = questionService.create(request);
         return ResponseEntity.ok(QuestionResponse.from(question));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<QuestionResponse> update(@PathVariable Long id,
-                                                   @Valid @RequestBody QuestionRequest request) {
+                                                   @Valid @RequestBody QuestionRequest request,
+                                                   @RequestHeader(value="X-Admin-Key",required=false) String key) {
+        adminAuth.require(key);
         Question question = questionService.update(id, request);
         return ResponseEntity.ok(QuestionResponse.from(question));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id,@RequestHeader(value="X-Admin-Key",required=false) String key) {
+        adminAuth.require(key);
         questionService.delete(id);
         return ResponseEntity.noContent().build();
     }
