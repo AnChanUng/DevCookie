@@ -61,12 +61,14 @@ export default function AdminPage() {
       <p>관리자 키 없이 확인할 수 있는 전체 집계입니다.</p>
       {metrics ? <>
         <div className="exam-stats">
-          <Tile k="가입 계정" v={metrics.registeredAccounts} sub="현재 등록된 계정 수" />
+          <Tile k="가입 계정" v={metrics.registeredAccounts} unit=" 개" sub="현재 등록된 계정 수" />
           <Tile k="오늘 방문자" v={metrics.todayVisitors} sub="오늘 0시부터 현재까지 · KST" />
           <Tile k="어제 방문자" v={metrics.yesterdayVisitors} sub="집계가 완료된 하루 · KST" />
           <Tile k="최근 30일 방문자" v={metrics.visitors30d} sub="기간 내 브라우저 ID 중복 제거" />
           <Tile k="최근 30일 최대 일간 방문자" v={metrics.peakDailyVisitors30d} sub="당일 진행 중 집계 포함" />
-          <Tile k="누적 풀이 완료" v={metrics.totalExamCompletions} sub="문항 수가 아닌 풀이 완료 이벤트 수" />
+          <Tile k="최근 30일 조회수" v={metrics.pageViews30d ?? '–'} unit=" 회" sub="페이지 조회 이벤트 · 반복 조회 포함" />
+          <Tile k="누적 조회수" v={metrics.totalPageViews ?? '–'} unit=" 회" sub="수집된 전체 페이지 조회 이벤트" />
+          <Tile k="누적 풀이 완료" v={metrics.totalExamCompletions} unit=" 건" sub="문항 수가 아닌 풀이 완료 이벤트 수" />
         </div>
         <p className="exam-note">{metrics.from} ~ {metrics.through} · {new Date(metrics.asOf).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })} KST 기준. 방문자는 페이지를 조회한 익명 브라우저 ID 기준으로, 가입자 수와 다릅니다. 기기 변경·브라우저 초기화 시 중복될 수 있으며 자동화 방문이 포함될 수 있습니다.</p>
       </> : <p role="status">{metricsError || '이용 통계를 불러오는 중입니다. 서버 시작에 1~2분 걸릴 수 있습니다.'}</p>}
