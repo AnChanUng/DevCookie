@@ -14,6 +14,17 @@ import java.util.List;
 @Repository
 public interface UsageEventRepository extends JpaRepository<UsageEvent, Long> {
 
+    @Query("select e.day, count(distinct e.visitorId) from UsageEvent e where e.type = 'view' " +
+            "and e.day between :from and :through and e.path not like '/admin%' group by e.day order by e.day")
+    List<Object[]> publicDailyVisitors(@Param("from") LocalDate from, @Param("through") LocalDate through);
+
+    @Query("select count(distinct e.visitorId) from UsageEvent e where e.type = 'view' " +
+            "and e.day between :from and :through and e.path not like '/admin%'")
+    long publicVisitors(@Param("from") LocalDate from, @Param("through") LocalDate through);
+
+    @Query("select count(e) from UsageEvent e where e.type = 'exam' and e.day <= :through and e.path not like '/admin%'")
+    long publicExamCompletions(@Param("through") LocalDate through);
+
     // [조회수, 방문자 수]
     @Query("select count(e), count(distinct e.visitorId) from UsageEvent e where e.type = :type and e.day >= :from")
     List<Object[]> totalsSince(@Param("type") String type, @Param("from") LocalDate from);
