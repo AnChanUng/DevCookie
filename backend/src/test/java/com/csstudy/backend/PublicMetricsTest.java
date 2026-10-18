@@ -43,11 +43,13 @@ class PublicMetricsTest {
                 .andExpect(jsonPath("$.todayVisitors").value(1))
                 .andExpect(jsonPath("$.yesterdayVisitors").value(1))
                 .andExpect(jsonPath("$.visitors30d").value(2))
+                .andExpect(jsonPath("$.pageViews30d").value(4))
+                .andExpect(jsonPath("$.totalPageViews").value(5))
                 .andExpect(jsonPath("$.peakDailyVisitors30d").value(1))
                 .andExpect(jsonPath("$.totalExamCompletions").value(1))
                 .andExpect(jsonPath("$.registeredAccounts").isNumber())
                 .andExpect(jsonPath("$.timezone").value("Asia/Seoul"))
-                .andExpect(jsonPath("$.length()").value(11))
+                .andExpect(jsonPath("$.length()").value(13))
                 .andExpect(jsonPath("$.users").doesNotExist())
                 .andExpect(jsonPath("$.visitors").doesNotExist());
         mvc.perform(get("/api/v1/admin/system")).andExpect(status().isServiceUnavailable());
@@ -59,6 +61,8 @@ class PublicMetricsTest {
         mvc.perform(get("/api/v1/public/metrics"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.visitors30d").value(0))
+                .andExpect(jsonPath("$.pageViews30d").value(0))
+                .andExpect(jsonPath("$.totalPageViews").value(0))
                 .andExpect(jsonPath("$.peakDailyVisitors30d").value(0))
                 .andExpect(jsonPath("$.totalExamCompletions").value(0));
     }

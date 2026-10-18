@@ -37,6 +37,8 @@ public class PublicMetricsController {
         result.put("todayVisitors", todayVisitors);
         result.put("yesterdayVisitors", yesterdayVisitors);
         result.put("visitors30d", events.publicVisitors(from, today));
+        result.put("pageViews30d", events.publicPageViews(from, today));
+        result.put("totalPageViews", events.publicPageViews(LocalDate.of(2000, 1, 1), today));
         result.put("peakDailyVisitors30d", peak);
         result.put("totalExamCompletions", events.publicExamCompletions(today));
         result.put("visitorBasis", "anonymous_browser_id_page_view");

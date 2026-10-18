@@ -22,6 +22,10 @@ public interface UsageEventRepository extends JpaRepository<UsageEvent, Long> {
             "and e.day between :from and :through and e.path not like '/admin%'")
     long publicVisitors(@Param("from") LocalDate from, @Param("through") LocalDate through);
 
+    @Query("select count(e) from UsageEvent e where e.type = 'view' " +
+            "and e.day between :from and :through and e.path not like '/admin%'")
+    long publicPageViews(@Param("from") LocalDate from, @Param("through") LocalDate through);
+
     @Query("select count(e) from UsageEvent e where e.type = 'exam' and e.day <= :through and e.path not like '/admin%'")
     long publicExamCompletions(@Param("through") LocalDate through);
 
