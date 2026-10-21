@@ -149,3 +149,7 @@ render.yaml     Render 배포 구성
 [등급과 접근 권한](docs/membership.md) / [기술면접 준비](docs/technical-interview.md) / [매일 바뀌는 CS 학습](docs/daily-cs.md) / [보안과 크롤링](docs/security.md)
 
 코드 범인 찾기는 `/bug-hunt`에서 계속 사용할 수 있으며 메인 메뉴에서는 숨겨두었습니다. 구현과 기록 방식은 [기능 문서](docs/bug-hunt.md)에 정리했습니다.
+
+## 개발환경 부하테스트
+
+운영과 분리한 로컬 PostgreSQL과 백엔드에서 k6로 API 부하와 요청 제한을 검증합니다. [실행 방법과 측정 범위](load-tests/README.md)를 참고하세요.
