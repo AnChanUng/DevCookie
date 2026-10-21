@@ -79,3 +79,9 @@ k6 run -e PROFILE=load load-tests/study-api.js
 ```
 
 생성한 `dashboard.html`을 다운로드한 뒤 브라우저에서 연다. GitHub 파일 페이지는 HTML을 실행하지 않고 소스만 보여주므로 파일을 내려받아 열어야 한다. 실행 중 대시보드는 실행 머신 내부에서만 접근할 수 있으며, 클라우드 머신의 루프백 주소는 사용자 브라우저에서 바로 열 수 없다.
+
+생성된 HTML을 한국어로 바꾸려면 다음 명령을 실행한다. 그래프 제목과 설명, 표의 표시만 번역하며 측정 이벤트가 유지되는지 검사한다.
+
+```bash
+python3 load-tests/tools/localize-report.py load-tests/results/dashboard.html
+```
