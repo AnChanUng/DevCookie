@@ -66,3 +66,16 @@ k6 run -e PROFILE=rate-limit load-tests/study-api.js
 결과는 단일 클라우드 개발 머신의 PostgreSQL 가상 데이터와 API 요청 조합에만 해당한다. 운영 배포의 네트워크 지연, Render 인스턴스 사양과 콜드 스타트, 장기간 증가한 데이터, 비밀번호 해싱, 코드 실행, SSE 장기 연결과 채팅 전송 성능은 별도 측정해야 한다. 100 VU 통과를 운영 서비스가 100명의 모든 행동을 항상 감당한다는 의미로 해석하지 않는다. VU는 DAU나 MAU도 아니다.
 
 [2026-10-21 실제 실행 결과](reports/2026-10-21.md)
+
+## 그래프로 확인하기
+
+[부하테스트 진행 방법과 그래프 읽는 법](READ-RESULTS.md)을 함께 참고한다. k6 기본 웹 대시보드를 켜고 실행하면 사용자 수, 처리량, 응답시간과 실패율의 시간 변화를 볼 수 있다. 실행이 끝나면 HTML 보고서가 생성된다.
+
+```bash
+mkdir -p load-tests/results
+K6_WEB_DASHBOARD=true \
+K6_WEB_DASHBOARD_EXPORT=load-tests/results/dashboard.html \
+k6 run -e PROFILE=load load-tests/study-api.js
+```
+
+생성한 `dashboard.html`을 다운로드한 뒤 브라우저에서 연다. GitHub 파일 페이지는 HTML을 실행하지 않고 소스만 보여주므로 파일을 내려받아 열어야 한다. 실행 중 대시보드는 실행 머신 내부에서만 접근할 수 있으며, 클라우드 머신의 루프백 주소는 사용자 브라우저에서 바로 열 수 없다.

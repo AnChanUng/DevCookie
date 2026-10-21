@@ -152,4 +152,4 @@ render.yaml     Render 배포 구성
 
 ## 개발환경 부하테스트
 
-운영과 분리한 로컬 PostgreSQL과 백엔드에서 k6로 API 부하와 요청 제한을 검증합니다. [실행 방법과 측정 범위](load-tests/README.md)를 참고하세요.
+운영과 분리한 로컬 PostgreSQL과 백엔드에서 k6로 API 부하와 요청 제한을 검증합니다. [실행 방법과 측정 범위](load-tests/README.md), [그래프 보고서](load-tests/reports/2026-10-21-dashboard/README.md), [지표 읽는 법](load-tests/READ-RESULTS.md)을 참고하세요.
