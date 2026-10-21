@@ -152,4 +152,18 @@ render.yaml     Render 배포 구성
 
 ## 개발환경 부하테스트
 
-운영과 분리한 로컬 PostgreSQL과 백엔드에서 k6로 API 부하와 요청 제한을 검증합니다. [실행 방법과 측정 범위](load-tests/README.md), [그래프 보고서](load-tests/reports/2026-10-21-dashboard/README.md), [지표 읽는 법](load-tests/READ-RESULTS.md)을 참고하세요.
+운영과 분리한 로컬 PostgreSQL과 백엔드에서 k6로 API 부하와 요청 제한을 검증했습니다. 아래는 가상 사용자 수를 늘리며 처리량과 응답시간을 측정한 한국어 그래프입니다.
+
+![한국어 k6 부하테스트 그래프](load-tests/reports/2026-10-21-dashboard/dashboard-overview.png)
+
+| 측정 항목 | 2026-10-21 재측정 결과 |
+| --- | ---: |
+| 최대 동시 가상 사용자 | 100 VU |
+| 총 요청 수 | 47,634건 |
+| 평균 처리량 | 초당 394.86건 |
+| 응답시간 p95 | 23.14ms |
+| HTTP 실패율 | 0% |
+
+p95는 측정 요청의 95%가 해당 시간 이내에 완료됐다는 뜻입니다. 카테고리와 문제 조회, 순위, 채팅 조회, 등급, 공개 이용 통계, 방문 기록 저장을 조합했습니다. 실제 계정 대신 가상 데이터를 사용한 로컬 API 결과이며 운영 서버 성능이나 실제 사용자 수를 의미하지 않습니다.
+
+[한국어 그래프 보고서](load-tests/reports/2026-10-21-dashboard/README.md) / [실행 방법과 측정 범위](load-tests/README.md) / [실무 테스트 방법과 지표 읽는 법](load-tests/READ-RESULTS.md)
