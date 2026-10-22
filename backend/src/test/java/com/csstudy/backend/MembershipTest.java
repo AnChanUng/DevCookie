@@ -63,24 +63,24 @@ class MembershipTest {
         mvc.perform(get("/api/v1/auth/me").header("Authorization","Bearer "+registered.path("token").asText()))
                 .andExpect(jsonPath("$.membership.tier").value("RUBY"));
     }
-    @Test void theoryRejectsBronzeAndServesGoldVisitorWithoutRegistration() throws Exception {
-        mvc.perform(get("/api/v1/theory/notes/sqld-concepts.pdf").header("X-Visitor-Id","new-visitor"))
-                .andExpect(status().isForbidden());
-        grants.saveAndFlush(new VisitorTierGrant("existing-anonymous",UserTier.GOLD));
-        mvc.perform(get("/api/v1/membership").header("X-Visitor-Id","existing-anonymous"))
-                .andExpect(jsonPath("$.tier").value("GOLD"))
-                .andExpect(jsonPath("$.nickname").value(com.csstudy.backend.service.VisitorProfileService.anonymous("existing-anonymous")));
-        mvc.perform(get("/api/v1/theory/notes/sqld-concepts.pdf").header("X-Visitor-Id","existing-anonymous"))
-                .andExpect(status().isOk()).andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PDF))
-                .andExpect(header().string("Cache-Control","no-store"));
-        for (String file : new String[]{"ipe-written-summary.pdf", "ipe-written-review.pdf"}) {
-            mvc.perform(get("/api/v1/theory/notes/" + file).header("X-Visitor-Id", "new-visitor"))
-                    .andExpect(status().isForbidden());
-            mvc.perform(get("/api/v1/theory/notes/" + file).header("X-Visitor-Id", "existing-anonymous"))
+    @Test void theoryIsPublicForGuestsAndEveryTierAndRejectsUnknownFiles() throws Exception {
+        String[] files = {"ipe-written-summary.pdf", "ipe-written-review.pdf", "ipe-silgi-theory.pdf",
+                "sqld-concepts.pdf", "bigdata-analyst-summary.pdf", "adsp-summary.pdf"};
+        for (String file : files) {
+            mvc.perform(get("/api/v1/theory/notes/" + file))
                     .andExpect(status().isOk()).andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PDF))
-                    .andExpect(header().string("Cache-Control", "no-store"));
+                    .andExpect(header().string("Cache-Control", "no-store"))
+                    .andExpect(header().string("Content-Disposition", "inline; filename=\"" + file + "\""));
         }
-        mvc.perform(get("/api/v1/theory/notes/not-allowed.pdf").header("X-Visitor-Id","existing-anonymous"))
+        for (UserTier tier : UserTier.values()) {
+            String visitor = "theory-" + tier.name();
+            grants.saveAndFlush(new VisitorTierGrant(visitor, tier));
+            mvc.perform(get("/api/v1/theory/notes/sqld-concepts.pdf").header("X-Visitor-Id", visitor))
+                    .andExpect(status().isOk()).andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PDF));
+        }
+        mvc.perform(get("/api/v1/theory/notes/sqld-concepts.pdf").header("Authorization", "Bearer expired"))
+                .andExpect(status().isOk());
+        mvc.perform(get("/api/v1/theory/notes/not-allowed.pdf"))
                 .andExpect(status().isNotFound());
     }
     @Test void renamePreservesTokenTierAndRecordsAndRejectsDuplicate() throws Exception {

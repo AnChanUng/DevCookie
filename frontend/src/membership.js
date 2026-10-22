@@ -4,7 +4,6 @@ import { account, onAccountChange } from './sync';
 import { visitorId } from './track';
 
 export const TIER_NAMES = { BRONZE: '브론즈', SILVER: '실버', GOLD: '골드', DIAMOND: '다이아', RUBY: '루비' };
-export const isGold = tier => ['GOLD', 'DIAMOND', 'RUBY'].includes(tier);
 export function membershipHeaders() {
   const token = account()?.token;
   return { 'X-Visitor-Id': visitorId(), ...(token ? { Authorization: `Bearer ${token}` } : {}) };
