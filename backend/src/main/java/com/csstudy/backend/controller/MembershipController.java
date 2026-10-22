@@ -15,8 +15,7 @@ public class MembershipController {
     @GetMapping("/membership")
     public MembershipService.Membership membership(HttpServletRequest request) { return membership.current(request); }
     @GetMapping("/theory/notes/{file}")
-    public ResponseEntity<ClassPathResource> note(@PathVariable String file, HttpServletRequest request) {
-        membership.requireGold(request);
+    public ResponseEntity<ClassPathResource> note(@PathVariable String file) {
         if (!NOTES.contains(file)) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF)
                 .cacheControl(CacheControl.noStore())

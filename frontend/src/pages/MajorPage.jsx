@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
-import { membershipHeaders } from '../membership';
 
-// PDF contents are served only after the backend verifies GOLD access.
+// Theory PDFs are available to every visitor without a membership lookup.
 const NOTES = [
   { file: 'ipe-written-summary.pdf', title: '정보처리기사 필기', desc: '필기 핵심 요약노트 · 전 과목 정리 · 18쪽' },
   { file: 'ipe-written-review.pdf', title: '정보처리기사 필기 (복습용)', desc: '필기 핵심 요약노트 · 복습용 · 17쪽' },
@@ -22,7 +21,7 @@ export default function MajorPage() {
     if (!open) return undefined;
     const controller = new AbortController();
     let url;
-    api.get(`/theory/notes/${open}`, { headers: membershipHeaders(), responseType: 'blob', signal: controller.signal, timeout: 90000 })
+    api.get(`/theory/notes/${open}`, { responseType: 'blob', signal: controller.signal, timeout: 90000 })
       .then(({ data }) => {
         if (controller.signal.aborted) return;
         url = URL.createObjectURL(data);
@@ -33,12 +32,12 @@ export default function MajorPage() {
   const download = async n => {
     setDownloadError('');
     try {
-      const { data } = await api.get(`/theory/notes/${n.file}`, { headers: membershipHeaders(), responseType: 'blob', timeout: 90000 });
+      const { data } = await api.get(`/theory/notes/${n.file}`, { responseType: 'blob', timeout: 90000 });
       const url = URL.createObjectURL(data), link = document.createElement('a');
       link.href = url; link.download = `${n.title} 요약노트.pdf`;
       document.body.appendChild(link); link.click(); link.remove();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
-    } catch { setDownloadError('자료를 받지 못했습니다. 등급과 서버 연결을 확인해 주세요.'); }
+    } catch { setDownloadError('자료를 받지 못했습니다. 서버 연결을 확인한 뒤 다시 시도해 주세요.'); }
   };
 
   const note = NOTES.find(n => n.file === open);
@@ -93,7 +92,7 @@ export default function MajorPage() {
             <button className="exam-btn" onClick={() => download(note)}>⬇ 다운로드</button>
           </div>
           {current.url ? <iframe title={note.title} src={`${current.url}#navpanes=0&view=FitH`} className="note-frame" />
-            : <p role={current.error ? 'alert' : 'status'}>{current.error ? '자료를 불러오지 못했습니다. 등급과 서버 연결을 확인해 주세요.' : '자료를 불러오는 중…'}</p>}
+            : <p role={current.error ? 'alert' : 'status'}>{current.error ? '자료를 불러오지 못했습니다. 서버 연결을 확인한 뒤 다시 시도해 주세요.' : '자료를 불러오는 중…'}</p>}
           <p className="note-hint">화면에서 바로 읽거나 다운로드해 보관할 수 있습니다. 일부 모바일 브라우저에서는 PDF가 표시되지 않을 수 있습니다.</p>
         </div>
       )}
