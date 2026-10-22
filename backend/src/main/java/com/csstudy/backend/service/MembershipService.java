@@ -8,8 +8,6 @@ import com.csstudy.backend.repository.VisitorTierGrantRepository;
 import com.csstudy.backend.repository.UsageEventRepository;
 import com.csstudy.backend.repository.VisitorProfileRepository;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -58,11 +56,6 @@ public class MembershipService {
         String nickname = id == null || id.isBlank() || id.length() > 40 ? "방문자"
                 : profiles.findByVisitorId(id).map(p -> p.getNickname()).orElseGet(() -> VisitorProfileService.anonymous(id));
         return describe(base, count, "visitor:" + id).withNickname(nickname);
-    }
-
-    public void requireGold(HttpServletRequest request) {
-        if (current(request).tier().ordinal() < UserTier.GOLD.ordinal())
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "필기이론은 골드 등급부터 이용할 수 있습니다.");
     }
 
     // Existing rows have no base_tier; this preserves GOLD for every pre-existing account.
