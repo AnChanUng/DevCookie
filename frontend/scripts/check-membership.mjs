@@ -8,31 +8,40 @@ const values=new Map();
 globalThis.IS_REACT_ACT_ENVIRONMENT=true;
 globalThis.localStorage={getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,String(v)),removeItem:k=>values.delete(k)};
 globalThis.window=new EventTarget();
-const server=await createServer({server:{middlewareMode:true},appType:'custom'});
+const server=await createServer({server:{middlewareMode:true,hmr:false},appType:'custom'});
 let view;const errors=[],originalError=console.error;
 console.error=(...a)=>{if(!String(a[0]).startsWith('react-test-renderer is deprecated'))errors.push(a.join(' '));};
 const text=n=>typeof n==='string'?n:(n?.children||[]).map(text).join('');
 try{
  const {default:api}=await server.ssrLoadModule('/src/api.js');
- const {default:Gate}=await server.ssrLoadModule('/src/components/GoldGate.jsx');
+ const {default:Page}=await server.ssrLoadModule('/src/pages/MajorPage.jsx');
  let tier='BRONZE',fail=false;const requests=[];
  api.defaults.adapter=async config=>{
   requests.push(config);
   if(fail)throw Object.assign(new Error('duplicate'),{response:{status:409,data:{error:'이미 사용 중인 닉네임입니다.'}}});
-  const data=config.url==='/auth/nickname'?{nickname:JSON.parse(config.data).nickname}:{tier,solvedCount:0};
+  const data=config.url.startsWith('/theory/notes/')?new Blob(['%PDF-1.4 test fixture'],{type:'application/pdf'}):config.url==='/auth/nickname'?{nickname:JSON.parse(config.data).nickname}:{tier,solvedCount:0};
   return {data,status:200,statusText:'OK',headers:{},config};
  };
- for(tier of ['BRONZE','SILVER','GOLD','DIAMOND','RUBY']){
-  await act(async()=>{view=TestRenderer.create(React.createElement(MemoryRouter,null,React.createElement(Gate,null,React.createElement('div',null,'protected-content'))));});
-  assert.equal(text(view.toJSON()).includes('protected-content'),['GOLD','DIAMOND','RUBY'].includes(tier));
+ for(tier of [null,'BRONZE','SILVER','GOLD','DIAMOND','RUBY']){
+  if(tier)localStorage.setItem('sync:account',JSON.stringify({nickname:'viewer',token:'viewer-token'}));
+  else localStorage.removeItem('sync:account');
+  requests.length=0;
+  await act(async()=>{view=TestRenderer.create(React.createElement(MemoryRouter,null,React.createElement(Page)));});
+  assert.ok(text(view.toJSON()).includes('필기이론'));
+  assert.equal(view.root.findAllByProps({className:'note-open'}).length,6);
+  await act(async()=>view.root.findAllByProps({className:'note-open'})[0].props.onClick());
+  assert.equal(view.root.findAllByType('iframe').length,1,`PDF opens for ${tier||'guest'}`);
+  assert.ok(requests.some(r=>r.url==='/theory/notes/ipe-written-summary.pdf'));
+  assert.ok(requests.every(r=>r.url!=='/membership'),'theory does not wait for the membership API');
+  assert.ok(requests.every(r=>!r.headers.Authorization&&!r.headers['X-Visitor-Id']),'public PDF requires no account or visitor headers');
   await act(()=>view.unmount());view=null;
  }
- fail=true;
- await act(async()=>{view=TestRenderer.create(React.createElement(MemoryRouter,null,React.createElement(Gate,null,'protected-content')));});
- assert.ok(text(view.toJSON()).includes('등급을 확인하지 못했습니다.'));assert.ok(!text(view.toJSON()).includes('protected-content'));
- fail=false;tier='GOLD';
- await act(async()=>{await new Promise(resolve=>setTimeout(resolve,2200));});
- assert.ok(text(view.toJSON()).includes('protected-content'),'temporary API failure recovers without remounting or refreshing');
+ requests.length=0;fail=true;
+ await act(async()=>{view=TestRenderer.create(React.createElement(MemoryRouter,null,React.createElement(Page)));});
+ assert.equal(view.root.findAllByProps({className:'note-open'}).length,6,'network failure does not block page entry');
+ await act(async()=>view.root.findAllByProps({className:'note-open'})[0].props.onClick());
+ assert.ok(text(view.toJSON()).includes('자료를 불러오지 못했습니다.'));
+ assert.ok(!text(view.toJSON()).includes('등급'));
  await act(()=>view.unmount());view=null;
  const {changeNickname}=await server.ssrLoadModule('/src/sync.js');
  localStorage.setItem('sync:account',JSON.stringify({nickname:'before',token:'same-token'}));
@@ -43,9 +52,9 @@ try{
  assert.deepEqual(JSON.parse(localStorage.getItem('sync:account')),{nickname:'after',token:'same-token'});
  assert.equal(requests.at(-1).headers.Authorization,'Bearer same-token');
  for(const file of ['ipe-written-summary.pdf','ipe-written-review.pdf','sqld-concepts.pdf','ipe-silgi-theory.pdf','adsp-summary.pdf','bigdata-analyst-summary.pdf']){
-  assert.equal(existsSync(`public/notes/${file}`),false,'no public PDF bypass');
+  assert.equal(existsSync(`public/notes/${file}`),false,'PDFs remain served by the backend');
   assert.ok(existsSync(`../backend/src/main/resources/private-notes/${file}`));
  }
  assert.deepEqual(errors,[]);
- console.log('Membership passed: all five tier gates, network failure blocks access, duplicate nickname preserves identity, successful rename preserves token, private PDF packaging. No live network.');
+ console.log('Membership passed: guest and all five tiers can open theory PDFs without membership requests or identity headers, PDF error feedback, nickname uniqueness, stable identity, backend PDF packaging. No live network.');
 }finally{if(view)await act(()=>view.unmount());await server.close();console.error=originalError;}

@@ -1,7 +1,6 @@
 import { lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
-import GoldGate from './components/GoldGate';
 import Home from './pages/Home';
 import './App.css';
 import './exam.css';
@@ -47,9 +46,9 @@ function App() {
           <Route path="interview" element={<InterviewPracticePage />} />
           <Route path="technical-interview" element={<TechnicalInterviewPage />} />
           <Route path="notes" element={<CsNotesPage />} />
-          <Route path="major" element={<GoldGate><MajorPage /></GoldGate>} />
-          <Route path="major/:company" element={<GoldGate><ExamCompanyPage /></GoldGate>} />
-          <Route path="major-exam" element={<GoldGate><MajorExamPage /></GoldGate>} />
+          <Route path="major" element={<MajorPage />} />
+          <Route path="major/:company" element={<ExamCompanyPage />} />
+          <Route path="major-exam" element={<MajorExamPage />} />
           <Route path="exam" element={<ExamListPage />} />
           <Route path="exam/category/:category" element={<ExamListPage />} />
           <Route path="exam/:company" element={<ExamCompanyPage />} />
