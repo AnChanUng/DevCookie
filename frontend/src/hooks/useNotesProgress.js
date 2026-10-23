@@ -30,12 +30,17 @@ export default function useNotesProgress(user) {
     if (!user || busy.current) return;
     busy.current = true;
     setStatus('saving');
+    if (id) {
+      const local = read(user);
+      const next = { ...local, [id]: { done: !local[id]?.done, at: Math.max(Date.now(), (local[id]?.at || 0) + 1) } };
+      cache(user, next);
+      if (alive.current) setData(next);
+    }
     const config = { headers: { Authorization: `Bearer ${user.token}` }, timeout: 90000 };
     try {
       const response = await api.get(endpoint, config);
       const remote = response.data.data ? JSON.parse(response.data.data).completed || {} : {};
-      let merged = migrateNotesCompletion(mergeNotes(read(user), remote));
-      if (id) merged = { ...merged, [id]: { done: !merged[id]?.done, at: Math.max(Date.now(), (merged[id]?.at || 0) + 1) } };
+      const merged = migrateNotesCompletion(mergeNotes(read(user), remote));
       cache(user, merged);
       if (alive.current) setData(merged);
       if (JSON.stringify(merged) !== JSON.stringify(remote)) {
