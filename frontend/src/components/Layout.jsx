@@ -62,6 +62,9 @@ export default function Layout() {
               <Link to="/notes" className={location.pathname === '/notes' ? 'active' : ''}>
                 전공노트
               </Link>
+              <a href="https://gitseon.github.io/study-space/" target="_blank" rel="noopener noreferrer" aria-label="스터디 스페이스 (새 탭에서 열림)">
+                스터디 스페이스 <span aria-hidden="true">↗</span>
+              </a>
               <Link to="/exam" className={location.pathname.startsWith('/exam') || location.pathname === '/computer-general' || location.pathname === '/topics' || location.pathname === '/calc' ? 'active' : ''}>
                 기업별 기출
               </Link>
