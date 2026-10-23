@@ -56,40 +56,152 @@ export async function signOut() {
   setAccount(null);
 }
 
-// 다른 기기에서 로그아웃해 토큰이 사라졌으면 이 기기도 로그아웃 상태로 돌린다
-const guard = (err) => {
-  if (err?.response?.status === 401) setAccount(null);
-  throw err;
+// A failed request may belong to an earlier login. Never log out its successor.
+const guard = (error, user) => {
+  if (error?.response?.status === 401 && account()?.token === user?.token) setAccount(null);
+  throw error;
 };
 
-export async function fetchRemote(company) {
-  const { data } = await api.get(`/exam/progress/${company}`, auth()).catch(guard);
-  try { return data.data ? JSON.parse(data.data) : null; } catch { return null; }
+export async function fetchRemote(company, user = account()) {
+  if (!user) return null;
+  const deadline = Date.now() + 90000;
+  for (let attempt = 0; ; attempt++) {
+    if (account()?.token !== user.token) return null;
+    let response;
+    try {
+      response = await api.get(`/exam/progress/${company}`, {
+        headers: { Authorization: `Bearer ${user.token}` }, timeout: Math.max(1, deadline - Date.now()),
+      });
+    } catch (error) {
+      const status = error?.response?.status;
+      const retryAfter = Number(error?.response?.headers?.['retry-after']) * 1000;
+      const delay = status === 429 ? Math.max(1500, retryAfter || 5000) : attempt === 0 ? 1500 : 3500;
+      const transient = !status || status === 429 || (status >= 500 && status <= 599);
+      if (!transient || attempt >= 2 || Date.now() + delay >= deadline) return guard(error, user);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      continue;
+    }
+    if (account()?.token !== user.token) return null;
+    return response.data.data ? JSON.parse(response.data.data) : null;
+  }
 }
 
-// 답을 고를 때마다 서버를 부르지 않게 문제은행마다 잠깐 모았다가 마지막 상태만 올린다
 const timers = new Map();
 const pending = new Map();
+const running = new Map();
+const ownerKey = user => user?.id ? `user:${user.id}` : `nickname:${user?.nickname}`;
+const queueKey = (user, company) => `${ownerKey(user)}:${company}`;
+const storageKey = user => `sync:pending:v1:${ownerKey(user)}`;
+const isCurrent = user => !!user && account()?.token === user.token;
 
-const flush = (company) => {
-  const data = pending.get(company);
-  if (!data || !account()) return Promise.resolve();
-  pending.delete(company);
-  return api.put(`/exam/progress/${company}`, { data: JSON.stringify(data) }, auth())
-    .catch(guard)
-    .catch(() => { if (!pending.has(company)) pending.set(company, data); }); // 실패한 것은 다음 저장 때 다시 올린다
-};
-
-export function pushRemote(company, data, delay = 1500) {
-  if (!account()) return;
-  pending.set(company, data);
-  clearTimeout(timers.get(company));
-  timers.set(company, setTimeout(() => flush(company), delay));
+function persist(user) {
+  const records = {};
+  for (const { entry } of running.values()) {
+    if (ownerKey(entry.user) === ownerKey(user)) records[entry.company] = entry.data;
+  }
+  for (const entry of pending.values()) {
+    if (ownerKey(entry.user) === ownerKey(user)) records[entry.company] = entry.data;
+  }
+  try {
+    if (Object.keys(records).length) localStorage.setItem(storageKey(user), JSON.stringify(records));
+    else localStorage.removeItem(storageKey(user));
+  } catch { /* The regular local progress record is retained as well. */ }
 }
 
-// 지금 바로 올리고 끝날 때까지 기다린다
+function schedule(key, delay) {
+  clearTimeout(timers.get(key));
+  const timer = setTimeout(() => {
+    timers.delete(key);
+    const entry = pending.get(key);
+    if (entry && isCurrent(entry.user)) void flush(entry.company, entry.user);
+  }, delay);
+  timer.unref?.();
+  timers.set(key, timer);
+}
+
+async function flush(company, user) {
+  const key = queueKey(user, company);
+  if (!isCurrent(user)) return false;
+  const active = running.get(key);
+  if (active) {
+    await active.promise;
+    return pending.has(key) ? flush(company, user) : true;
+  }
+  const entry = pending.get(key);
+  if (!entry) return true;
+  clearTimeout(timers.get(key)); timers.delete(key);
+  pending.delete(key);
+  const promise = (async () => {
+    let saved = false, retry = true, retryDelay = 5000;
+    try {
+      await api.put(`/exam/progress/${company}`, { data: JSON.stringify(entry.data) }, {
+        headers: { Authorization: `Bearer ${user.token}` }, timeout: 90000,
+      }).catch(error => guard(error, user));
+      saved = true;
+    } catch (error) {
+      const status = error?.response?.status;
+      retry = !status || status === 408 || status === 429 || status >= 500;
+      if (status === 429) retryDelay = Math.max(5000, Number(error.response.headers?.['retry-after']) * 1000 || 5000);
+      if (!pending.has(key)) pending.set(key, entry);
+    } finally {
+      running.delete(key);
+      persist(user);
+      if (pending.has(key) && isCurrent(pending.get(key).user) && (saved || retry)) schedule(key, saved ? 0 : retryDelay);
+    }
+    return saved;
+  })();
+  running.set(key, { entry, promise });
+  return promise;
+}
+
+function enqueue(company, data) {
+  const user = account();
+  if (!user) return null;
+  const key = queueKey(user, company);
+  pending.set(key, { company, data, user: { ...user } });
+  persist(user);
+  return { key, user };
+}
+
+export function pushRemote(company, data, delay = 1500) {
+  const queued = enqueue(company, data);
+  if (queued) schedule(queued.key, delay);
+}
+
+// False means the record is safely queued locally, but not yet acknowledged.
 export function pushRemoteNow(company, data) {
-  pending.set(company, data);
-  clearTimeout(timers.get(company));
-  return flush(company);
+  const queued = enqueue(company, data);
+  return queued ? flush(company, queued.user) : Promise.resolve(false);
+}
+
+function restorePending() {
+  for (const timer of timers.values()) clearTimeout(timer);
+  timers.clear();
+  const user = account();
+  if (!user) return;
+  try {
+    const records = JSON.parse(localStorage.getItem(storageKey(user)) || '{}');
+    for (const [company, data] of Object.entries(records)) {
+      const key = queueKey(user, company);
+      if (!pending.has(key)) pending.set(key, { company, data, user: { ...user } });
+      else pending.get(key).user = { ...user };
+    }
+  } catch { /* Ignore corrupt queue metadata; regular progress is still local. */ }
+  for (const [key, entry] of pending) if (isCurrent(entry.user)) schedule(key, 0);
+}
+
+function flushPending() {
+  for (const entry of pending.values()) if (isCurrent(entry.user)) void flush(entry.company, entry.user);
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener(EVENT, restorePending);
+  window.addEventListener('storage', event => { if (event.key === KEY || event.key === null) restorePending(); });
+  window.addEventListener('online', restorePending);
+  window.addEventListener('focus', restorePending);
+  window.addEventListener('pagehide', flushPending);
+  if (typeof document !== 'undefined') document.addEventListener?.('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushPending();
+  });
+  restorePending();
 }

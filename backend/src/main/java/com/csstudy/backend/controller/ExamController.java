@@ -22,6 +22,8 @@ public class ExamController {
 
     private final ExamProgressRepository examProgressRepository;
     private final AuthService authService;
+    private final com.csstudy.backend.repository.UserRepository users;
+    private final com.csstudy.backend.service.ExamProgressMerge merge;
     private final com.csstudy.backend.service.MembershipService membership;
     private final com.csstudy.backend.service.PromotionNoticeService notices;
 
@@ -48,13 +50,19 @@ public class ExamController {
             return ResponseEntity.badRequest().body(Map.of("error", "저장 데이터가 너무 큽니다."));
         }
 
+        // Lock the account row even when this problem bank has no progress row yet.
+        users.findForUpdate(user.getId()).orElseThrow();
         var before=membership.membership(user);
         ExamProgress progress = examProgressRepository.findByUserIdAndCompany(user.getId(), company)
                 .orElseGet(() -> ExamProgress.builder().user(user).company(company).build());
-        progress.setData(data);
+        String merged = merge.merge(progress.getData(), data);
+        if (merged.length() > MAX_DATA_LENGTH) {
+            return ResponseEntity.badRequest().body(Map.of("error", "합친 기록이 너무 큽니다. 백업 후 문의해 주세요."));
+        }
+        progress.setData(merged);
         ExamProgress saved = examProgressRepository.saveAndFlush(progress);
         notices.announce("user:"+user.getId(),before,membership.membership(user));
 
-        return ResponseEntity.ok(Map.of("company", company, "updatedAt", saved.getUpdatedAt()));
+        return ResponseEntity.ok(Map.of("company", company, "updatedAt", saved.getUpdatedAt(), "data", saved.getData()));
     }
 }
