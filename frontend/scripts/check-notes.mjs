@@ -40,11 +40,12 @@ try {
   const answerVisible = id => view.root.findByProps({id:'answer-'+id}).props.hidden === false;
 
   const remote = { alice: {}, bob: {} }; const requests=[];
-  let failPut=false, holdGet=null;
+  let failPut=false, failGet=false, holdGet=null;
   api.defaults.adapter = async config => {
     const token=config.headers.Authorization?.replace('Bearer ','');
     assert.ok(token === 'alice' || token === 'bob');
     requests.push({ token, method:config.method, url:config.url });
+    if(failGet && config.method==='get') throw new Error('offline');
     if(holdGet && config.method==='get') await holdGet;
     if(config.method==='put') {
       if(failPut) throw new Error('offline');
@@ -106,6 +107,12 @@ try {
   failPut=false;
   await act(async()=>{await view.root.findAllByType('button').find(b=>text(b)==='다시 저장').props.onClick();});
   assert.equal(JSON.parse(remote.alice['/exam/progress/cs-notes-v1']).completed[entries[0].id].done,false,'Unchecked tombstone persists');
+  failGet=true;
+  await act(async()=>{await checkbox(entries[1].id).props.onChange();});
+  assert.equal(checkbox(entries[1].id).props.checked,true,'Offline GET must retain a new completion locally');
+  failGet=false;
+  await act(async()=>{await view.root.findAllByType('button').find(b=>text(b)==='다시 저장').props.onClick();});
+  assert.equal(JSON.parse(remote.alice['/exam/progress/cs-notes-v1']).completed[entries[1].id].done,true,'Retry uploads completion after offline GET');
   await act(()=>view.root.findByProps({'aria-label':'질문 검색'}).props.onChange({target:{value:'존재하지않는질문'}}));
   assert.ok(text(view.toJSON()).includes('조건에 맞는 질문이 없습니다'));
   await unmount();await mount(Page,`/notes#${entries[50].id}`);

@@ -36,7 +36,7 @@ public class NicknameService {
     }
     @Transactional
     public User rename(User existing,String name,String visitorId) {
-        User user=users.findForNicknameUpdate(existing.getId()).orElseThrow();
+        User user=users.findForUpdate(existing.getId()).orElseThrow();
         String clean=validate(name),owner="u:"+user.getId(),old=user.getNickname();
         claim(clean,owner,visitorId);
         user.setNickname(clean);users.saveAndFlush(user);

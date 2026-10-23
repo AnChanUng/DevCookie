@@ -39,11 +39,17 @@ const SYNC_EVERY_MS = 10 * 60 * 1000;
 
 function pullOtherDevices() {
   if (!account()) return null;
+  const key = `${SYNC_AT}:${account().id || account().nickname}`;
+  const token = account().token;
   try {
-    if (Date.now() - Number(sessionStorage.getItem(SYNC_AT) || 0) < SYNC_EVERY_MS) return null;
-    sessionStorage.setItem(SYNC_AT, String(Date.now()));
+    if (Date.now() - Number(sessionStorage.getItem(key) || 0) < SYNC_EVERY_MS) return null;
   } catch { /* storage unavailable */ }
-  return syncAllProgress(SYNC_KEYS);
+  return syncAllProgress(SYNC_KEYS).then(result => {
+    if (account()?.token === token) {
+      try { sessionStorage.setItem(key, String(Date.now())); } catch { /* storage unavailable */ }
+    }
+    return result;
+  });
 }
 
 // 문제를 많이 푼 사람 순위. 지금까지 푼 문제 수를 서버에 알리고 순위를 받아 온다
