@@ -4,6 +4,7 @@ import TestRenderer, { act } from 'react-test-renderer';
 import { MemoryRouter } from 'react-router-dom';
 import { createServer } from 'vite';
 globalThis.IS_REACT_ACT_ENVIRONMENT=true;
+globalThis.window=new EventTarget();
 const values=new Map();
 globalThis.localStorage={getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,String(v))};
 const server=await createServer({server:{middlewareMode:true,hmr:false},appType:'custom'});
@@ -21,7 +22,7 @@ try {
  };
  await act(async()=>{view=TestRenderer.create(React.createElement(MemoryRouter,null,React.createElement(Rank)));await new Promise(r=>setImmediate(r));});
  assert.equal(view.root.findAllByType('li').length,6,'Top five plus self');
- assert.ok(text(view.toJSON()).includes('전체 총 772문제 풀이 완료'));
+ assert.ok(view.root.findByProps({'aria-label':'전체 총 772문제 풀이 완료'}));
  const toggle=()=>view.root.findAllByType('button').find(b=>b.props['aria-controls']==='solve-rank-results');
  await act(()=>toggle().props.onClick());
  assert.equal(view.root.findAllByType('li').length,8);
