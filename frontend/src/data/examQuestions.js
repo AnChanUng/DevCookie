@@ -159,7 +159,7 @@ export const EXAM_CATEGORIES = [
   { key: "finance", name: "금융공기업", desc: "금융공기업 · 금융권 IT직무 필기" },
   { key: "public", name: "공기업", desc: "일반 공기업 전산직 전공필기" },
   // 기업 문제집이 아닌 기술 과목 문제집. 기업별 기출이 아니라 필기이론 화면(/major)에 모아 보여 준다
-  { key: "stack", name: "개발 스택", desc: "Spring · JPA 기술 면접 · 필기 대비", unit: "과목", hub: "major" },
+  { key: "stack", name: "개발 스택", desc: "Spring · JPA 기술 면접 · 필기 대비", unit: "과목", hub: "web" },
   // hub가 있는 분류는 기업별 기출이 아니라 그 이름의 상단 메뉴(/ssafy)에 모아 보여 준다
   { key: "major", name: "전공필기", desc: "SSAFY 과목평가 · 객관식 · 단답형 · 서술형", unit: "과목", hub: "ssafy" },
   { key: "monthly", name: "월말평가", desc: "SSAFY 월말평가 서술형 (구현 문제 제외)", unit: "과목", hub: "ssafy" },

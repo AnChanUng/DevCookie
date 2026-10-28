@@ -5,6 +5,7 @@ import { track } from '../track';
 import ChaosChat from './ChaosChat';
 import StudyAmbience from './StudyAmbience';
 import StudyCount from './StudyCount';
+import RankWelcome from './RankWelcome';
 import MemberMenu from './MemberMenu';
 import PromotionAnnouncements from './PromotionAnnouncements';
 
@@ -62,22 +63,19 @@ export default function Layout() {
               <Link to="/notes" className={location.pathname === '/notes' ? 'active' : ''}>
                 전공노트
               </Link>
-              <Link to="/web-essentials" className={location.pathname === '/web-essentials' || location.pathname === '/notes/web-essentials' ? 'active' : ''}>
-                웹 필수지식
-              </Link>
               <a href="https://gitseon.github.io/study-space/" target="_blank" rel="noopener noreferrer" aria-label="gs study (새 탭에서 열림)">
                 gs study <span aria-hidden="true">↗</span>
               </a>
               <Link to="/exam" className={location.pathname.startsWith('/exam') || location.pathname === '/computer-general' || location.pathname === '/topics' || location.pathname === '/calc' ? 'active' : ''}>
                 기업별 기출
               </Link>
-              <Link to="/ncs" className={location.pathname === '/ncs' ? 'active' : ''}>
-                NCS
+              <Link to="/aptitude" className={location.pathname.startsWith('/aptitude') || location.pathname === '/ncs' ? 'active' : ''}>
+                NCS/인적성
               </Link>
-              <Link to="/aptitude" className={location.pathname.startsWith('/aptitude') ? 'active' : ''}>
-                인적성
+              <Link to="/web" className={location.pathname.startsWith('/web') || location.pathname === '/notes/web-essentials' || location.pathname === '/major/spring' ? 'active' : ''}>
+                웹
               </Link>
-              <Link to="/major" className={location.pathname.startsWith('/major') ? 'active' : ''}>
+              <Link to="/major" className={(location.pathname.startsWith('/major') && location.pathname !== '/major/spring') ? 'active' : ''}>
                 필기이론
               </Link>
             </nav>
@@ -109,6 +107,7 @@ export default function Layout() {
       </main>
 
       <PromotionAnnouncements />
+      {!location.pathname.startsWith('/admin') && <RankWelcome />}
       <StudyAmbience />
       {SHOW_CHAOS_CHAT && <ChaosChat />}
     </>

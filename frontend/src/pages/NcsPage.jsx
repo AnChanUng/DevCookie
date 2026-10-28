@@ -1,7 +1,7 @@
 import { NCS } from '../data/examQuestions';
 import { CompanyExam } from './ExamCompanyPage';
 
-const BACK = { to: '/', label: '← 홈으로' };
+const BACK = { to: '/aptitude', label: '← NCS/인적성' };
 
 // NCS 직업기초능력 문제은행. 회사별 기출문제와 같은 풀이 화면을 쓴다
 export default function NcsPage() {
