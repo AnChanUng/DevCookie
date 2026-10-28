@@ -1,7 +1,6 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { CS_NOTES, NOTE_SOURCES } from '../data/csNotes';
-import { WEB_NOTE_SOURCES } from '../data/webEssentials';
 import { account, onAccountChange } from '../sync';
 import useNotesProgress from '../hooks/useNotesProgress';
 import NoteAnswer from '../components/NoteAnswer';
@@ -11,6 +10,8 @@ const entries = CS_NOTES.flatMap(s => s.items.map(e => ({ ...e, subject: s.title
 const tokenSnapshot = () => account()?.token || '';
 export default function CsNotesPage() {
   const token = useSyncExternalStore(onAccountChange, tokenSnapshot, () => '');
+  const { hash } = useLocation();
+  if (hash.startsWith('#web-')) return <Navigate to={`/notes/web-essentials${hash}`} replace />;
   return <NotesWorkspace key={token} user={token ? account() : null} />;
 }
 function NotesWorkspace({ user }) {
@@ -44,6 +45,7 @@ function NotesWorkspace({ user }) {
         <div className="notes-progress"><strong>학습 완료 {completed} / {entries.length}</strong><progress value={completed} max={entries.length} aria-label="전공노트 학습 완료" /></div>
         <Link to="/account">내 계정 →</Link>
       </header>
+      <Link className="notes-collection-link" to="/notes/web-essentials"><span><strong>웹 필수지식</strong><small>새로 정리한 50문답을 주제별로 읽기</small></span><span aria-hidden="true">별도 노트 열기 →</span></Link>
       <div className="notes-save-status" role="status">{statusText} {(status === 'error') && <button type="button" onClick={retry}>다시 저장</button>}</div>
       <div className="notes-layout">
         <aside className="notes-index">
@@ -67,7 +69,7 @@ function NotesWorkspace({ user }) {
           </nav>
         </aside>
         <div className="notes-content">
-          <p className="notes-list-intro">질문을 먼저 설명해 보고 ‘답 보기’로 확인한 뒤 학습 완료를 체크하세요. 웹 필수지식은 새로 작성한 모범답안입니다. 기존 전공 문답의 원문과 보완 답변, 과목별 출처·이용 조건은 아래에서 확인할 수 있습니다.</p>
+          <p className="notes-list-intro">질문을 먼저 설명해 보고 ‘답 보기’로 확인한 뒤 학습 완료를 체크하세요. 원문과 보완 답변, 과목별 출처·이용 조건은 아래에서 확인할 수 있습니다.</p>
           {selected && hideDone && data[selected.id]?.done && <p className="notes-empty">이 링크의 질문은 학습 완료되어 숨겨져 있습니다. ‘완료한 지식 숨기기’를 해제하면 다시 볼 수 있습니다.</p>}
           {CS_NOTES.map(section => {
             const list = visible.filter(e => e.section === section.id);
@@ -87,10 +89,6 @@ function NotesWorkspace({ user }) {
           })}
           {!visible.length && <div className="notes-empty"><h2>표시할 질문이 없습니다.</h2><p>완료한 지식 숨기기를 해제하거나 검색·과목 조건을 바꿔보세요.</p></div>}
           <details className="notes-sources"><summary>출처 · 이용 조건</summary>
-            <h3>웹 필수지식</h3>
-            <p>NAVER D2 ‘백엔드 개발자를 꿈꾸는 학생개발자에게’(2018.06.21)의 주제를 참고해 2026.10.28에 질문과 모범답안을 새로 작성했습니다. 원문 본문을 이식한 자료가 아니며 NAVER의 공식 답변·검수 자료가 아닙니다. 각 답변의 참고 자료에서 개념과 적용 조건을 더 확인할 수 있습니다.</p>
-            <ul>{WEB_NOTE_SOURCES.map(s => <li key={s.url}><a href={s.url} target="_blank" rel="noreferrer">{s.title} ↗</a></li>)}</ul>
-            <h3>기존 전공 문답</h3>
             <p>원문 저작자: ksundong 및 저장소 기여자. 원문은 CC BY-NC-SA로 명시하며 CC BY-NC 2.0 KR 링크도 함께 제공합니다. 이식·보완한 해당 문답은 저작자표시·비영리·동일조건으로 제공합니다. 요청한 항목 제외, 질문별 분리와 서식 적용에 더해 2026.10.15에 기술적 오류 정정·빈 답변 작성·예시 보충을 진행했습니다. 보완 답변은 원문 저자의 답변과 구분하며 제목 옆 ‘원문’에서 변경 전 내용을 볼 수 있습니다. 빅데이터는 별도 보충 문답입니다.</p>
             <ul>{NOTE_SOURCES.map(s => <li key={s.title}><a href={s.url} target="_blank" rel="noreferrer">{s.title} ↗</a></li>)}</ul>
           </details>
