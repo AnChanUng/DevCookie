@@ -28,21 +28,13 @@ try{
   requests.length=0;
   await act(async()=>{view=TestRenderer.create(React.createElement(MemoryRouter,null,React.createElement(Page)));});
   assert.ok(text(view.toJSON()).includes('필기이론'));
-  assert.equal(view.root.findAllByProps({className:'note-open'}).length,6);
-  await act(async()=>view.root.findAllByProps({className:'note-open'})[0].props.onClick());
-  assert.equal(view.root.findAllByType('iframe').length,1,`PDF opens for ${tier||'guest'}`);
-  assert.ok(requests.some(r=>r.url==='/theory/notes/ipe-written-summary.pdf'));
-  assert.ok(requests.every(r=>r.url!=='/membership'),'theory does not wait for the membership API');
-  assert.ok(requests.every(r=>!r.headers.Authorization&&!r.headers['X-Visitor-Id']),'public PDF requires no account or visitor headers');
+  assert.ok(text(view.toJSON()).includes('요약노트 제공 일시 중단'));
+  assert.equal(view.root.findAllByType('iframe').length,0);
+  assert.equal(view.root.findAllByProps({className:'note-open'}).length,0);
+  assert.equal(view.root.findAllByProps({className:'note-dl'}).length,0);
+  assert.equal(requests.length,0,'paused page must not fetch any PDFs or membership');
   await act(()=>view.unmount());view=null;
  }
- requests.length=0;fail=true;
- await act(async()=>{view=TestRenderer.create(React.createElement(MemoryRouter,null,React.createElement(Page)));});
- assert.equal(view.root.findAllByProps({className:'note-open'}).length,6,'network failure does not block page entry');
- await act(async()=>view.root.findAllByProps({className:'note-open'})[0].props.onClick());
- assert.ok(text(view.toJSON()).includes('자료를 불러오지 못했습니다.'));
- assert.ok(!text(view.toJSON()).includes('등급'));
- await act(()=>view.unmount());view=null;
  const {changeNickname}=await server.ssrLoadModule('/src/sync.js');
  localStorage.setItem('sync:account',JSON.stringify({nickname:'before',token:'same-token'}));
  fail=true;
@@ -52,9 +44,9 @@ try{
  assert.deepEqual(JSON.parse(localStorage.getItem('sync:account')),{nickname:'after',token:'same-token'});
  assert.equal(requests.at(-1).headers.Authorization,'Bearer same-token');
  for(const file of ['ipe-written-summary.pdf','ipe-written-review.pdf','sqld-concepts.pdf','ipe-silgi-theory.pdf','adsp-summary.pdf','bigdata-analyst-summary.pdf']){
-  assert.equal(existsSync(`public/notes/${file}`),false,'PDFs remain served by the backend');
-  assert.ok(existsSync(`../backend/src/main/resources/private-notes/${file}`));
+  assert.equal(existsSync(`public/notes/${file}`),false,'no static public PDF copies');
+  assert.equal(existsSync(`../backend/src/main/resources/private-notes/${file}`),false,'PDF must not be bundled in the backend');
  }
  assert.deepEqual(errors,[]);
- console.log('Membership passed: guest and all five tiers can open theory PDFs without membership requests or identity headers, PDF error feedback, nickname uniqueness, stable identity, backend PDF packaging. No live network.');
+ console.log('Membership passed: PDFs unavailable for guests and all five tiers, no document fetches or embeds, no packaged PDFs, nickname uniqueness and stable identity. No live network.');
 }finally{if(view)await act(()=>view.unmount());await server.close();console.error=originalError;}
