@@ -1,0 +1,419 @@
+// Original study answers inspired by the topics in the user-supplied D2 article.
+// Do not import the article's prose or attribute these answers to NAVER.
+const references = {
+  d2: { title: 'NAVER D2 — 백엔드 개발자를 꿈꾸는 학생개발자에게 (2018)', url: 'https://d2.naver.com/news/3435170' },
+  http: { title: 'RFC 9110 — HTTP Semantics', url: 'https://www.rfc-editor.org/rfc/rfc9110.html' },
+  http2: { title: 'RFC 9113 — HTTP/2', url: 'https://www.rfc-editor.org/rfc/rfc9113.html' },
+  http3: { title: 'RFC 9114 — HTTP/3', url: 'https://www.rfc-editor.org/rfc/rfc9114.html' },
+  rest: { title: 'Roy Fielding — REST 제약 조건', url: 'https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm' },
+  rendering: { title: 'MDN — Server-side rendering', url: 'https://developer.mozilla.org/en-US/docs/Glossary/SSR' },
+  hydration: { title: 'React — hydrateRoot', url: 'https://react.dev/reference/react-dom/client/hydrateRoot' },
+  openapi: { title: 'OpenAPI Specification', url: 'https://spec.openapis.org/oas/latest.html' },
+  graphql: { title: 'GraphQL — Queries', url: 'https://graphql.org/learn/queries/' },
+  tls: { title: 'MDN — TLS', url: 'https://developer.mozilla.org/en-US/docs/Web/Security/Transport_Layer_Security' },
+  pgindex: { title: 'PostgreSQL — Indexes', url: 'https://www.postgresql.org/docs/current/indexes.html' },
+  pgexplain: { title: 'PostgreSQL — Using EXPLAIN', url: 'https://www.postgresql.org/docs/current/using-explain.html' },
+  pgprocedures: { title: 'PostgreSQL — User-Defined Procedures', url: 'https://www.postgresql.org/docs/current/xproc.html' },
+  pgreplication: { title: 'PostgreSQL — High Availability and Replication', url: 'https://www.postgresql.org/docs/current/high-availability.html' },
+  pgisolation: { title: 'PostgreSQL — Transaction Isolation', url: 'https://www.postgresql.org/docs/current/transaction-iso.html' },
+  sharding: { title: 'Microsoft Azure — Sharding pattern', url: 'https://learn.microsoft.com/en-us/azure/architecture/patterns/sharding' },
+  cache: { title: 'Microsoft Azure — Cache-Aside pattern', url: 'https://learn.microsoft.com/en-us/azure/architecture/patterns/cache-aside' },
+  redis: { title: 'Redis — EXPIRE', url: 'https://redis.io/docs/latest/commands/expire/' },
+  s3: { title: 'Amazon S3 — Presigned URLs', url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html' },
+  elastic: { title: 'Elasticsearch — Near real-time search', url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/near-real-time.html' },
+  scope: { title: 'Spring — Bean scopes', url: 'https://docs.spring.io/spring-framework/reference/core/beans/factory-scopes.html' },
+  concurrency: { title: 'Java — java.util.concurrent', url: 'https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/package-summary.html' },
+  executor: { title: 'Java — ThreadPoolExecutor', url: 'https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html' },
+  webflux: { title: 'Spring — WebFlux와 동시성 모델', url: 'https://docs.spring.io/spring-framework/reference/web/webflux/new-framework.html' },
+  virtual: { title: 'OpenJDK JEP 444 — Virtual Threads', url: 'https://openjdk.org/jeps/444' },
+  sql: { title: 'OWASP — SQL Injection Prevention', url: 'https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html' },
+  xss: { title: 'OWASP — XSS Prevention', url: 'https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html' },
+  csrf: { title: 'OWASP — CSRF Prevention', url: 'https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html' },
+  supplychain: { title: 'OWASP — Vulnerable Dependency Management', url: 'https://cheatsheetseries.owasp.org/cheatsheets/Vulnerable_Dependency_Management_Cheat_Sheet.html' },
+  unit: { title: 'Spring — Unit Testing', url: 'https://docs.spring.io/spring-framework/reference/testing/unit.html' },
+  mockmvc: { title: 'Spring — MockMvc', url: 'https://docs.spring.io/spring-framework/reference/testing/mockmvc.html' },
+  testtx: { title: 'Spring — Test-managed Transactions', url: 'https://docs.spring.io/spring-framework/reference/testing/testcontext-framework/tx.html' },
+  tdd: { title: 'Martin Fowler — Test Driven Development', url: 'https://martinfowler.com/bliki/TestDrivenDevelopment.html' },
+  vo: { title: 'Martin Fowler — Value Object', url: 'https://martinfowler.com/bliki/ValueObject.html' },
+  dto: { title: 'Martin Fowler — Data Transfer Object', url: 'https://martinfowler.com/eaaCatalog/dataTransferObject.html' },
+  msa: { title: 'Martin Fowler / James Lewis — Microservices', url: 'https://martinfowler.com/articles/microservices.html' },
+  retry: { title: 'AWS Builders’ Library — Timeouts, retries, and backoff with jitter', url: 'https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/' },
+  gradle: { title: 'Gradle — Dependency Locking', url: 'https://docs.gradle.org/current/userguide/dependency_locking.html' },
+  github: { title: 'GitHub — About protected branches', url: 'https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches' },
+  deploy: { title: 'Kubernetes — Deployments', url: 'https://kubernetes.io/docs/concepts/workloads/controllers/deployment/' },
+  migration: { title: 'Martin Fowler — Parallel Change', url: 'https://martinfowler.com/bliki/ParallelChange.html' },
+  gc: { title: 'Oracle — Java 21 Garbage Collection Tuning Guide', url: 'https://docs.oracle.com/en/java/javase/21/gctuning/' },
+  jfr: { title: 'Oracle — Java Flight Recorder', url: 'https://docs.oracle.com/en/java/javase/21/jfapi/' },
+  k6: { title: 'Grafana k6 — Test types', url: 'https://grafana.com/docs/k6/latest/testing-guides/test-types/' },
+  otel: { title: 'OpenTelemetry — Observability primer', url: 'https://opentelemetry.io/docs/concepts/observability-primer/' },
+  cloud: { title: 'NIST SP 800-145 — Cloud Computing', url: 'https://csrc.nist.gov/pubs/sp/800/145/final' },
+  serverless: { title: 'AWS Lambda — Best practices', url: 'https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html' },
+};
+
+const note = (id, topic, title, question, answer, refs) => ({
+  id: `web-${id}`, topic, title, question, answer, answerMarkdown: answer,
+  answerLabel: '모범답안', references: refs.map(key => references[key]),
+});
+
+export const WEB_ESSENTIALS = {
+  id: 'web-essentials',
+  title: '웹 필수지식',
+  description: 'NAVER D2의 2018년 글에서 다룬 주제를 학습 질문으로 재구성했습니다. 모범답안은 새로 작성한 학습 예시이며 NAVER의 공식 답변이 아닙니다. HTTP/3, 가상 스레드 등 이후의 기술 변화도 보충했습니다.',
+  items: [
+    note('backend-role', '학습 방향', '백엔드 개발자의 역할',
+      '백엔드 개발자는 무엇을 책임지고, 다른 개발 직군과 어떻게 협업하나요?',
+      `**사용자 요청을 업무 규칙에 따라 처리하고 데이터를 안전하게 저장·제공하는 것이 핵심입니다.** API, 인증·권한, 트랜잭션, 외부 시스템 연동과 운영 중 장애 대응까지 서비스의 신뢰성을 책임집니다.
+
+프런트엔드와는 요청·응답 계약을, 인프라 담당자와는 배포·용량·관측 방법을, DBA와는 데이터 구조와 쿼리 성능을 맞춥니다. 작은 팀에서는 이 역할을 한 사람이 겸할 수도 있습니다.
+
+예를 들어 주문 API는 화면에 성공을 표시하는 데 그치지 않고 재고 차감과 주문 저장의 일관성, 중복 요청, 실패 시 복구까지 설계해야 합니다.`, ['d2']),
+    note('operations', '학습 방향', '안정성과 운영 책임',
+      '백엔드 서비스가 일단 실행되는 것과 운영할 수 있는 것의 차이는 무엇인가요?',
+      `**운영 가능한 서비스는 정상 요청뿐 아니라 부하·장애·변경 상황에서도 약속한 품질을 지킵니다.** 응답 시간과 오류율 목표를 정하고 이를 관측하며, 장애 시 담당자가 원인을 좁히고 복구할 수 있어야 합니다.
+
+시간 제한, 자원 상한, 백업과 복구 연습, 배포 취소 절차가 필요합니다. 온콜은 이런 준비를 대신하는 수단이 아니라 자동 탐지와 대응 절차를 사람이 보완하는 운영 방식입니다.
+
+작은 프로젝트라도 “DB가 느려지면 어떻게 되는가, 지난 배포로 돌아갈 수 있는가”에 답해 보면 운영 준비 수준을 점검할 수 있습니다.`, ['d2', 'otel']),
+    note('learning', '학습 방향', '기본기와 학습 순서',
+      '백엔드 입문자가 기본기와 프레임워크를 어떤 순서로 공부하면 좋을까요?',
+      `**한 언어로 작은 서비스를 끝까지 만들면서 HTTP·DB·OS 원리를 연결해 익히는 것이 좋습니다.** 처음부터 모든 도구를 공부하기보다 요청이 들어와 데이터가 저장되고 응답되는 경로를 설명할 수 있어야 합니다.
+
+1. 언어와 자료구조, Git, 기본 테스트를 익힙니다.
+2. HTTP API와 관계형 DB로 작은 기능을 구현합니다.
+3. 인증·트랜잭션·인덱스와 오류 처리를 추가합니다.
+4. 배포한 뒤 로그·지표와 부하 테스트로 문제를 찾아 개선합니다.
+
+면접에서는 도구 목록보다 선택 이유, 겪은 실패, 측정한 개선 결과를 실제 경험으로 설명합니다.`, ['d2']),
+    note('tool-choice', '학습 방향', '도구 선택과 공식 문서',
+      'Jenkins나 AWS를 사용할 줄 아는 것이 실력인가요? 기술은 어떻게 선택하나요?',
+      `**도구 경험은 가치가 있지만, 문제에 맞게 선택하고 운영할 수 있는 능력으로 이어져야 합니다.** 기능 요구, 장애 복구, 보안, 비용, 팀의 경험과 유지보수 상태를 비교합니다.
+
+공식 문서로 최소 예제를 실행한 뒤 서비스에 필요한 설정과 실패 동작을 확인하고, 결정 이유를 짧은 문서로 남깁니다. 경험이 없는 기술은 영향이 작은 기능에서 검증한 후 확대할 수 있습니다.
+
+예를 들어 관리형 DB는 설치 부담을 줄이지만 연결 제한, 백업 복구와 요금까지 알아야 제대로 선택한 것입니다. 유행이나 이력서에 쓸 기술 수만으로 결정하지 않습니다.`, ['d2']),
+    note('framework-basics', '학습 방향', '프레임워크와 동작 원리',
+      '프레임워크 사용법을 아는 것에서 한 단계 더 나아가려면 무엇을 확인해야 하나요?',
+      `**요청이 어떤 경로로 실행되고 객체와 자원이 언제 생성·공유·해제되는지 설명할 수 있어야 합니다.** SDK가 제공하는 자료구조와 실행 도구를 이해하고, 프레임워크의 의존성 주입·생명주기·예외 처리와 기본 설정을 확인합니다.
+
+예를 들어 컨트롤러에서 서비스를 호출하는 코드를 넘어 빈의 범위, 트랜잭션이 적용되는 경계, 연결을 반납하는 시점과 예외가 응답으로 바뀌는 위치를 추적합니다. 공식 문서와 작은 실험을 먼저 쓰고 필요하면 소스로 확인합니다.
+
+모든 내부 구현을 외울 필요는 없습니다. 사용하는 버전과 기본값을 알고 장애가 났을 때 가정을 검증할 수 있는 깊이를 목표로 합니다.`, ['scope', 'webflux', 'd2']),
+    note('growth', '학습 방향', '전문성, AI와 도메인',
+      '새로운 프레임워크나 AI 도구가 늘어날 때 개발자는 어떤 역량을 쌓아야 하나요?',
+      `**문제를 정의하고 결과를 검증하는 능력에 기본기와 도메인 지식을 더해야 합니다.** 특정 도구의 미래를 단정하기보다 데이터 모델, 통신, 동시성, 테스트처럼 도구가 바뀌어도 적용할 수 있는 원리를 익힙니다.
+
+AI가 작성한 코드도 권한 검사, 예외 상황, 성능과 라이선스 조건을 검토해야 합니다. 데이터 분석으로 확장하려면 수집 목적과 품질, 접근 권한뿐 아니라 분석 대상 업무의 의미를 이해해야 합니다.
+
+구체적인 경력 질문에는 자신의 프로젝트와 측정 결과를 넣어 답합니다. 2018년 글의 시장 전망이나 특정 회사 경험을 현재의 보장된 사실로 인용하지 않습니다.`, ['d2']),
+    note('http-versions', '웹 통신', 'HTTP/1.1, HTTP/2, HTTP/3',
+      'HTTP/1.1과 HTTP/2는 어떻게 다르고 HTTP/3는 무엇을 바꾸나요?',
+      `**요청·응답의 의미는 유지하면서 전송 방식을 개선한 버전들입니다.** HTTP/1.1은 지속 연결을 지원하지만 브라우저는 여러 요청을 처리하기 위해 여러 연결을 사용하는 경우가 많습니다. HTTP/2는 이진 프레임과 스트림으로 한 연결에서 요청들을 다중화하고 헤더를 압축합니다.
+
+HTTP/2는 TCP를 사용하므로 패킷 손실 시 같은 연결의 스트림들이 전송 계층에서 함께 기다릴 수 있습니다. HTTP/3는 UDP 위의 QUIC을 사용해 서로 다른 스트림 사이의 이런 대기를 줄입니다. 손실이 난 해당 스트림의 대기까지 사라지는 것은 아닙니다.
+
+새 버전이 모든 상황에서 빠른 것은 아닙니다. 네트워크 상태와 서버·클라이언트 지원, 실제 지연 시간을 확인합니다.`, ['http', 'http2', 'http3']),
+    note('http-methods', '웹 통신', '안전한 메서드와 멱등성',
+      'HTTP 메서드의 안전성과 멱등성은 무엇이며 재시도와 어떤 관계가 있나요?',
+      `**안전성은 클라이언트가 상태 변경을 요구하지 않는 성질이고, 멱등성은 같은 요청을 반복해도 의도한 최종 효과가 같은 성질입니다.** GET·HEAD는 안전하고 멱등적이며, PUT·DELETE는 멱등적이지만 안전한 메서드는 아닙니다. 서버가 접근 로그를 쓰는 것은 이 정의와 충돌하지 않습니다.
+
+POST와 PATCH는 메서드 자체로 멱등성을 보장하지 않습니다. 결제 생성 POST를 재시도하려면 사용자와 작업 범위에 묶인 멱등성 키를 저장하고 중복 효과를 막는 별도 설계가 필요합니다.
+
+DELETE를 두 번 호출해 응답 코드가 달라도 리소스가 삭제된 최종 효과가 같으면 멱등적일 수 있습니다. GET으로 삭제를 수행하면 안 됩니다.`, ['http']),
+    note('rest', '웹 통신', 'HTTP API, REST와 HATEOAS',
+      'JSON으로 통신하는 API는 모두 REST API인가요?',
+      `**HTTP로 JSON을 주고받는다는 사실만으로 REST의 모든 제약을 충족하지는 않습니다.** REST는 클라이언트·서버 분리, 무상태성, 캐시, 균일한 인터페이스, 계층화 등을 갖춘 아키텍처 스타일이며 코드 전송은 선택 제약입니다.
+
+균일한 인터페이스에는 리소스 식별과 표현뿐 아니라 응답의 하이퍼미디어를 따라 상태를 전이하는 HATEOAS도 포함됩니다. 예를 들어 주문 응답에 현재 가능한 취소 동작의 링크를 함께 제공할 수 있습니다.
+
+실무에서 일부 원칙만 적용했다면 그 범위를 설명하고 HTTP API라고 부를 수 있습니다. 무상태성은 서버에 업무 데이터를 저장하지 않는다는 뜻이 아니라 요청 이해에 필요한 문맥을 이전 요청의 대화 상태에 의존하지 않는다는 뜻입니다.`, ['rest', 'http']),
+    note('rendering', '웹 통신', 'CSR, SSR와 하이드레이션',
+      'CSR과 SSR은 어떻게 선택하고 하이드레이션은 무엇인가요?',
+      `**CSR은 브라우저에서 화면을 구성하고, SSR은 서버가 요청에 맞는 HTML을 만들어 전달합니다.** CSR은 앱 내부 상호작용에 유리할 수 있지만 초기 JavaScript 다운로드·실행 부담이 있습니다. SSR은 첫 콘텐츠 전달과 검색 수집에 도움이 될 수 있지만 서버 비용과 캐시·개인화 처리를 고려해야 합니다.
+
+하이드레이션은 서버가 만든 HTML에 클라이언트 코드가 이벤트 처리 등 상호작용을 연결하는 과정입니다. 서버와 클라이언트의 초기 렌더링 결과가 맞아야 합니다.
+
+공개 문서는 정적 생성이나 SSR, 로그인 후 대시보드는 CSR처럼 페이지별로 섞을 수 있습니다. 렌더링 위치와 무관하게 권한 검사는 서버가 수행합니다.`, ['rendering', 'hydration']),
+    note('api-contract', '웹 통신', 'API 계약과 오류 응답',
+      '클라이언트가 사용하기 좋은 HTTP API는 어떤 기준으로 설계하나요?',
+      `**요청·응답 구조, 권한과 실패 동작을 예측할 수 있는 계약을 만듭니다.** 리소스와 메서드를 일관되게 정하고 필수 값, 타입, 범위, 날짜 형식과 하위 호환 규칙을 문서화합니다.
+
+예를 들어 생성 성공은 201과 새 리소스 위치를, 잘못된 입력은 400을, 인증 정보 문제는 401을, 권한 부족은 403을 사용할 수 있습니다. 오류 본문에는 안정적인 오류 코드와 사용자가 조치할 메시지를 제공하고 내부 스택이나 비밀 정보는 제외합니다.
+
+OpenAPI 등으로 계약을 공유하고 정상·실패 응답을 검증합니다. 인증된 사용자인지와 요청한 데이터에 접근할 수 있는지는 별도로 검사합니다.`, ['http', 'openapi']),
+    note('pagination', '웹 통신', '페이징과 복잡한 검색',
+      '오프셋과 커서 페이징은 언제 선택하고 검색 API에서는 무엇을 제한해야 하나요?',
+      `**오프셋은 페이지 번호로 이동하기 쉽고, 커서는 정렬 위치를 이어 읽는 데 적합합니다.** 큰 오프셋은 많은 행을 건너뛰는 비용이 들 수 있고, 읽는 사이 데이터가 추가되면 중복·누락이 생길 수 있습니다.
+
+커서는 생성 시각과 고유 ID처럼 순서가 결정되는 복합 기준을 사용하고 그에 맞는 인덱스를 둡니다. 임의 페이지 이동이나 전체 건수 계산은 별도 비용이 듭니다. 커서만으로 여러 요청의 동일한 스냅샷이 보장되지는 않습니다.
+
+페이지 크기, 정렬 필드, 검색 조건의 수와 연산을 제한합니다. 복잡한 검색에 POST를 사용할 수도 있지만 GET과 같은 캐시·멱등성 의미가 자동으로 생기지는 않습니다.`, ['http', 'pgindex']),
+    note('graphql', '웹 통신', 'GraphQL과 HTTP API 선택',
+      'GraphQL을 도입하면 어떤 이점과 비용이 생기나요?',
+      `**GraphQL은 클라이언트가 타입 스키마에서 필요한 필드를 선택해 요청하도록 합니다.** 여러 화면의 데이터 요구가 다를 때 불필요한 필드 수신이나 여러 API 호출을 줄이는 데 도움이 될 수 있습니다.
+
+서버는 필드별 권한, 쿼리 깊이·복잡도 제한, N+1 조회, 오류와 캐시 전략을 설계해야 합니다. resolver를 나눴다는 이유로 DB 호출이 자동으로 효율적이거나 모든 요청이 빨라지지는 않습니다.
+
+단순 CRUD와 HTTP 캐시가 중요한 서비스에는 기존 HTTP API가 충분할 수 있습니다. 두 방식은 공존할 수 있으며 팀의 운영 경험과 실제 클라이언트 요구로 결정합니다.`, ['graphql', 'http']),
+    note('request-path', '웹 통신', 'URL 입력부터 HTTPS 응답까지',
+      '브라우저에 HTTPS 주소를 입력하면 어떤 과정으로 화면이 나오나요?',
+      `**이름 해석, 보안 연결, HTTP 통신, 화면 구성이 이어집니다.** 브라우저는 URL을 해석하고 캐시를 확인하며, 필요하면 DNS로 주소를 구합니다. 기존 연결이 없다면 HTTP/1.1·HTTP/2는 보통 TCP와 TLS, HTTP/3는 QUIC을 통해 연결합니다.
+
+CDN·프록시·서버 중 요청을 처리하는 구성 요소가 응답하면 HTML을 파싱하고 CSS·JavaScript 등을 추가로 받아 화면을 그립니다. 기존 캐시와 연결 때문에 일부 단계가 생략될 수 있습니다.
+
+TLS는 전송 중 기밀성·무결성과 보통 서버 인증을 제공합니다. HTTPS라도 권한 오류, XSS나 서버에 저장된 평문 비밀번호까지 해결해 주지는 않습니다.`, ['http', 'tls']),
+    note('database-basics', '데이터와 저장소', 'RDB 기본기와 인덱스',
+      '백엔드 개발자는 관계형 DB를 어느 수준까지 알아야 하나요?',
+      `**데이터 무결성을 표현하고, 쿼리의 비용과 트랜잭션 경계를 설명할 수 있어야 합니다.** 기본 키·외래 키·유일성 제약, 정규화, 조인, 인덱스, 격리 수준과 잠금이 출발점입니다.
+
+인덱스는 조회를 돕지만 저장 공간과 쓰기 비용이 들며 모든 쿼리에 사용되는 것은 아닙니다. 복합 인덱스의 열 순서와 조건·정렬 방식이 실제 실행 계획에 미치는 영향을 확인합니다.
+
+예를 들어 사용자별 최신 주문 조회라면 사용자 ID와 정렬 키를 고려한 인덱스를 검토합니다. 특정 인덱스가 항상 정답이라고 단정하지 않고 데이터 분포와 실행 계획으로 판단합니다.`, ['pgindex', 'pgisolation']),
+    note('query-tuning', '데이터와 저장소', '느린 쿼리와 ORM N+1',
+      'ORM을 쓰는 서비스에서 느린 조회를 어떻게 찾아 개선하나요?',
+      `**한 요청이 실행한 SQL의 수와 시간, 실제 읽은 행부터 확인합니다.** 느린 쿼리 로그와 추적으로 후보를 찾고 EXPLAIN으로 접근 경로와 추정 행 수를 봅니다. EXPLAIN ANALYZE는 실제 실행하므로 운영 데이터와 부하에 주의해야 합니다.
+
+목록 N개를 읽고 연관 데이터 조회가 N번 더 나가는 N+1은 fetch join, 배치 조회나 필요한 필드만 조회하는 방식으로 줄일 수 있습니다. 컬렉션 조인에 페이징을 섞을 때는 행 증가와 프레임워크 동작을 확인합니다.
+
+쿼리 호출 수, DB 시간, p95 지연을 전후 비교합니다. ORM이 SQL과 DB 비용을 없애 주는 것은 아닙니다.`, ['pgexplain', 'pgindex']),
+    note('joins', '데이터와 저장소', 'JOIN과 애플리케이션 조합',
+      '트래픽이 많은 서비스에서는 JOIN을 사용하면 안 되나요?',
+      `**JOIN 금지라는 보편 규칙은 없습니다.** 같은 DB 안의 적절히 인덱싱된 조인은 여러 번 원격 조회하는 것보다 효율적이고 일관된 결과를 얻기 쉬울 수 있습니다.
+
+여러 샤드나 다른 저장소에 데이터가 흩어져 있으면 애플리케이션에서 묶어 조회하고 조합할 수 있습니다. 이때 N+1 호출, 전송량, 부분 실패와 조회 시점 차이를 함께 다뤄야 합니다.
+
+2018년 글의 특정 대규모 서비스 운영 경험을 모든 서비스의 설계 규칙으로 일반화하지 않습니다. 조회 범위와 데이터 배치, 실행 계획을 비교해 선택합니다.`, ['d2', 'pgexplain']),
+    note('stored-procedure', '데이터와 저장소', '저장 프로시저의 장단점',
+      '업무 로직을 저장 프로시저에 넣는 것과 애플리케이션에 두는 것을 어떻게 판단하나요?',
+      `**데이터 가까이에서 처리할 이점과 배포·테스트·유지보수 비용을 비교합니다.** 저장 프로시저는 여러 DB 작업을 묶고 네트워크 왕복을 줄이는 데 도움이 될 수 있습니다. 지원 기능과 트랜잭션 제약은 DBMS마다 다릅니다.
+
+반면 복잡한 업무 규칙이 DB에 집중되면 변경 추적과 단위 테스트, DB 교체, 수평 확장이 어려워질 수 있습니다. 프로시저도 소스로 버전 관리하고 권한과 변경 절차를 갖춰야 합니다.
+
+무조건 금지하거나 항상 빠르다고 답하지 않습니다. 데이터 중심 일괄 처리인지 자주 바뀌는 도메인 규칙인지, 실제 병목이 무엇인지로 결정합니다.`, ['pgprocedures', 'd2']),
+    note('cache-local-global', '데이터와 저장소', '로컬 캐시와 공유 캐시',
+      '로컬 캐시와 Redis 같은 공유 캐시는 어떤 차이가 있나요?',
+      `**로컬 캐시는 프로세스 안에서 빠르게 읽고, 공유 캐시는 여러 인스턴스가 같은 저장소를 이용합니다.** 로컬 캐시는 네트워크 왕복이 없지만 인스턴스마다 값과 메모리가 분리되고 재시작하면 보통 사라집니다. 공유 캐시는 네트워크·운영 비용과 자체 장애 가능성이 있습니다.
+
+변경이 드문 설정은 로컬 캐시, 여러 서버에서 함께 쓰는 값은 공유 캐시를 고려할 수 있습니다. 키 설계, 크기 상한, 만료·갱신과 장애 시 원본 저장소 보호 정책이 필요합니다.
+
+캐시에 개인정보나 권한 의존 값을 넣는다면 사용자·범위별 키와 유효 기간을 정해야 합니다. 공유 캐시를 쓴다는 사실만으로 DB와의 일관성이 보장되지는 않습니다.`, ['cache', 'redis']),
+    note('cache-invalidation', '데이터와 저장소', '캐시 무효화와 동시 만료',
+      'Cache-aside에서 값이 오래되거나 캐시가 동시에 만료되는 문제는 어떻게 다루나요?',
+      `**원본을 기준으로 허용 가능한 오래된 값의 범위를 먼저 정합니다.** Cache-aside는 캐시 미스 시 DB를 읽어 채우고, 쓰기 후 관련 캐시를 무효화하거나 갱신합니다. DB 변경과 캐시 작업 사이의 경쟁 때문에 오래된 값이 다시 채워질 수도 있습니다.
+
+TTL은 오래된 값의 수명을 제한하는 수단이지 강한 일관성 보장은 아닙니다. 중요한 값은 캐시를 우회하거나 버전 확인을 적용하고, 갱신 이벤트를 사용할 때도 유실·중복을 다룹니다.
+
+동시 만료로 DB가 몰리는 현상은 TTL 분산, 키별 요청 합치기, 제한된 갱신과 사전 적재로 완화합니다. 장애 시 모든 요청이 DB로 몰리지 않도록 상한도 둡니다.`, ['cache', 'redis']),
+    note('replication', '데이터와 저장소', '복제와 읽기 일관성',
+      'DB를 복제해 읽기를 분산하면 어떤 일관성 문제가 생기나요?',
+      `**비동기 복제본에는 방금 쓴 값이 아직 없을 수 있습니다.** 쓰기는 primary에, 읽기는 replica에 보내면 읽기 부하를 나눌 수 있지만 복제 지연 때문에 저장 직후 이전 값이 보일 수 있습니다.
+
+자신이 방금 변경한 데이터는 일정 조건에서 primary로 읽거나 복제 진행 위치를 확인하는 등의 정책을 둡니다. 동기 복제는 확인을 기다리므로 지연과 장애 시 가용성의 비용이 생기며, 구체적인 보장 범위를 설정에서 확인해야 합니다.
+
+복제는 백업과 같지 않습니다. 잘못된 삭제도 전파될 수 있으므로 별도 백업, 시점 복구와 복구 연습이 필요합니다.`, ['pgreplication']),
+    note('sharding', '데이터와 저장소', '샤딩과 샤드 키',
+      '샤딩은 언제 검토하고 좋은 샤드 키는 어떤 조건을 갖춰야 하나요?',
+      `**한 DB로 감당하기 어려운 용량이나 쓰기 부하를 여러 DB로 나누는 방법입니다.** 인덱스·쿼리·용량 개선과 복제로 해결할 수 있는 문제인지 먼저 확인합니다. 복제는 같은 데이터의 사본, 샤딩은 데이터의 분할이라는 점이 다릅니다.
+
+샤드 키는 요청을 특정 샤드로 찾기 쉽고 데이터·부하가 지나치게 쏠리지 않아야 합니다. 사용자 ID는 사용자 단위 조회에 유리할 수 있지만 초대형 사용자가 있는 경우에는 편향을 따져야 합니다.
+
+샤드 간 JOIN·트랜잭션·집계, 재분배와 운영 비용이 늘어납니다. 샤드 키 변경과 데이터 이동 계획 없이 미리 도입하지 않습니다.`, ['sharding', 'pgreplication']),
+    note('files-search', '데이터와 저장소', '파일 저장과 검색 색인',
+      '업로드 파일과 전문 검색 데이터는 DB와 어떻게 역할을 나누면 좋을까요?',
+      `**원본 데이터의 책임과 파생 데이터의 책임을 구분합니다.** 파일 본문은 객체 저장소에, 소유자·권한·저장 키 같은 메타데이터는 DB에 두는 구성이 가능합니다. 파일 크기와 실제 유형을 검증하고 공개 여부와 보관 정책을 정합니다.
+
+서명 URL을 발급하더라도 발급 전에 권한을 확인하고 짧은 만료 시간과 필요한 작업 범위만 부여합니다. URL을 아는 동안 접근할 수 있으므로 로그나 공유로 유출되지 않도록 합니다.
+
+검색 색인은 보통 원본에서 만드는 파생 저장소이며 반영 지연이 있습니다. 이벤트 재처리, 삭제 전파와 전체 재색인을 준비하고 색인 지연을 원본 저장 실패와 구분합니다.`, ['s3', 'elastic']),
+    note('thread-safety', '동시성과 실행 모델', '싱글턴과 요청 간 상태 공유',
+      'Spring 싱글턴 서비스의 멤버 변수에 사용자별 값을 저장하면 왜 위험한가요?',
+      `**같은 객체를 여러 요청이 공유하므로 한 사용자의 값이 다른 요청에 섞일 수 있습니다.** 싱글턴은 컨테이너에서 하나의 인스턴스를 사용한다는 뜻이지 단일 스레드로 실행한다는 뜻이 아닙니다.
+
+요청별 정보는 메서드 인자나 지역 변수에 두고 공유 필드는 불변 의존성이나 적절히 보호한 상태로 제한합니다. 지역 변수라도 공유된 가변 객체를 참조하면 그 객체의 변경은 안전하지 않을 수 있습니다.
+
+공유 카운터라면 원자적 연산을, 여러 값의 불변식을 함께 지켜야 한다면 잠금·트랜잭션 등 맞는 도구를 택합니다. 컬렉션을 동시성 구현으로 바꾸는 것만으로 복합 업무 연산 전체가 원자적이 되지는 않습니다.`, ['scope', 'concurrency']),
+    note('parallelism', '동시성과 실행 모델', '동시성, 병렬성, 비동기',
+      '동시성·병렬성·비동기는 같은 의미인가요?',
+      `**동시성은 여러 작업을 진행 중인 상태로 다루는 것이고, 병렬성은 실제로 동시에 실행하는 것입니다.** 비동기는 작업 완료를 호출 흐름이 즉시 기다리지 않고 나중에 받는 방식으로, 멀티코어 병렬 실행을 뜻하지 않습니다.
+
+CPU 계산은 코어 수와 분할 비용이 중요하고, I/O 대기가 많은 작업은 기다리는 동안 다른 작업을 수행하도록 설계하는 것이 유리할 수 있습니다. 그래도 DB 연결이나 외부 API 허용량은 유한합니다.
+
+작업을 나누기 전에 공유 상태와 순서 의존성을 확인합니다. 병렬화 후 결과가 정확한지와 처리 시간·자원 사용이 실제로 개선됐는지를 함께 측정합니다.`, ['concurrency', 'webflux']),
+    note('thread-pool', '동시성과 실행 모델', '스레드 풀과 작업 유실',
+      '오래 걸리는 작업을 별도 스레드 풀로 넘길 때 무엇을 설계해야 하나요?',
+      `**스레드 수뿐 아니라 대기열·거절 정책·시간 제한과 종료 시 동작을 정해야 합니다.** 무제한 큐는 과부하를 메모리와 긴 대기 시간으로 숨기며, 과도한 스레드는 문맥 전환과 DB 연결 경쟁을 늘립니다.
+
+CPU 작업과 블로킹 I/O 작업의 특성, DB 연결 수와 외부 서비스 한도를 보고 동시 실행을 제한합니다. 요청의 인증 문맥이나 트랜잭션이 다른 스레드로 자동 전달된다고 가정하면 안 됩니다.
+
+결제 후 알림처럼 재시작 뒤에도 반드시 수행해야 하는 작업은 메모리 큐만으로 부족합니다. 영속 큐나 아웃박스와 멱등 소비로 작업 유실·중복을 다룹니다.`, ['executor', 'retry']),
+    note('reactive-virtual', '동시성과 실행 모델', 'MVC, WebFlux와 가상 스레드',
+      'Spring MVC, WebFlux, 가상 스레드는 어떤 기준으로 선택하나요?',
+      `**대기 방식과 사용하는 라이브러리, 팀의 운영 능력으로 결정합니다.** MVC는 JDBC·JPA 같은 블로킹 라이브러리와 자연스럽게 맞습니다. WebFlux는 적은 이벤트 루프 스레드가 멈추지 않도록 비차단 호출과 배압을 활용합니다.
+
+WebFlux 이벤트 루프에서 JDBC나 오래 걸리는 계산을 직접 실행하면 다른 요청도 지연될 수 있습니다. 비차단 DB 접근에는 R2DBC 같은 선택지가 있으며, 블로킹 호출을 격리해도 DB 자원 한도가 사라지지는 않습니다.
+
+Java 21에서 정식 도입된 가상 스레드는 I/O 대기가 많은 코드를 스레드 단위로 작성하는 선택지입니다. CPU 연산을 빠르게 하거나 DB 연결을 늘려 주지 않으므로 동시 접근 제한과 측정이 필요합니다. 2018년 글의 생태계 설명과 구분합니다.`, ['webflux', 'virtual']),
+    note('immutable-cache', '동시성과 실행 모델', '불변 객체와 안전한 캐시',
+      '캐시 객체를 불변으로 유지하면 어떤 문제가 줄고 무엇이 여전히 남나요?',
+      `**여러 요청이 같은 객체를 읽을 때 한 요청의 변경이 다른 요청에 영향을 주는 위험을 줄입니다.** 캐시에 사용자 목록을 넣고 호출자가 그 목록을 수정하면 다른 요청도 바뀐 값을 볼 수 있습니다.
+
+방어적 복사나 불변 컬렉션을 사용하고 내부 원소도 가변인지 확인합니다. Java의 final 필드는 참조 재할당을 막을 뿐 그 참조가 가리키는 목록 전체를 불변으로 만들지 않습니다. 읽기 전용 뷰도 원본이 바뀌면 내용이 바뀔 수 있습니다.
+
+불변 값이라도 캐시 맵의 안전한 공개, 삽입·교체의 동시성, 크기·만료 관리는 별도 문제입니다. 검증된 캐시 구현과 적절한 수명 정책을 함께 사용합니다.`, ['concurrency', 'cache']),
+    note('sql-injection', '보안', 'SQL Injection 방어',
+      'SQL Injection은 왜 발생하고 ORM을 사용하면 안전한가요?',
+      `**외부 입력이 SQL의 데이터가 아니라 구문으로 해석될 때 발생합니다.** 문자열 연결로 쿼리를 만들지 말고 SQL 구조와 값을 분리해 매개변수로 바인딩합니다. ORM의 직접 쿼리나 동적 문자열도 같은 원칙을 지켜야 합니다.
+
+정렬 열, 테이블명, ASC·DESC처럼 값 바인딩을 할 수 없는 구문 요소는 애플리케이션이 정한 허용 목록에 매핑합니다. 값의 형식 검증이나 수동 이스케이프만으로 바인딩을 대신하지 않습니다.
+
+DB 계정에는 필요한 권한만 주고, 데이터 접근 권한 검사도 별도로 수행합니다. 저장 프로시저 내부에서 입력을 동적 SQL에 연결하면 프로시저를 사용해도 취약할 수 있습니다.`, ['sql']),
+    note('xss', '보안', 'XSS와 출력 문맥',
+      'XSS는 어떻게 방어하며 React를 사용하면 추가 조치가 필요 없나요?',
+      `**신뢰할 수 없는 값이 브라우저에서 실행 가능한 HTML·스크립트로 해석되지 않도록 해야 합니다.** 일반 텍스트는 프레임워크의 자동 이스케이프나 textContent 등 안전한 출력을 사용하고, 속성·URL·스크립트 등 출력 문맥에 맞게 처리합니다.
+
+HTML 자체를 허용하는 에디터나 Markdown은 허용 목록 기반 sanitizer를 적용합니다. React도 dangerouslySetInnerHTML이나 검증하지 않은 URL 등 안전장치를 우회하는 사용법까지 보호하지는 않습니다.
+
+CSP와 HttpOnly 쿠키는 보조 방어입니다. HttpOnly는 스크립트의 쿠키 읽기를 제한하지만 XSS가 사용자의 권한으로 요청을 보내는 것까지 막지는 않습니다.`, ['xss']),
+    note('csrf', '보안', 'CSRF, 쿠키와 CORS',
+      'CSRF는 어떤 조건에서 발생하고 CORS를 설정하면 막을 수 있나요?',
+      `**브라우저가 자동 첨부하는 인증 정보를 이용해 공격자가 사용자의 의도와 다른 상태 변경 요청을 보내는 공격입니다.** 쿠키 인증에서는 CSRF 토큰, SameSite 설정과 Origin·Fetch Metadata 검증 등을 프레임워크 지원에 맞춰 조합합니다. GET에는 상태 변경을 넣지 않습니다.
+
+CORS는 다른 출처의 스크립트가 응답을 읽는 권한을 주로 통제합니다. 단순 폼 요청처럼 응답을 읽지 않아도 전송 가능한 요청이 있으므로 CORS만으로 CSRF를 해결할 수 없습니다.
+
+애플리케이션 코드가 Authorization 헤더에만 붙이는 토큰은 자동 쿠키 전송과 위험 조건이 다릅니다. 다만 XSS로 토큰이나 실행 권한을 탈취할 위험은 따로 다뤄야 합니다.`, ['csrf', 'xss']),
+    note('dependencies', '보안', '의존성 취약점 대응',
+      '사용 중인 프레임워크나 라이브러리의 취약점이 공개되면 어떻게 대응하나요?',
+      `**직접·간접 의존성과 실제 노출 경로를 확인하고 위험도에 맞춰 조치합니다.** 버전 목록과 보안 공지를 관리하고 취약 기능이 실행 가능한지, 외부에서 도달 가능한지 평가합니다. 점수가 낮다는 이유만으로 방치하지 않습니다.
+
+공식 수정 버전으로 갱신한 뒤 호환성과 회귀를 확인합니다. 즉시 갱신하기 어렵다면 해당 기능 비활성화나 접근 제한 같은 임시 완화를 적용하고 교체 기한을 정합니다.
+
+자동 스캔은 탐지 수단이며 안전의 증명은 아닙니다. 빌드 재현성, 비밀 관리와 업데이트 책임자를 함께 관리해야 지속적으로 대응할 수 있습니다.`, ['supplychain']),
+    note('testing-terms', '테스트', '단위 테스트, 통합 테스트와 TDD',
+      'JUnit으로 작성한 테스트는 모두 단위 테스트이고 테스트를 추가하면 TDD인가요?',
+      `**JUnit은 실행 도구이며 테스트의 범위나 개발 순서를 결정하지 않습니다.** 단위 테스트는 작은 로직을 외부 기반 시설과 분리해 검증하고, 통합 테스트는 DB·프레임워크·여러 구성 요소의 연동을 검증합니다.
+
+TDD는 실패하는 테스트 작성 → 통과할 최소 구현 → 리팩토링을 반복해 설계를 진행하는 방식입니다. 이미 작성한 코드에 회귀 테스트를 추가하는 것도 유용하지만 그 사실만으로 TDD라 부르지는 않습니다.
+
+계산 규칙은 빠른 단위 테스트, 실제 SQL·트랜잭션은 통합 테스트처럼 실패 위험에 맞춰 범위를 정합니다. 용어보다 무엇을 실제로 보장하는지 설명하는 것이 중요합니다.`, ['unit', 'tdd']),
+    note('api-testing', '테스트', 'HTTP API 테스트 범위',
+      'HTTP API 테스트에서는 성공 응답 외에 무엇을 확인해야 하나요?',
+      `**계약과 권한, 상태 변경의 결과까지 확인합니다.** 상태 코드와 JSON 형식뿐 아니라 필수 값 누락, 경계값, 인증 만료, 다른 사용자 데이터 접근과 중복 요청을 검증합니다.
+
+예를 들어 주문 생성은 응답의 주문 ID뿐 아니라 재고가 한 번만 줄었는지, 실패 시 일부 변경만 남지 않는지 확인합니다. 개인정보와 내부 예외가 응답에 노출되지 않는지도 봅니다.
+
+MockMvc는 실제 네트워크 서버 없이 MVC 흐름을 검증할 수 있고, 실제 포트에 요청하는 테스트는 서버 구성과 네트워크 경로를 추가로 다룹니다. 의존성을 mock으로 바꾸면 그 실제 연동까지 확인한 것은 아닙니다.`, ['mockmvc', 'openapi']),
+    note('db-testing', '테스트', 'DB 테스트와 자동 롤백',
+      'DB 테스트에서 자동 롤백을 쓰면 운영과 같은 동작을 모두 검증할 수 있나요?',
+      `**자동 롤백은 테스트 격리에 유용하지만 실제 커밋과 동시성 검증을 대신하지 못합니다.** 테스트 트랜잭션 안에서만 실행하면 커밋 때 발생하는 제약 오류나 커밋 후 이벤트를 놓칠 수 있습니다.
+
+다른 스레드나 실제 HTTP 요청에서 수행한 DB 작업은 테스트 스레드의 트랜잭션에 자동 참여하지 않을 수 있습니다. 별도 정리, 고유 테스트 데이터나 격리된 DB를 사용해야 합니다.
+
+운영 DBMS의 SQL·잠금 동작을 확인할 때는 같은 종류의 테스트 DB를 사용하고 필요한 경우 명시적으로 flush·commit합니다. H2 통과만으로 PostgreSQL의 모든 동작을 보장하지 않습니다.`, ['testtx', 'pgisolation']),
+    note('regression', '테스트', '의미 있는 테스트와 우선순위',
+      '시간이 제한적일 때 어떤 테스트부터 작성하면 좋을까요?',
+      `**실패 시 피해가 크고 변경 중 깨지기 쉬운 행동부터 검증합니다.** 권한 경계, 금액·재고 계산, 데이터 손실, 중복 처리와 과거 장애 재현이 우선 후보입니다. 커버리지 숫자만 높이는 테스트보다 실제 실패를 잡는 검증이 필요합니다.
+
+버그를 고칠 때는 가능하면 수정 전 실패하고 수정 후 통과하는 재현을 남깁니다. 동시성 문제라면 여러 요청을 실제로 겹치게 실행하고 최종 데이터가 모두 보존되는지 검사합니다.
+
+내부 함수 호출 순서를 그대로 따라 쓰기보다 사용자가 관찰할 계약과 불변식을 검증합니다. mock을 많이 쓴 테스트만으로 외부 연동의 신뢰성을 판단하지 않습니다.`, ['unit', 'mockmvc']),
+    note('data-structures', '설계', '자료구조와 알고리즘의 실무 활용',
+      '자료구조와 알고리즘은 웹 백엔드 실무에서 어떻게 활용되나요?',
+      `**직접 다시 구현하기보다 접근 패턴과 비용에 맞는 구현을 선택하는 데 활용합니다.** 키 조회에는 해시 기반 구조, 순서·범위 검색에는 정렬 구조, 우선순위 처리에는 힙을 고려할 수 있습니다. 시간 복잡도뿐 아니라 메모리, 동시성, 데이터 크기와 분포도 중요합니다.
+
+예를 들어 HashMap은 일반적으로 빠른 키 조회를 제공하지만 해시 충돌과 equals·hashCode 계약을 이해해야 합니다. 키로 넣은 객체의 동등성 관련 값을 바꾸면 조회가 기대와 다르게 동작할 수 있습니다.
+
+DB 인덱스와 캐시도 같은 원리로 이해합니다. 이미 검증된 라이브러리를 우선 사용하고 실제 입력으로 성능과 정확성을 확인합니다.`, ['concurrency', 'pgindex', 'd2']),
+    note('dto-vo', '설계', 'DTO와 Value Object',
+      'DTO와 VO는 어떻게 다르며 getter와 setter가 있으면 VO인가요?',
+      `**DTO는 계층·프로세스 사이의 데이터 전달 역할, Value Object는 값으로 동등성을 판단하는 도메인 개념입니다.** getter·setter의 유무만으로 구분하지 않습니다.
+
+예를 들어 CreateOrderRequest는 요청을 전달하는 DTO이고, 통화와 금액의 조합으로 동등성을 정하는 Money는 VO가 될 수 있습니다. VO는 생성 시 유효성을 검사하고 보통 불변으로 설계해 도메인 규칙을 보호합니다.
+
+일부 조직에서 VO를 단순 전달 객체라는 뜻으로 쓰는 경우가 있으므로 문맥을 확인합니다. Java record를 사용했다는 사실만으로 자동으로 도메인 VO가 되는 것도 아닙니다.`, ['vo', 'dto']),
+    note('boundaries', '설계', '책임과 모듈 경계',
+      '클래스와 모듈의 책임은 어떤 기준으로 나누면 좋을까요?',
+      `**함께 바뀌는 업무 규칙을 모으고 변경 이유가 다른 부분은 경계를 둡니다.** 컨트롤러는 통신 계약, 도메인은 업무 규칙, 저장소는 영속화처럼 역할을 드러내되 파일 수나 계층 수 자체를 목표로 삼지 않습니다.
+
+외부 연동은 인터페이스 뒤로 분리하고 중요한 트랜잭션과 데이터의 소유자를 명확히 합니다. 다른 모듈의 내부 테이블이나 가변 상태에 직접 의존하면 함께 수정·배포해야 하는 범위가 커집니다.
+
+예를 들어 주문 가격 규칙을 컨트롤러와 배치에 복사하지 않고 한 경계에서 관리하면 규칙 변경과 테스트가 쉬워집니다. 추상화는 실제 변경 가능성과 중복을 보고 추가합니다.`, ['d2', 'msa']),
+    note('microservices', '설계', '모놀리스와 MSA',
+      '마이크로서비스를 도입하면 어떤 문제가 해결되고 어떤 비용이 늘어나나요?',
+      `**잘 나뉜 경계는 독립 배포와 팀별 변경, 부하별 확장에 도움이 됩니다.** 반면 원격 호출, 부분 장애, 분산 데이터 일관성, 계약 변경과 관측의 복잡도가 늘어납니다.
+
+한 프로세스의 함수를 API로 바꾸기만 하면 작은 장애가 연쇄 지연으로 번지거나 여러 서비스를 동시에 배포해야 할 수 있습니다. 데이터 소유권과 업무 경계를 먼저 정해야 합니다.
+
+작은 팀이나 요구가 빠르게 바뀌는 초기 서비스는 모듈 경계가 분명한 모놀리스로 시작하는 선택도 합리적입니다. 서비스 수가 많다는 사실보다 독립 변경의 이익이 운영 비용보다 큰지로 판단합니다.`, ['msa']),
+    note('remote-failures', '설계', '타임아웃, 재시도와 멱등성',
+      '외부 API가 느리거나 응답을 잃었을 때 안전하게 재시도하려면 무엇이 필요한가요?',
+      `**전체 요청 기한과 시도별 시간 제한을 정하고 중복 효과를 막아야 합니다.** 타임아웃은 결과를 받지 못했다는 뜻이므로 상대 서버의 처리가 실패했다고 단정하면 안 됩니다.
+
+재시도할 오류와 횟수를 제한하고 지수 백오프에 무작위 지연을 섞습니다. 429의 Retry-After를 존중하고 여러 계층에서 겹쳐 재시도해 부하가 증폭되지 않게 합니다. 회로 차단과 동시 호출 상한도 고려합니다.
+
+결제·주문 생성은 멱등성 키와 저장된 결과를 이용해 중복을 막습니다. 재시도 가능한 조회와 업무 처리를 구분하고 기한이 끝난 뒤에도 작업이 계속될 가능성을 다룹니다.`, ['retry', 'http']),
+    note('builds', '개발과 운영', '빌드 도구와 재현성',
+      'Maven이나 Gradle은 무엇을 담당하고 재현 가능한 빌드는 왜 중요한가요?',
+      `**의존성 해석, 컴파일, 테스트와 배포 산출물 생성을 자동화합니다.** 같은 소스라도 JDK·도구·의존성 버전이 달라지면 결과가 달라질 수 있으므로 버전을 관리합니다.
+
+Wrapper로 빌드 도구 버전을 맞추고 의존성을 고정하거나 잠금 파일을 사용합니다. 비밀 정보와 환경별 설정은 소스·산출물과 분리하고, CI에서 만든 산출물을 환경별 설정과 함께 승격하는 방식을 고려합니다.
+
+실패했을 때 다시 만들 수 있도록 커밋과 산출물 식별자를 연결합니다. 특정 PC에서만 되는 빌드를 줄이면 검증한 버전과 배포한 버전을 비교하고 되돌리기 쉬워집니다.`, ['gradle']),
+    note('review-ci', '개발과 운영', '브랜치, 리뷰와 CI',
+      '여러 사람이 안전하게 변경하고 배포하려면 어떤 협업 규칙이 필요한가요?',
+      `**작은 변경을 검토하고 자동 검증을 통과한 버전을 추적할 수 있어야 합니다.** 짧은 기능 브랜치와 PR, 또는 팀에 맞는 trunk 기반 흐름을 선택하고 오래 분리된 브랜치의 충돌 비용을 줄입니다.
+
+CI에는 빌드, 필요한 테스트, 정적 검사와 의존성 점검을 연결합니다. 보호 브랜치의 필수 검사를 설정해야 검사 실패가 실제 병합을 막을 수 있습니다. 리뷰에는 변경 이유, 사용자 영향과 검증 결과를 제공합니다.
+
+긴급 수정도 가능한 한 동일한 검증과 추적을 남기고 모든 유지 브랜치에 반영합니다. 2018년 글에 나온 특정 팀의 주간 배포 일정이나 사후 리뷰를 보편적인 규칙으로 적용하지 않습니다.`, ['github', 'd2']),
+    note('deployment', '개발과 운영', '배포와 롤백',
+      '롤링, 블루그린, 카나리 배포는 어떻게 다르며 무중단 배포에는 무엇이 필요한가요?',
+      `**롤링은 인스턴스를 차례로 교체하고, 블루그린은 두 환경 사이의 트래픽을 전환하며, 카나리는 일부 트래픽에 먼저 노출해 검증합니다.** 선택에 따라 여분 용량과 검증·복귀 방법이 달라집니다.
+
+준비 상태 확인, 진행 중 요청 종료, 세션 처리와 구·신 버전의 API·DB 호환성이 필요합니다. 배포 후 오류율과 지연 시간을 보고 중단·복귀 기준을 적용합니다. 프로세스가 실행됐다는 이유만으로 트래픽을 보내지 않습니다.
+
+코드 롤백이 삭제된 데이터나 호환되지 않는 DB 변경까지 되돌려 주지는 않습니다. 되돌릴 수 있는 범위와 전진 수정 절차를 배포 전에 정합니다.`, ['deploy', 'migration']),
+    note('schema-migration', '개발과 운영', 'DB 스키마 변경',
+      '운영 중인 DB의 컬럼이나 제약 조건을 어떻게 안전하게 바꾸나요?',
+      `**구버전과 신버전이 함께 동작할 수 있도록 확장 → 이행 → 정리 단계를 나눕니다.** 새 컬럼을 먼저 추가하고 호환 코드를 배포한 뒤 기존 데이터를 나눠 이행하고 검증합니다. 구버전이 더 이상 필요 없을 때 이전 컬럼을 제거합니다.
+
+Flyway·Liquibase 같은 도구로 변경을 버전 관리하고 실행 기록을 남깁니다. 큰 테이블의 잠금, 인덱스 생성과 데이터 갱신 부하를 실제 DBMS 기준으로 점검합니다. 도구를 쓴다고 변경이 자동으로 안전해지는 것은 아닙니다.
+
+백업과 복구 가능성을 확인하되 대규모 DDL이나 데이터 변경은 단순 역방향 SQL만으로 복구할 수 없을 수 있습니다. 코드 롤백과 별도로 계획합니다.`, ['migration', 'pgindex']),
+    note('jvm-gc', '개발과 운영', 'JVM, GC와 프로파일링',
+      'Java 서버의 응답이 느릴 때 GC 옵션부터 바꾸면 될까요?',
+      `**지연의 원인을 측정한 뒤 해당 병목을 개선합니다.** CPU·메모리·GC 일시 정지, 스레드와 연결 풀 대기, DB·외부 호출 시간을 함께 봅니다. 평균만 보면 긴 꼬리 지연을 놓치기 쉽습니다.
+
+JFR 같은 프로파일러와 GC 로그로 할당량, 오래 살아남는 객체와 정지 시간을 확인합니다. 메모리 누수나 과도한 객체 생성이라면 먼저 코드를 개선하고, GC 방식과 힙 크기는 지연·처리량 목표와 배포 자원 한도에 맞춥니다.
+
+JVM 힙 외에도 스레드 스택·메타스페이스·직접 메모리 등이 필요합니다. 컨테이너 메모리 전체를 힙으로 지정하면 프로세스가 종료될 수 있습니다.`, ['gc', 'jfr']),
+    note('performance', '개발과 운영', '부하 테스트와 서버 설정',
+      '성능 테스트는 어떻게 진행하고 Nginx·Tomcat·OS 설정은 무엇을 확인하나요?',
+      `**실제 사용 시나리오, 목표 부하와 성공 기준을 먼저 정합니다.** 워밍업 후 부하를 점진적으로 높이며 처리량, 오류율, p95·p99 지연과 CPU·메모리·DB 지표를 같은 시간축으로 봅니다. 가상 사용자 수는 동시 실제 사용자 수와 자동으로 같지 않습니다.
+
+접속·읽기 시간 제한, 요청 크기, Tomcat 스레드·대기열, DB 연결 풀과 OS 파일 디스크립터 한도를 연관 지어 확인합니다. 한도를 무작정 늘리면 DB나 메모리로 병목을 옮길 수 있습니다.
+
+허가된 격리 환경에서 실제와 비슷한 데이터·인증 경로로 측정하고, 자원이 다른 개발 환경 결과를 운영 용량으로 단정하지 않습니다. 부하 발생기 자체가 병목인지도 확인합니다.`, ['k6', 'executor']),
+    note('observability', '개발과 운영', '로그, 지표와 분산 추적',
+      '모니터링에는 로그·지표·추적이 모두 필요한가요? 알림은 어떻게 정하나요?',
+      `**세 수단은 서로 다른 질문에 답합니다.** 지표는 오류율·지연·포화도의 추세를, 로그는 개별 사건의 상세를, 분산 추적은 여러 서비스를 거친 한 요청의 시간과 경로를 보여 줍니다.
+
+사용자에게 의미 있는 SLO를 정하고 오류 예산 소모나 지속적인 사용자 영향으로 알림을 설계합니다. 모든 일시 변동에 알리면 실제 장애를 놓치기 쉽습니다. 알림에는 담당자와 대응 절차를 연결합니다.
+
+로그에는 비밀번호·토큰·불필요한 개인정보를 남기지 않고 수집 범위·권한·보관 기간을 정합니다. 도구를 설치하는 것과 원인을 찾을 수 있는 관측 체계를 갖추는 것은 별개의 일입니다.`, ['otel']),
+    note('cloud-models', '개발과 운영', 'IaaS, PaaS와 SaaS',
+      'IaaS·PaaS·SaaS는 어떻게 다르며 관리형 서비스를 쓰면 책임이 없어지나요?',
+      `**공급자가 관리하는 계층의 범위가 다릅니다.** IaaS는 가상 서버 등 기반 자원을 제공해 사용자가 보통 OS와 애플리케이션을 관리합니다. PaaS는 실행 플랫폼 운영을 더 맡아 주고, SaaS는 완성된 소프트웨어를 사용하게 합니다.
+
+관리 범위는 실제 제품 계약마다 다릅니다. 관리형 DB나 배포 플랫폼을 써도 계정 권한, 애플리케이션 취약점, 데이터 보관·백업 설정과 비용 관리 등 사용자 책임이 남습니다.
+
+선택할 때는 운영 부담 외에도 장애 대응 범위, 데이터 위치, 이식성·종속성과 복구 목표를 확인합니다. 서비스 이름만으로 모든 계층의 책임을 판단하지 않습니다.`, ['cloud']),
+    note('serverless', '개발과 운영', 'Serverless의 의미와 한계',
+      'Serverless는 서버가 없다는 뜻인가요? 어떤 작업에 적합한가요?',
+      `**서버 운영의 많은 부분을 공급자가 추상화하고 애플리케이션을 실행하는 방식입니다.** FaaS와 관리형 백엔드 조합이 대표적이며 실제 서버와 자원 한도는 여전히 존재합니다.
+
+이벤트 기반의 간헐적 작업이나 변동 부하에 유리할 수 있지만 시작 지연, 실행 시간·동시 실행 제한, 상태 저장과 호출 비용을 확인합니다. 이벤트 전달 방식에 따라 중복 실행될 수 있으므로 멱등 처리와 재시도·실패 큐를 설계합니다.
+
+함수 인스턴스가 늘면 DB 연결이 급증할 수도 있습니다. 상시 고부하의 비용이나 장시간 작업 요구를 비교해 결정하며, 기반 구조를 이해할수록 관리형 환경도 더 잘 진단할 수 있습니다.`, ['serverless', 'd2']),
+  ],
+};
+
+export const WEB_NOTE_SOURCES = Object.values(references);

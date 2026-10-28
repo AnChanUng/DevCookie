@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { createServer } from 'vite';
 import { INTERVIEW_NOTES } from '../src/data/interviewNotes.js';
 import { NOTE_REVISIONS } from '../src/data/noteRevisions.js';
+import { WEB_ESSENTIALS } from '../src/data/webEssentials.js';
 
 const sourceSnapshot = JSON.stringify(INTERVIEW_NOTES);
 const server = await createServer({ server: { middlewareMode: true, hmr: false }, appType: 'custom' });
@@ -12,7 +13,8 @@ try {
   const { default: Answer } = await server.ssrLoadModule('/src/components/NoteAnswer.jsx');
   const entries = CS_NOTES.flatMap(s => s.items);
   const byId = new Map(entries.map(e => [e.id, e]));
-  assert.equal(entries.length, 169);
+  assert.equal(entries.length, 169 + WEB_ESSENTIALS.items.length);
+  assert.equal(entries.filter(e => !e.id.startsWith('web-')).length, 169, 'All historical questions remain present');
   assert.equal(byId.size, entries.length);
   for (const id of Object.keys(NOTE_REVISIONS)) assert.ok(byId.has(id), `Orphan revision: ${id}`);
   const originalEntries = INTERVIEW_NOTES.flatMap(s => s.items);
@@ -41,6 +43,13 @@ try {
       assert.ok(!html.includes('<h4></h4>'));
     }
     if (entry.sourceUrl) assert.ok(html.includes(`href="${entry.sourceUrl}"`));
+    if (entry.id.startsWith('web-')) {
+      assert.equal(entry.answerLabel, '모범답안');
+      assert.ok(entry.references.length > 0);
+      assert.ok(html.includes('모범답안') && html.includes('참고 자료'));
+      assert.ok(!html.includes('>원문 답변</a>'), 'New answers must not impersonate the reference author');
+      for (const ref of entry.references) assert.ok(html.includes(`href="${ref.url}"`));
+    }
   }
   assert.equal(revised, Object.keys(NOTE_REVISIONS).length);
   const originallyEmpty = originalEntries.filter(e => !e.answerMarkdown);
