@@ -73,6 +73,10 @@ main.container:has(.cs-notes) { max-width: 1600px; width: 100%; padding-inline: 
 .notes-markdown a, .notes-original, .notes-list-intro a { color: var(--accent-blue); overflow-wrap: anywhere; }
 .notes-original { font-size: inherit; text-underline-offset: 3px; }
 .notes-original:hover { text-decoration: underline; }
+.notes-collection-link { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 0 16px; padding: 14px 16px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-primary); color: var(--accent-blue); font-size: .85rem; }
+.notes-collection-link strong { display: block; }
+.notes-collection-link small { display: block; margin-top: 4px; color: var(--text-secondary); }
+.notes-collection-link > span:last-child { flex-shrink: 0; font-size: .78rem; }
 .notes-answer-references { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-color); font-size: .8rem; line-height: 1.7; color: var(--text-secondary); }
 .notes-answer-references ul { padding-left: 20px; margin: 6px 0 0; }
 .notes-answer-references a { color: var(--accent-blue); overflow-wrap: anywhere; }
