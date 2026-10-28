@@ -1,5 +1,5 @@
 import { lazy } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import './App.css';
@@ -33,6 +33,11 @@ const SsafyPage = lazy(() => import('./pages/SsafyPage'));
 const AptitudePage = lazy(() => import('./pages/AptitudePage'));
 const CosProPage = lazy(() => import('./pages/CosProPage'));
 
+function WebEssentialsRedirect() {
+  const { hash, search } = useLocation();
+  return <Navigate to={`/web-essentials${search}${hash}`} replace />;
+}
+
 function App() {
   return (
     <BrowserRouter>
@@ -47,7 +52,8 @@ function App() {
           <Route path="interview" element={<InterviewPracticePage />} />
           <Route path="technical-interview" element={<TechnicalInterviewPage />} />
           <Route path="notes" element={<CsNotesPage />} />
-          <Route path="notes/web-essentials" element={<WebEssentialsPage />} />
+          <Route path="web-essentials" element={<WebEssentialsPage />} />
+          <Route path="notes/web-essentials" element={<WebEssentialsRedirect />} />
           <Route path="major" element={<MajorPage />} />
           <Route path="major/:company" element={<ExamCompanyPage />} />
           <Route path="major-exam" element={<MajorExamPage />} />

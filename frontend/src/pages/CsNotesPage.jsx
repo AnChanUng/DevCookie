@@ -11,7 +11,7 @@ const tokenSnapshot = () => account()?.token || '';
 export default function CsNotesPage() {
   const token = useSyncExternalStore(onAccountChange, tokenSnapshot, () => '');
   const { hash } = useLocation();
-  if (hash.startsWith('#web-')) return <Navigate to={`/notes/web-essentials${hash}`} replace />;
+  if (hash.startsWith('#web-')) return <Navigate to={`/web-essentials${hash}`} replace />;
   return <NotesWorkspace key={token} user={token ? account() : null} />;
 }
 function NotesWorkspace({ user }) {
@@ -45,7 +45,7 @@ function NotesWorkspace({ user }) {
         <div className="notes-progress"><strong>학습 완료 {completed} / {entries.length}</strong><progress value={completed} max={entries.length} aria-label="전공노트 학습 완료" /></div>
         <Link to="/account">내 계정 →</Link>
       </header>
-      <Link className="notes-collection-link" to="/notes/web-essentials"><span><strong>웹 필수지식</strong><small>새로 정리한 50문답을 주제별로 읽기</small></span><span aria-hidden="true">별도 노트 열기 →</span></Link>
+      <Link className="notes-collection-link" to="/web-essentials"><span><strong>웹 필수지식</strong><small>정리한 질문과 모범답안 50개 전체 보기</small></span><span aria-hidden="true">채널 열기 →</span></Link>
       <div className="notes-save-status" role="status">{statusText} {(status === 'error') && <button type="button" onClick={retry}>다시 저장</button>}</div>
       <div className="notes-layout">
         <aside className="notes-index">
