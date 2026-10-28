@@ -1,7 +1,8 @@
 import { INTERVIEW_NOTES } from './interviewNotes';
 import { reviseNote } from './noteRevisions';
+import { WEB_ESSENTIALS } from './webEssentials';
 
-export const CS_NOTES = [...INTERVIEW_NOTES, {
+export const CS_NOTES = [WEB_ESSENTIALS, ...INTERVIEW_NOTES, {
   "id": "bigdata",
   "title": "빅데이터 · 기업은행 보충",
   "items": [

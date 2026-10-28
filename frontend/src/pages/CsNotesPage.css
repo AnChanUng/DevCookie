@@ -73,3 +73,6 @@ main.container:has(.cs-notes) { max-width: 1600px; width: 100%; padding-inline: 
 .notes-markdown a, .notes-original, .notes-list-intro a { color: var(--accent-blue); overflow-wrap: anywhere; }
 .notes-original { font-size: inherit; text-underline-offset: 3px; }
 .notes-original:hover { text-decoration: underline; }
+.notes-answer-references { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-color); font-size: .8rem; line-height: 1.7; color: var(--text-secondary); }
+.notes-answer-references ul { padding-left: 20px; margin: 6px 0 0; }
+.notes-answer-references a { color: var(--accent-blue); overflow-wrap: anywhere; }
