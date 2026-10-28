@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import React from 'react';
 import TestRenderer, { act } from 'react-test-renderer';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { createServer } from 'vite';
 
 const values = new Map();
@@ -19,6 +19,7 @@ const settle = () => new Promise(resolve => setImmediate(resolve));
 try {
   const { default: api } = await server.ssrLoadModule('/src/api.js');
   const { default: Page } = await server.ssrLoadModule('/src/pages/CsNotesPage.jsx');
+  const { default: WebPage } = await server.ssrLoadModule('/src/pages/WebEssentialsPage.jsx');
   const { default: Account } = await server.ssrLoadModule('/src/pages/AccountPage.jsx');
   const { CS_NOTES, migrateNotesCompletion } = await server.ssrLoadModule('/src/data/csNotes.js');
   const { WEB_ESSENTIALS } = await server.ssrLoadModule('/src/data/webEssentials.js');
@@ -28,10 +29,9 @@ try {
   const historical={'architecture-02':{done:true,at:1}};
   assert.deepEqual(migrateNotesCompletion(historical),historical);
   assert.equal(migrateNotesCompletion(historical)[entries[0].id],undefined);
-  assert.equal(entries.length,169 + WEB_ESSENTIALS.items.length);
-  const web = CS_NOTES.find(s => s.id === 'web-essentials');
-  assert.equal(web.title, '웹 필수지식');
-  assert.equal(web.items.length,50);
+  assert.equal(entries.length,169);
+  assert.ok(!CS_NOTES.some(s => s.id === 'web-essentials'), 'Web answers belong to their separate collection');
+  assert.equal(WEB_ESSENTIALS.items.length,50);
   assert.equal(new Set(entries.map(e=>e.id)).size,entries.length);
   assert.ok(entries.every(e=>e.question && e.answer));
   assert.ok(!CS_NOTES.some(s=>['커뮤니케이션','기타','개인의 역량','최신기술에 관심이 있는지'].includes(s.title)));
@@ -65,6 +65,7 @@ try {
   const showDone = async () => { await act(()=>view.root.findByProps({'aria-label':'완료한 지식 숨기기'}).props.onChange({target:{checked:false}})); };
   const reveal = async id => { await act(()=>view.root.findByProps({id}).findAllByType('button').find(b=>b.props['aria-controls']).props.onClick()); };
   await mount();
+  assert.equal(view.root.findAllByType('a').filter(a=>a.props.href==='/notes/web-essentials').length,1,'Notes show one collection link instead of 50 extra questions');
   assert.equal(view.root.findAllByType('article').length,entries.length,'All questions appear in the initial list');
   for(const entry of entries) { assert.ok(text(view.toJSON()).includes(entry.question)); assert.ok(!answerVisible(entry.id)); }
   assert.equal(view.root.findByProps({'aria-label':'완료한 지식 숨기기'}).props.checked,false);
@@ -78,18 +79,6 @@ try {
   assert.ok(!answerVisible(entries[0].id),'Answers can be collapsed again');
   assert.ok(!answerVisible(entries[1].id));
   await login('alice');
-  await act(()=>view.root.findByProps({'aria-label':'과목 선택'}).props.onChange({target:{value:web.id}}));
-  assert.equal(view.root.findAllByType('article').length,50);
-  await act(()=>view.root.findByProps({'aria-label':'질문 검색'}).props.onChange({target:{value:'CSRF'}}));
-  const csrf = web.items.find(e=>e.id==='web-csrf');
-  assert.equal(view.root.findAllByType('article').length,1,'Web course search narrows the actual question list');
-  await choose(csrf.title);
-  assert.ok(!answerVisible(csrf.id),'New web deep links also keep answers hidden');
-  await reveal(csrf.id);
-  const csrfCard = view.root.findByProps({id:csrf.id});
-  assert.ok(text(csrfCard).includes('모범답안'));
-  for(const ref of csrf.references) assert.ok(csrfCard.findAllByType('a').some(a=>a.props.href===ref.url),'Each model answer exposes its references');
-  await act(()=>view.root.findByProps({'aria-label':'질문 검색'}).props.onChange({target:{value:''}}));
   await act(()=>view.root.findByProps({'aria-label':'과목 선택'}).props.onChange({target:{value:java.id}}));
   assert.equal(view.root.findAllByType('article').length,java.items.length);
   await reveal(java.items[0].id);
@@ -144,6 +133,53 @@ try {
   assert.equal(checkbox(entries[0].id).props.checked,false);
   assert.ok(JSON.parse(remote.alice['/exam/progress/cs-notes-v1']).completed[entries[0].id].done);
   await unmount();
+  // Preserve existing web completion under the same bank while moving its UI.
+  const previous = JSON.parse(remote.alice['/exam/progress/cs-notes-v1']);
+  previous.completed['web-csrf'] = {done:true,at:1};
+  remote.alice['/exam/progress/cs-notes-v1'] = JSON.stringify(previous);
+  await login('alice');
+  const NotesRoutes = () => React.createElement(Routes,null,
+    React.createElement(Route,{path:'/notes',element:React.createElement(Page)}),
+    React.createElement(Route,{path:'/notes/web-essentials',element:React.createElement(WebPage)}));
+  await mount(NotesRoutes,'/notes#web-csrf');
+  const csrf = WEB_ESSENTIALS.items.find(e=>e.id==='web-csrf');
+  const webCheckbox = () => view.root.findByProps({'aria-label':`${csrf.title} 학습 완료`});
+  assert.equal(view.root.findAllByType('article').length,1,'Legacy links redirect to a single web answer');
+  assert.ok(text(view.toJSON()).includes(csrf.question));
+  assert.ok(webCheckbox().props.checked,'Previously saved completion survives the page split');
+  assert.equal(view.root.findByProps({'aria-label':'웹 필수지식 질문 목록'}).findAllByType('li').length,4);
+  await act(async()=>{await webCheckbox().props.onChange();});
+  let saved = JSON.parse(remote.alice['/exam/progress/cs-notes-v1']).completed;
+  assert.equal(saved['web-csrf'].done,false);
+  assert.ok(saved[entries[0].id].done && saved[entries[1].id].done,'Web updates retain existing subject records');
+  await act(async()=>{await webCheckbox().props.onChange();});
+  await act(()=>view.root.findByProps({'aria-label':'웹 통신'}).props.onClick());
+  assert.equal(view.root.findAllByType('article').length,1);
+  assert.equal(view.root.findByProps({'aria-label':'웹 필수지식 질문 목록'}).findAllByType('li').length,8);
+  assert.ok(text(view.toJSON()).includes('HTTP/1.1과 HTTP/2는 어떻게 다르고'));
+  await act(()=>view.root.findByProps({'aria-label':'웹 필수지식 질문 선택'}).props.onChange({target:{value:'web-rest'}}));
+  assert.ok(text(view.toJSON()).includes('JSON으로 통신하는 API는 모두 REST API인가요?'),'Compact question selector opens the selected answer');
+  await act(()=>view.root.findByProps({'aria-label':'웹 필수지식 질문 선택'}).props.onChange({target:{value:'web-http-versions'}}));
+  await act(()=>view.root.findAllByType('button').find(b=>text(b)==='다음 질문 →').props.onClick());
+  assert.ok(text(view.toJSON()).includes('HTTP 메서드의 안전성과 멱등성'));
+  await act(()=>view.root.findAllByType('button').find(b=>text(b)==='← 이전 질문').props.onClick());
+  assert.ok(text(view.toJSON()).includes('HTTP/1.1과 HTTP/2는 어떻게 다르고'));
+  await act(()=>view.root.findByProps({'aria-label':'웹 필수지식 검색'}).props.onChange({target:{value:'CSRF'}}));
+  assert.equal(view.root.findByProps({'aria-label':'웹 필수지식 질문 목록'}).findAllByType('li').length,1);
+  assert.equal(view.root.findAllByType('article').length,1);
+  assert.ok(text(view.toJSON()).includes('모범답안'));
+  for(const ref of csrf.references) assert.ok(view.root.findAllByType('a').some(a=>a.props.href===ref.url));
+  await act(()=>view.root.findByProps({'aria-label':'웹 필수지식 검색'}).props.onChange({target:{value:'없는질문검색'}}));
+  assert.equal(view.root.findAllByType('article').length,0);
+  assert.ok(text(view.toJSON()).includes('검색 결과가 없습니다'));
+  await unmount();await mount(WebPage,'/notes/web-essentials#web-csrf');
+  assert.ok(webCheckbox().props.checked,'Reload restores web completion');
+  await login('bob');assert.equal(webCheckbox().props.checked,false,'Web completion is isolated across accounts');
+  await login(null);assert.ok(webCheckbox().props.disabled,'Guests can read but cannot save completion');
+  await unmount();await login('alice');await mount();
+  assert.equal(view.root.findAllByType('article').length,169);
+  assert.ok(checkbox(entries[0].id).props.checked,'Returning to original notes retains their completion');
+  await unmount();
   const bank=ACCOUNT_BANKS.find(b=>b.key==='pearl');const q=bank.questions[0];
   remote.alice[`/exam/progress/${bank.key}`]=JSON.stringify({stats:{[q.id]:{c:2,w:1,last:'w',at:1000}}});
   const totals=summarizeAccount({[bank.key]:{stats:{[q.id]:{c:2,w:1,last:'w',at:1000}}}});
@@ -151,6 +187,7 @@ try {
   await login('alice');await mount(Account,'/account');
   assert.ok(text(view.toJSON()).includes(q.q));
   assert.ok(text(view.toJSON()).includes('67%'));
+  assert.ok(view.root.findAllByType('a').some(a=>a.props.href==='/notes/web-essentials#web-csrf'),'Account links target the separate reader');
   await login('bob');assert.ok(!text(view.toJSON()).includes(q.q),'Dashboard resets on account switch');
   assert.equal(errors.length,0,errors.join('\n'));
   console.log('PASS: Basic keyword questions visible by default; answers hidden until explicit reveal, sidebar/deep links stay collapsed; completion hides/restores across reload; account isolation, save retries, dashboard and in-flight switching.');

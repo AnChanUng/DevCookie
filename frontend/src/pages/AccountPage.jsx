@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { account, changeNickname, onAccountChange, signIn, signOut } from '../sync';
 import { loadAccountRecords, summarizeAccount } from '../accountRecords';
 import { CS_NOTES, migrateNotesCompletion } from '../data/csNotes';
+import { WEB_ESSENTIALS } from '../data/webEssentials';
 import QuestionExplanation from '../components/QuestionExplanation';
 import { buildAccountRetry } from '../accountRetry';
 import './AccountPage.css';
@@ -61,7 +62,7 @@ function AccountDashboard({ user }) {
   const retryCount = buildAccountRetry(result.records).company.questions.length;
   const filtered = rows.filter(r => (!wrongOnly || r.last === 'w') && `${r.bank} ${r.title}`.toLowerCase().includes(query.trim().toLowerCase()));
   const noteRecords = migrateNotesCompletion(result.records['cs-notes-v1']?.completed);
-  const completed = CS_NOTES.flatMap(s => s.items).filter(e => noteRecords[e.id]?.done);
+  const completed = [...CS_NOTES.flatMap(s => s.items), ...WEB_ESSENTIALS.items].filter(e => noteRecords[e.id]?.done);
   return <div className="account-page fade-in">
     <header className="page-header"><h1>내 계정</h1><p>{user ? `${user.nickname}님의 학습 기록` : '로그인하면 내 계정에 저장된 학습 기록을 볼 수 있습니다.'}</p></header>
     <section className="account-auth" id="settings" tabIndex={-1}>
@@ -123,6 +124,6 @@ function AccountDashboard({ user }) {
       {filtered.slice(0, limit).map(row => <details className="account-question" key={row.key}><summary><span className="account-result">{row.last === 'r' ? '정답' : '오답'}</span><span>{row.bank} · {row.title}</span></summary><div><p>총 {row.c + row.w}회 · 정답 {row.c}회 / 오답 {row.w}회{row.at > 0 && ` · 최근 풀이 ${new Date(row.at).toLocaleString('ko-KR')}`}</p>{row.question && <QuestionExplanation q={row.question} />}<Link to={row.path}>해당 문제집 열기 →</Link></div></details>)}
       {filtered.length > limit && <button className="exam-btn" onClick={() => setLimit(n => n + 20)}>20개 더 보기 ({Math.min(limit, filtered.length)}/{filtered.length})</button>}
     </section>
-    <section className="account-notes"><h2>학습 완료한 전공노트</h2>{completed.length ? <ul>{completed.map(entry => <li key={entry.id}><Link to={`/notes#${entry.id}`}>✓ {entry.title}</Link></li>)}</ul> : <p>아직 완료한 지식이 없습니다.</p>}<Link to="/notes">전공노트 공부하기 →</Link></section>
+    <section className="account-notes"><h2>학습 완료한 전공노트</h2>{completed.length ? <ul>{completed.map(entry => <li key={entry.id}><Link to={`${entry.id.startsWith('web-') ? '/notes/web-essentials' : '/notes'}#${entry.id}`}>✓ {entry.title}</Link></li>)}</ul> : <p>아직 완료한 지식이 없습니다.</p>}<Link to="/notes">전공노트 공부하기 →</Link></section>
   </div>;
 }
