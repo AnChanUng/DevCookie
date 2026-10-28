@@ -11,7 +11,8 @@ const server = await createServer({ server: { middlewareMode: true, hmr: false }
 try {
   const { CS_NOTES, migrateNotesCompletion } = await server.ssrLoadModule('/src/data/csNotes.js');
   const { default: Answer } = await server.ssrLoadModule('/src/components/NoteAnswer.jsx');
-  const entries = CS_NOTES.flatMap(s => s.items);
+  assert.equal(CS_NOTES.flatMap(s => s.items).length,169);
+  const entries = [...CS_NOTES.flatMap(s => s.items), ...WEB_ESSENTIALS.items];
   const byId = new Map(entries.map(e => [e.id, e]));
   assert.equal(entries.length, 169 + WEB_ESSENTIALS.items.length);
   assert.equal(entries.filter(e => !e.id.startsWith('web-')).length, 169, 'All historical questions remain present');
