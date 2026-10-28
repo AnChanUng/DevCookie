@@ -124,6 +124,6 @@ function AccountDashboard({ user }) {
       {filtered.slice(0, limit).map(row => <details className="account-question" key={row.key}><summary><span className="account-result">{row.last === 'r' ? '정답' : '오답'}</span><span>{row.bank} · {row.title}</span></summary><div><p>총 {row.c + row.w}회 · 정답 {row.c}회 / 오답 {row.w}회{row.at > 0 && ` · 최근 풀이 ${new Date(row.at).toLocaleString('ko-KR')}`}</p>{row.question && <QuestionExplanation q={row.question} />}<Link to={row.path}>해당 문제집 열기 →</Link></div></details>)}
       {filtered.length > limit && <button className="exam-btn" onClick={() => setLimit(n => n + 20)}>20개 더 보기 ({Math.min(limit, filtered.length)}/{filtered.length})</button>}
     </section>
-    <section className="account-notes"><h2>학습 완료한 전공노트</h2>{completed.length ? <ul>{completed.map(entry => <li key={entry.id}><Link to={`${entry.id.startsWith('web-') ? '/notes/web-essentials' : '/notes'}#${entry.id}`}>✓ {entry.title}</Link></li>)}</ul> : <p>아직 완료한 지식이 없습니다.</p>}<Link to="/notes">전공노트 공부하기 →</Link></section>
+    <section className="account-notes"><h2>학습 완료한 전공노트</h2>{completed.length ? <ul>{completed.map(entry => <li key={entry.id}><Link to={`${entry.id.startsWith('web-') ? '/web-essentials' : '/notes'}#${entry.id}`}>✓ {entry.title}</Link></li>)}</ul> : <p>아직 완료한 지식이 없습니다.</p>}<Link to="/notes">전공노트 공부하기 →</Link></section>
   </div>;
 }
