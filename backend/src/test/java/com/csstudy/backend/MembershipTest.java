@@ -63,23 +63,22 @@ class MembershipTest {
         mvc.perform(get("/api/v1/auth/me").header("Authorization","Bearer "+registered.path("token").asText()))
                 .andExpect(jsonPath("$.membership.tier").value("RUBY"));
     }
-    @Test void theoryIsPublicForGuestsAndEveryTierAndRejectsUnknownFiles() throws Exception {
+    @Test void theoryPdfIsUnavailableForGuestsAndEveryTier() throws Exception {
         String[] files = {"ipe-written-summary.pdf", "ipe-written-review.pdf", "ipe-silgi-theory.pdf",
                 "sqld-concepts.pdf", "bigdata-analyst-summary.pdf", "adsp-summary.pdf"};
         for (String file : files) {
             mvc.perform(get("/api/v1/theory/notes/" + file))
-                    .andExpect(status().isOk()).andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PDF))
-                    .andExpect(header().string("Cache-Control", "no-store"))
-                    .andExpect(header().string("Content-Disposition", "inline; filename=\"" + file + "\""));
+                    .andExpect(status().isGone()).andExpect(header().string("Cache-Control", "no-store"))
+                    .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                    .andExpect(jsonPath("$.code").value("THEORY_NOTES_UNAVAILABLE"));
+            assertFalse(new org.springframework.core.io.ClassPathResource("private-notes/" + file).exists());
         }
         for (UserTier tier : UserTier.values()) {
             String visitor = "theory-" + tier.name();
             grants.saveAndFlush(new VisitorTierGrant(visitor, tier));
             mvc.perform(get("/api/v1/theory/notes/sqld-concepts.pdf").header("X-Visitor-Id", visitor))
-                    .andExpect(status().isOk()).andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PDF));
+                    .andExpect(status().isGone());
         }
-        mvc.perform(get("/api/v1/theory/notes/sqld-concepts.pdf").header("Authorization", "Bearer expired"))
-                .andExpect(status().isOk());
         mvc.perform(get("/api/v1/theory/notes/not-allowed.pdf"))
                 .andExpect(status().isNotFound());
     }
