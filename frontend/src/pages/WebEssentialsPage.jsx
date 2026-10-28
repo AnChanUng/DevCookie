@@ -38,9 +38,19 @@ function WebChannel({ user }) {
       <div className="notes-progress"><strong>학습 완료 {completed} / {entries.length}</strong><progress value={completed} max={entries.length} aria-label="웹 필수지식 학습 완료" /></div>
     </header>
     <div className="notes-save-status" role="status">{statusText} {status === 'error' && <button type="button" onClick={retry}>다시 저장</button>}</div>
+    <div className="web-channel-layout">
     <nav className="web-channel-toc" aria-label="웹 필수지식 목차">
-      {sections.map(section => <Link key={section.id} to={`/web-essentials#${section.id}`}>{section.title}<small>{section.items.length}</small></Link>)}
+      <h2>목차</h2>
+      {sections.map(section => <div key={section.id} className="web-toc-group">
+        <Link className="web-toc-topic" to={`/web-essentials#${section.id}`} aria-current={hash === `#${section.id}` ? 'location' : undefined}>{section.title}<small>{section.items.length}</small></Link>
+        <ul>{section.items.map(entry => <li key={entry.id}>
+          <Link to={`/web-essentials#${entry.id}`} className={data[entry.id]?.done ? 'is-done' : ''} aria-current={hash === `#${entry.id}` ? 'location' : undefined}>
+            <span>{data[entry.id]?.done ? '✓' : numbers.get(entry.id)}</span>{entry.title}
+          </Link>
+        </li>)}</ul>
+      </div>)}
     </nav>
+    <div className="web-channel-content">
     {sections.map(section => <section key={section.id} id={section.id} className="web-channel-topic" aria-labelledby={`${section.id}-title`}>
       <h2 id={`${section.id}-title`}>{section.title}<small>{section.items.length}문답</small></h2>
       {section.items.map(entry => <article key={entry.id} id={entry.id} className="notes-detail-card">
@@ -49,6 +59,8 @@ function WebChannel({ user }) {
         <NoteAnswer entry={entry} />
       </article>)}
     </section>)}
+    </div>
+    </div>
     <details className="notes-sources"><summary>참고 글과 작성 기준</summary><p>{WEB_ESSENTIALS.description}</p><a href={WEB_NOTE_SOURCES[0].url} target="_blank" rel="noreferrer">{WEB_NOTE_SOURCES[0].title} ↗</a><p>2026.10.28 작성. 개념별 참고 문서는 각 모범답안 아래에 연결했습니다.</p></details>
   </div>;
 }
