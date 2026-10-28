@@ -14,7 +14,8 @@ try {
     const line=Number(entry.sourceUrl.match(/#L(\d+)$/)[1]);
     const block=original.split('\n').slice(line-1).join('\n').split('</details>')[0];
     const body=block.slice(block.indexOf('</summary>')+'</summary>'.length).trim();
-    if(entry.answerMarkdown) assert.equal(entry.answerMarkdown,body,'Exact source answer: '+entry.id);
+    // The pinned JSON retains upstream CRLF while Git may check out vendor Markdown as LF.
+    if(entry.answerMarkdown) assert.equal(entry.answerMarkdown.replace(/\r\n/g,'\n'),body.replace(/\r\n/g,'\n'),'Exact source answer (line endings normalized): '+entry.id);
     else { empty++; assert.ok(!body.replace(/<[^>]*>/g,'').trim(),'Only empty source answers receive placeholder'); }
     const html=renderToStaticMarkup(React.createElement(Answer,{entry}));
     assert.ok(html.includes(`href="${entry.sourceUrl}"`));
