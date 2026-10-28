@@ -59,8 +59,11 @@ export default function Layout() {
               <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
                 홈
               </Link>
-              <Link to="/notes" className={location.pathname.startsWith('/notes') ? 'active' : ''}>
+              <Link to="/notes" className={location.pathname === '/notes' ? 'active' : ''}>
                 전공노트
+              </Link>
+              <Link to="/web-essentials" className={location.pathname === '/web-essentials' || location.pathname === '/notes/web-essentials' ? 'active' : ''}>
+                웹 필수지식
               </Link>
               <a href="https://gitseon.github.io/study-space/" target="_blank" rel="noopener noreferrer" aria-label="gs study (새 탭에서 열림)">
                 gs study <span aria-hidden="true">↗</span>
