@@ -14,14 +14,6 @@ export default function MajorPage() {
         <p>현재 PDF 열람과 다운로드를 제공하지 않습니다. 이용 가능한 자료는 확인 후 다시 안내하겠습니다.</p>
       </section>
 
-      <div className="section-title">문제로 확인하기</div>
-      <div className="exam-sections">
-        <Link to="/major/spring" className="exam-section duel-room">
-          <span className="t">Spring · JPA</span>
-          <span className="d">스프링 코어 · 웹 MVC · JPA · 부트</span>
-          <span className="d">60문제 · 60분 · 4지선다</span>
-        </Link>
-      </div>
     </div>
   );
 }
