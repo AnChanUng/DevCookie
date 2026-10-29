@@ -59,6 +59,9 @@ try {
 
   const render = id => renderToStaticMarkup(React.createElement(Answer, { entry: byId.get(id) }));
   assert.ok(render('ksundong-3e144e9031b661d3').includes('<table>'), 'Normalization stages render as a table');
+  for (const id of ['web-cookie-session', 'web-session-jwt']) {
+    assert.ok(render(id).includes('<table>'), 'Cookie attributes and session/JWT comparisons render as readable tables');
+  }
   for (const id of ['ksundong-18feb1226da92c24', 'ksundong-d21932e114664fbf']) {
     assert.ok(render(id).includes('<pre><code'), 'Examples render as code, not executable markup');
   }

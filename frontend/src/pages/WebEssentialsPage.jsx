@@ -34,7 +34,7 @@ function WebChannel({ user }) {
 
   return <div className="cs-notes web-channel">
     <header className="notes-heading">
-      <div><h1>웹 필수지식</h1><p>정리한 질문과 모범답안 50개를 한곳에 모았습니다.</p></div>
+      <div><h1>웹 필수지식</h1><p>정리한 질문과 모범답안 {entries.length}개를 한곳에 모았습니다.</p></div>
       <div className="notes-progress"><strong>학습 완료 {completed} / {entries.length}</strong><progress value={completed} max={entries.length} aria-label="웹 필수지식 학습 완료" /></div>
     </header>
     <div className="notes-save-status" role="status">{statusText} {status === 'error' && <button type="button" onClick={retry}>다시 저장</button>}</div>
@@ -61,6 +61,6 @@ function WebChannel({ user }) {
     </section>)}
     </div>
     </div>
-    <details className="notes-sources"><summary>참고 글과 작성 기준</summary><p>{WEB_ESSENTIALS.description}</p><a href={WEB_NOTE_SOURCES[0].url} target="_blank" rel="noreferrer">{WEB_NOTE_SOURCES[0].title} ↗</a><p>2026.10.28 작성. 개념별 참고 문서는 각 모범답안 아래에 연결했습니다.</p></details>
+    <details className="notes-sources"><summary>참고 글과 작성 기준</summary><p>{WEB_ESSENTIALS.description}</p><a href={WEB_NOTE_SOURCES[0].url} target="_blank" rel="noreferrer">{WEB_NOTE_SOURCES[0].title} ↗</a><p>2026.10.28 최초 작성, 2026.10.29 쿠키·세션·JWT 문답 추가. 개념별 참고 문서는 각 모범답안 아래에 연결했습니다.</p></details>
   </div>;
 }
