@@ -45,6 +45,22 @@ public class RankController {
     private final VisitorTierGrantRepository grants;
     private final com.csstudy.backend.service.PromotionNoticeService notices;
 
+    private final com.csstudy.backend.service.RankWelcomeService welcomeService;
+
+    @PostMapping("/rank/welcome")
+    public Map<String, Object> welcome(HttpServletRequest request) {
+        User user = authService.currentUser(request).orElse(null);
+        Integer rank = null;
+        if (user != null) {
+            Board current = board();
+            rank = solvedRepository.findByUserId(user.getId()).stream()
+                    .map(v -> current.rankOf().get(v.getVisitorId()))
+                    .filter(Objects::nonNull).min(Integer::compareTo).orElse(null);
+        }
+        return Map.of("notices", welcomeService.heartbeat(user == null ? null : user.getId(),
+                rank, user == null ? null : user.getNickname(), Instant.now()));
+    }
+
     private volatile Board cached;
     @org.springframework.transaction.event.TransactionalEventListener(fallbackExecution = true)
     public void profileChanged(com.csstudy.backend.service.NicknameService.Changed event) { cached=null; }
