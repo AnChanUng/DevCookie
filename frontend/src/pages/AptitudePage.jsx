@@ -52,12 +52,12 @@ export default function AptitudePage() {
 
       <section className="ssafy-hero">
         <div className="ssafy-hero-text">
-          <span className="ssafy-eyebrow">인적성검사 · 기업별</span>
-          <h1>기업별 인적성검사 대비</h1>
+          <span className="ssafy-eyebrow">직업기초 · 기업별 적성검사</span>
+          <h1>NCS/인적성</h1>
           <p>기업별 문제를 풀고 영역별 정답률로 약한 곳을 확인하세요. 사이트 내 문제집은 시간 제한 없이 풀 수 있으며, SKCT와 삼성 GSAT는 외부 CBT로 연결됩니다.</p>
         </div>
         <div className="ssafy-hero-stats">
-          <div className="ssafy-stat big"><b>{total}</b><span>전체 문항</span></div>
+          <div className="ssafy-stat big"><b>{total}</b><span>인적성 문항</span></div>
           <div className="ssafy-stat"><b>{BANKS.length}</b><span>기업</span></div>
           <div className="ssafy-stat"><b>{AREAS.length}</b><span>영역</span></div>
           <div className="ssafy-stat"><b>5지</b><span>선다</span></div>
@@ -77,6 +77,12 @@ export default function AptitudePage() {
       </div>
 
       <div className="ssafy-grid">
+        <Link to="/ncs" className="ssafy-card">
+          <div className="ssafy-card-top"><span className="ssafy-tag">NCS</span></div>
+          <h2>NCS 직업기초능력</h2>
+          <p className="ssafy-desc">PSAT형 직업기초능력 모의고사 · 의사소통 · 수리 · 문제해결</p>
+          <span className="ssafy-go">NCS 풀러 가기 →</span>
+        </Link>
         <a href="https://cbt.linkareer.com/exam/detail/1231?tab=COMMUNITY" target="_blank" rel="noopener noreferrer" className="ssafy-card apt-ext">
           <div className="ssafy-card-top"><span className="ssafy-tag">SKCT</span><span className="ssafy-time">외부 사이트</span></div>
           <h2>SKCT</h2>
