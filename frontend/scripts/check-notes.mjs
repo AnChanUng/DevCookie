@@ -32,7 +32,7 @@ try {
   assert.equal(migrateNotesCompletion(historical)[entries[0].id],undefined);
   assert.equal(entries.length,169);
   assert.ok(!CS_NOTES.some(s => s.id === 'web-essentials'), 'Web answers belong to their separate collection');
-  assert.equal(WEB_ESSENTIALS.items.length,50);
+  assert.equal(WEB_ESSENTIALS.items.length,52);
   assert.equal(new Set(entries.map(e=>e.id)).size,entries.length);
   assert.ok(entries.every(e=>e.question && e.answer));
   assert.ok(!CS_NOTES.some(s=>['커뮤니케이션','기타','개인의 역량','최신기술에 관심이 있는지'].includes(s.title)));
@@ -66,7 +66,7 @@ try {
   const showDone = async () => { await act(()=>view.root.findByProps({'aria-label':'완료한 지식 숨기기'}).props.onChange({target:{checked:false}})); };
   const reveal = async id => { await act(()=>view.root.findByProps({id}).findAllByType('button').find(b=>b.props['aria-controls']).props.onClick()); };
   await mount();
-  assert.equal(view.root.findAllByType('a').filter(a=>a.props.href==='/web-essentials').length,1,'Notes show one collection link instead of 50 extra questions');
+  assert.equal(view.root.findAllByType('a').filter(a=>a.props.href==='/web-essentials').length,1,'Notes show one link to the web collection');
   assert.equal(view.root.findAllByType('article').length,entries.length,'All questions appear in the initial list');
   for(const entry of entries) { assert.ok(text(view.toJSON()).includes(entry.question)); assert.ok(!answerVisible(entry.id)); }
   assert.equal(view.root.findByProps({'aria-label':'완료한 지식 숨기기'}).props.checked,false);
@@ -145,7 +145,7 @@ try {
   await mount(NotesRoutes,'/notes#web-csrf');
   const csrf = WEB_ESSENTIALS.items.find(e=>e.id==='web-csrf');
   const webCheckbox = () => view.root.findByProps({'aria-label':`${csrf.title} 학습 완료`});
-  assert.equal(view.root.findAllByType('article').length,50,'Legacy links reach the channel with all answers displayed');
+  assert.equal(view.root.findAllByType('article').length,WEB_ESSENTIALS.items.length,'Legacy links reach the channel with all answers displayed');
   assert.ok(text(view.toJSON()).includes(csrf.question));
   assert.ok(webCheckbox().props.checked,'Previously saved completion survives the page split');
   const channelArticles = view.root.findAllByType('article');
@@ -162,9 +162,10 @@ try {
   assert.ok(saved[entries[0].id].done && saved[entries[1].id].done,'Web updates retain existing subject records');
   await act(async()=>{await webCheckbox().props.onChange();});
   const toc = view.root.findByProps({'aria-label':'웹 필수지식 목차'});
-  assert.equal(toc.findAllByType('a').length,8);
+  assert.equal(toc.findAllByType('a').filter(a=>a.props.className==='web-toc-topic').length,8);
+  assert.equal(toc.findAllByType('a').length,8 + WEB_ESSENTIALS.items.length,'Topic and question links cover the complete collection');
   await act(()=>toc.findAllByType('a').find(a=>a.props.href==='/web-essentials#web-topic-4').props.onClick({button:0,defaultPrevented:false,preventDefault(){this.defaultPrevented=true;}}));
-  assert.equal(view.root.findAllByType('article').length,50,'The table of contents scrolls without filtering any answers');
+  assert.equal(view.root.findAllByType('article').length,WEB_ESSENTIALS.items.length,'The table of contents scrolls without filtering any answers');
   assert.equal(scrolled.at(-1),'web-topic-4');
   for(const ref of csrf.references) assert.ok(view.root.findByProps({id:csrf.id}).findAllByType('a').some(a=>a.props.href===ref.url));
   await unmount();await mount(WebPage,'/web-essentials#web-csrf');
