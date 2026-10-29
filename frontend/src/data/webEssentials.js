@@ -29,6 +29,10 @@ const references = {
   sql: { title: 'OWASP — SQL Injection Prevention', url: 'https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html' },
   xss: { title: 'OWASP — XSS Prevention', url: 'https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html' },
   csrf: { title: 'OWASP — CSRF Prevention', url: 'https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html' },
+  session: { title: 'OWASP — Session Management', url: 'https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html' },
+  jwt: { title: 'OWASP — JSON Web Token', url: 'https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_Cheat_Sheet.html' },
+  jwtSpec: { title: 'RFC 7519 — JSON Web Token (JWT)', url: 'https://www.rfc-editor.org/rfc/rfc7519.html' },
+  jwtSecurity: { title: 'RFC 8725 — JWT Best Current Practices', url: 'https://www.rfc-editor.org/rfc/rfc8725.html' },
   supplychain: { title: 'OWASP — Vulnerable Dependency Management', url: 'https://cheatsheetseries.owasp.org/cheatsheets/Vulnerable_Dependency_Management_Cheat_Sheet.html' },
   unit: { title: 'Spring — Unit Testing', url: 'https://docs.spring.io/spring-framework/reference/testing/unit.html' },
   mockmvc: { title: 'Spring — MockMvc', url: 'https://docs.spring.io/spring-framework/reference/testing/mockmvc.html' },
@@ -58,7 +62,7 @@ const note = (id, topic, title, question, answer, refs) => ({
 export const WEB_ESSENTIALS = {
   id: 'web-essentials',
   title: '웹 필수지식',
-  description: 'NAVER D2의 2018년 글에서 다룬 주제를 학습 질문으로 재구성했습니다. 모범답안은 새로 작성한 학습 예시이며 NAVER의 공식 답변이 아닙니다. HTTP/3, 가상 스레드 등 이후의 기술 변화도 보충했습니다.',
+  description: 'NAVER D2의 2018년 글에서 다룬 주제와 추가 학습 문답을 정리했습니다. 모범답안은 새로 작성한 학습 예시이며 NAVER의 공식 답변이 아닙니다. HTTP/3, 가상 스레드 등 이후의 기술 변화와 쿠키·세션·JWT 비교도 보충했습니다.',
   items: [
     note('backend-role', '학습 방향', '백엔드 개발자의 역할',
       '백엔드 개발자는 무엇을 책임지고, 다른 개발 직군과 어떻게 협업하나요?',
@@ -259,6 +263,63 @@ Java 21에서 정식 도입된 가상 스레드는 I/O 대기가 많은 코드�
 방어적 복사나 불변 컬렉션을 사용하고 내부 원소도 가변인지 확인합니다. Java의 final 필드는 참조 재할당을 막을 뿐 그 참조가 가리키는 목록 전체를 불변으로 만들지 않습니다. 읽기 전용 뷰도 원본이 바뀌면 내용이 바뀔 수 있습니다.
 
 불변 값이라도 캐시 맵의 안전한 공개, 삽입·교체의 동시성, 크기·만료 관리는 별도 문제입니다. 검증된 캐시 구현과 적절한 수명 정책을 함께 사용합니다.`, ['concurrency', 'cache']),
+    note('cookie-session', '보안', '쿠키(Cookie)와 세션(Session)',
+      '쿠키와 세션은 무엇이 다르고, 세션 로그인은 어떻게 유지되나요?',
+      `**쿠키는 브라우저가 저장하고 조건에 맞는 요청에 실어 보내는 데이터이고, 서버 세션은 로그인 상태를 서버에서 관리하는 방식입니다.** 둘은 대체 관계가 아닙니다. 서버 세션 인증에서는 보통 쿠키에 예측하기 어려운 세션 ID를 담고, 사용자 ID·권한·만료 정보 같은 세션 상태는 서버 메모리나 Redis·DB에서 관리합니다. 쿠키는 로그인 외에도 화면 설정 등에 사용할 수 있습니다.
+
+#### 로그인 흐름
+
+1. 클라이언트가 HTTPS로 로그인 정보를 보내고 서버가 검증합니다.
+2. 서버는 안전한 난수로 세션 ID를 만들고 세션 저장소에 로그인 상태를 저장합니다. 로그인·권한 상승 시에는 세션 ID를 재발급하고 이전 ID를 무효화해 세션 고정을 방지합니다.
+3. 서버가 Set-Cookie 응답 헤더로 세션 ID를 전달하면 브라우저가 저장합니다.
+4. 이후 브라우저는 쿠키의 범위·SameSite·요청 자격 증명 설정 등 전송 조건이 맞으면 Cookie 헤더에 ID를 보냅니다. 서버는 저장소에서 유효한 세션을 확인하고 요청별 권한을 검사합니다.
+
+쿠키에 사용자 ID만 넣고 그 값을 신뢰하면 사용자가 값을 바꾸어 다른 사용자로 행동할 수 있습니다. 세션 ID 자체도 탈취되면 인증에 악용될 수 있으므로 비밀번호처럼 보호해야 합니다.
+
+#### 인증 쿠키에서 확인할 속성
+
+| 속성 | 역할과 주의점 |
+| --- | --- |
+| Secure | HTTPS 연결로 전송하도록 제한합니다. 저장된 값 자체를 암호화하는 옵션은 아닙니다. |
+| HttpOnly | document.cookie 같은 JavaScript 접근을 막습니다. XSS가 사용자의 권한으로 요청을 보내는 것까지 막지는 않습니다. |
+| SameSite | 다른 사이트에서 시작된 요청에 쿠키를 보낼 조건을 정합니다. None은 Secure와 함께 사용해야 하며, SameSite만으로 모든 CSRF를 해결하지는 않습니다. |
+| Domain·Path | 쿠키를 보낼 호스트와 경로 범위를 정합니다. 서버의 접근 권한 검사를 대신하지 않습니다. |
+| Max-Age·Expires | 브라우저가 쿠키를 보관할 기간을 정합니다. 서버 세션의 유효 기간과는 별개입니다. |
+
+Max-Age·Expires가 없는 **세션 쿠키**와 서버의 **세션 상태**도 다른 개념입니다. 브라우저의 세션 복원 기능 등 때문에 창을 닫으면 반드시 로그아웃된다고 가정하면 안 됩니다. 서버에서 유휴 시간과 최대 수명에 따른 만료를 적용해야 합니다.
+
+로그아웃할 때는 서버 세션을 무효화하고 같은 이름·도메인·경로의 쿠키도 만료시킵니다. 브라우저 쿠키만 지우면 이미 탈취된 ID는 서버에서 계속 유효할 수 있습니다. 쿠키 인증에는 CSRF 방어도 함께 적용합니다.
+
+**면접용 요약:** 쿠키는 브라우저의 저장·전송 수단이고 세션은 상태 관리 방식입니다. 세션 ID를 쿠키로 전달해 서버의 로그인 상태를 찾으며, 만료와 로그아웃은 서버에서도 처리해야 합니다.`, ['session', 'csrf']),
+    note('session-jwt', '보안', 'Session vs JWT',
+      '서버 세션 인증과 JWT 기반 인증은 어떻게 다르고 언제 선택해야 하나요?',
+      `**서버 세션 인증은 서버에 저장된 상태를 조회하고, JWT 기반 인증은 주로 서명된 토큰의 클레임을 검증합니다.** 엄밀히 말하면 세션은 상태 관리 방식이고 JWT는 클레임을 전달하는 토큰 형식이므로 완전히 같은 수준의 개념은 아닙니다. 여기서는 불투명한 세션 ID를 사용하는 인증과 서명된 JWT 액세스 토큰을 사용하는 인증을 비교합니다.
+
+| 비교 기준 | 서버 세션 ID 기반 인증 | JWT 액세스 토큰 기반 인증 |
+| --- | --- | --- |
+| 클라이언트가 가진 값 | 보통 임의의 세션 ID | 사용자 식별자·만료 시각 등 클레임과 서명 |
+| 기본 검증 | 세션 저장소의 상태·만료 확인 | 신뢰하는 키로 서명과 필요한 클레임 검증 |
+| 서버 상태 | 세션 저장소가 필요함 | 토큰마다 세션을 조회하지 않을 수 있으나 폐기·갱신 관리에는 별도 상태가 필요할 수 있음 |
+| 강제 로그아웃 | 서버 세션을 무효화하고 이후 검증에서 차단 | 독립적으로 검증되는 토큰은 만료 전까지 유효할 수 있어 폐기 목록·버전 확인 등 추가 설계가 필요함 |
+| 서버 확장 | 공유 세션 저장소나 세션 라우팅 전략을 고려 | 검증 키와 발급자·수신 대상 정책을 배포하고 키 교체를 관리 |
+| 권한 변경 | 서버 상태와 권한 조회 정책에 따라 반영 | 토큰의 권한이 발급 시점 값이면 오래될 수 있어 짧은 만료나 최신 권한 확인을 고려 |
+| 전송·저장 | 보통 쿠키를 사용하지만 ID 전달 방식을 따로 설계할 수 있음 | 쿠키 또는 Authorization 헤더 등으로 전달할 수 있음 |
+
+#### JWT에서 자주 혼동하는 점
+
+일반적인 서명형 JWT(JWS)는 **Header.Payload.Signature**의 세 부분으로 표현합니다. Header와 Payload는 Base64url 인코딩이므로 누구나 내용을 읽을 수 있습니다. **서명은 변조 검증을 위한 것이며 암호화가 아닙니다.** 암호화된 JWT(JWE)도 있지만 별도 형식입니다. 비밀번호나 불필요한 개인정보를 Payload에 넣지 않습니다.
+
+서버는 토큰 문자열을 디코딩하는 데 그치지 않고, 서버가 허용한 알고리즘과 신뢰하는 키로 서명 또는 MAC을 검증합니다. 인증 정책에 맞게 exp(만료), nbf(사용 가능 시점), iss(발급자), aud(수신 대상)와 토큰 용도도 검사합니다. 토큰 헤더가 주장하는 알고리즘·키 주소를 그대로 신뢰하거나 인증용 토큰에 무서명 방식을 허용하면 안 됩니다.
+
+#### 로그아웃과 토큰 갱신
+
+클라이언트에서 JWT를 삭제해도 다른 곳에 복사된 토큰은 자동으로 무효화되지 않습니다. 짧은 수명의 액세스 토큰과 서버에서 관리하는 리프레시 토큰을 조합하고, 필요에 따라 갱신 토큰 교체·재사용 탐지·폐기 목록 등을 설계합니다. 리프레시 토큰만 폐기해도 이미 발급된 액세스 토큰이 즉시 무효가 되는 것은 아닙니다. 즉시 차단을 위해 서버 상태를 확인한다면 완전한 무상태 인증은 아니게 됩니다.
+
+쿠키에 JWT를 넣으면 쿠키 인증과 마찬가지로 CSRF 대응이 필요합니다. localStorage는 JavaScript가 읽을 수 있어 XSS에 노출될 수 있으며, HttpOnly 쿠키도 XSS 자체나 사용자 권한으로 실행되는 요청까지 해결하지는 않습니다. 따라서 “세션은 쿠키라서 불안전하고 JWT는 안전하다”처럼 형식만으로 보안을 비교하면 안 됩니다.
+
+**선택 기준:** 일반적인 브라우저 서비스에서 즉시 로그아웃과 상태 제어가 중요하면 서버 세션이 단순한 선택일 수 있습니다. 여러 API가 토큰 발급자와 분리되어 독립적으로 검증해야 한다면 JWT를 고려하되 키 관리, 만료, 폐기와 권한 갱신 비용까지 비교합니다. 세션도 분산 환경에서 확장할 수 있고 JWT도 항상 더 빠르거나 안전한 것은 아닙니다.
+
+**면접용 요약:** 세션은 서버 상태를 조회해 인증을 관리하고 JWT는 서명된 클레임으로 검증을 분산할 수 있습니다. 세션은 중앙에서 폐기하기 쉽고 JWT는 독립 검증에 이점이 있지만, 만료 전 차단과 권한 변경을 추가로 설계해야 하므로 요구사항에 맞게 선택합니다.`, ['session', 'jwt', 'jwtSpec', 'jwtSecurity']),
     note('sql-injection', '보안', 'SQL Injection 방어',
       'SQL Injection은 왜 발생하고 ORM을 사용하면 안전한가요?',
       `**외부 입력이 SQL의 데이터가 아니라 구문으로 해석될 때 발생합니다.** 문자열 연결로 쿼리를 만들지 말고 SQL 구조와 값을 분리해 매개변수로 바인딩합니다. ORM의 직접 쿼리나 동적 문자열도 같은 원칙을 지켜야 합니다.

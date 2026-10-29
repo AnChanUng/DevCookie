@@ -10,7 +10,7 @@ export default function WebPage() {
     <div className="exam-sections">
       <Link to="/web-essentials" className="exam-section">
         <span className="t">웹 필수지식</span>
-        <span className="d">웹 개발 핵심 질문 50개와 모범답변</span>
+        <span className="d">웹 개발 핵심 질문과 모범답변</span>
         <span className="d">기존 웹 필수지식 페이지로 이동 →</span>
       </Link>
       <Link to="/web/spring" className="exam-section">
