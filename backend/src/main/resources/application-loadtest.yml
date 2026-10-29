@@ -1,0 +1,23 @@
+# Local-only PostgreSQL fixture. This profile never uses production DB bindings.
+spring:
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:55432/cs_study_k6
+    username: postgres
+    password: ""
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+  jpa:
+    show-sql: false
+server:
+  address: 127.0.0.1
+  port: 18080
+app:
+  admin-key: ""
+  security:
+    rate-limit-enabled: true
+    trust-forwarded-for: false
+slack:
+  enabled: false
+gemini:
+  api-key: ""
