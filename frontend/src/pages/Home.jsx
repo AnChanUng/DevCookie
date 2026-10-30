@@ -23,6 +23,7 @@ export default function Home() {
       {/* 왼쪽은 소개와 시험 일정, 오른쪽은 문제 많이 푼 사람 순위 */}
       <div className="home-top">
         <div className="hero">
+          <img className="home-cookie-flower" src="/images/cookie-daisy.png" alt="초코칩 쿠키를 중심에 넣은 하얀 데이지꽃" width="1254" height="1254" fetchPriority="high" />
           <h1>전산학 전공필기 준비</h1>
           <p>기출 기반 모의고사로 풀고, 틀린 문제는 다시 풉니다.</p>
           <div className="home-cta">
