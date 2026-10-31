@@ -8,6 +8,7 @@ import './exam.css';
 const PromotionExamPage = lazy(() => import('./pages/PromotionExamPage'));
 const BugHuntPage = lazy(() => import('./pages/BugHuntPage'));
 const TechnicalInterviewPage = lazy(() => import('./pages/TechnicalInterviewPage'));
+const ChanungPage = lazy(() => import('./pages/ChanungPage'));
 const CategoryPage = lazy(() => import('./pages/CategoryPage'));
 const QuestionPage = lazy(() => import('./pages/QuestionPage'));
 const AccountPage = lazy(() => import('./pages/AccountPage'));
@@ -52,6 +53,8 @@ function App() {
           <Route path="stats" element={<StatsPage />} />
           <Route path="interview" element={<InterviewPracticePage />} />
           <Route path="technical-interview" element={<TechnicalInterviewPage />} />
+          <Route path="chanung" element={<ChanungPage />} />
+          <Route path="chanung/company" element={<ChanungPage company />} />
           <Route path="ai-interview" element={<Navigate to="/" replace />} />
           <Route path="notes" element={<CsNotesPage />} />
           <Route path="web-essentials" element={<WebEssentialsPage />} />
