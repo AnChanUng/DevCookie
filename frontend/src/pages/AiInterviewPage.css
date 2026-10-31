@@ -1,0 +1,18 @@
+.ai-interview .ai-intro { margin: 8px 0; color: var(--text-secondary); font-size: .9rem; }
+.ai-interview .notes-questions a { display: block; padding: 9px 0; color: var(--text-primary); font-size: .8rem; line-height: 1.55; overflow-wrap: anywhere; }
+.ai-interview .notes-filters { grid-template-columns: 1fr; }
+.ai-interview .ai-draft-label { display: block; font-size: .8rem; margin: 12px 0 6px; }
+.ai-interview textarea { width: 100%; box-sizing: border-box; resize: vertical; min-height: 90px; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; background: var(--bg-secondary); color: var(--text-primary); font: inherit; line-height: 1.6; margin-bottom: 12px; }
+.ai-interview textarea:focus-visible, .ai-interview a:focus-visible, .ai-interview summary:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 3px; }
+.ai-interview .notes-answer h3 { font-size: .95rem; margin: 12px 0; }
+.ai-interview .notes-answer strong { font-weight: 800; }
+.ai-interview .ai-followup { border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 18px; }
+.ai-interview .ai-followup h4 { font-size: .9rem; margin: 0 0 10px; }
+.ai-interview summary { cursor: pointer; color: var(--accent-blue); }
+.ai-interview .ai-followup details p { margin-top: 10px; }
+@media (max-width: 800px) {
+  .ai-interview .notes-layout { grid-template-columns: 1fr; }
+  .ai-interview .notes-index { position: static; max-height: 32dvh; }
+  .ai-interview .notes-heading { align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+  .ai-interview .notes-detail-top { flex-wrap: wrap; gap: 8px; }
+}

@@ -26,6 +26,6 @@ try {
   assert.equal(spring.questions.length, 60);
   const home = await readFile(new URL('../src/pages/Home.jsx', import.meta.url), 'utf8');
   const destinations = [...home.matchAll(/\{ to: '([^']+)'/g)].map(m => m[1]);
-  assert.deepEqual(destinations, ['/exam', '/aptitude', '/web', '/major']);
+  assert.deepEqual(destinations, ['/exam', '/aptitude', '/web', '/ai-interview']);
   console.log('PASS: merged NCS/aptitude, third web menu, Spring 60 questions, 52 web answers available');
 } finally { await server.close(); }
