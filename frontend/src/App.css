@@ -3001,19 +3001,6 @@ button.today-cs:hover { border-color: var(--accent-blue); transform: translateY(
   line-height: 1.2;
 }
 
-.home-cookie-flower {
-  display: block;
-  width: clamp(150px, 15vw, 210px);
-  max-width: 100%;
-  height: auto;
-  margin: 0 0 18px;
-  filter: drop-shadow(0 5px 9px rgb(94 65 29 / 16%));
-}
-
-@media (max-width: 640px) {
-  .home-cookie-flower { width: 150px; margin: 0 auto 14px; }
-}
-
 .home-top .hero p {
   max-width: 520px;
   font-size: 1.05rem;
