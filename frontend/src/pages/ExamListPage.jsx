@@ -25,7 +25,7 @@ export default function ExamListPage() {
   const { category: key } = useParams();
   if (!key) return <CategoryPicker />;
   const category = EXAM_CATEGORIES.find(c => c.key === key);
-  if (!category) return <Navigate to="/exam" replace />;
+  if (!category || category.key === 'tech') return <Navigate to="/exam" replace />;
   if (category.hub) return <Navigate to={`/${category.hub}`} replace />;
   return <CompanyList category={category} />;
 }
@@ -55,9 +55,6 @@ function CategoryPicker() {
           <span className="exam-company-meta">숫자가 매번 바뀌는 계산 문제 · 그림 해설</span>
           <span className="exam-category-count">스케줄링 · 페이지 교체 · 서브넷 등 19종</span>
         </Link>
-        {EXAM_CATEGORIES.filter(cat => cat.key === 'tech').map(cat => (
-          <CategoryCard key={cat.key} category={cat} />
-        ))}
       </div>
 
       <ProgressBackup />
