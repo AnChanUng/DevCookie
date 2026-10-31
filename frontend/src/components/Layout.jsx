@@ -75,9 +75,6 @@ export default function Layout() {
               <Link to="/web" className={location.pathname.startsWith('/web') || location.pathname === '/notes/web-essentials' || location.pathname === '/major/spring' ? 'active' : ''}>
                 웹
               </Link>
-              <Link to="/ai-interview" className={location.pathname === '/ai-interview' ? 'active' : ''}>
-                AI 면접준비
-              </Link>
             </nav>
             {/* 지금 모드의 아이콘을 보여 주고, 누르면 색 견본이 펼쳐진다 */}
             <div className="theme-pick">
