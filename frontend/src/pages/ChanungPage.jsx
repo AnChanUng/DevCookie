@@ -91,8 +91,11 @@ function PracticeQuestion({ q, draft, write, recording, saveRecording }) {
     <div className="notes-detail-top"><span>{q.category}</span><span>{q.original ? '내가 작성한 원문' : '모범답변 예시'}</span></div>
     <h2 className="notes-question">{q.question}</h2>
     <InterviewAudio questionId={q.id} recording={recording} saveRecording={saveRecording} />
-    <label className="chanung-label" htmlFor="chanung-draft">내 연습 답변</label>
-    <textarea id="chanung-draft" rows={7} value={draft} onChange={e => write(q.id, e.target.value)} placeholder="실제로 면접에서 말하듯 작성해 보세요." />
+    <details className="chanung-draft-panel">
+      <summary>직접 적어보기{draft.trim() ? ' · 작성한 답변 있음' : ' (선택)'}</summary>
+      <label className="chanung-label" htmlFor="chanung-draft">내 연습 답변</label>
+      <textarea id="chanung-draft" rows={2} value={draft} onChange={e => write(q.id, e.target.value)} placeholder="핵심만 짧게 적어 보세요." />
+    </details>
     <div className="chanung-actions"><button type="button" className="exam-btn sm" disabled={!draft.trim()} onClick={() => setOpen(true)} aria-controls="chanung-answer">답변 제출하고 비교</button><button type="button" className="exam-btn sm" aria-expanded={open} aria-controls="chanung-answer" onClick={() => setOpen(value => !value)}>{open ? '답변 숨기기' : '기억 안 나요 · 답변 보기'}</button></div>
     <div id="chanung-answer" hidden={!open}>{open && <section className="notes-answer" aria-label="참고 답변">
       <h3>{q.original ? '내가 작성한 답변 · 원문 그대로' : '모범답변 · 말하기 예시'}</h3>

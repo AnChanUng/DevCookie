@@ -7,6 +7,9 @@
 .chanung-page button:disabled { opacity: .5; cursor: default; }
 .chanung-pagination { margin-bottom: 14px; }
 .chanung-label { display: block; margin: 16px 0 8px; font-size: .85rem; font-weight: 600; }
+.chanung-draft-panel { margin: 12px 0; }
+.chanung-draft-panel summary { cursor: pointer; color: var(--text-secondary); font-size: .8rem; }
+.chanung-draft-panel #chanung-draft { min-height: 64px; padding: 10px; font-size: .85rem; line-height: 1.5; }
 .interview-audio { margin: 18px 0; padding: 16px; border: 1px solid var(--border-color); border-radius: 10px; }
 .interview-audio h3 { font-size: 1rem; margin: 0 0 10px; }
 .camera-preview { display: block; width: 100%; max-width: 520px; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; background: #111; margin-top: 12px; }
