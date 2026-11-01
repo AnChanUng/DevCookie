@@ -103,7 +103,6 @@ function Practice() {
         <details className="chanung-concept-review">
           <summary>기초 개념 몰아보기 · {concepts.length}개</summary>
           <p className="audio-hint">하루 한 번 펼쳐서 정의를 쭉 읽고 반복해 보세요.</p>
-          <p className="audio-hint">개념 참고: <a href="https://ai.google.dev/gemini-api/docs/tokens" target="_blank" rel="noreferrer">토큰</a> · <a href="https://learn.microsoft.com/en-us/azure/search/hybrid-search-overview" target="_blank" rel="noreferrer">하이브리드 검색</a> · <a href="https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html" target="_blank" rel="noreferrer">프롬프트 인젝션</a></p>
           {concepts.filter(q => showCompleted || !completed.includes(q.id)).map(q => <section key={q.id} className="notes-detail-card" id={q.id}>
             <div className="notes-detail-top"><h3>{q.question}</h3><label><input type="checkbox" aria-label={`${q.question} 학습 완료`} checked={completed.includes(q.id)} onChange={() => toggleCompleted(q.id)} /> 학습 완료</label></div>
             {q.original ? <div className="chanung-original">{q.answer}</div> : <div className="notes-markdown"><ReactMarkdown>{q.answer}</ReactMarkdown></div>}
