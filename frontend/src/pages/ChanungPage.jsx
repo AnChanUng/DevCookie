@@ -1,4 +1,4 @@
-import { useState, useSyncExternalStore } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import InterviewAudio from '../components/InterviewAudio';
@@ -35,10 +35,12 @@ function Practice() {
   const visible = CHANUNG_CATEGORIES.flatMap(c => CHANUNG_QUESTIONS.filter(q => q.category === c))
     .filter(q => (!category || q.category === category) && `${q.question} ${q.category}`.toLowerCase().includes(query.trim().toLowerCase()));
   const selected = visible.find(q => q.id === hash.slice(1)) || visible[0];
-  const index = visible.findIndex(q => q.id === selected?.id);
+  useEffect(() => {
+    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start' });
+  }, [hash]);
   const select = id => {
     navigate(`/chanung#${id}`, { replace: true });
-    document.getElementById('chanung-question')?.scrollIntoView({ block: 'start' });
+    document.getElementById(id)?.scrollIntoView({ block: 'start' });
   };
   const write = (id, value) => {
     const next = { ...drafts, [id]: value };
@@ -64,7 +66,7 @@ function Practice() {
       <p><strong>힘들었던 경험 답변 틀</strong><br />힘들었던 경험은 [인턴십에서 겪은 어려움]입니다. 인턴십에서 [업무]를 하며 [문제] 때문에 어려움을 겪었습니다. 저는 [구체적인 행동]으로 개선했습니다. 그 결과 [변화]가 있었고, [배운 점]을 배웠습니다.</p>
       <p>첫마디에서 질문만 반복하지 말고 빈칸에 결론을 바로 넣으세요. 경험 질문에는 이 흐름을 쓰고, 개념 질문은 “정의 → 동작·역할”로 짧게 답하면 됩니다.</p>
     </details>
-    <p className="notes-list-intro">한 질문씩 답해 본 뒤 모범답변과 비교하세요. 기억이 안 나면 바로 펼쳐 읽을 수 있습니다. 직접 작성한 답변 {CHANUNG_QUESTIONS.filter(q => q.original).length}개는 원문 그대로, 나머지는 준비용 답변 예시입니다.</p>
+    <p className="notes-list-intro">전체 질문과 답변을 아래로 스크롤하며 읽어 보세요. 왼쪽 목차를 누르면 해당 위치로 이동합니다. 직접 작성한 답변 {CHANUNG_QUESTIONS.filter(q => q.original).length}개는 원문 그대로, 나머지는 준비용 답변 예시입니다.</p>
     <p className="notes-save-status" role="status">{saveError ? '저장에 실패했습니다. 입력한 답변을 따로 복사해 주세요.' : '내 연습 답변은 현재 브라우저에 계정별로 저장됩니다. 다른 기기와 동기화되지 않으며 자동 채점하지 않습니다.'}</p>
     <div className="notes-layout">
       <aside className="notes-index">
@@ -76,32 +78,29 @@ function Practice() {
         })}</nav>
       </aside>
       <div className="notes-content">
-        {selected ? <>
-          <div className="chanung-pagination"><button type="button" className="exam-btn sm" disabled={index <= 0} onClick={() => select(visible[index - 1].id)}>← 이전</button><span>{index + 1} / {visible.length}</span><button type="button" className="exam-btn sm" disabled={index === visible.length - 1} onClick={() => select(visible[index + 1].id)}>다음 →</button></div>
-          <PracticeQuestion key={selected.id} q={selected} draft={drafts[selected.id] || ''} write={write} recording={recordings[selected.id]} saveRecording={saveRecording} />
-        </> : <p className="notes-empty">검색 결과가 없습니다. 검색어나 분류를 바꿔 주세요.</p>}
+        {visible.map(q => <PracticeQuestion key={q.id} q={q} draft={drafts[q.id] || ''} write={write} recording={recordings[q.id]} saveRecording={saveRecording} active={selected?.id === q.id} activate={() => select(q.id)} />)}
+        {!visible.length && <p className="notes-empty">검색 결과가 없습니다. 검색어나 분류를 바꿔 주세요.</p>}
       </div>
     </div>
   </>;
 }
 
-function PracticeQuestion({ q, draft, write, recording, saveRecording }) {
-  const [open, setOpen] = useState(false);
-  return <article className="notes-detail-card" id="chanung-question">
+function PracticeQuestion({ q, draft, write, recording, saveRecording, active, activate }) {
+  const [open, setOpen] = useState(true);
+  return <article className="notes-detail-card" id={q.id}>
     <div className="notes-detail-top"><span>{q.category}</span><span>{q.original ? '내가 작성한 원문' : '모범답변 예시'}</span></div>
     <h2 className="notes-question">{q.question}</h2>
-    <InterviewAudio questionId={q.id} recording={recording} saveRecording={saveRecording} />
+    {active ? <InterviewAudio questionId={q.id} recording={recording} saveRecording={saveRecording} /> : <button type="button" className="exam-btn sm" onClick={activate}>이 질문 녹음 연습</button>}
     <details className="chanung-draft-panel">
       <summary>직접 적어보기{draft.trim() ? ' · 작성한 답변 있음' : ' (선택)'}</summary>
-      <label className="chanung-label" htmlFor="chanung-draft">내 연습 답변</label>
-      <textarea id="chanung-draft" rows={2} value={draft} onChange={e => write(q.id, e.target.value)} placeholder="핵심만 짧게 적어 보세요." />
+      <label className="chanung-label" htmlFor={`draft-${q.id}`}>내 연습 답변</label>
+      <textarea id={`draft-${q.id}`} rows={2} value={draft} onChange={e => write(q.id, e.target.value)} placeholder="핵심만 짧게 적어 보세요." />
     </details>
-    <div className="chanung-actions"><button type="button" className="exam-btn sm" disabled={!draft.trim()} onClick={() => setOpen(true)} aria-controls="chanung-answer">답변 제출하고 비교</button><button type="button" className="exam-btn sm" aria-expanded={open} aria-controls="chanung-answer" onClick={() => setOpen(value => !value)}>{open ? '답변 숨기기' : '기억 안 나요 · 답변 보기'}</button></div>
-    <div id="chanung-answer" hidden={!open}>{open && <section className="notes-answer" aria-label="참고 답변">
+    <div className="chanung-actions"><button type="button" className="exam-btn sm" disabled={!draft.trim()} onClick={() => setOpen(true)} aria-controls={`answer-${q.id}`}>답변 제출하고 비교</button><button type="button" className="exam-btn sm" aria-expanded={open} aria-controls={`answer-${q.id}`} onClick={() => setOpen(value => !value)}>{open ? '답변 숨기기' : '기억 안 나요 · 답변 보기'}</button></div>
+    <div id={`answer-${q.id}`} hidden={!open}>{open && <section className="notes-answer" aria-label="참고 답변">
       <h3>{q.original ? '내가 작성한 답변 · 원문 그대로' : '모범답변 · 말하기 예시'}</h3>
       {q.original ? <div className="chanung-original">{q.answer}</div> : <div className="notes-markdown"><ReactMarkdown>{q.answer}</ReactMarkdown></div>}
       {q.note && <p className="chanung-note"><strong>준비 메모</strong> {q.note}</p>}
     </section>}</div>
   </article>;
 }
-
