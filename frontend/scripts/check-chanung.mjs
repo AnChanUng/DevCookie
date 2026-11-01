@@ -15,7 +15,7 @@ try{
  const {default:Page}=await server.ssrLoadModule('/src/pages/ChanungPage.jsx');
  const {default:api}=await server.ssrLoadModule('/src/api.js');api.get=async()=>({data:{available:true}});
  const {CHANUNG_QUESTIONS:qs,CHANUNG_CATEGORIES:cats}=await server.ssrLoadModule('/src/data/chanung.js');
- assert.deepEqual(cats,['기술','인성','자소서꼬리질문']);assert.equal(qs.length,30);
+ assert.deepEqual(cats,['기술','인성','자소서꼬리질문']);assert.equal(qs.length,42);
  const mount=async()=>{await act(async()=>{view=TestRenderer.create(React.createElement(MemoryRouter,{initialEntries:['/chanung']},React.createElement(Page)));});};
  await mount();assert.equal(view.root.findAllByType('article').length,13);
  for(const q of qs.filter(q=>q.id!=='cu-rag'&&!q.id.endsWith('-concept')))assert.equal(view.root.findByProps({id:`answer-${q.id}`}).props.hidden,true);
@@ -37,5 +37,5 @@ try{
  await act(async()=>complete().props.onChange());
  await act(async()=>view.root.findByType('select').props.onChange({target:{value:'인성'}}));assert.equal(view.root.findAllByType('article').length,5);
  await act(async()=>view.root.findByProps({type:'search'}).props.onChange({target:{value:'없는질문xyz'}}));assert.equal(view.root.findAllByType('article').length,0);
- console.log('PASS: 13 interview questions and 17 concepts in collapsed review, sidebar scroll preserves cards, single recording/camera panel, unique IDs, saved drafts, filters');
+ console.log('PASS: 13 interview questions and 29 concepts in collapsed review, sidebar scroll preserves cards, single recording/camera panel, unique IDs, saved drafts, filters');
 }finally{if(view)await act(async()=>view.unmount());await server.close();}
