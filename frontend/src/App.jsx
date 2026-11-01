@@ -54,7 +54,7 @@ function App() {
           <Route path="interview" element={<InterviewPracticePage />} />
           <Route path="technical-interview" element={<TechnicalInterviewPage />} />
           <Route path="chanung" element={<ChanungPage />} />
-          <Route path="chanung/company" element={<ChanungPage company />} />
+          <Route path="chanung/company" element={<Navigate to="/chanung" replace />} />
           <Route path="ai-interview" element={<Navigate to="/" replace />} />
           <Route path="notes" element={<CsNotesPage />} />
           <Route path="web-essentials" element={<WebEssentialsPage />} />

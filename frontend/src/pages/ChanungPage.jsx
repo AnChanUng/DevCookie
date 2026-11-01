@@ -1,18 +1,17 @@
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { account, onAccountChange } from '../sync';
-import { CHANUNG_QUESTIONS, CHANUNG_CATEGORIES, COMPANY_SECTIONS, COMPANY_SOURCES } from '../data/chanung';
+import { CHANUNG_QUESTIONS, CHANUNG_CATEGORIES } from '../data/chanung';
 import './CsNotesPage.css';
 import './ChanungPage.css';
 
 const identity = () => account()?.token || '';
-export default function ChanungPage({ company = false }) {
+export default function ChanungPage() {
   const token = useSyncExternalStore(onAccountChange, identity, () => '');
   return <div className="cs-notes chanung-page">
-    <header className="notes-heading"><div><h1>{company ? '딜로이트 기업 분석' : '찬웅의 면접 연습'}</h1><p>딜로이트 안진 · 경영지원부문 IT AI 엔지니어</p></div><Link to="/">홈으로</Link></header>
-    <nav className="chanung-tabs" aria-label="면접 준비 페이지"><Link to="/chanung" aria-current={!company ? 'page' : undefined}>주관식 연습</Link><Link to="/chanung/company" aria-current={company ? 'page' : undefined}>기업 분석 읽기</Link></nav>
-    {company ? <CompanyReading /> : <Practice key={token} />}
+    <header className="notes-heading"><div><h1>찬웅의 면접 연습</h1><p>딜로이트 안진 · 경영지원부문 IT AI 엔지니어</p></div><Link to="/">홈으로</Link></header>
+    <Practice key={token} />
   </div>;
 }
 
@@ -65,7 +64,6 @@ function Practice() {
           <div className="chanung-pagination"><button type="button" className="exam-btn sm" disabled={index <= 0} onClick={() => select(visible[index - 1].id)}>← 이전</button><span>{index + 1} / {visible.length}</span><button type="button" className="exam-btn sm" disabled={index === visible.length - 1} onClick={() => select(visible[index + 1].id)}>다음 →</button></div>
           <PracticeQuestion key={selected.id} q={selected} draft={drafts[selected.id] || ''} write={write} />
         </> : <p className="notes-empty">검색 결과가 없습니다. 검색어나 분류를 바꿔 주세요.</p>}
-        <details className="notes-sources"><summary>면접 후기 메모</summary><p>첨부 자료에는 3:1 개인 면접이며 함께 일할 분들이 면접관으로 참여했다는 후기가 있습니다. 개별 경험에 관한 메모이며, 본인의 면접 구성이나 질문을 보장하지 않습니다.</p></details>
       </div>
     </div>
   </>;
@@ -83,25 +81,7 @@ function PracticeQuestion({ q, draft, write }) {
       <h3>{q.original ? '내가 작성한 답변 · 원문 그대로' : '모범답변 · 말하기 예시'}</h3>
       {q.original ? <div className="chanung-original">{q.answer}</div> : <div className="notes-markdown"><ReactMarkdown>{q.answer}</ReactMarkdown></div>}
       {q.note && <p className="chanung-note"><strong>준비 메모</strong> {q.note}</p>}
-      <Sources ids={q.sources} />
     </section>}</div>
   </article>;
 }
 
-function Sources({ ids = [] }) {
-  return ids.length ? <ul className="chanung-sources">{ids.map(id => <li key={id}><a href={COMPANY_SOURCES[id][1]} target="_blank" rel="noreferrer">{COMPANY_SOURCES[id][0]} ↗</a></li>)}</ul> : null;
-}
-
-function CompanyReading() {
-  const { hash } = useLocation();
-  useEffect(() => {
-    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start' });
-  }, [hash]);
-  return <>
-    <p className="notes-list-intro">2026.11.01 확인 · 공식 자료의 발표 시점과 향후 계획을 구분했습니다. 사실 설명 아래의 ‘면접 연결·해석’은 지원 준비를 위한 분석입니다.</p>
-    <div className="notes-layout">
-      <aside className="notes-index"><nav className="notes-questions" aria-label="기업 분석 목차"><h2>계속 읽을 기업 노트</h2><ul>{COMPANY_SECTIONS.map((section, index) => <li key={section.id}><Link to={`#company-${section.id}`}>{index + 1}. {section.title}</Link></li>)}</ul></nav></aside>
-      <div className="notes-content">{COMPANY_SECTIONS.map(section => <section key={section.id} id={`company-${section.id}`} className="notes-detail-card"><h2 className="notes-question">{section.title}</h2><div className="notes-markdown"><ReactMarkdown>{section.body}</ReactMarkdown></div><Sources ids={section.sources} /></section>)}</div>
-    </div>
-  </>;
-}

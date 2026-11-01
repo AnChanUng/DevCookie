@@ -1,6 +1,3 @@
-.chanung-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
-.chanung-tabs a { padding: 10px 16px; border: 1px solid var(--border-color); border-radius: 9px; color: var(--text-primary); }
-.chanung-tabs a[aria-current=page] { color: var(--accent-blue); background: var(--accent-blue-light); border-color: var(--accent-blue); }
 .chanung-page .notes-layout { grid-template-columns: 310px minmax(0, 1fr); }
 .chanung-page .notes-content { min-width: 0; }
 .chanung-page .notes-filters { grid-template-columns: 1fr; }
@@ -16,8 +13,6 @@
 .chanung-page .notes-answer h3 { font-size: 1rem; margin-bottom: 16px; }
 .chanung-note { padding: 12px; border-left: 3px solid var(--accent-blue); background: var(--bg-secondary); font-size: .85rem; line-height: 1.8; margin-top: 18px; }
 .chanung-note strong { display: block; }
-.chanung-sources { font-size: .78rem; line-height: 1.8; margin: 16px 0 0; padding-left: 20px; }
-.chanung-sources a { color: var(--accent-blue); overflow-wrap: anywhere; }
 .chanung-page .notes-questions a { display: block; padding: 10px 0; font-size: .82rem; color: var(--text-primary); }
 .chanung-page .notes-detail-card { scroll-margin-top: 90px; }
 .chanung-page textarea:focus-visible, .chanung-page a:focus-visible, .chanung-page select:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 3px; }
