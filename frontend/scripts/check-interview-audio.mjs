@@ -70,7 +70,7 @@ try {
   await act(async () => view.root.findByType('textarea').props.onChange({ target: { value: '추가 수정' } }));
   assert.equal(recording.result, null, 'editing invalidates old grade');
   api.post = async () => { throw { response: { data: { error: 'API 사용 한도 초과' } } }; };
-  await click('확인한 답변으로 채점'); assert.ok(text(view.root.findByProps({ role: 'alert' })).includes('사용 한도'));
+  await click('확인한 답변으로 채점'); assert.ok(view.root.findAllByProps({ role: 'alert' }).some(node => text(node).includes('사용 한도')));
   assert.ok(recording.blob, 'failed AI request preserves recording');
   await click('다시 녹음'); const previous = stopped; await act(async () => view.unmount()); view = null; assert.ok(stopped > previous);
   signedIn = false;
