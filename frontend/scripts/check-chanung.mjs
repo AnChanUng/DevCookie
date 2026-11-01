@@ -26,6 +26,13 @@ try{
  await act(async()=>draft().props.onChange({target:{value:'내 답변'}}));
  await act(async()=>view.unmount());await mount();assert.equal(draft().props.value,'내 답변');
  assert.equal(new Set(view.root.findAll(n=>typeof n.type==='string'&&n.props.id).map(n=>n.props.id)).size,view.root.findAll(n=>typeof n.type==='string'&&n.props.id).length,'unique element IDs');
+ const complete=()=>view.root.findByProps({'aria-label':'자기소개 학습 완료'});
+ await act(async()=>complete().props.onChange());assert.equal(view.root.findAllByType('article').length,19);
+ assert.ok(!view.root.findAllByType('button').some(n=>text(n)==='자기소개'));
+ await act(async()=>view.unmount());await mount();assert.equal(view.root.findAllByType('article').length,19);
+ const toggle=view.root.findByProps({className:'notes-filters'}).findAllByType('input').find(n=>n.props.type==='checkbox');
+ await act(async()=>toggle.props.onChange({target:{checked:true}}));assert.equal(view.root.findAllByType('article').length,20);
+ await act(async()=>complete().props.onChange());
  await act(async()=>view.root.findByType('select').props.onChange({target:{value:'인성'}}));assert.equal(view.root.findAllByType('article').length,5);
  await act(async()=>view.root.findByProps({type:'search'}).props.onChange({target:{value:'없는질문xyz'}}));assert.equal(view.root.findAllByType('article').length,0);
  console.log('PASS: all 20 answers expanded, sidebar scroll preserves cards, single recording/camera panel, unique IDs, saved drafts, filters');
