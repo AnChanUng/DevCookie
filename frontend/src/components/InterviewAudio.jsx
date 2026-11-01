@@ -79,9 +79,7 @@ export default function InterviewAudio({ questionId, recording, saveRecording })
       <span aria-live="polite">{phase === 'recording' ? `녹음 중 ${seconds}초 / 180초` : phase === 'permission' ? '마이크 권한 확인 중…' : phase === 'stopping' ? '녹음 정리 중…' : phase === 'transcribing' ? '음성 인식 중…' : phase === 'grading' ? '채점 중…' : ''}</span>
     </div>
     {recording?.blob && url && <div className="audio-playback"><audio controls src={url} aria-label="내 답변 다시 듣기" /><a href={url} download={`${questionId}.${extension}`}>녹음 다운로드</a></div>}
-    <p className="audio-hint">‘녹음 내용 인식’을 누르면 음성을, ‘채점’을 누르면 확인한 텍스트를 Google Gemini로 전송합니다. 서비스 서버에는 음성과 답변을 저장하지 않습니다. 채점은 내용 기준의 연습용 평가이며 발음·억양은 평가하지 않습니다.</p>
     {!account() && <p className="audio-hint">녹음·재생은 바로 이용할 수 있습니다. AI 인식·채점은 로그인해 주세요.</p>}
-    {availability === 'unconfigured' && <p role="status">서버 Gemini API 키가 설정되지 않아 AI 채점이 준비되지 않았습니다.</p>}
     {availability === 'unreachable' && <p className="audio-hint">AI 서버 상태를 확인하지 못했습니다. 녹음 후 다시 요청할 수 있습니다.</p>}
     {recording?.blob && <button type="button" className="exam-btn sm" disabled={aiDisabled} onClick={() => request('transcribing')}>녹음 내용 인식</button>}
     {recording?.transcribed && <>
