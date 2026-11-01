@@ -98,14 +98,6 @@ export const CHANUNG_QUESTIONS = [
     "note": ""
   },
   {
-    "id": "cu-similarity-concept",
-    "category": "기술",
-    "question": "유사도가 뭐예요?",
-    "answer": "**유사도**는 질문과 문서가 얼마나 비슷한지를 나타내는 값입니다. 임베딩 벡터를 비교해 관련 문서를 찾는 데 활용하지만, 유사도가 높다고 답변이 반드시 정확한 것은 아닙니다.",
-    "original": false,
-    "note": ""
-  },
-  {
     "id": "cu-threshold-concept",
     "category": "기술",
     "question": "유사도 임계값이 뭐예요?",
@@ -158,5 +150,77 @@ export const CHANUNG_QUESTIONS = [
     "answer": "이전 회사에서는 ETL 서버 개발과 유지보수를 통해 데이터 처리와 운영 경험을 쌓았습니다. 퇴사한 직접적인 이유는 [실제 퇴사 사유]입니다.\n\n현재는 SSAFY에서 AI를 학습하고 직접 서비스에 적용하고 있습니다. 앞으로는 기존 서버 개발 경험과 AI 개발 경험을 함께 활용해, 업무에 필요한 AI 시스템을 만들고 운영하는 개발자로 성장하고 싶습니다.",
     "original": false,
     "note": "실제 퇴사 이유는 전달받지 않아 대괄호로 남겼습니다. 본인의 사유로 바꿔 연습하세요."
+  },
+  {
+    "id": "cu-generative-ai-concept",
+    "category": "기술",
+    "question": "생성형 AI가 뭐예요?",
+    "answer": "**생성형 AI**는 학습한 패턴을 바탕으로 글·이미지·음성 같은 새로운 결과물을 생성하는 AI입니다. LLM은 언어를 다루는 생성형 AI에 활용됩니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-hallucination-concept",
+    "category": "기술",
+    "question": "환각(Hallucination)이 뭐예요?",
+    "answer": "**환각**은 AI가 사실과 다르거나 근거가 없는 내용을 사실처럼 생성하는 현상입니다. 금융 상담에서 존재하지 않는 지원 금액이나 신청 기간을 답하는 것이 예입니다. RAG로 근거를 제공해 줄일 수 있지만 완전히 없어지는 것은 아닙니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-prompt-concept",
+    "category": "기술",
+    "question": "프롬프트가 뭐예요?",
+    "answer": "**프롬프트**는 모델에 전달하는 질문·지시·참고 정보입니다. RAG에서는 검색한 문서와 사용자 질문, 답변 기준 등을 전달해 근거를 참고한 답변을 유도합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-inference-concept",
+    "category": "기술",
+    "question": "학습과 추론은 어떻게 달라요?",
+    "answer": "**학습**은 데이터를 이용해 모델의 파라미터를 조정하는 과정이고, **추론**은 학습된 모델이 입력을 받아 결과를 생성하는 과정입니다. 일반적인 RAG에서 문서를 검색해 프롬프트로 전달하는 것은 모델을 다시 학습시키는 것과 다릅니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-etl-concept",
+    "category": "기술",
+    "question": "ETL이 뭐예요?",
+    "answer": "**ETL**은 Extract·Transform·Load의 약자로, 데이터를 추출하고 목적에 맞게 변환한 뒤 대상 시스템에 적재하는 과정입니다. 형식 변환, 정제, 데이터 검증 등이 포함될 수 있습니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-cloud-concept",
+    "category": "기술",
+    "question": "클라우드가 뭐예요?",
+    "answer": "**클라우드**는 네트워크를 통해 서버·저장소·데이터베이스 같은 IT 자원을 제공받아 사용하는 방식입니다. AWS·GCP·Azure 등이 서비스를 제공합니다. AI 서비스를 운영할 때도 접근 권한과 비용, 장애 대응을 함께 관리해야 합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-secure-coding-concept",
+    "category": "기술",
+    "question": "시큐어 코딩이 뭐예요?",
+    "answer": "**시큐어 코딩**은 보안 취약점을 줄이도록 코드를 설계하고 구현하는 것입니다. 입력값 검증, 파라미터화된 SQL 사용, 비밀정보 보호, 필요한 권한만 부여하는 방식 등이 포함됩니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-testing-concept",
+    "category": "기술",
+    "question": "테스트와 검증은 왜 필요한가요?",
+    "answer": "**테스트**는 프로그램이 의도한 동작을 하는지 확인하는 과정입니다. AI 시스템에서는 API나 오류 처리뿐 아니라 답변의 정확성과 근거도 검증해야 합니다. 평가셋을 이용해 변경 전후 결과를 비교할 수 있습니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-deployment-concept",
+    "category": "기술",
+    "question": "배포와 운영은 어떻게 달라요?",
+    "answer": "**배포**는 개발한 프로그램을 사용 가능한 환경에 반영하는 과정입니다. **운영**은 배포한 서비스의 상태를 관찰하고 장애·보안·성능 문제를 관리하며 안정적으로 유지하는 과정입니다.",
+    "original": false,
+    "note": ""
   }
 ];
