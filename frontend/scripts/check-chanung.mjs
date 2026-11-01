@@ -28,13 +28,15 @@ try {
   assert.ok(!qs.some(q => q.id === 'cu-product'));
   assert.ok(qs.find(q => q.id === 'cu-threshold-standard').answer.includes('0.85'));
   const { default: Page } = await server.ssrLoadModule('/src/pages/ChanungPage.jsx');
+  const { default: api } = await server.ssrLoadModule('/src/api.js');
+  api.get = async () => ({ data: { available: true } });
   const mount = async (path = '/chanung', company = false) => { await act(async () => { view = TestRenderer.create(React.createElement(MemoryRouter, { initialEntries: [path] }, React.createElement(Page, { company }))); }); };
-  const unmount = async () => { await act(() => view.unmount()); view = null; };
+  const unmount = async () => { await act(async () => view.unmount()); view = null; };
   const button = label => { const found = view.root.findAllByType('button').find(n => text(n) === label); assert.ok(found, label); return found; };
-  const click = async label => { const b = button(label); assert.ok(!b.props.disabled); await act(() => b.props.onClick()); };
+  const click = async label => { const b = button(label); assert.ok(!b.props.disabled); await act(async () => b.props.onClick()); };
   const hidden = () => view.root.findByProps({ id: 'chanung-answer' }).props.hidden;
   const draft = () => view.root.findByType('textarea');
-  const write = async value => { await act(() => draft().props.onChange({ target: { value } })); };
+  const write = async value => { await act(async () => draft().props.onChange({ target: { value } })); };
   await mount();
   assert.equal(view.root.findAllByType('article').length, 1, 'one question at a time');
   assert.ok(hidden()); assert.ok(button('답변 제출하고 비교').props.disabled);
@@ -46,7 +48,7 @@ try {
   await click('다음 →'); assert.ok(hidden()); assert.equal(draft().props.value, '');
   await click('← 이전'); assert.equal(draft().props.value, '나의 연습 답변'); assert.ok(hidden());
   await unmount(); await mount(); assert.equal(draft().props.value, '나의 연습 답변');
-  const login = async id => { await act(() => { saved.set('sync:account', JSON.stringify({ id, nickname: String(id), token: `t${id}` })); window.dispatchEvent(new Event('sync:change')); }); };
+  const login = async id => { await act(async () => { saved.set('sync:account', JSON.stringify({ id, nickname: String(id), token: `t${id}` })); window.dispatchEvent(new Event('sync:change')); }); };
   await login(1); assert.equal(draft().props.value, ''); await write('user 1');
   await login(2); assert.equal(draft().props.value, '');
   await login(1); assert.equal(draft().props.value, 'user 1');
@@ -54,9 +56,9 @@ try {
   await click('기억 안 나요 · 답변 보기');
   assert.ok(view.root.findAllByType('strong').some(n => text(n).includes('LLM')));
   await click('랜덤 질문'); assert.ok(hidden());
-  await act(() => view.root.findByType('select').props.onChange({ target: { value: '인성' } }));
+  await act(async () => view.root.findByType('select').props.onChange({ target: { value: '인성' } }));
   assert.ok(text(view.root.findByProps({ className: 'notes-detail-top' })).includes('인성'));
-  await act(() => view.root.findByProps({ type: 'search' }).props.onChange({ target: { value: '없는질문xyz' } }));
+  await act(async () => view.root.findByProps({ type: 'search' }).props.onChange({ target: { value: '없는질문xyz' } }));
   assert.equal(view.root.findAllByType('textarea').length, 0);
   assert.ok(text(view.toJSON()).includes('검색 결과가 없습니다.'));
   await unmount(); await mount('/chanung#cu-rag');
@@ -74,7 +76,7 @@ try {
   assert.ok(app.includes('path="chanung/company" element={<Navigate to="/chanung" replace />}'));
   console.log('PASS: technical first, 15 technical + 5 personality, removed company notes, answer reveal, submit, navigation, filters, persistence and account isolation');
 } finally {
-  if (view) await act(() => view.unmount());
+  if (view) await act(async () => view.unmount());
   console.error = originalError;
   await server.close();
 }

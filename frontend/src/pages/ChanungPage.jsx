@@ -1,6 +1,7 @@
 import { useState, useSyncExternalStore } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
+import InterviewAudio from '../components/InterviewAudio';
 import { account, onAccountChange } from '../sync';
 import { CHANUNG_QUESTIONS, CHANUNG_CATEGORIES } from '../data/chanung';
 import './CsNotesPage.css';
@@ -16,6 +17,8 @@ export default function ChanungPage() {
 }
 
 function Practice() {
+  const [recordings, setRecordings] = useState({});
+  const saveRecording = (id, recording) => setRecordings(prev => ({ ...prev, [id]: recording }));
   const { hash } = useLocation();
   const navigate = useNavigate();
   const user = account();
@@ -62,18 +65,19 @@ function Practice() {
       <div className="notes-content">
         {selected ? <>
           <div className="chanung-pagination"><button type="button" className="exam-btn sm" disabled={index <= 0} onClick={() => select(visible[index - 1].id)}>← 이전</button><span>{index + 1} / {visible.length}</span><button type="button" className="exam-btn sm" disabled={index === visible.length - 1} onClick={() => select(visible[index + 1].id)}>다음 →</button></div>
-          <PracticeQuestion key={selected.id} q={selected} draft={drafts[selected.id] || ''} write={write} />
+          <PracticeQuestion key={selected.id} q={selected} draft={drafts[selected.id] || ''} write={write} recording={recordings[selected.id]} saveRecording={saveRecording} />
         </> : <p className="notes-empty">검색 결과가 없습니다. 검색어나 분류를 바꿔 주세요.</p>}
       </div>
     </div>
   </>;
 }
 
-function PracticeQuestion({ q, draft, write }) {
+function PracticeQuestion({ q, draft, write, recording, saveRecording }) {
   const [open, setOpen] = useState(false);
   return <article className="notes-detail-card" id="chanung-question">
     <div className="notes-detail-top"><span>{q.category}</span><span>{q.original ? '내가 작성한 원문' : '모범답변 예시'}</span></div>
     <h2 className="notes-question">{q.question}</h2>
+    <InterviewAudio questionId={q.id} recording={recording} saveRecording={saveRecording} />
     <label className="chanung-label" htmlFor="chanung-draft">내 연습 답변</label>
     <textarea id="chanung-draft" rows={7} value={draft} onChange={e => write(q.id, e.target.value)} placeholder="실제로 면접에서 말하듯 작성해 보세요." />
     <div className="chanung-actions"><button type="button" className="exam-btn sm" disabled={!draft.trim()} onClick={() => setOpen(true)} aria-controls="chanung-answer">답변 제출하고 비교</button><button type="button" className="exam-btn sm" aria-expanded={open} aria-controls="chanung-answer" onClick={() => setOpen(value => !value)}>{open ? '답변 숨기기' : '기억 안 나요 · 답변 보기'}</button></div>
