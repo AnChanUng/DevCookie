@@ -9,6 +9,11 @@
 .chanung-label { display: block; margin: 16px 0 8px; font-size: .85rem; font-weight: 600; }
 .interview-audio { margin: 18px 0; padding: 16px; border: 1px solid var(--border-color); border-radius: 10px; }
 .interview-audio h3 { font-size: 1rem; margin: 0 0 10px; }
+.camera-preview { display: block; width: 100%; max-width: 520px; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; background: #111; margin-top: 12px; }
+.camera-preview[hidden] { display: none; }
+.camera-preview.is-mirrored { transform: scaleX(-1); }
+.interview-camera .chanung-actions { align-items: center; margin-top: 0; }
+.interview-camera label { font-size: .85rem; }
 .audio-hint { color: var(--text-secondary); font-size: .78rem; line-height: 1.7; margin: 10px 0; }
 .audio-playback { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 16px 0; }
 .audio-playback audio { width: 100%; max-width: 440px; }

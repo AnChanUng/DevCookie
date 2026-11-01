@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import api from '../api';
 import { account } from '../sync';
 import { InterviewRecorder, toWav } from '../interviewAudio';
+import InterviewCamera from './InterviewCamera';
 
 export default function InterviewAudio({ questionId, recording, saveRecording }) {
   const [phase, setPhase] = useState('idle');
@@ -71,6 +72,7 @@ export default function InterviewAudio({ questionId, recording, saveRecording })
   const extension = recording?.blob?.type.includes('mp4') ? 'm4a' : recording?.blob?.type.includes('ogg') ? 'ogg' : 'webm';
   return <section className="interview-audio" aria-label="음성 답변 연습">
     <h3>말로 답변하기</h3>
+    <InterviewCamera />
     <p className="audio-hint">최대 3분 녹음 · 녹음은 이 페이지를 나가거나 새로고침하면 사라집니다. 보관하려면 다운로드하세요. 녹음 중 문항을 바꾸면 녹음이 취소됩니다.</p>
     <div className="chanung-actions">
       <button type="button" className="exam-btn sm" disabled={busy} onClick={start}>{recording?.blob ? '다시 녹음' : '녹음 시작'}</button>
