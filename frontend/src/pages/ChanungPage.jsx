@@ -51,6 +51,19 @@ function Practice() {
     if (pool.length) select(pool[Math.floor(Math.random() * pool.length)].id);
   };
   return <>
+    <details className="notes-detail-card notes-markdown"><summary>두괄식 마스터 답변 템플릿</summary>
+      <p><strong>질문의 표현을 받아 첫 문장에서 답하기 → 구체적인 경험 → 내가 한 행동 → 결과·배운 점</strong></p>
+      <p>“○○한 경험은 [핵심 경험]입니다. [어디서] [무엇을 하며] [어떤 어려움]이 있었습니다. 저는 [행동]으로 개선했습니다. 그 결과 [결과]를 얻었고, [배운 점]을 배웠습니다.”</p>
+      <ul>
+        <li>힘들었던 경험이 있나요? → “힘들었던 경험은 ○○입니다.”</li>
+        <li>갈등을 해결한 경험이 있나요? → “갈등을 해결한 경험은 ○○입니다.”</li>
+        <li>본인의 강점은 무엇인가요? → “제 강점은 ○○입니다.”</li>
+        <li>왜 지원했나요? → “지원한 이유는 ○○입니다.”</li>
+        <li>어떻게 개선했나요? → “○○를 조정해 개선했습니다.”</li>
+      </ul>
+      <p><strong>힘들었던 경험 답변 틀</strong><br />힘들었던 경험은 [인턴십에서 겪은 어려움]입니다. 인턴십에서 [업무]를 하며 [문제] 때문에 어려움을 겪었습니다. 저는 [구체적인 행동]으로 개선했습니다. 그 결과 [변화]가 있었고, [배운 점]을 배웠습니다.</p>
+      <p>첫마디에서 질문만 반복하지 말고 빈칸에 결론을 바로 넣으세요. 경험 질문에는 이 흐름을 쓰고, 개념 질문은 “정의 → 동작·역할”로 짧게 답하면 됩니다.</p>
+    </details>
     <p className="notes-list-intro">한 질문씩 답해 본 뒤 모범답변과 비교하세요. 기억이 안 나면 바로 펼쳐 읽을 수 있습니다. 직접 작성한 답변 {CHANUNG_QUESTIONS.filter(q => q.original).length}개는 원문 그대로, 나머지는 준비용 답변 예시입니다.</p>
     <p className="notes-save-status" role="status">{saveError ? '저장에 실패했습니다. 입력한 답변을 따로 복사해 주세요.' : '내 연습 답변은 현재 브라우저에 계정별로 저장됩니다. 다른 기기와 동기화되지 않으며 자동 채점하지 않습니다.'}</p>
     <div className="notes-layout">
