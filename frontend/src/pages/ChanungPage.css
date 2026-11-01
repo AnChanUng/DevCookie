@@ -15,6 +15,17 @@
 .camera-preview { display: block; width: 100%; max-width: 280px; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; background: #111; margin-top: 12px; }
 .camera-preview[hidden] { display: none; }
 .camera-preview.is-mirrored { transform: scaleX(-1); }
+.chanung-camera-dock { position: sticky; top: 76px; z-index: 5; padding: 10px 14px; margin-bottom: 14px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-primary); box-shadow: 0 3px 12px #00000012; }
+.chanung-camera-dock .interview-camera { display: grid; grid-template-columns: minmax(0, 1fr) 200px; gap: 8px 16px; align-items: start; }
+.chanung-camera-dock .camera-preview { grid-column: 2; grid-row: 1 / 3; width: 200px; margin: 0; }
+.chanung-camera-dock .audio-hint { grid-column: 1; margin: 0; }
+.chanung-camera-dock .audio-error { grid-column: 1 / -1; }
+@media (max-width: 640px) {
+  .chanung-camera-dock { top: 108px; padding: 8px; }
+  .chanung-camera-dock .interview-camera { grid-template-columns: minmax(0, 1fr) 112px; gap: 6px; }
+  .chanung-camera-dock .camera-preview { width: 112px; }
+  .chanung-camera-dock .audio-hint { font-size: .65rem; line-height: 1.4; }
+}
 .interview-camera .chanung-actions { align-items: center; margin-top: 0; }
 .interview-camera label { font-size: .85rem; }
 .audio-hint { color: var(--text-secondary); font-size: .78rem; line-height: 1.7; margin: 10px 0; }

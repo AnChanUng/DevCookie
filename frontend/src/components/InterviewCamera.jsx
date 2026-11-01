@@ -44,7 +44,7 @@ export default function InterviewCamera() {
       <label><input type="checkbox" checked={mirror} onChange={e => setMirror(e.target.checked)} /> 거울 모드</label>
     </div>
     <video ref={video} hidden={state !== 'on'} autoPlay muted playsInline controls className={mirror ? 'camera-preview is-mirrored' : 'camera-preview'} aria-label="내 표정 실시간 미리보기" />
-    <p className="audio-hint">{state === 'waiting' ? '카메라 권한 확인 중… ' : ''}표정과 시선을 실시간으로 확인하세요. 영상은 녹화하거나 전송하지 않습니다. 문항을 열면 자동으로 켜지고, 페이지를 나가면 꺼집니다.</p>
+    <p className="audio-hint">{state === 'waiting' ? '카메라 권한 확인 중… ' : ''}표정과 시선을 실시간으로 확인하세요. 영상은 녹화하거나 전송하지 않습니다. 페이지를 열면 자동으로 켜지고, 나가면 꺼집니다.</p>
     {error && <p role="alert" className="audio-error">{error}</p>}
   </section>;
 }

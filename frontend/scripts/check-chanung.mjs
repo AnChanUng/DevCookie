@@ -18,7 +18,7 @@ try{
  assert.deepEqual(cats,['기술','인성']);assert.equal(qs.length,20);
  const mount=async()=>{await act(async()=>{view=TestRenderer.create(React.createElement(MemoryRouter,{initialEntries:['/chanung']},React.createElement(Page)));});};
  await mount();assert.equal(view.root.findAllByType('article').length,20);
- for(const q of qs)assert.equal(view.root.findByProps({id:`answer-${q.id}`}).props.hidden,false);
+ for(const q of qs)assert.equal(view.root.findByProps({id:`answer-${q.id}`}).props.hidden,true);
  assert.equal(view.root.findAllByProps({'aria-label':'음성 답변 연습'}).length,1);
  const click=async label=>{const b=view.root.findAllByType('button').find(n=>text(n)===label);assert.ok(b,label);await act(async()=>b.props.onClick());};
  await click('자기소개');assert.equal(view.root.findAllByType('article').length,20);assert.ok(scrolled.includes('cu-intro'));
@@ -35,5 +35,5 @@ try{
  await act(async()=>complete().props.onChange());
  await act(async()=>view.root.findByType('select').props.onChange({target:{value:'인성'}}));assert.equal(view.root.findAllByType('article').length,5);
  await act(async()=>view.root.findByProps({type:'search'}).props.onChange({target:{value:'없는질문xyz'}}));assert.equal(view.root.findAllByType('article').length,0);
- console.log('PASS: all 20 answers expanded, sidebar scroll preserves cards, single recording/camera panel, unique IDs, saved drafts, filters');
+ console.log('PASS: all 20 questions with collapsed answers, sidebar scroll preserves cards, single recording/camera panel, unique IDs, saved drafts, filters');
 }finally{if(view)await act(async()=>view.unmount());await server.close();}
