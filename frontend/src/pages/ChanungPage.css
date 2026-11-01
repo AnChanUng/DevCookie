@@ -53,3 +53,7 @@
   .chanung-page .notes-heading { flex-wrap: wrap; gap: 12px; }
   .chanung-page .notes-detail-card { padding: 18px; }
 }
+
+.chanung-concept-review { margin: 28px 0 12px; border-top: 1px solid var(--border-color); padding-top: 16px; }
+.chanung-concept-review > summary { cursor: pointer; font-size: .82rem; color: var(--text-secondary); }
+.chanung-concept-review h3 { font-size: .95rem; margin: 0 0 12px; }

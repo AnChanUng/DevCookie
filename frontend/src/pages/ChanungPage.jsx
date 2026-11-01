@@ -8,6 +8,10 @@ import { CHANUNG_QUESTIONS, CHANUNG_CATEGORIES } from '../data/chanung';
 import './CsNotesPage.css';
 import './ChanungPage.css';
 
+const isConcept = q => q.id === 'cu-rag' || q.id.endsWith('-concept');
+const concepts = CHANUNG_QUESTIONS.filter(isConcept);
+const mainQuestions = CHANUNG_QUESTIONS.filter(q => !isConcept(q));
+
 const identity = () => account()?.token || '';
 export default function ChanungPage() {
   const token = useSyncExternalStore(onAccountChange, identity, () => '');
@@ -47,7 +51,7 @@ function Practice() {
   };
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('');
-  const visible = CHANUNG_CATEGORIES.flatMap(c => CHANUNG_QUESTIONS.filter(q => q.category === c))
+  const visible = CHANUNG_CATEGORIES.flatMap(c => mainQuestions.filter(q => q.category === c))
     .filter(q => (showCompleted || !completed.includes(q.id)) && (!category || q.category === category) && `${q.question} ${q.category}`.toLowerCase().includes(query.trim().toLowerCase()));
   const selected = visible.find(q => q.id === hash.slice(1)) || visible[0];
   useEffect(() => {
@@ -86,7 +90,7 @@ function Practice() {
     <div className="notes-layout">
       <aside className="notes-index">
         <div className="notes-filters"><input type="search" aria-label="면접 질문 검색" placeholder="질문 검색" value={query} onChange={e => setQuery(e.target.value)} /><select aria-label="면접 질문 분류" value={category} onChange={e => setCategory(e.target.value)}><option value="">전체 질문</option>{CHANUNG_CATEGORIES.map(c => <option key={c}>{c}</option>)}</select><label><input type="checkbox" checked={showCompleted} onChange={e => setShowCompleted(e.target.checked)} /> 완료한 답변도 표시 ({completed.length})</label></div>
-        <div className="chanung-list-meta"><span>{visible.length}문항 · 작성 {CHANUNG_QUESTIONS.filter(q => drafts[q.id]?.trim()).length}/{CHANUNG_QUESTIONS.length}</span><button type="button" disabled={visible.length < 2} onClick={random}>랜덤 질문</button></div>
+        <div className="chanung-list-meta"><span>{visible.length}문항 · 작성 {mainQuestions.filter(q => drafts[q.id]?.trim()).length}/{mainQuestions.length}</span><button type="button" disabled={visible.length < 2} onClick={random}>랜덤 질문</button></div>
         <nav className="notes-questions" aria-label="면접 질문 목차">{CHANUNG_CATEGORIES.map(c => {
           const list = visible.filter(q => q.category === c);
           return list.length ? <section key={c}><h2>{c}<small>{list.length}</small></h2><ul>{list.map(q => <li key={q.id} className={selected?.id === q.id ? 'is-selected' : ''}><button type="button" aria-current={selected?.id === q.id ? 'true' : undefined} onClick={() => select(q.id)}>{q.question}{drafts[q.id]?.trim() && <small> · 작성함</small>}</button></li>)}</ul></section> : null;
@@ -96,6 +100,15 @@ function Practice() {
         <div className="chanung-camera-dock"><InterviewCamera /></div>
         {visible.map(q => <PracticeQuestion key={q.id} q={q} draft={drafts[q.id] || ''} write={write} recording={recordings[q.id]} saveRecording={saveRecording} active={selected?.id === q.id} activate={() => select(q.id)} done={completed.includes(q.id)} toggleDone={() => toggleCompleted(q.id)} />)}
         {!visible.length && <p className="notes-empty">표시할 답변이 없습니다. 완료한 답변 표시를 켜거나 검색 조건을 바꿔 주세요.</p>}
+        <details className="chanung-concept-review">
+          <summary>기초 개념 몰아보기 · {concepts.length}개</summary>
+          <p className="audio-hint">하루 한 번 펼쳐서 정의를 쭉 읽고 반복해 보세요.</p>
+          {concepts.filter(q => showCompleted || !completed.includes(q.id)).map(q => <section key={q.id} className="notes-detail-card" id={q.id}>
+            <div className="notes-detail-top"><h3>{q.question}</h3><label><input type="checkbox" aria-label={`${q.question} 학습 완료`} checked={completed.includes(q.id)} onChange={() => toggleCompleted(q.id)} /> 학습 완료</label></div>
+            {q.original ? <div className="chanung-original">{q.answer}</div> : <div className="notes-markdown"><ReactMarkdown>{q.answer}</ReactMarkdown></div>}
+          </section>)}
+          {concepts.every(q => completed.includes(q.id)) && !showCompleted && <p className="audio-hint">기초 개념을 모두 완료했습니다. ‘완료한 답변도 표시’를 켜면 다시 볼 수 있습니다.</p>}
+        </details>
       </div>
     </div>
   </>;
