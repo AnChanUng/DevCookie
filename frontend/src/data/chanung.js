@@ -50,70 +50,6 @@ export const CHANUNG_QUESTIONS = [
     "note": ""
   },
   {
-    "id": "cu-rag",
-    "category": "기술",
-    "question": "RAG가 뭐예요?",
-    "answer": "RAG(Retrieval-Augmented Generation): 검색 증강 생성\n: LLM이 외부 데이터에서 관련 정보를 검색한 뒤 그 정보를 참고해 답변하도록 하는 기술",
-    "original": true,
-    "note": ""
-  },
-  {
-    "id": "cu-chunk-size-concept",
-    "category": "기술",
-    "question": "Chunk Size가 뭐예요?",
-    "answer": "문서를 나누는 단위의 크기",
-    "original": true,
-    "note": ""
-  },
-  {
-    "id": "cu-chunk-overlap-concept",
-    "category": "기술",
-    "question": "Chunk Overlap이 뭐예요?",
-    "answer": "인접한 청크 사이에 중복으로 포함하는 내용의 크기",
-    "original": true,
-    "note": ""
-  },
-  {
-    "id": "cu-llm-concept",
-    "category": "기술",
-    "question": "LLM이 뭐예요?",
-    "answer": "**LLM**(Large Language Model)은 대규모 언어 모델입니다. 많은 텍스트를 학습해 질문에 답하거나 글을 요약·생성하는 모델입니다. 자연스러운 답변을 만들 수 있지만 항상 사실에 맞는 것은 아닙니다.",
-    "original": false,
-    "note": ""
-  },
-  {
-    "id": "cu-embedding-concept",
-    "category": "기술",
-    "question": "임베딩이 뭐예요?",
-    "answer": "**임베딩**(Embedding)은 텍스트의 의미적 특징을 숫자로 이루어진 벡터로 표현하는 것입니다. 질문과 문서를 벡터로 바꾸면 서로 얼마나 관련 있는지 비교해 검색에 활용할 수 있습니다.",
-    "original": false,
-    "note": ""
-  },
-  {
-    "id": "cu-vectordb-concept",
-    "category": "기술",
-    "question": "VectorDB가 뭐예요?",
-    "answer": "VectorDB는 텍스트나 이미지 등의 데이터를 임베딩한 벡터를 저장하고, 유사도를 기준으로 관련 데이터를 검색하는 데이터베이스입니다. RAG에서는 사용자의 질문과 관련된 문서를 찾는 데 활용합니다.",
-    "original": false,
-    "note": ""
-  },
-  {
-    "id": "cu-threshold-concept",
-    "category": "기술",
-    "question": "유사도 임계값이 뭐예요?",
-    "answer": "**유사도 임계값**은 검색 결과를 답변에 사용할지 판단하는 기준값입니다. 높은 값일수록 더 유사한 점수를 기준으로 할 때, 점수가 임계값 이상이면 근거로 사용하고 미만이면 답변을 제한할 수 있습니다.",
-    "original": false,
-    "note": ""
-  },
-  {
-    "id": "cu-evaluation-concept",
-    "category": "기술",
-    "question": "평가셋이 뭐예요?",
-    "answer": "**평가셋**은 시스템이 잘 동작하는지 확인하기 위해 준비한 질문과 기대 결과의 모음입니다. RAG에서는 관련 질문뿐 아니라 무관한 질문도 넣어, 적절한 문서를 찾는지와 답변을 제한해야 할 때 제한하는지 확인합니다.",
-    "original": false,
-    "note": ""
-  },
-  {
     "id": "cu-intro",
     "category": "인성",
     "question": "자기소개",
@@ -169,70 +105,6 @@ export const CHANUNG_QUESTIONS = [
     "note": ""
   },
   {
-    "id": "cu-hallucination-concept",
-    "category": "기술",
-    "question": "환각(Hallucination)이 뭐예요?",
-    "answer": "**환각**은 AI가 사실과 다르거나 근거가 없는 내용을 사실처럼 생성하는 현상입니다. 금융 상담에서 존재하지 않는 지원 금액이나 신청 기간을 답하는 것이 예입니다. RAG로 근거를 제공해 줄일 수 있지만 완전히 없어지는 것은 아닙니다.",
-    "original": false,
-    "note": ""
-  },
-  {
-    "id": "cu-prompt-concept",
-    "category": "기술",
-    "question": "프롬프트가 뭐예요?",
-    "answer": "**프롬프트**는 모델에 전달하는 질문·지시·참고 정보입니다. RAG에서는 검색한 문서와 사용자 질문, 답변 기준 등을 전달해 근거를 참고한 답변을 유도합니다.",
-    "original": false,
-    "note": ""
-  },
-  {
-    "id": "cu-inference-concept",
-    "category": "기술",
-    "question": "학습과 추론은 어떻게 달라요?",
-    "answer": "**학습**은 데이터를 이용해 모델의 파라미터를 조정하는 과정이고, **추론**은 학습된 모델이 입력을 받아 결과를 생성하는 과정입니다. 일반적인 RAG에서 문서를 검색해 프롬프트로 전달하는 것은 모델을 다시 학습시키는 것과 다릅니다.",
-    "original": false,
-    "note": ""
-  },
-  {
-    "id": "cu-etl-concept",
-    "category": "기술",
-    "question": "ETL이 뭐예요?",
-    "answer": "**ETL**은 Extract·Transform·Load의 약자로, 데이터를 추출하고 목적에 맞게 변환한 뒤 대상 시스템에 적재하는 과정입니다. 형식 변환, 정제, 데이터 검증 등이 포함될 수 있습니다.",
-    "original": false,
-    "note": ""
-  },
-  {
-    "id": "cu-cloud-concept",
-    "category": "기술",
-    "question": "클라우드가 뭐예요?",
-    "answer": "**클라우드**는 네트워크를 통해 서버·저장소·데이터베이스 같은 IT 자원을 제공받아 사용하는 방식입니다. AWS·GCP·Azure 등이 서비스를 제공합니다. AI 서비스를 운영할 때도 접근 권한과 비용, 장애 대응을 함께 관리해야 합니다.",
-    "original": false,
-    "note": ""
-  },
-  {
-    "id": "cu-secure-coding-concept",
-    "category": "기술",
-    "question": "시큐어 코딩이 뭐예요?",
-    "answer": "**시큐어 코딩**은 보안 취약점을 줄이도록 코드를 설계하고 구현하는 것입니다. 입력값 검증, 파라미터화된 SQL 사용, 비밀정보 보호, 필요한 권한만 부여하는 방식 등이 포함됩니다.",
-    "original": false,
-    "note": ""
-  },
-  {
-    "id": "cu-testing-concept",
-    "category": "기술",
-    "question": "테스트와 검증은 왜 필요한가요?",
-    "answer": "**테스트**는 프로그램이 의도한 동작을 하는지 확인하는 과정입니다. AI 시스템에서는 API나 오류 처리뿐 아니라 답변의 정확성과 근거도 검증해야 합니다. 평가셋을 이용해 변경 전후 결과를 비교할 수 있습니다.",
-    "original": false,
-    "note": ""
-  },
-  {
-    "id": "cu-deployment-concept",
-    "category": "기술",
-    "question": "배포와 운영은 어떻게 달라요?",
-    "answer": "**배포**는 개발한 프로그램을 사용 가능한 환경에 반영하는 과정입니다. **운영**은 배포한 서비스의 상태를 관찰하고 장애·보안·성능 문제를 관리하며 안정적으로 유지하는 과정입니다.",
-    "original": false,
-    "note": ""
-  },
-  {
     "id": "cu-intro-programs",
     "category": "자소서꼬리질문",
     "question": "LLM을 활용한 로그 분석 프로그램과 고객사 환경 재현 시스템이 무엇인가요?",
@@ -254,6 +126,393 @@ export const CHANUNG_QUESTIONS = [
     "question": "고객사 환경 재현 시스템은 무엇인가요?",
     "answer": "고객사마다 운영체제와 DB 종류가 달라 동일한 환경에서 문제를 재현하기 어려웠습니다. 이를 해결하기 위해 고객사의 환경 정보를 입력하면, Linux 서버와 Docker를 활용해 해당 환경을 자동으로 구축하는 프로그램입니다.",
     "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-ai-ml-concept",
+    "category": "기술",
+    "topic": "기초 개념",
+    "question": "AI 모델과 머신러닝 모델의 차이는 무엇인가요?",
+    "answer": "AI는 지능적인 작업을 수행하는 기술의 넓은 범위이고, 머신러닝은 데이터에서 패턴을 학습하는 AI의 한 분야입니다. AI 시스템은 ML 모델뿐 아니라 규칙 엔진이나 검색 기능도 함께 사용할 수 있습니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-llm-concept",
+    "category": "기술",
+    "topic": "기초 개념",
+    "question": "LLM이란 무엇인가요?",
+    "answer": "LLM은 대규모 데이터로 학습해 언어를 이해하고 생성하는 대규모 언어 모델입니다. 대표적인 생성형 LLM은 트랜스포머를 기반으로 다음 토큰을 예측하며, 챗봇·요약·문서 분석 등에 활용됩니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-tokenization-concept",
+    "category": "기술",
+    "topic": "기초 개념",
+    "question": "토크나이제이션이란 무엇인가요?",
+    "answer": "텍스트를 토큰 단위로 나누고 각 토큰을 숫자 ID로 변환하는 과정입니다. 토큰은 단어 전체나 일부, 문자 등이 될 수 있으며 토큰 수는 입력 한도·비용·처리시간에 영향을 줍니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-prompt-concept",
+    "category": "기술",
+    "topic": "기초 개념",
+    "question": "프롬프트란 무엇인가요?",
+    "answer": "모델에 전달하는 지시, 질문, 예시, 참고 정보입니다. 원하는 작업과 답변 조건을 명확하게 전달하기 위해 구성합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-inference-concept",
+    "category": "기술",
+    "topic": "기초 개념",
+    "question": "추론과 학습의 차이는 무엇인가요?",
+    "answer": "학습은 데이터를 이용해 모델의 가중치를 조정하는 과정이고, 추론은 학습된 모델로 입력에 대한 출력을 만드는 과정입니다. 프롬프트에 문서를 추가하는 일반적인 RAG는 모델 가중치를 바꾸는 학습과 다릅니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-api-ai-concept",
+    "category": "기술",
+    "topic": "기초 개념",
+    "question": "API 기반 AI 시스템이란 무엇인가요?",
+    "answer": "외부 서비스가 제공하는 모델을 API로 호출해 사용하는 시스템입니다. 모델 서버를 직접 운영하는 부담은 줄지만 데이터 전송 정책, 비용, 호출 제한과 장애 처리는 관리해야 합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-finetuning-concept",
+    "category": "기술",
+    "topic": "기초 개념",
+    "question": "파인튜닝과 프롬프트의 차이는 무엇인가요?",
+    "answer": "프롬프트는 모델 가중치를 바꾸지 않고 입력으로 동작을 유도합니다. 파인튜닝은 추가 데이터로 가중치를 조정하는 방법이며, 필요한 품질과 데이터·비용을 고려해 선택합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-rag",
+    "category": "기술",
+    "topic": "기초 개념",
+    "question": "검색 증강 생성(RAG)이란 무엇인가요?",
+    "answer": "관련 문서를 검색해 모델의 입력에 함께 제공하고, 그 근거를 참고해 답변하도록 하는 방식입니다. 최신·내부 정보를 활용하고 환각을 줄이는 데 도움이 되지만, 검색 결과나 생성 과정이 잘못되면 오답이 나올 수 있습니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-embedding-concept",
+    "category": "기술",
+    "topic": "검색·평가",
+    "question": "임베딩이란 무엇이며, 어떻게 사용하나요?",
+    "answer": "텍스트나 이미지 등의 특징을 숫자로 이루어진 벡터로 표현하는 것입니다. 벡터 간 유사도를 비교해 관련 문서 검색이나 추천 등에 사용합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-llm-evaluation-concept",
+    "category": "기술",
+    "topic": "검색·평가",
+    "question": "LLM 시스템은 어떻게 평가하나요?",
+    "answer": "실제 업무를 대표하는 질문과 기대 결과로 평가셋을 만들고, 정확성·근거 충실도·관련성 등을 평가합니다. 사람 검토와 함께 비용·응답시간·업무 성과도 확인하고 변경 전후를 비교합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-hallucination-concept",
+    "category": "기술",
+    "topic": "검색·평가",
+    "question": "LLM의 환각은 무엇이며 왜 발생하나요?",
+    "answer": "모델이 사실과 다르거나 근거가 없는 내용을 사실처럼 생성하는 현상입니다. 학습 데이터의 한계, 부족하거나 잘못된 문맥, 그럴듯한 다음 토큰을 생성하는 특성 등이 원인이 될 수 있습니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-reduce-hallucination-concept",
+    "category": "기술",
+    "topic": "검색·평가",
+    "question": "환각을 어떻게 줄이나요?",
+    "answer": "신뢰할 수 있는 문서를 검색해 제공하고, 근거가 부족하면 답변을 제한하며, 중요한 주장은 출처와 대조합니다. 구조화된 출력은 형식 검증에 도움을 주지만 내용의 사실성을 보장하지는 않습니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-transformer-concept",
+    "category": "기술",
+    "topic": "LLM·프롬프트",
+    "question": "트랜스포머는 높은 수준에서 어떻게 동작하나요?",
+    "answer": "어텐션으로 입력의 각 토큰이 다른 토큰과 어떤 관계가 있는지 반영해 표현을 만듭니다. 대표적인 생성형 LLM은 디코더 기반으로 이전 토큰을 참고해 다음 토큰을 순차적으로 생성합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-attention-concept",
+    "category": "기술",
+    "topic": "LLM·프롬프트",
+    "question": "어텐션이란 무엇인가요?",
+    "answer": "현재 처리하는 토큰과 다른 토큰의 관련성을 계산해 필요한 정보에 더 큰 가중치를 주는 방식입니다. 떨어져 있는 단어 사이의 관계도 반영할 수 있습니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-context-window-concept",
+    "category": "기술",
+    "topic": "LLM·프롬프트",
+    "question": "컨텍스트 윈도우란 무엇인가요?",
+    "answer": "한 요청에서 모델이 다룰 수 있는 토큰 범위의 한도입니다. 시스템 지시, 대화 기록, 검색 문서와 생성할 답변을 고려해 길이를 관리해야 하며 구체적인 제한은 모델마다 다릅니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-temperature-concept",
+    "category": "기술",
+    "topic": "LLM·프롬프트",
+    "question": "생성에서 온도(Temperature)란 무엇인가요?",
+    "answer": "다음 토큰을 샘플링할 때 확률 분포를 조정하는 값입니다. 낮으면 높은 확률의 토큰을 더 선호하고 높으면 선택이 다양해질 수 있지만, 낮다고 사실성이 보장되거나 항상 같은 답이 나오는 것은 아닙니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-prompt-engineering-concept",
+    "category": "기술",
+    "topic": "LLM·프롬프트",
+    "question": "프롬프트 엔지니어링이란 무엇인가요?",
+    "answer": "원하는 동작을 얻기 위해 지시·예시·문맥·출력 형식을 설계하고 평가하며 개선하는 과정입니다. 모델이나 프롬프트 변경에 따른 결과를 비교하고 버전을 관리합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-system-user-prompt-concept",
+    "category": "기술",
+    "topic": "LLM·프롬프트",
+    "question": "시스템 프롬프트와 사용자 프롬프트의 차이는 무엇인가요?",
+    "answer": "시스템 프롬프트는 역할·동작 기준·제약 등을 지정하고, 사용자 프롬프트는 개별 요청을 전달합니다. 시스템 지시만으로 보안이 보장되는 것은 아니므로 권한과 도구 실행은 애플리케이션에서도 검증해야 합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-tool-calling-concept",
+    "category": "기술",
+    "topic": "LLM·프롬프트",
+    "question": "툴 사용 또는 함수 호출이란 무엇인가요?",
+    "answer": "모델이 사용할 도구와 인자를 정해진 형식으로 요청하는 기능입니다. 일반적인 사용자 정의 도구는 애플리케이션이 권한과 인자를 검증한 뒤 실행하고, 결과를 모델에 전달해 다음 답변에 활용합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-cot-concept",
+    "category": "기술",
+    "topic": "LLM·프롬프트",
+    "question": "체인 오브 소트 프롬프팅은 성능을 어떻게 향상시키나요?",
+    "answer": "복잡한 문제를 중간 단계로 나누어 검토하도록 유도하면 일부 작업의 성능을 높일 수 있습니다. 효과는 모델과 작업에 따라 다르므로 권장 프롬프트 방식을 따르고 최종 결과를 별도로 검증해야 합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-chatbot-design-concept",
+    "category": "기술",
+    "topic": "AI 시스템 설계",
+    "question": "LLM을 사용해 챗봇을 설계해 보세요.",
+    "answer": "요청을 받은 서버가 대화 기록과 필요한 근거를 준비해 LLM을 호출하고, 출력을 검증해 응답하도록 설계합니다. 인증·권한, 호출 제한, 개인정보 보호, 비용·오류 모니터링도 함께 구성합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-document-search-concept",
+    "category": "기술",
+    "topic": "AI 시스템 설계",
+    "question": "임베딩을 사용한 문서 검색 시스템을 설계해 보세요.",
+    "answer": "문서를 수집·정제·분할하고 임베딩과 메타데이터를 벡터 DB에 저장합니다. 질문도 임베딩해 검색하고, 사용자 권한에 맞는 결과만 반환하며 필요하면 키워드 검색과 재순위화를 결합합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-rag-design-concept",
+    "category": "기술",
+    "topic": "AI 시스템 설계",
+    "question": "RAG 파이프라인을 설계해 보세요.",
+    "answer": "수집·정제·청킹 → 임베딩·저장 → 질문 검색 → 관련 근거를 프롬프트에 추가 → LLM 생성 → 검증·출처 표시 순서로 구성합니다. 검색 품질에 따라 필터·재순위화를 추가하고, 근거가 부족하면 답변을 제한합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-high-traffic-concept",
+    "category": "기술",
+    "topic": "AI 시스템 설계",
+    "question": "고트래픽 추론은 어떻게 처리하나요?",
+    "answer": "먼저 API 호출 한도와 처리시간·처리량을 측정하고 요청 제한, 큐, 캐싱과 부하 분산을 적용합니다. 자체 호스팅이라면 배칭이나 서버 확장도 검토하며 품질·비용·지연시간을 함께 비교합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-latency-concept",
+    "category": "기술",
+    "topic": "AI 시스템 설계",
+    "question": "AI 시스템의 지연 시간을 어떻게 줄이나요?",
+    "answer": "검색·대기·모델 호출·출력 생성 시간을 나눠 병목을 찾습니다. 불필요한 입력과 출력 길이를 줄이고 캐싱이나 작은 모델을 검토하며, 스트리밍은 사용자가 첫 응답을 빨리 보도록 하는 데 활용합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-output-monitoring-concept",
+    "category": "기술",
+    "topic": "AI 시스템 설계",
+    "question": "출력을 어떻게 평가하고 모니터링하나요?",
+    "answer": "정확성·근거 충실도 평가와 표본 기반 사람 검토를 수행하고, 응답시간·오류율·토큰 비용도 추적합니다. 요청과 응답을 기록할 때는 민감정보를 제거하고 접근 권한과 보관 기간을 관리합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-ai-deployment-concept",
+    "category": "기술",
+    "topic": "AI 배포·운영",
+    "question": "LLM 기반 애플리케이션은 어떻게 배포하나요?",
+    "answer": "모델 API를 호출하는 서버와 화면을 배포하고, 비밀 키·권한·환경 설정을 관리합니다. 검증을 거쳐 점진적으로 반영하고 오류와 비용을 관찰하며, 모델 직접 호스팅은 GPU·모델 서버 운영까지 추가로 고려합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-model-versioning-concept",
+    "category": "기술",
+    "topic": "AI 배포·운영",
+    "question": "모델 버저닝은 어떻게 처리하나요?",
+    "answer": "모델·임베딩 모델·프롬프트·검색 데이터와 설정의 버전을 함께 기록합니다. 변경 전후 평가 결과를 남기고 문제가 생기면 이전 구성으로 되돌릴 수 있도록 합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-model-monitoring-concept",
+    "category": "기술",
+    "topic": "AI 배포·운영",
+    "question": "프로덕션에서 모델 성능은 어떻게 모니터링하나요?",
+    "answer": "응답시간, 처리량, 오류율, 토큰 사용량과 비용을 관찰합니다. 정기 평가와 사용자 피드백으로 답변 품질을 확인하고 기준을 벗어나면 원인을 점검하도록 알림을 설정합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-drift-concept",
+    "category": "기술",
+    "topic": "AI 배포·운영",
+    "question": "AI 시스템에서 드리프트란 무엇인가요?",
+    "answer": "시간이 지나 입력 데이터의 분포나 데이터와 정답의 관계 등이 달라지는 현상입니다. 이 변화로 성능이 저하될 수 있어 실제 요청과 평가 결과를 비교하고 데이터·검색·모델을 점검합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-inference-scaling-concept",
+    "category": "기술",
+    "topic": "AI 배포·운영",
+    "question": "추론을 어떻게 확장하나요?",
+    "answer": "API 방식에서는 공급자 한도, 큐와 동시 요청 수를 조절합니다. 자체 호스팅에서는 배칭·수평 확장·양자화나 모델 분산을 검토하며, 메모리·처리량·답변 품질의 변화를 측정합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-ai-tools-concept",
+    "category": "기술",
+    "topic": "AI 배포·운영",
+    "question": "AI 배포에 사용하는 도구는 무엇인가요?",
+    "answer": "애플리케이션 패키징에는 Docker, 규모에 따라 오케스트레이션 도구를 사용할 수 있습니다. 자체 모델 서빙에는 vLLM 같은 엔진, 검색에는 벡터 DB, 운영에는 모니터링 도구를 조합하며 API 방식에서는 클라우드 모델 서비스를 활용할 수 있습니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-wrong-answer-concept",
+    "category": "기술",
+    "topic": "상황별 대응",
+    "question": "LLM 챗봇이 틀린 답을 합니다. 어떻게 하시겠습니까?",
+    "answer": "문제를 재현하고 입력·검색 근거·프롬프트·생성 결과 중 어디서 오류가 났는지 나눠 확인하겠습니다. 원인에 맞게 개선하고 같은 유형의 질문을 평가셋에 추가해 재발 여부를 확인하겠습니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-latency-spike-concept",
+    "category": "기술",
+    "topic": "상황별 대응",
+    "question": "지연 시간이 갑자기 증가했습니다. 어떻게 디버그하나요?",
+    "answer": "검색 시간, 큐 대기, 네트워크, 모델 응답 시간과 토큰 수를 나눠 비교하겠습니다. 최근 변경과 공급자 상태·호출 제한도 확인한 뒤 병목 구간부터 완화하겠습니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-cost-spike-concept",
+    "category": "기술",
+    "topic": "상황별 대응",
+    "question": "프로덕션 비용이 급증했습니다. 어떻게 접근하나요?",
+    "answer": "요청 수와 모델별 입력·출력 토큰, 재시도 횟수를 먼저 확인하겠습니다. 원인에 따라 길이 제한·캐싱·요청 제한·모델 선택을 조정하고 예산 알림을 설정하되 품질도 다시 검증하겠습니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-user-hallucination-concept",
+    "category": "기술",
+    "topic": "상황별 대응",
+    "question": "사용자가 환각을 보고합니다. 어떻게 완화하나요?",
+    "answer": "문제가 된 응답과 근거를 확인하고 영향이 큰 기능은 답변을 제한하거나 사람 검토로 연결하겠습니다. 검색과 출처 검증을 개선하고 근거가 부족할 때 답하지 않도록 한 뒤 회귀 평가를 진행하겠습니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-irrelevant-retrieval-concept",
+    "category": "기술",
+    "topic": "상황별 대응",
+    "question": "RAG가 관련 없는 결과를 반환합니다. 무엇이 문제일까요?",
+    "answer": "원문과 청크에 필요한 정보가 있는지, 질문·문서 임베딩이 호환되는지 확인하겠습니다. 메타데이터 필터·유사도 기준·검색 순위를 점검하고 평가셋으로 개선 전후를 비교하겠습니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-ai-ml-role-concept",
+    "category": "기술",
+    "topic": "직무 이해",
+    "question": "AI 엔지니어와 머신러닝 엔지니어는 어떻게 다른가요?",
+    "answer": "일반적으로 AI 엔지니어는 모델을 서비스와 업무에 통합하고, ML 엔지니어는 학습·추론 파이프라인과 모델 운영·최적화에 더 집중하는 경우가 많습니다. 실제 역할은 겹치며 회사의 JD에 따라 달라지고, ML 엔지니어가 반드시 기반 모델 연구를 하는 것은 아닙니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-chunk-size-concept",
+    "category": "기술",
+    "topic": "검색·평가",
+    "question": "Chunk Size가 뭐예요?",
+    "answer": "문서를 나누는 단위의 크기",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-chunk-overlap-concept",
+    "category": "기술",
+    "topic": "검색·평가",
+    "question": "Chunk Overlap이 뭐예요?",
+    "answer": "인접한 청크 사이에 중복으로 포함하는 내용의 크기",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-vectordb-concept",
+    "category": "기술",
+    "topic": "검색·평가",
+    "question": "VectorDB가 뭐예요?",
+    "answer": "VectorDB는 텍스트나 이미지 등의 데이터를 임베딩한 벡터를 저장하고, 유사도를 기준으로 관련 데이터를 검색하는 데이터베이스입니다. RAG에서는 사용자의 질문과 관련된 문서를 찾는 데 활용합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-threshold-concept",
+    "category": "기술",
+    "topic": "검색·평가",
+    "question": "유사도 임계값이 뭐예요?",
+    "answer": "검색 결과를 답변의 근거로 사용할지 판단하는 기준값입니다. 점수의 의미와 방향은 검색 방식에 따라 다르므로 평가셋으로 적절한 기준을 정하며, 기준을 넘었다고 내용이 반드시 맞는 것은 아닙니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-evaluation-concept",
+    "category": "기술",
+    "topic": "검색·평가",
+    "question": "평가셋이 뭐예요?",
+    "answer": "시스템의 동작을 검증하기 위해 준비한 질문과 기대 결과의 모음입니다. 정상 질문뿐 아니라 무관한 질문, 근거가 없는 질문과 경계 사례도 포함해 검증합니다.",
+    "original": false,
     "note": ""
   }
 ];

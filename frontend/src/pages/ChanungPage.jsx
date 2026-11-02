@@ -12,6 +12,7 @@ import './ChanungPage.css';
 
 const isConcept = q => q.id === 'cu-rag' || q.id.endsWith('-concept');
 const concepts = CHANUNG_QUESTIONS.filter(isConcept);
+const conceptTopics = [...new Set(concepts.map(q => q.topic))];
 const portfolioQuestions = PORTFOLIO_GROUPS.flatMap(group => group.questions);
 const allQuestions = [...CHANUNG_QUESTIONS, ...portfolioQuestions];
 const mainQuestions = CHANUNG_QUESTIONS.filter(q => !isConcept(q));
@@ -101,9 +102,13 @@ function Practice() {
         {visible.map(q => <PracticeQuestion key={q.id} q={q} draft={drafts[q.id] || ''} write={write} recording={recordings[q.id]} saveRecording={saveRecording} active={selected?.id === q.id} activate={() => select(q.id)} done={completed.includes(q.id)} toggleDone={() => toggleCompleted(q.id)} />)}
         {!visible.length && <p className="notes-empty">표시할 답변이 없습니다. 완료한 답변 표시를 켜거나 검색 조건을 바꿔 주세요.</p>}
         <details className="chanung-concept-review">
-          <summary>기초 개념 몰아보기 · {concepts.length}개</summary>
+          <summary>AI 엔지니어 기초·실무 질문 · {concepts.length}개</summary>
           <p className="audio-hint">질문을 보고 먼저 답한 뒤, 답변 보기 버튼으로 정의를 확인하세요.</p>
-          {concepts.filter(q => showCompleted || !completed.includes(q.id)).map(q => <ConceptQuestion key={q.id} q={q} done={completed.includes(q.id)} toggleDone={() => toggleCompleted(q.id)} />)}
+          <nav className="portfolio-topics" aria-label="AI 질문 주제">{conceptTopics.map((topic, index) => <a key={topic} href={`#ai-topic-${index}`}>{topic}</a>)}</nav>
+          {conceptTopics.map((topic, index) => {
+            const list = concepts.filter(q => q.topic === topic && (showCompleted || !completed.includes(q.id)));
+            return list.length ? <section key={topic} id={`ai-topic-${index}`} className="portfolio-group"><h3>{topic}</h3>{list.map(q => <ConceptQuestion key={q.id} q={q} done={completed.includes(q.id)} toggleDone={() => toggleCompleted(q.id)} />)}</section> : null;
+          })}
           {concepts.every(q => completed.includes(q.id)) && !showCompleted && <p className="audio-hint">기초 개념을 모두 완료했습니다. ‘완료한 답변도 표시’를 켜면 다시 볼 수 있습니다.</p>}
         </details>
         <section className="portfolio-followups" id="portfolio-followups" aria-labelledby="portfolio-followups-title">

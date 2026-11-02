@@ -15,7 +15,11 @@ try{
  const {default:Page}=await server.ssrLoadModule('/src/pages/ChanungPage.jsx');
  const {default:api}=await server.ssrLoadModule('/src/api.js');api.get=async()=>({data:{available:true}});
  const {CHANUNG_QUESTIONS:qs,CHANUNG_CATEGORIES:cats}=await server.ssrLoadModule('/src/data/chanung.js');
- assert.deepEqual(cats,['기술','인성','자소서꼬리질문']);assert.equal(qs.length,32);
+ assert.deepEqual(cats,['기술','인성','자소서꼬리질문']);assert.equal(qs.length,59);
+ for(const id of ['cu-etl-concept','cu-cloud-concept','cu-secure-coding-concept','cu-testing-concept','cu-deployment-concept'])assert.ok(!qs.some(q=>q.id===id),'generic knowledge removed');
+ const concepts=qs.filter(q=>q.id==='cu-rag'||q.id.endsWith('-concept'));
+ assert.equal(concepts.length,43);assert.equal(new Set(concepts.map(q=>q.topic)).size,7);
+ for(const id of ['cu-tokenization-concept','cu-finetuning-concept','cu-transformer-concept','cu-tool-calling-concept','cu-cost-spike-concept'])assert.ok(concepts.some(q=>q.id===id));
  const mount=async()=>{await act(async()=>{view=TestRenderer.create(React.createElement(MemoryRouter,{initialEntries:['/chanung']},React.createElement(Page)));});};
  await mount();assert.equal(view.root.findAllByType('article').length,16);
  for(const q of qs)assert.equal(view.root.findByProps({id:`answer-${q.id}`}).props.hidden,true);
@@ -58,5 +62,5 @@ try{
  await act(async()=>complete().props.onChange());
  await act(async()=>view.root.findByType('select').props.onChange({target:{value:'인성'}}));assert.equal(view.root.findAllByType('article').length,7);
  await act(async()=>view.root.findByProps({type:'search'}).props.onChange({target:{value:'없는질문xyz'}}));assert.equal(view.root.findAllByType('article').length,0);
- console.log('PASS: 16 interview questions and 16 concepts in collapsed review, sidebar scroll preserves cards, single recording/camera panel, unique IDs, saved drafts, filters');
+ console.log('PASS: 16 interview questions and 43 AI concepts in collapsed review, sidebar scroll preserves cards, single recording/camera panel, unique IDs, saved drafts, filters');
 }finally{if(view)await act(async()=>view.unmount());await server.close();}
