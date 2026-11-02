@@ -39,7 +39,7 @@
 .audio-result h4 { margin-top: 14px !important; }
 .chanung-page textarea { display: block; width: 100%; box-sizing: border-box; resize: vertical; min-height: 180px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-secondary); color: var(--text-primary); padding: 16px; font: inherit; line-height: 1.8; }
 .chanung-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
-.chanung-original { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.9; }
+.chanung-original { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.65; }
 .chanung-page .notes-answer h3 { font-size: 1rem; margin-bottom: 16px; }
 .chanung-note { padding: 12px; border-left: 3px solid var(--accent-blue); background: var(--bg-secondary); font-size: .85rem; line-height: 1.8; margin-top: 18px; }
 .chanung-note strong { display: block; }
@@ -57,3 +57,5 @@
 .chanung-concept-review { margin: 28px 0 12px; border-top: 1px solid var(--border-color); padding-top: 16px; }
 .chanung-concept-review > summary { cursor: pointer; font-size: .82rem; color: var(--text-secondary); }
 .chanung-concept-review h3 { font-size: .95rem; margin: 0 0 12px; }
+
+.chanung-page .notes-answer .notes-markdown p { margin: 0 0 .4em; line-height: 1.65; }
