@@ -27,6 +27,7 @@ export default function ChanungPage() {
 }
 
 function Practice() {
+  const [cameraWidth, setCameraWidth] = useState(320);
   const [recordings, setRecordings] = useState({});
   const saveRecording = (id, recording) => setRecordings(prev => ({ ...prev, [id]: recording }));
   const { hash } = useLocation();
@@ -88,7 +89,7 @@ function Practice() {
       error: '계정 저장에 실패했습니다. 체크는 이 기기에 보관되며 다시 연결하면 재시도합니다.',
       expired: '로그인이 만료되었습니다. 다시 로그인하면 계정 기록을 불러옵니다.',
     })[completionStatus]} {completionStatus === 'error' && <button type="button" onClick={retryCompletion}>다시 저장</button>} {!user && <Link to="/account">로그인</Link>}</p>
-    <div className="notes-layout">
+    <div className="notes-layout" style={{ '--camera-width': `${cameraWidth}px` }}>
       <aside className="notes-index">
         <div className="notes-filters"><input type="search" aria-label="면접 질문 검색" placeholder="질문 검색" value={query} onChange={e => setQuery(e.target.value)} /><select aria-label="면접 질문 분류" value={category} onChange={e => setCategory(e.target.value)}><option value="">전체 질문</option>{CHANUNG_CATEGORIES.map(c => <option key={c}>{c}</option>)}</select><label><input type="checkbox" checked={showCompleted} onChange={e => setShowCompleted(e.target.checked)} /> 완료한 답변도 표시 ({completed.length})</label></div>
         <div className="chanung-list-meta"><span>{visible.length}문항 · 작성 {mainQuestions.filter(q => drafts[q.id]?.trim()).length}/{mainQuestions.length}</span><button type="button" disabled={visible.length < 2} onClick={random}>랜덤 질문</button></div>
@@ -97,8 +98,11 @@ function Practice() {
           return list.length ? <section key={c}><h2>{c}<small>{list.length}</small></h2><ul>{list.map(q => <li key={q.id} className={selected?.id === q.id ? 'is-selected' : ''}><button type="button" aria-current={selected?.id === q.id ? 'true' : undefined} onClick={() => select(q.id)}>{q.question}{drafts[q.id]?.trim() && <small> · 작성함</small>}</button></li>)}</ul></section> : null;
         })}</nav>
       </aside>
+      <div className="chanung-camera-dock">
+        <label className="camera-size-control" htmlFor="camera-size">카메라 크기 <input id="camera-size" type="range" min="240" max="400" step="20" value={cameraWidth} onChange={e => setCameraWidth(Number(e.target.value))} /></label>
+        <InterviewCamera />
+      </div>
       <div className="notes-content">
-        <div className="chanung-camera-dock"><InterviewCamera /></div>
         {visible.map(q => <PracticeQuestion key={q.id} q={q} draft={drafts[q.id] || ''} write={write} recording={recordings[q.id]} saveRecording={saveRecording} active={selected?.id === q.id} activate={() => select(q.id)} done={completed.includes(q.id)} toggleDone={() => toggleCompleted(q.id)} />)}
         {!visible.length && <p className="notes-empty">표시할 답변이 없습니다. 완료한 답변 표시를 켜거나 검색 조건을 바꿔 주세요.</p>}
         <details className="chanung-concept-review">
