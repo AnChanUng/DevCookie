@@ -5,11 +5,14 @@ import InterviewAudio from '../components/InterviewAudio';
 import InterviewCamera from '../components/InterviewCamera';
 import { account, onAccountChange } from '../sync';
 import { CHANUNG_QUESTIONS, CHANUNG_CATEGORIES } from '../data/chanung';
+import { PORTFOLIO_GROUPS } from '../data/portfolioFollowups';
 import './CsNotesPage.css';
 import './ChanungPage.css';
 
 const isConcept = q => q.id === 'cu-rag' || q.id.endsWith('-concept');
 const concepts = CHANUNG_QUESTIONS.filter(isConcept);
+const portfolioQuestions = PORTFOLIO_GROUPS.flatMap(group => group.questions);
+const allQuestions = [...CHANUNG_QUESTIONS, ...portfolioQuestions];
 const mainQuestions = CHANUNG_QUESTIONS.filter(q => !isConcept(q));
 
 const identity = () => account()?.token || '';
@@ -31,14 +34,14 @@ function Practice() {
   const [drafts, setDrafts] = useState(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(storageKey));
-      return Object.fromEntries(CHANUNG_QUESTIONS.filter(q => typeof saved?.[q.id] === 'string').map(q => [q.id, saved[q.id]]));
+      return Object.fromEntries(allQuestions.filter(q => typeof saved?.[q.id] === 'string').map(q => [q.id, saved[q.id]]));
     } catch { return {}; }
   });
   const completedKey = `${storageKey}:completed`;
   const [completed, setCompleted] = useState(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(completedKey));
-      return Array.isArray(saved) ? saved.filter(id => CHANUNG_QUESTIONS.some(q => q.id === id)) : [];
+      return Array.isArray(saved) ? saved.filter(id => allQuestions.some(q => q.id === id)) : [];
     } catch { return []; }
   });
   const [showCompleted, setShowCompleted] = useState(false);
@@ -86,6 +89,7 @@ function Practice() {
       <p>첫마디에서 질문만 반복하지 말고 빈칸에 결론을 바로 넣으세요. 경험 질문에는 이 흐름을 쓰고, 개념 질문은 “정의 → 동작·역할”로 짧게 답하면 됩니다.</p>
     </details>
     <p className="notes-list-intro">전체 질문을 아래로 스크롤하며 연습하고, 답변은 필요할 때 펼쳐 보세요. 왼쪽 목차를 누르면 해당 위치로 이동합니다. 직접 작성한 답변 {CHANUNG_QUESTIONS.filter(q => q.original).length}개는 원문 그대로, 나머지는 준비용 답변 예시입니다.</p>
+    <p><a href="#portfolio-followups">이력서/포트폴리오 꼬리질문으로 이동 ↓</a></p>
     <p className="notes-save-status" role="status">{saveError ? '저장에 실패했습니다. 입력한 답변을 따로 복사해 주세요.' : '내 연습 답변과 완료 체크는 현재 브라우저에 계정별로 저장됩니다. 다른 기기와 동기화되지 않으며 자동 채점하지 않습니다.'}</p>
     <div className="notes-layout">
       <aside className="notes-index">
@@ -106,6 +110,16 @@ function Practice() {
           {concepts.filter(q => showCompleted || !completed.includes(q.id)).map(q => <ConceptQuestion key={q.id} q={q} done={completed.includes(q.id)} toggleDone={() => toggleCompleted(q.id)} />)}
           {concepts.every(q => completed.includes(q.id)) && !showCompleted && <p className="audio-hint">기초 개념을 모두 완료했습니다. ‘완료한 답변도 표시’를 켜면 다시 볼 수 있습니다.</p>}
         </details>
+        <section className="portfolio-followups" id="portfolio-followups" aria-labelledby="portfolio-followups-title">
+          <h2 id="portfolio-followups-title">이력서/포트폴리오 꼬리질문</h2>
+          <p className="audio-hint">제출 자료와 면접 회고를 바탕으로 구성한 12개 주제·36개 질문입니다. 각 주제는 설명 → 구현·선택 이유 → 검증·개선의 3단계로 이어집니다. 먼저 직접 답하고 준비 포인트를 확인하세요.</p>
+          <nav className="portfolio-topics" aria-label="프로젝트 질문 주제">{PORTFOLIO_GROUPS.map(group => <a key={group.id} href={`#portfolio-${group.id}`}>{group.title}</a>)}</nav>
+          {PORTFOLIO_GROUPS.map(group => <section key={group.id} id={`portfolio-${group.id}`} className="portfolio-group">
+            <h3>{group.title}</h3>
+            {group.questions.filter(q => showCompleted || !completed.includes(q.id)).map(q => <PortfolioQuestion key={q.id} q={q} draft={drafts[q.id] || ''} write={write} done={completed.includes(q.id)} toggleDone={() => toggleCompleted(q.id)} />)}
+            {!showCompleted && group.questions.every(q => completed.includes(q.id)) && <p className="audio-hint">이 주제의 질문을 모두 완료했습니다.</p>}
+          </section>)}
+        </section>
       </div>
     </div>
   </>;
@@ -137,5 +151,19 @@ function ConceptQuestion({ q, done, toggleDone }) {
     <div className="notes-detail-top"><h3>{q.question}</h3><label><input type="checkbox" aria-label={`${q.question} 학습 완료`} checked={done} onChange={toggleDone} /> 학습 완료</label></div>
     <button type="button" className="exam-btn sm" aria-expanded={open} aria-controls={`answer-${q.id}`} onClick={() => setOpen(value => !value)}>{open ? '답변 숨기기' : '답변 보기'}</button>
     <div id={`answer-${q.id}`} hidden={!open}>{open && (q.original ? <div className="chanung-original">{q.answer}</div> : <div className="notes-markdown"><ReactMarkdown>{q.answer}</ReactMarkdown></div>)}</div>
+  </section>;
+}
+
+function PortfolioQuestion({ q, draft, write, done, toggleDone }) {
+  const [open, setOpen] = useState(false);
+  return <section className="notes-detail-card portfolio-question" id={q.id}>
+    <div className="notes-detail-top"><span>{q.depth}단계 · {['', '설명', '구현·선택 이유', '검증·개선'][q.depth]}</span><label><input type="checkbox" aria-label={`${q.question} 학습 완료`} checked={done} onChange={toggleDone} /> 학습 완료</label></div>
+    <h4 className="notes-question">{q.question}</h4>
+    <details className="chanung-draft-panel"><summary>직접 적어보기{draft.trim() ? ' · 작성한 답변 있음' : ' (선택)'}</summary>
+      <label className="chanung-label" htmlFor={`draft-${q.id}`}>내 연습 답변</label>
+      <textarea id={`draft-${q.id}`} value={draft} onChange={e => write(q.id, e.target.value)} placeholder="실제로 맡은 역할과 구현·검증한 내용을 적어 보세요." />
+    </details>
+    <button type="button" className="exam-btn sm" aria-expanded={open} aria-controls={`hint-${q.id}`} onClick={() => setOpen(value => !value)}>{open ? '준비 포인트 숨기기' : '답변 준비 포인트 보기'}</button>
+    <div id={`hint-${q.id}`} hidden={!open}>{open && <p className="chanung-note">{q.hint}</p>}</div>
   </section>;
 }

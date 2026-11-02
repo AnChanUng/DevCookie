@@ -15,7 +15,7 @@ try{
  const {default:Page}=await server.ssrLoadModule('/src/pages/ChanungPage.jsx');
  const {default:api}=await server.ssrLoadModule('/src/api.js');api.get=async()=>({data:{available:true}});
  const {CHANUNG_QUESTIONS:qs,CHANUNG_CATEGORIES:cats}=await server.ssrLoadModule('/src/data/chanung.js');
- assert.deepEqual(cats,['기술','인성','자소서꼬리질문']);assert.equal(qs.length,32);
+ assert.deepEqual(cats,['기술','인성','자소서꼬리질문']);assert.equal(qs.length,31);
  const mount=async()=>{await act(async()=>{view=TestRenderer.create(React.createElement(MemoryRouter,{initialEntries:['/chanung']},React.createElement(Page)));});};
  await mount();assert.equal(view.root.findAllByType('article').length,15);
  for(const q of qs)assert.equal(view.root.findByProps({id:`answer-${q.id}`}).props.hidden,true);
@@ -31,11 +31,23 @@ try{
  assert.equal(view.root.findByProps({id:'answer-cu-chunk-size-concept'}).props.hidden,true,'other answers stay hidden');
  await act(async()=>conceptButton().props.onClick());
  assert.equal(view.root.findByProps({id:'answer-cu-vectordb-concept'}).props.hidden,true);
+ assert.ok(!qs.some(q=>q.id==='cu-generative-ai-concept'));
+ const {PORTFOLIO_GROUPS:groups}=await server.ssrLoadModule('/src/data/portfolioFollowups.js');
+ assert.equal(groups.length,12);assert.equal(groups.flatMap(g=>g.questions).length,36);
+ assert.ok(groups.every(g=>g.questions.every((q,i)=>q.depth===i+1 && q.depth<=3)));
+ const portfolio=view.root.findByProps({id:'portfolio-followups'});
+ assert.equal(portfolio.findAllByProps({className:'notes-detail-card portfolio-question'}).length,36);
+ for(const q of groups.flatMap(g=>g.questions))assert.equal(view.root.findByProps({id:`hint-${q.id}`}).props.hidden,true);
+ const pf=view.root.findByProps({id:'pf-rag-stack-1'});
+ await act(async()=>pf.findByType('button').props.onClick());
+ assert.equal(view.root.findByProps({id:'hint-pf-rag-stack-1'}).props.hidden,false);
+ assert.equal(view.root.findByProps({id:'hint-pf-rag-stack-2'}).props.hidden,true);
+ await act(async()=>view.root.findByProps({id:'draft-pf-rag-stack-1'}).props.onChange({target:{value:'내 프로젝트 설명'}}));
  const click=async label=>{const b=view.root.findAllByType('button').find(n=>text(n)===label);assert.ok(b,label);await act(async()=>b.props.onClick());};
  await click('자기소개');assert.equal(view.root.findAllByType('article').length,15);assert.ok(scrolled.includes('cu-intro'));
  const draft=()=>view.root.findByProps({id:'draft-cu-intro'});
  await act(async()=>draft().props.onChange({target:{value:'내 답변'}}));
- await act(async()=>view.unmount());await mount();assert.equal(draft().props.value,'내 답변');
+ await act(async()=>view.unmount());await mount();assert.equal(draft().props.value,'내 답변');assert.equal(view.root.findByProps({id:'draft-pf-rag-stack-1'}).props.value,'내 프로젝트 설명');
  assert.equal(new Set(view.root.findAll(n=>typeof n.type==='string'&&n.props.id).map(n=>n.props.id)).size,view.root.findAll(n=>typeof n.type==='string'&&n.props.id).length,'unique element IDs');
  const complete=()=>view.root.findByProps({'aria-label':'자기소개 학습 완료'});
  await act(async()=>complete().props.onChange());assert.equal(view.root.findAllByType('article').length,14);
@@ -46,5 +58,5 @@ try{
  await act(async()=>complete().props.onChange());
  await act(async()=>view.root.findByType('select').props.onChange({target:{value:'인성'}}));assert.equal(view.root.findAllByType('article').length,6);
  await act(async()=>view.root.findByProps({type:'search'}).props.onChange({target:{value:'없는질문xyz'}}));assert.equal(view.root.findAllByType('article').length,0);
- console.log('PASS: 15 interview questions and 17 concepts in collapsed review, sidebar scroll preserves cards, single recording/camera panel, unique IDs, saved drafts, filters');
+ console.log('PASS: 15 interview questions and 16 concepts in collapsed review, sidebar scroll preserves cards, single recording/camera panel, unique IDs, saved drafts, filters');
 }finally{if(view)await act(async()=>view.unmount());await server.close();}

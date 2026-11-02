@@ -161,14 +161,6 @@ export const CHANUNG_QUESTIONS = [
     "note": ""
   },
   {
-    "id": "cu-generative-ai-concept",
-    "category": "기술",
-    "question": "생성형 AI가 뭐예요?",
-    "answer": "**생성형 AI**는 학습한 패턴을 바탕으로 글·이미지·음성 같은 새로운 결과물을 생성하는 AI입니다. LLM은 언어를 다루는 생성형 AI에 활용됩니다.",
-    "original": false,
-    "note": ""
-  },
-  {
     "id": "cu-hallucination-concept",
     "category": "기술",
     "question": "환각(Hallucination)이 뭐예요?",
