@@ -102,11 +102,8 @@ function Practice() {
         {!visible.length && <p className="notes-empty">표시할 답변이 없습니다. 완료한 답변 표시를 켜거나 검색 조건을 바꿔 주세요.</p>}
         <details className="chanung-concept-review">
           <summary>기초 개념 몰아보기 · {concepts.length}개</summary>
-          <p className="audio-hint">하루 한 번 펼쳐서 정의를 쭉 읽고 반복해 보세요.</p>
-          {concepts.filter(q => showCompleted || !completed.includes(q.id)).map(q => <section key={q.id} className="notes-detail-card" id={q.id}>
-            <div className="notes-detail-top"><h3>{q.question}</h3><label><input type="checkbox" aria-label={`${q.question} 학습 완료`} checked={completed.includes(q.id)} onChange={() => toggleCompleted(q.id)} /> 학습 완료</label></div>
-            {q.original ? <div className="chanung-original">{q.answer}</div> : <div className="notes-markdown"><ReactMarkdown>{q.answer}</ReactMarkdown></div>}
-          </section>)}
+          <p className="audio-hint">질문을 보고 먼저 답한 뒤, 답변 보기 버튼으로 정의를 확인하세요.</p>
+          {concepts.filter(q => showCompleted || !completed.includes(q.id)).map(q => <ConceptQuestion key={q.id} q={q} done={completed.includes(q.id)} toggleDone={() => toggleCompleted(q.id)} />)}
           {concepts.every(q => completed.includes(q.id)) && !showCompleted && <p className="audio-hint">기초 개념을 모두 완료했습니다. ‘완료한 답변도 표시’를 켜면 다시 볼 수 있습니다.</p>}
         </details>
       </div>
@@ -132,4 +129,13 @@ function PracticeQuestion({ q, draft, write, recording, saveRecording, active, a
       {q.note && <p className="chanung-note"><strong>준비 메모</strong> {q.note}</p>}
     </section>}</div>
   </article>;
+}
+
+function ConceptQuestion({ q, done, toggleDone }) {
+  const [open, setOpen] = useState(false);
+  return <section className="notes-detail-card" id={q.id}>
+    <div className="notes-detail-top"><h3>{q.question}</h3><label><input type="checkbox" aria-label={`${q.question} 학습 완료`} checked={done} onChange={toggleDone} /> 학습 완료</label></div>
+    <button type="button" className="exam-btn sm" aria-expanded={open} aria-controls={`answer-${q.id}`} onClick={() => setOpen(value => !value)}>{open ? '답변 숨기기' : '답변 보기'}</button>
+    <div id={`answer-${q.id}`} hidden={!open}>{open && (q.original ? <div className="chanung-original">{q.answer}</div> : <div className="notes-markdown"><ReactMarkdown>{q.answer}</ReactMarkdown></div>)}</div>
+  </section>;
 }
