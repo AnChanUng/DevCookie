@@ -6,6 +6,7 @@ import InterviewCamera from '../components/InterviewCamera';
 import { account, onAccountChange } from '../sync';
 import { CHANUNG_QUESTIONS, CHANUNG_CATEGORIES } from '../data/chanung';
 import { PORTFOLIO_GROUPS } from '../data/portfolioFollowups';
+import useChanungCompletion from '../hooks/useChanungCompletion';
 import './CsNotesPage.css';
 import './ChanungPage.css';
 
@@ -37,21 +38,9 @@ function Practice() {
       return Object.fromEntries(allQuestions.filter(q => typeof saved?.[q.id] === 'string').map(q => [q.id, saved[q.id]]));
     } catch { return {}; }
   });
-  const completedKey = `${storageKey}:completed`;
-  const [completed, setCompleted] = useState(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem(completedKey));
-      return Array.isArray(saved) ? saved.filter(id => allQuestions.some(q => q.id === id)) : [];
-    } catch { return []; }
-  });
+  const { completed, status: completionStatus, toggle: toggleCompleted, retry: retryCompletion } = useChanungCompletion(user, allQuestions.map(q => q.id));
   const [showCompleted, setShowCompleted] = useState(false);
   const [saveError, setSaveError] = useState(false);
-  const toggleCompleted = id => {
-    const next = completed.includes(id) ? completed.filter(value => value !== id) : [...completed, id];
-    setCompleted(next);
-    try { localStorage.setItem(completedKey, JSON.stringify(next)); setSaveError(false); }
-    catch { setSaveError(true); }
-  };
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('');
   const visible = CHANUNG_CATEGORIES.flatMap(c => mainQuestions.filter(q => q.category === c))
@@ -90,7 +79,14 @@ function Practice() {
     </details>
     <p className="notes-list-intro">전체 질문을 아래로 스크롤하며 연습하고, 답변은 필요할 때 펼쳐 보세요. 왼쪽 목차를 누르면 해당 위치로 이동합니다. 직접 작성한 답변 {CHANUNG_QUESTIONS.filter(q => q.original).length}개는 원문 그대로, 나머지는 준비용 답변 예시입니다.</p>
     <p><a href="#portfolio-followups">이력서/포트폴리오 꼬리질문으로 이동 ↓</a></p>
-    <p className="notes-save-status" role="status">{saveError ? '저장에 실패했습니다. 입력한 답변을 따로 복사해 주세요.' : '내 연습 답변과 완료 체크는 현재 브라우저에 계정별로 저장됩니다. 다른 기기와 동기화되지 않으며 자동 채점하지 않습니다.'}</p>
+    <p className="notes-save-status" role="status">{saveError ? '저장에 실패했습니다. 입력한 답변을 따로 복사해 주세요.' : '직접 적은 연습 답변은 현재 브라우저에 저장됩니다.'}</p>
+    <p className="notes-save-status" role="status">{({
+      guest: '학습 완료는 이 브라우저에 유지됩니다. 다른 세션·기기에서 이어 보려면 로그인해 주세요.',
+      loading: '학습 완료 기록을 불러오는 중…', saving: '학습 완료 기록을 계정에 저장하는 중…',
+      saved: '학습 완료 기록이 계정에 저장되었습니다. 같은 계정으로 다시 로그인해도 유지됩니다.',
+      error: '계정 저장에 실패했습니다. 체크는 이 기기에 보관되며 다시 연결하면 재시도합니다.',
+      expired: '로그인이 만료되었습니다. 다시 로그인하면 계정 기록을 불러옵니다.',
+    })[completionStatus]} {completionStatus === 'error' && <button type="button" onClick={retryCompletion}>다시 저장</button>} {!user && <Link to="/account">로그인</Link>}</p>
     <div className="notes-layout">
       <aside className="notes-index">
         <div className="notes-filters"><input type="search" aria-label="면접 질문 검색" placeholder="질문 검색" value={query} onChange={e => setQuery(e.target.value)} /><select aria-label="면접 질문 분류" value={category} onChange={e => setCategory(e.target.value)}><option value="">전체 질문</option>{CHANUNG_CATEGORIES.map(c => <option key={c}>{c}</option>)}</select><label><input type="checkbox" checked={showCompleted} onChange={e => setShowCompleted(e.target.checked)} /> 완료한 답변도 표시 ({completed.length})</label></div>
