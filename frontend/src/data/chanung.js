@@ -93,7 +93,7 @@ export const CHANUNG_QUESTIONS = [
     "id": "cu-vectordb-concept",
     "category": "기술",
     "question": "VectorDB가 뭐예요?",
-    "answer": "**VectorDB**는 임베딩 벡터를 저장하고 비슷한 벡터를 검색하는 데이터베이스입니다. RAG에서는 사용자의 질문과 관련된 문서를 찾는 데 활용합니다.",
+    "answer": "VectorDB는 텍스트나 이미지 등의 데이터를 임베딩한 벡터를 저장하고, 유사도를 기준으로 관련 데이터를 검색하는 데이터베이스입니다. RAG에서는 사용자의 질문과 관련된 문서를 찾는 데 활용합니다.",
     "original": false,
     "note": ""
   },
