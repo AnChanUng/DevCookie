@@ -61,9 +61,9 @@ export const CHANUNG_QUESTIONS = [
     "id": "cu-intro-en",
     "category": "인성",
     "question": "영어로 자기소개를 해주세요. (Please introduce yourself in English.)",
-    "answer": "Hello, my name is Chan-Ung An. I am an applicant who identifies business problems and solves them using AI.\nAt DataStreams, I developed an LLM-based log analysis program and a system that automatically recreates client environments. These improvements reduced maintenance time by 50 percent.\nI also worked at a KB Kookmin Bank branch, where I communicated with customers of different ages. I helped customers who had difficulty using mobile banking solve problems on their own using the AI chatbot. This contributed to a 20 percent reduction in branch congestion.\nWith my AI skills and communication experience, I would like to help improve operational efficiency at Deloitte Anjin.\nThank you.",
-    "original": false,
-    "note": "확정한 한국어 자기소개를 바탕으로 한 영어 말하기 예시입니다. 50%, 20% 성과의 측정 근거도 영어로 짧게 설명할 수 있도록 준비하세요."
+    "answer": "Hello, my name is Chan-Ung An.\nI use AI to solve problems at work.\n\nAt DataStreams, I developed a log analysis program using AI.\nI also built a system to recreate customer environments.\nThese tools reduced maintenance time by 50 percent.\n\nAt KB Kookmin Bank, I helped customers use mobile banking.\nI showed them how to use an AI chatbot to solve their problems.\nThis helped reduce crowding at the branch by 20 percent.\n\nI would like to use these skills to help Deloitte Anjin.\nThank you.",
+    "original": true,
+    "note": "짧은 문장으로 나누어 말하는 영어 자기소개입니다."
   },
   {
     "id": "cu-motivation",
