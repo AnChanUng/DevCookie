@@ -61,7 +61,7 @@ export const CHANUNG_QUESTIONS = [
     "id": "cu-intro-en",
     "category": "인성",
     "question": "영어로 자기소개를 해주세요. (Please introduce yourself in English.)",
-    "answer": "Hello, my name is Chan-Ung An.\nI use AI to solve problems.\n\nI worked at DataStreams.\nI made AI tools.\nThese tools saved time.\n\nI also worked at KB Kookmin Bank.\nI helped customers use an AI chatbot.\n\nI want to use my skills at Deloitte Anjin.\nThank you.",
+    "answer": "Hello, my name is Chan-Ung An.\nI use AI to solve problems.\n\nPreviously, I worked at DataStreams, where I developed AI tools.\n\nI also worked at KB Kookmin Bank, helping customers use an AI chatbot.\n\nI hope to use these skills at Deloitte Anjin.\nThank you.",
     "original": true,
     "note": "한 문장씩 끊어 말하는 짧은 영어 자기소개입니다."
   },
