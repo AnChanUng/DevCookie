@@ -90,6 +90,12 @@
     "answer": "안녕하십니까. 현업의 문제를 파악해 AI로 해결하는 지원자 안찬웅입니다.\n데이터스트림즈에서 LLM을 활용해 로그 분석 프로그램과 고객사 환경 재현 시스템을 개발했습니다. 그 결과 유지보수 시간을 50% 단축했습니다.\n또한 국민은행 영업점에서 다양한 연령대의 고객들과 소통하며, 모바일뱅킹 앱 이용에 어려움을 겪는 고객들이 AI 챗봇을 활용해 스스로 문제를 해결할 수 있도록 도왔습니다. 그 결과 영업점 혼잡도를 20% 개선했습니다.\n이러한 AI 활용 역량과 소통 역량을 바탕으로 딜로이트 안진에서도 업무 효율성을 높이는 데 기여하겠습니다."
   },
   {
+    "id": "cu-intro-en",
+    "category": "인성",
+    "question": "영어로 자기소개를 해주세요. (Please introduce yourself in English.)",
+    "answer": "Hello, my name is Chan-Ung An. I am an applicant who identifies business problems and solves them using AI.\nAt DataStreams, I developed an LLM-based log analysis program and a system that automatically recreates client environments. These improvements reduced maintenance time by 50 percent.\nI also worked at a KB Kookmin Bank branch, where I communicated with customers of different ages. I helped customers who had difficulty using mobile banking solve problems on their own using the AI chatbot. This contributed to a 20 percent reduction in branch congestion.\nWith my AI skills and communication experience, I would like to help improve operational efficiency at Deloitte Anjin.\nThank you."
+  },
+  {
     "id": "cu-motivation",
     "category": "인성",
     "question": "왜 딜로이트 안진회계법인인가요?",

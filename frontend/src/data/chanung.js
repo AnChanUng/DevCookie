@@ -121,6 +121,14 @@ export const CHANUNG_QUESTIONS = [
     "original": true
   },
   {
+    "id": "cu-intro-en",
+    "category": "인성",
+    "question": "영어로 자기소개를 해주세요. (Please introduce yourself in English.)",
+    "answer": "Hello, my name is Chan-Ung An. I am an applicant who identifies business problems and solves them using AI.\nAt DataStreams, I developed an LLM-based log analysis program and a system that automatically recreates client environments. These improvements reduced maintenance time by 50 percent.\nI also worked at a KB Kookmin Bank branch, where I communicated with customers of different ages. I helped customers who had difficulty using mobile banking solve problems on their own using the AI chatbot. This contributed to a 20 percent reduction in branch congestion.\nWith my AI skills and communication experience, I would like to help improve operational efficiency at Deloitte Anjin.\nThank you.",
+    "original": false,
+    "note": "확정한 한국어 자기소개를 바탕으로 한 영어 말하기 예시입니다. 50%, 20% 성과의 측정 근거도 영어로 짧게 설명할 수 있도록 준비하세요."
+  },
+  {
     "id": "cu-motivation",
     "category": "인성",
     "question": "왜 딜로이트 안진회계법인인가요?",
