@@ -10,6 +10,8 @@ const PromotionExamPage = lazy(() => import('./pages/PromotionExamPage'));
 const BugHuntPage = lazy(() => import('./pages/BugHuntPage'));
 const TechnicalInterviewPage = lazy(() => import('./pages/TechnicalInterviewPage'));
 const ExperiencePage = lazy(() => import('./pages/ExperiencePage'));
+const CompanyPrepPage = lazy(() => import('./pages/CompanyPrepPage'));
+const DeloitteAiFocusPage = lazy(() => import('./pages/DeloitteAiFocusPage'));
 const ChanungPage = lazy(() => import('./pages/ChanungPage'));
 const CategoryPage = lazy(() => import('./pages/CategoryPage'));
 const QuestionPage = lazy(() => import('./pages/QuestionPage'));
@@ -55,7 +57,11 @@ function App() {
           <Route path="stats" element={<StatsPage />} />
           <Route path="interview" element={<InterviewPracticePage />} />
           <Route path="technical-interview" element={<TechnicalInterviewPage />} />
-          <Route path="chanung" element={<PracticeEntry />} />
+          <Route path="chanung" element={<PracticeEntry suffix="/companies" />} />
+          <Route path="p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9/companies" element={<CompanyPrepPage />} />
+          <Route path="p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9/ai-focus" element={<DeloitteAiFocusPage />} />
+          <Route path="chanung/deloitte" element={<PracticeEntry />} />
+          <Route path="chanung/deloitte/ai" element={<PracticeEntry suffix="/ai-focus" />} />
           <Route path="p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9" element={<ChanungPage />} />
           <Route path="chanung/experience" element={<PracticeEntry suffix="/experience" />} />
           <Route path="p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9/experience" element={<ExperiencePage />} />
