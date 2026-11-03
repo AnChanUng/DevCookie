@@ -127,7 +127,7 @@ export const CHANUNG_QUESTIONS = [
     "id": "cu-environment-system",
     "category": "자소서꼬리질문",
     "question": "고객사 환경 재현 시스템은 무엇인가요?",
-    "answer": "고객사마다 운영체제와 DB 종류가 달라 동일한 환경에서 문제를 재현하기 어려웠습니다. 이를 해결하기 위해 고객사의 환경 정보를 입력하면, Linux 서버와 Docker를 활용해 해당 환경을 자동으로 구축하는 프로그램입니다.",
+    "answer": "고객사의 운영체제와 DB를 입력하면 해당 서버에 맞게 구축해주는 프로그램입니다.",
     "original": true,
     "note": ""
   },
