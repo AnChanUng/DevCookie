@@ -6,6 +6,8 @@ export const ANSWER_CORES = {
     "50% 단축",
     "AI 챗봇 사용 방법을 안내",
     "20% 개선"
+  ,
+    "같은 문제로 재방문하는 고객이 줄어"
   ],
   "cu-motivation": [
     "변화를 주도",
