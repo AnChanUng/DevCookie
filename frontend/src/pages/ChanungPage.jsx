@@ -151,7 +151,7 @@ function PracticeQuestion({ archived, q, draft, write, recording, saveRecording,
     <div className="chanung-actions"><button type="button" className="exam-btn sm" disabled={!draft.trim()} onClick={() => setOpen(true)} aria-controls={`answer-${q.id}`}>답변 제출하고 비교</button><button type="button" className="exam-btn sm" aria-expanded={open} aria-controls={`answer-${q.id}`} onClick={() => setOpen(value => !value)}>{open ? '답변 숨기기' : '기억 안 나요 · 답변 보기'}</button></div>
     <div id={`answer-${q.id}`} hidden={!open}>{open && <section className="notes-answer" aria-label="참고 답변">
       <h3>{q.original ? '내가 작성한 답변 · 원문 그대로' : '모범답변 · 말하기 예시'}</h3>
-      {q.original ? <div className="chanung-original">{<CoreText text={q.answer} id={q.id} />}</div> : <div className="notes-markdown"><ReactMarkdown>{coreMarkdown(q.answer, q.id)}</ReactMarkdown></div>}
+      {q.original ? <div className="chanung-original">{<CoreText text={q.answer} id={q.id} />}</div> : <div className="notes-markdown"><ReactMarkdown components={{ strong: ({ children }) => <span className="answer-core">{children}</span> }}>{coreMarkdown(q.answer, q.id)}</ReactMarkdown></div>}
       {q.note && <p className="chanung-note"><strong>준비 메모</strong> {q.note}</p>}
     </section>}</div>
   </article>;
@@ -162,7 +162,7 @@ function ConceptQuestion({ q, done, toggleDone }) {
   return <section className="notes-detail-card" id={q.id}>
     <div className="notes-detail-top"><h3>{q.question}</h3><label><input type="checkbox" aria-label={`${q.question} 학습 완료`} checked={done} onChange={toggleDone} /> 학습 완료</label></div>
     <button type="button" className="exam-btn sm" aria-expanded={open} aria-controls={`answer-${q.id}`} onClick={() => setOpen(value => !value)}>{open ? '답변 숨기기' : '답변 보기'}</button>
-    <div id={`answer-${q.id}`} hidden={!open}>{open && (q.original ? <div className="chanung-original">{<CoreText text={q.answer} id={q.id} />}</div> : <div className="notes-markdown"><ReactMarkdown>{coreMarkdown(q.answer, q.id)}</ReactMarkdown></div>)}</div>
+    <div id={`answer-${q.id}`} hidden={!open}>{open && (q.original ? <div className="chanung-original">{<CoreText text={q.answer} id={q.id} />}</div> : <div className="notes-markdown"><ReactMarkdown components={{ strong: ({ children }) => <span className="answer-core">{children}</span> }}>{coreMarkdown(q.answer, q.id)}</ReactMarkdown></div>)}</div>
   </section>;
 }
 
@@ -181,5 +181,5 @@ function PortfolioQuestion({ q, draft, write, done, toggleDone }) {
 }
 
 function CoreText({ text, id }) {
-  return coreParts(text, id).map((part, index) => part.bold ? <strong key={index}>{part.text}</strong> : part.text);
+  return coreParts(text, id).map((part, index) => part.bold ? <span className="answer-core" key={index}>{part.text}</span> : part.text);
 }

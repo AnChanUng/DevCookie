@@ -79,3 +79,6 @@
   .chanung-camera-dock { grid-column: 1; grid-row: 2; }
   .chanung-page .notes-content { grid-column: 1; grid-row: 3; }
 }
+
+/* Speaking anchors share the theme's blue across light and dark screens. */
+.chanung-page .answer-core { color: var(--accent-blue, #2563eb); font-weight: inherit; }
