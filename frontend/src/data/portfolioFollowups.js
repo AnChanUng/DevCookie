@@ -14,7 +14,7 @@ export const PORTFOLIO_GROUPS = [
       },
       {
         "id": "pf-rag-stack-2",
-        "answer": "Spring AI와 multilingual-e5-small 임베딩 모델을 사용했고, 벡터 저장소는 처음에는 SimpleVectorStore를 사용했습니다. 이후에는 Chroma도 선택해서 사용할 수 있도록 확장했습니다. Spring AI로 모델 호출과 검색을 연결했고, 임베딩은 ONNX 모델을 서버 내부에서 실행하도록 구성했습니다.",
+        "answer": "Spring AI(스프링 에이아이)와 multilingual-e5-small(멀티링구얼 이 파이브 스몰) 임베딩 모델을 사용했고, 벡터 저장소는 처음에는 SimpleVectorStore(심플 벡터 스토어)를 사용했습니다. 이후에는 Chroma(크로마)도 선택해서 사용할 수 있도록 확장했습니다. Spring AI로 모델 호출과 검색을 연결했고, 임베딩은 ONNX(오닉스) 모델을 서버 내부에서 실행하도록 구성했습니다.",
         "answerNote": "한국어 지원과 외부 임베딩 API 없이 실행할 수 있다는 점은 모델의 장점입니다. 당시 선택 이유나 다른 모델과 비교한 결과는 실제 확인한 범위에서 설명하세요. Chroma 확장은 초기 개발과 구분하세요.",
         "depth": 2,
         "question": "RAG 구현에 어떤 라이브러리, 임베딩 모델, VectorDB를 사용했고 왜 선택했나요?",
