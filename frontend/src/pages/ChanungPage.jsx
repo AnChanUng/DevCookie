@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import InterviewAudio from '../components/InterviewAudio';
 import InterviewCamera from '../components/InterviewCamera';
 import { account, onAccountChange } from '../sync';
-import { CHANUNG_QUESTIONS as currentQuestions, CHANUNG_CATEGORIES as currentCategories, INTERVIEW_STAGES as currentStages } from '../data/chanung';
+import { CHANUNG_QUESTIONS as currentQuestions, CHANUNG_CATEGORIES as currentCategories, INTERVIEW_STAGES as currentStages } from '../data/p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9';
 import { PORTFOLIO_GROUPS as currentPortfolio } from '../data/portfolioFollowups';
 import snapshot from '../data/interview-versions/20261103_ver1.json';
 import { coreParts, coreMarkdown } from '../data/answerCores';
@@ -26,8 +26,8 @@ export default function ChanungPage() {
   return <div className="cs-notes chanung-page">
     <header className="notes-heading"><div><h1>찬웅의 면접 연습</h1><p>딜로이트 안진 · 경영지원부문 IT AI 엔지니어</p></div><Link to="/">홈으로</Link></header>
     {params.get('view') === 'versions' ? <AnswerVersions snapshot={snapshot} /> : versionMissing
-      ? <p role="alert">찾을 수 없는 답변 버전입니다. <Link to="/chanung?view=versions">저장된 버전 보기</Link></p>
-      : <><p><Link to="/chanung?view=versions">답변 버전 관리</Link> · 현재 답변: <strong>{archived ? snapshot.id : '최신 답변'}</strong> {archived && <Link to="/chanung">최신 답변으로 돌아가기</Link>}</p>
+      ? <p role="alert">찾을 수 없는 답변 버전입니다. <Link to="/p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9?view=versions">저장된 버전 보기</Link></p>
+      : <><p><Link to="/p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9?view=versions">답변 버전 관리</Link> · 현재 답변: <strong>{archived ? snapshot.id : '최신 답변'}</strong> {archived && <Link to="/p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9">최신 답변으로 돌아가기</Link>}</p>
       <Practice key={token + ':' + (archived ? snapshot.id : 'latest')} snapshot={archived ? snapshot : null} /></>}
   </div>;
 }
@@ -74,7 +74,7 @@ const flowQuestions = INTERVIEW_STAGES.flatMap(stage => stage.ids.map(id => ques
     if (hash) document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start' });
   }, [hash]);
   const select = id => {
-    navigate(`/chanung${snapshot ? `?version=${snapshot.id}` : ''}#${id}`, { replace: true });
+    navigate(`/p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9${snapshot ? `?version=${snapshot.id}` : ''}#${id}`, { replace: true });
     document.getElementById(id)?.scrollIntoView({ block: 'start' });
   };
   const write = (id, value) => {

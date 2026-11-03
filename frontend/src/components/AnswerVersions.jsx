@@ -30,14 +30,14 @@ export default function AnswerVersions({ snapshot }) {
   return <section className="notes-detail-card" aria-label="답변 버전 관리">
     <h2>답변 버전 관리</h2>
     <p>이전에 저장한 질문과 답변을 확인하고, 그 버전으로 돌아가 연습할 수 있습니다.</p>
-    <p><Link to="/chanung">최신 답변으로 연습하기</Link></p>
+    <p><Link to="/p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9">최신 답변으로 연습하기</Link></p>
     <article>
       <h3>{snapshot.id}</h3>
       <p>{snapshot.savedOn} 저장 · {snapshot.description}</p>
       <p>질문·답변 {snapshot.questions.length}개 · 포트폴리오 꼬리질문 {questions.length - snapshot.questions.length}개 · 면접 순서 포함</p>
       <p>불러오면 이 저장본으로 연습합니다. 최신 답변을 덮어쓰지 않으며, 새로고침해도 선택한 버전이 유지됩니다.</p>
       <div className="chanung-actions">
-        <Link className="exam-btn sm" to={`/chanung?version=${snapshot.id}`}>이 버전 불러오기</Link>
+        <Link className="exam-btn sm" to={`/p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9?version=${snapshot.id}`}>이 버전 불러오기</Link>
         <button className="exam-btn sm" onClick={() => download(false)}>저장본 내려받기</button>
         <button className="exam-btn sm" onClick={() => download(true)}>내 연습 답변도 함께 내려받기</button>
       </div>

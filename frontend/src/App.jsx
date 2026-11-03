@@ -1,5 +1,6 @@
 import { lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import PracticeEntry from './components/PracticeEntry';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import './App.css';
@@ -53,8 +54,9 @@ function App() {
           <Route path="stats" element={<StatsPage />} />
           <Route path="interview" element={<InterviewPracticePage />} />
           <Route path="technical-interview" element={<TechnicalInterviewPage />} />
-          <Route path="chanung" element={<ChanungPage />} />
-          <Route path="chanung/company" element={<Navigate to="/chanung" replace />} />
+          <Route path="chanung" element={<PracticeEntry />} />
+          <Route path="p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9" element={<ChanungPage />} />
+          <Route path="chanung/company" element={<PracticeEntry />} />
           <Route path="ai-interview" element={<Navigate to="/" replace />} />
           <Route path="notes" element={<CsNotesPage />} />
           <Route path="web-essentials" element={<WebEssentialsPage />} />
