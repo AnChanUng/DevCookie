@@ -177,8 +177,8 @@ function PortfolioQuestion({ q, draft, write, done, toggleDone }) {
       <label className="chanung-label" htmlFor={`draft-${q.id}`}>내 연습 답변</label>
       <textarea id={`draft-${q.id}`} value={draft} onChange={e => write(q.id, e.target.value)} placeholder="실제로 맡은 역할과 구현·검증한 내용을 적어 보세요." />
     </details>
-    <button type="button" className="exam-btn sm" aria-expanded={open} aria-controls={`hint-${q.id}`} onClick={() => setOpen(value => !value)}>{open ? '준비 포인트 숨기기' : '답변 준비 포인트 보기'}</button>
-    <div id={`hint-${q.id}`} hidden={!open}>{open && <p className="chanung-note">{<CoreText text={q.hint} id={q.id} />}</p>}</div>
+    <button type="button" className="exam-btn sm" aria-expanded={open} aria-controls={`hint-${q.id}`} onClick={() => setOpen(value => !value)}>{q.answer ? (open ? '답변 숨기기' : '모범답변 보기') : (open ? '준비 포인트 숨기기' : '답변 준비 포인트 보기')}</button>
+    <div id={`hint-${q.id}`} hidden={!open}>{open && <>{q.answer && <div className="chanung-original"><CoreText text={q.answer} id={q.id} /></div>}{q.answerNote && <p className="chanung-note"><strong>확인할 점</strong> {q.answerNote}</p>}<p className="chanung-note"><CoreText text={q.hint} id={q.id} /></p></>}</div>
   </section>;
 }
 
