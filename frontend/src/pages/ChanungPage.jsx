@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import InterviewAudio from '../components/InterviewAudio';
 import InterviewCamera from '../components/InterviewCamera';
 import { account, onAccountChange } from '../sync';
-import { CHANUNG_QUESTIONS as currentQuestions, CHANUNG_CATEGORIES as currentCategories, INTERVIEW_STAGES as currentStages } from '../data/p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9';
+import { CHANUNG_QUESTIONS as currentQuestions, CHANUNG_CATEGORIES as currentCategories, INTERVIEW_STAGES as currentStages } from '../data/chanung';
 import { PORTFOLIO_GROUPS as currentPortfolio } from '../data/portfolioFollowups';
 import snapshot from '../data/interview-versions/20261103_ver1.json';
 import { coreParts, coreMarkdown } from '../data/answerCores';
