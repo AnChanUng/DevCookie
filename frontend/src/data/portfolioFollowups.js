@@ -14,11 +14,11 @@ export const PORTFOLIO_GROUPS = [
       },
       {
         "id": "pf-rag-stack-2",
-        "answer": "Spring AI(스프링 에이아이)와 multilingual-e5-small(멀티링구얼 이 파이브 스몰) 임베딩 모델을 사용했고, 벡터 저장소는 처음에는 SimpleVectorStore(심플 벡터 스토어)를 사용했습니다. 이후에는 Chroma(크로마)도 선택해서 사용할 수 있도록 확장했습니다. Spring AI로 모델 호출과 검색을 연결했고, 임베딩은 ONNX(오닉스) 모델을 서버 내부에서 실행하도록 구성했습니다.",
-        "answerNote": "한국어 지원과 외부 임베딩 API 없이 실행할 수 있다는 점은 모델의 장점입니다. 당시 선택 이유나 다른 모델과 비교한 결과는 실제 확인한 범위에서 설명하세요. Chroma 확장은 초기 개발과 구분하세요.",
+        "answer": "Spring AI로 RAG 파이프라인을 구성하고, KLUE-BERT로 한국어 문서를 임베딩했습니다. 임베딩 벡터는 ChromaDB에 저장해 유사도 검색에 사용하고, 검색된 문서를 OpenAI LLM에 전달해 답변을 생성했습니다. 원본 청년정책 데이터는 Oracle에 저장했습니다.\n\nSpring AI(스프링 에이아이): RAG 파이프라인 구성 및 LLM 연동\nKLUE-BERT(클루 버트): 한국어 문서를 벡터로 변환하는 임베딩 모델\nChromaDB(크로마 디비): 임베딩 벡터 저장 및 유사도 검색\nOracle(오라클): 청년정책 등 원본 데이터 저장\nOpenAI LLM(오픈에이아이 엘엘엠): 검색된 문서를 기반으로 답변 생성",
+        "answerNote": "사용자가 제공한 기술 스택 기준의 답변입니다. 앞서 확인한 StarRoad 코드에서는 multilingual-e5-small, SimpleVectorStore/Chroma 선택 구성, Anthropic 기본 설정이 확인됐습니다. 이 답변이 적용되는 당시 버전·구현을 확인하세요.",
         "depth": 2,
-        "question": "RAG 구현에 어떤 라이브러리, 임베딩 모델, VectorDB를 사용했고 왜 선택했나요?",
-        "hint": "삼일PwC에서 받았던 유형입니다. 실제 사용한 이름과 선택 이유를 확인해 답하세요. 자료에서 확인되지 않은 제품명을 추측하지 마세요."
+        "question": "RAG 기술 스택과 각 기술의 역할은 무엇인가요?",
+        "hint": "기술 이름뿐 아니라 원본 데이터 저장 → 임베딩 → 벡터 검색 → LLM 답변 순서로 역할을 설명하세요."
       },
       {
         "id": "pf-rag-stack-3",
