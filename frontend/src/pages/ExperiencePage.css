@@ -1,4 +1,5 @@
-.experience-page{max-width:1180px;margin:0 auto;padding:32px 24px 72px;color:var(--text-primary,#172033);line-height:1.6}
+main.container:has(> .experience-page){width:100%;max-width:none;padding:0}
+.experience-page{width:100%;max-width:none;margin:0;padding:24px 24px 56px;color:var(--text-primary,#172033);line-height:1.6}
 .experience-page *{box-sizing:border-box}
 .experience-heading{display:flex;justify-content:space-between;align-items:center;gap:20px;padding-bottom:24px}
 .experience-heading h1{font-size:clamp(1.7rem,4vw,2.3rem);letter-spacing:-.05em;margin:4px 0 8px}
@@ -7,7 +8,7 @@
 .experience-heading a,.experience-sources a{color:var(--accent-blue,#2563eb);text-decoration:none}
 .experience-heading a{white-space:nowrap;font-size:.9rem}
 .experience-guide{display:flex;flex-wrap:wrap;gap:12px 32px;padding:16px 20px;background:var(--bg-secondary,#f4f7fb);border-radius:12px;font-size:.85rem;margin-bottom:28px}
-.experience-layout{display:grid;grid-template-columns:210px minmax(0,1fr);gap:36px}
+.experience-layout{display:grid;grid-template-columns:200px minmax(0,1fr);gap:24px}
 .experience-sidebar{align-self:start;position:sticky;top:84px}
 .experience-sidebar h2{font-size:.85rem;margin:0 0 12px}
 .experience-sidebar nav{display:grid;gap:4px}
