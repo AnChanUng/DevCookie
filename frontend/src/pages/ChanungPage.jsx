@@ -24,7 +24,7 @@ export default function ChanungPage() {
   const archived = version === snapshot.id;
   const versionMissing = version && !archived;
   return <div className="cs-notes chanung-page">
-    <header className="notes-heading"><div><h1>찬웅의 면접 연습</h1><p>딜로이트 안진 · 경영지원부문 IT AI 엔지니어</p></div><Link to="/">홈으로</Link></header>
+    <header className="notes-heading"><div><h1>찬웅의 면접 연습</h1><p>딜로이트 안진 · 경영지원부문 IT AI 엔지니어</p></div><div><Link to="/p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9/experience">경험 정리</Link> · <Link to="/">홈으로</Link></div></header>
     {params.get('view') === 'versions' ? <AnswerVersions snapshot={snapshot} /> : versionMissing
       ? <p role="alert">찾을 수 없는 답변 버전입니다. <Link to="/p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9?view=versions">저장된 버전 보기</Link></p>
       : <><p><Link to="/p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9?view=versions">답변 버전 관리</Link> · 현재 답변: <strong>{archived ? snapshot.id : '최신 답변'}</strong> {archived && <Link to="/p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9">최신 답변으로 돌아가기</Link>}</p>
