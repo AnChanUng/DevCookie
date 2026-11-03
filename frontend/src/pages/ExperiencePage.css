@@ -31,7 +31,7 @@
 .experience-card h3{font-size:1.05rem;margin:8px 0}
 .experience-card h3 button{display:flex;justify-content:space-between;gap:20px;width:100%;padding:0;background:none;color:inherit;border:none;text-align:left;font-weight:600;line-height:1.5}
 .experience-card h3 button span{color:var(--text-secondary,#596579)}
-.experience-core{color:var(--accent-blue,#2563eb)!important;font-weight:400}
+.experience-core{color:#2563eb!important;font-weight:400}
 .experience-card>.experience-core{font-size:.9rem;margin:7px 0}
 .experience-preview{font-size:.85rem;color:var(--text-secondary,#596579);margin:6px 0 0}
 .experience-detail{border-top:1px solid var(--border-color,#e3e8ef);margin-top:18px;padding-top:16px;font-size:.9rem}
