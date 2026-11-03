@@ -13,7 +13,7 @@ export const ANSWER_CORES = {
     "변화를 주도",
     "LLM을 활용한 데이터 처리 프로그램",
     "데이터 처리 경험",
-    "AI 기술을 함께 활용"
+    "AI 기술을 함께 사용"
   ],
   "cu-resignation": [
     "이론적인 이해",
