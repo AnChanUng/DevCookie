@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import InterviewAudio from '../components/InterviewAudio';
 import InterviewCamera from '../components/InterviewCamera';
 import { account, onAccountChange } from '../sync';
-import { CHANUNG_QUESTIONS, CHANUNG_CATEGORIES } from '../data/chanung';
+import { CHANUNG_QUESTIONS, CHANUNG_CATEGORIES, INTERVIEW_STAGES } from '../data/chanung';
 import { PORTFOLIO_GROUPS } from '../data/portfolioFollowups';
 import useChanungCompletion from '../hooks/useChanungCompletion';
 import './CsNotesPage.css';
@@ -16,6 +16,11 @@ const conceptTopics = [...new Set(concepts.map(q => q.topic))];
 const portfolioQuestions = PORTFOLIO_GROUPS.flatMap(group => group.questions);
 const allQuestions = [...CHANUNG_QUESTIONS, ...portfolioQuestions];
 const mainQuestions = CHANUNG_QUESTIONS.filter(q => !isConcept(q));
+const questionById = new Map([
+  ...mainQuestions.map(q => [q.id, q]),
+  ...portfolioQuestions.map(q => [q.id, { ...q, category: '자소서꼬리질문', portfolio: true }]),
+]);
+const flowQuestions = INTERVIEW_STAGES.flatMap(stage => stage.ids.map(id => questionById.get(id)));
 
 const identity = () => account()?.token || '';
 export default function ChanungPage() {
@@ -45,7 +50,7 @@ function Practice() {
   const [saveError, setSaveError] = useState(false);
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('');
-  const visible = CHANUNG_CATEGORIES.flatMap(c => mainQuestions.filter(q => q.category === c))
+  const visible = flowQuestions
     .filter(q => (showCompleted || !completed.includes(q.id)) && (!category || q.category === category) && `${q.question} ${q.category}`.toLowerCase().includes(query.trim().toLowerCase()));
   const selected = visible.find(q => q.id === hash.slice(1)) || visible[0];
   useEffect(() => {
@@ -66,21 +71,8 @@ function Practice() {
     if (pool.length) select(pool[Math.floor(Math.random() * pool.length)].id);
   };
   return <>
-    <details className="notes-detail-card notes-markdown"><summary>두괄식 마스터 답변 템플릿</summary>
-      <p><strong>질문의 표현을 받아 첫 문장에서 답하기 → 구체적인 경험 → 내가 한 행동 → 결과·배운 점</strong></p>
-      <p>“○○한 경험은 [핵심 경험]입니다. [어디서] [무엇을 하며] [어떤 어려움]이 있었습니다. 저는 [행동]으로 개선했습니다. 그 결과 [결과]를 얻었고, [배운 점]을 배웠습니다.”</p>
-      <ul>
-        <li>힘들었던 경험이 있나요? → “힘들었던 경험은 ○○입니다.”</li>
-        <li>갈등을 해결한 경험이 있나요? → “갈등을 해결한 경험은 ○○입니다.”</li>
-        <li>본인의 강점은 무엇인가요? → “제 강점은 ○○입니다.”</li>
-        <li>왜 지원했나요? → “지원한 이유는 ○○입니다.”</li>
-        <li>어떻게 개선했나요? → “○○를 조정해 개선했습니다.”</li>
-      </ul>
-      <p><strong>힘들었던 경험 답변 틀</strong><br />힘들었던 경험은 [인턴십에서 겪은 어려움]입니다. 인턴십에서 [업무]를 하며 [문제] 때문에 어려움을 겪었습니다. 저는 [구체적인 행동]으로 개선했습니다. 그 결과 [변화]가 있었고, [배운 점]을 배웠습니다.</p>
-      <p>첫마디에서 질문만 반복하지 말고 빈칸에 결론을 바로 넣으세요. 경험 질문에는 이 흐름을 쓰고, 개념 질문은 “정의 → 동작·역할”로 짧게 답하면 됩니다.</p>
-    </details>
-    <p className="notes-list-intro">전체 질문을 아래로 스크롤하며 연습하고, 답변은 필요할 때 펼쳐 보세요. 왼쪽 목차를 누르면 해당 위치로 이동합니다. 직접 작성한 답변 {CHANUNG_QUESTIONS.filter(q => q.original).length}개는 원문 그대로, 나머지는 준비용 답변 예시입니다.</p>
-    <p><a href="#portfolio-followups">이력서/포트폴리오 꼬리질문으로 이동 ↓</a></p>
+    <p className="notes-list-intro">자기소개부터 마지막 한마디까지 면접 순서로 연습하세요. 프로젝트 설명 뒤에 관련 꼬리질문이 이어집니다. 실제 질문 순서는 면접에 따라 달라질 수 있습니다.</p>
+    <p><a href="#ai-review">필수 AI 개념 복습으로 이동 ↓</a></p>
     <p className="notes-save-status" role="status">{saveError ? '저장에 실패했습니다. 입력한 답변을 따로 복사해 주세요.' : '직접 적은 연습 답변은 현재 브라우저에 저장됩니다.'}</p>
     <p className="notes-save-status" role="status">{({
       guest: '학습 완료는 이 브라우저에 유지됩니다. 다른 세션·기기에서 이어 보려면 로그인해 주세요.',
@@ -92,10 +84,10 @@ function Practice() {
     <div className="notes-layout" style={{ '--camera-width': `${cameraWidth}px` }}>
       <aside className="notes-index">
         <div className="notes-filters"><input type="search" aria-label="면접 질문 검색" placeholder="질문 검색" value={query} onChange={e => setQuery(e.target.value)} /><select aria-label="면접 질문 분류" value={category} onChange={e => setCategory(e.target.value)}><option value="">전체 질문</option>{CHANUNG_CATEGORIES.map(c => <option key={c}>{c}</option>)}</select><label><input type="checkbox" checked={showCompleted} onChange={e => setShowCompleted(e.target.checked)} /> 완료한 답변도 표시 ({completed.length})</label></div>
-        <div className="chanung-list-meta"><span>{visible.length}문항 · 작성 {mainQuestions.filter(q => drafts[q.id]?.trim()).length}/{mainQuestions.length}</span><button type="button" disabled={visible.length < 2} onClick={random}>랜덤 질문</button></div>
-        <nav className="notes-questions" aria-label="면접 질문 목차">{CHANUNG_CATEGORIES.map(c => {
-          const list = visible.filter(q => q.category === c);
-          return list.length ? <section key={c}><h2>{c}<small>{list.length}</small></h2><ul>{list.map(q => <li key={q.id} className={selected?.id === q.id ? 'is-selected' : ''}><button type="button" aria-current={selected?.id === q.id ? 'true' : undefined} onClick={() => select(q.id)}>{q.question}{drafts[q.id]?.trim() && <small> · 작성함</small>}</button></li>)}</ul></section> : null;
+        <div className="chanung-list-meta"><span>{visible.length}문항 · 작성 {flowQuestions.filter(q => drafts[q.id]?.trim()).length}/{flowQuestions.length}</span><button type="button" disabled={visible.length < 2} onClick={random}>랜덤 질문</button></div>
+        <nav className="notes-questions" aria-label="면접 질문 목차">{INTERVIEW_STAGES.map(stage => {
+          const list = visible.filter(q => stage.ids.includes(q.id));
+          return list.length ? <section key={stage.title}><h2>{stage.title}<small>{list.length}</small></h2><ul>{list.map(q => <li key={q.id} className={selected?.id === q.id ? 'is-selected' : ''}><button type="button" aria-current={selected?.id === q.id ? 'true' : undefined} onClick={() => select(q.id)}>{q.question}{drafts[q.id]?.trim() && <small> · 작성함</small>}</button></li>)}</ul></section> : null;
         })}</nav>
       </aside>
       <div className="chanung-camera-dock">
@@ -103,10 +95,18 @@ function Practice() {
         <InterviewCamera />
       </div>
       <div className="notes-content">
-        {visible.map(q => <PracticeQuestion key={q.id} q={q} draft={drafts[q.id] || ''} write={write} recording={recordings[q.id]} saveRecording={saveRecording} active={selected?.id === q.id} activate={() => select(q.id)} done={completed.includes(q.id)} toggleDone={() => toggleCompleted(q.id)} />)}
+        {INTERVIEW_STAGES.map((stage, index) => {
+          const list = visible.filter(q => stage.ids.includes(q.id));
+          return list.length ? <section key={stage.title} className="interview-stage" id={`interview-stage-${index}`}>
+            <h2>{stage.title}</h2>
+            {list.map(q => q.portfolio
+              ? <PortfolioQuestion key={q.id} q={q} draft={drafts[q.id] || ''} write={write} done={completed.includes(q.id)} toggleDone={() => toggleCompleted(q.id)} />
+              : <PracticeQuestion key={q.id} q={q} draft={drafts[q.id] || ''} write={write} recording={recordings[q.id]} saveRecording={saveRecording} active={selected?.id === q.id} activate={() => select(q.id)} done={completed.includes(q.id)} toggleDone={() => toggleCompleted(q.id)} />)}
+          </section> : null;
+        })}
         {!visible.length && <p className="notes-empty">표시할 답변이 없습니다. 완료한 답변 표시를 켜거나 검색 조건을 바꿔 주세요.</p>}
-        <details className="chanung-concept-review">
-          <summary>AI 엔지니어 기초·실무 질문 · {concepts.length}개</summary>
+        <details className="chanung-concept-review" id="ai-review">
+          <summary>필수 AI 개념 복습 · {concepts.length}개</summary>
           <p className="audio-hint">질문을 보고 먼저 답한 뒤, 답변 보기 버튼으로 정의를 확인하세요.</p>
           <nav className="portfolio-topics" aria-label="AI 질문 주제">{conceptTopics.map((topic, index) => <a key={topic} href={`#ai-topic-${index}`}>{topic}</a>)}</nav>
           {conceptTopics.map((topic, index) => {
@@ -115,16 +115,6 @@ function Practice() {
           })}
           {concepts.every(q => completed.includes(q.id)) && !showCompleted && <p className="audio-hint">기초 개념을 모두 완료했습니다. ‘완료한 답변도 표시’를 켜면 다시 볼 수 있습니다.</p>}
         </details>
-        <section className="portfolio-followups" id="portfolio-followups" aria-labelledby="portfolio-followups-title">
-          <h2 id="portfolio-followups-title">이력서/포트폴리오 꼬리질문</h2>
-          <p className="audio-hint">제출 자료와 면접 회고를 바탕으로 구성한 12개 주제·36개 질문입니다. 각 주제는 설명 → 구현·선택 이유 → 검증·개선의 3단계로 이어집니다. 먼저 직접 답하고 준비 포인트를 확인하세요.</p>
-          <nav className="portfolio-topics" aria-label="프로젝트 질문 주제">{PORTFOLIO_GROUPS.map(group => <a key={group.id} href={`#portfolio-${group.id}`}>{group.title}</a>)}</nav>
-          {PORTFOLIO_GROUPS.map(group => <section key={group.id} id={`portfolio-${group.id}`} className="portfolio-group">
-            <h3>{group.title}</h3>
-            {group.questions.filter(q => showCompleted || !completed.includes(q.id)).map(q => <PortfolioQuestion key={q.id} q={q} draft={drafts[q.id] || ''} write={write} done={completed.includes(q.id)} toggleDone={() => toggleCompleted(q.id)} />)}
-            {!showCompleted && group.questions.every(q => completed.includes(q.id)) && <p className="audio-hint">이 주제의 질문을 모두 완료했습니다.</p>}
-          </section>)}
-        </section>
       </div>
     </div>
   </>;

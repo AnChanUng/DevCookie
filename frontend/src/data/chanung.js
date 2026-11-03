@@ -1,6 +1,127 @@
-export const CHANUNG_CATEGORIES = ['기술', '인성', '자소서꼬리질문'];
+export const CHANUNG_CATEGORIES = ['인성', '자소서꼬리질문', '기술'];
+
+export const INTERVIEW_STAGES = [
+  {
+    "title": "1. 자기소개·지원동기",
+    "ids": [
+      "cu-intro",
+      "cu-motivation"
+    ]
+  },
+  {
+    "title": "2. 이전 회사·실무 경험",
+    "ids": [
+      "cu-resignation",
+      "cu-snd-work",
+      "pf-platform-1",
+      "pf-platform-2",
+      "pf-platform-3",
+      "cu-log-program",
+      "pf-log-ai-2",
+      "pf-log-ai-3",
+      "cu-environment-system",
+      "pf-environment-2",
+      "pf-environment-3"
+    ]
+  },
+  {
+    "title": "3. StarRoad·AI 기술",
+    "ids": [
+      "pf-rag-stack-1",
+      "pf-rag-stack-2",
+      "pf-rag-stack-3",
+      "cu-pipeline",
+      "cu-search-quality",
+      "pf-rag-quality-1",
+      "pf-rag-quality-2",
+      "pf-rag-quality-3",
+      "cu-rag-test",
+      "cu-threshold-standard",
+      "cu-threshold"
+    ]
+  },
+  {
+    "title": "4. 문제 해결·보안",
+    "ids": [
+      "pf-batch-1",
+      "pf-batch-2",
+      "pf-batch-3",
+      "pf-encryption-1",
+      "pf-encryption-2",
+      "pf-encryption-3",
+      "pf-sql-security-1",
+      "pf-sql-security-2",
+      "pf-sql-security-3"
+    ]
+  },
+  {
+    "title": "5. 협업·인성",
+    "ids": [
+      "pf-ownership-2",
+      "pf-ownership-3",
+      "cu-low-gpa",
+      "cu-overtime"
+    ]
+  },
+  {
+    "title": "6. 영어·마무리",
+    "ids": [
+      "cu-intro-en",
+      "cu-ask-company",
+      "cu-last"
+    ]
+  }
+];
 
 export const CHANUNG_QUESTIONS = [
+  {
+    "id": "cu-intro",
+    "category": "인성",
+    "question": "자기소개",
+    "answer": "안녕하십니까. 현업의 문제를 파악해 AI로 해결하는 지원자 안찬웅입니다.\n\n데이터스트림즈에서 LLM을 활용해 로그 분석 프로그램과 고객사 환경 재현 시스템을 개발했습니다. 그 결과 유지보수 시간을 50% 단축했습니다.\n\n또한 국민은행 영업점에서 다양한 연령대의 고객들과 소통했습니다. 모바일뱅킹 앱 이용에 어려움을 겪는 고객들이 AI 챗봇을 활용해 스스로 문제를 해결할 수 있도록 도왔습니다. 그 결과 영업점 혼잡도를 20% 개선했습니다.\n\n이러한 AI 활용 역량과 소통 역량을 바탕으로 딜로이트 안진에서도 업무 효율성을 높이는 데 기여하겠습니다.",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-motivation",
+    "category": "인성",
+    "question": "왜 딜로이트 안진회계법인인가요?",
+    "answer": "딜로이트 안진회계법인에서 LLM을 활용한 데이터 처리 프로그램을 개발하고 싶어 지원했습니다.\n저는 실무에서 대규모 데이터를 추출·변환·적재하는 솔루션을 개발해 왔습니다. 또한 현재는 삼성청년SW·AI아카데미에서 AI를 공부하고 직접 서비스에 적용하고 있습니다.\n이러한 대규모 데이터를 AI에 활용하는 데 어려움이 있을 것이라고 생각했습니다.",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-resignation",
+    "category": "인성",
+    "question": "퇴사사유",
+    "answer": "실무에서 LLM을 활용한 서비스를 개발하면서, AI를 더 잘 활용하려면 이론적인 이해도 함께 갖춰야 한다고 느꼈습니다.\n그래서 AI를 체계적으로 학습하는 데 집중하고자 퇴사를 결정했고, 이후 SSAFY에 참여했습니다. AI의 기본 원리부터 실제 서비스에 적용하는 방법까지 학습하며 관련 역량을 키웠습니다.\n기존의 데이터 처리 경험과 새롭게 쌓은 AI 역량을 바탕으로, 딜로이트 안진에서 현업의 문제를 해결하고 장기적으로 성장하고 싶습니다.",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-snd-work",
+    "category": "자소서꼬리질문",
+    "question": "에스앤디에서 어떤 일을 했나요?",
+    "answer": "에스앤디에서는 경기도 자율주행 플랫폼의 개발과 유지보수를 담당했습니다.\n\n장애가 발생하면 로그를 확인해 원인을 좁히고, 관련 업체와 협의해 해결했습니다. 또한 도로에서 검지한 이벤트를 서버로 전달하는 통신 모듈과, 장비가 다운되면 담당자에게 문자로 알리는 기능을 개발했습니다.\n\n이외에도 서버에 로그가 과도하게 쌓이지 않도록 자동으로 정리하는 기능을 개발하며 플랫폼이 안정적으로 운영되도록 관리했습니다.",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-log-program",
+    "category": "자소서꼬리질문",
+    "question": "LLM을 활용한 로그 분석 프로그램은 무엇인가요?",
+    "answer": "Jira에 고객사 이슈가 등록되면, 솔루션에서 발생한 버그와 관련 로그를 추적하고 LLM을 활용해 오류 원인을 분석한 뒤 핵심 내용을 요약해서 제공하는 프로그램입니다.",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-environment-system",
+    "category": "자소서꼬리질문",
+    "question": "고객사 환경 재현 시스템은 무엇인가요?",
+    "answer": "고객사마다 운영체제와 DB 종류가 달라 동일한 환경에서 문제를 재현하기 어려웠습니다. 이를 해결하기 위해 고객사의 환경 정보를 입력하면, Linux 서버와 Docker를 활용해 해당 환경을 자동으로 구축하는 프로그램입니다.",
+    "original": true,
+    "note": ""
+  },
   {
     "id": "cu-pipeline",
     "category": "기술",
@@ -42,66 +163,10 @@ export const CHANUNG_QUESTIONS = [
     "note": ""
   },
   {
-    "id": "cu-answer-quality",
-    "category": "기술",
-    "question": "LLM이 정확하게 답변하는 기준은 무엇인가요?",
-    "answer": "금융상품과 정책에 대한 질문 평가셋을 만들고, LLM의 답변이 실제 정책과 상품 데이터에 맞는지 확인했습니다. 또한 데이터에 없는 질문에도 임의로 답변하는지 확인하면서 답변 품질을 검증했습니다.",
-    "original": true,
-    "note": ""
-  },
-  {
-    "id": "cu-intro",
-    "category": "인성",
-    "question": "자기소개",
-    "answer": "안녕하십니까. 현업의 문제를 파악해 AI로 해결하는 지원자 안찬웅입니다.\n\n데이터스트림즈에서 LLM을 활용해 로그 분석 프로그램과 고객사 환경 재현 시스템을 개발했습니다. 그 결과 유지보수 시간을 50% 단축했습니다.\n\n또한 국민은행 영업점에서 다양한 연령대의 고객들과 소통했습니다. 모바일뱅킹 앱 이용에 어려움을 겪는 고객들이 AI 챗봇을 활용해 스스로 문제를 해결할 수 있도록 도왔습니다. 그 결과 영업점 혼잡도를 20% 개선했습니다.\n\n이러한 AI 활용 역량과 소통 역량을 바탕으로 딜로이트 안진에서도 업무 효율성을 높이는 데 기여하겠습니다.",
-    "original": true,
-    "note": ""
-  },
-  {
-    "id": "cu-intro-en",
-    "category": "인성",
-    "question": "영어로 자기소개를 해주세요. (Please introduce yourself in English.)",
-    "answer": "Hello, my name is Chan-Ung An.\nI use AI to solve problems.\n\nPreviously, I worked at DataStreams, where I developed AI tools.\n\nI also worked at KB Kookmin Bank, helping customers use an AI chatbot.\n\nI hope to use these skills at Deloitte Anjin.\nThank you.",
-    "original": true,
-    "note": "한 문장씩 끊어 말하는 짧은 영어 자기소개입니다."
-  },
-  {
-    "id": "cu-motivation",
-    "category": "인성",
-    "question": "왜 딜로이트 안진회계법인인가요?",
-    "answer": "딜로이트 안진회계법인에서 LLM을 활용한 데이터 처리 프로그램을 개발하고 싶어 지원했습니다.\n저는 실무에서 대규모 데이터를 추출·변환·적재하는 솔루션을 개발해 왔습니다. 또한 현재는 삼성청년SW·AI아카데미에서 AI를 공부하고 직접 서비스에 적용하고 있습니다.\n이러한 대규모 데이터를 AI에 활용하는 데 어려움이 있을 것이라고 생각했습니다.",
-    "original": true,
-    "note": ""
-  },
-  {
     "id": "cu-low-gpa",
     "category": "인성",
     "question": "학점이 낮은 이유",
     "answer": "네, 학점이 낮은 것은 사실입니다.\n군 복무 전에는 동아리와 학생회 활동, 학비 마련을 위한 아르바이트를 병행했습니다. 그 과정에서 학업에 소홀했던 점은 제 책임입니다.\n이후에는 학업에 집중해 성적을 개선하고 학업 장학금을 받았습니다. 또한 연구실 활동과 인턴십을 통해 부족한 전공 역량을 보완했고, 현재는 삼성청년SW·AI아카데미에서 AI와 개발 역량을 키우고 있습니다.\n이러한 경험들이 AI 엔지니어로 성장하는 데 도움이 됐다고 생각합니다.",
-    "original": true,
-    "note": ""
-  },
-  {
-    "id": "cu-last",
-    "category": "인성",
-    "question": "마지막 할말",
-    "answer": "회계법인에는 축적된 데이터와 전문성을 바탕으로 AI를 활용해 개선할 수 있는 업무가 많다고 생각합니다. 실무에서 쌓은 대규모 데이터 처리 경험과 AI 역량을 바탕으로 안진의 다양한 문제를 해결하고 싶습니다.",
-    "original": true,
-    "note": ""
-  },
-  {
-    "id": "cu-ask-company",
-    "category": "인성",
-    "question": "안진회계법인에 궁금한것은?",
-    "answer": "AI를 실제 업무에 활용하는 과정에서는 다양한 법률·규제 및 윤리적 이슈가 발생할 수 있다고 생각합니다. 안진에서는 이러한 문제를 어떤 기준과 절차로 관리하고 있는지, 개발팀은 현업 담당자들과 어떻게 협업하는지 궁금합니다.",
-    "original": true,
-    "note": ""
-  },
-  {
-    "id": "cu-resignation",
-    "category": "인성",
-    "question": "퇴사사유",
-    "answer": "실무에서 LLM을 활용한 서비스를 개발하면서, AI를 더 잘 활용하려면 이론적인 이해도 함께 갖춰야 한다고 느꼈습니다.\n그래서 AI를 체계적으로 학습하는 데 집중하고자 퇴사를 결정했고, 이후 SSAFY에 참여했습니다. AI의 기본 원리부터 실제 서비스에 적용하는 방법까지 학습하며 관련 역량을 키웠습니다.\n기존의 데이터 처리 경험과 새롭게 쌓은 AI 역량을 바탕으로, 딜로이트 안진에서 현업의 문제를 해결하고 장기적으로 성장하고 싶습니다.",
     "original": true,
     "note": ""
   },
@@ -114,44 +179,27 @@ export const CHANUNG_QUESTIONS = [
     "note": ""
   },
   {
-    "id": "cu-snd-work",
-    "category": "자소서꼬리질문",
-    "question": "에스앤디에서 어떤 일을 했나요?",
-    "answer": "에스앤디에서는 경기도 자율주행 플랫폼의 개발과 유지보수를 담당했습니다.\n\n장애가 발생하면 로그를 확인해 원인을 좁히고, 관련 업체와 협의해 해결했습니다. 또한 도로에서 검지한 이벤트를 서버로 전달하는 통신 모듈과, 장비가 다운되면 담당자에게 문자로 알리는 기능을 개발했습니다.\n\n이외에도 서버에 로그가 과도하게 쌓이지 않도록 자동으로 정리하는 기능을 개발하며 플랫폼이 안정적으로 운영되도록 관리했습니다.",
+    "id": "cu-intro-en",
+    "category": "인성",
+    "question": "영어로 자기소개를 해주세요. (Please introduce yourself in English.)",
+    "answer": "Hello, my name is Chan-Ung An.\nI use AI to solve problems.\n\nPreviously, I worked at DataStreams, where I developed AI tools.\n\nI also worked at KB Kookmin Bank, helping customers use an AI chatbot.\n\nI hope to use these skills at Deloitte Anjin.\nThank you.",
+    "original": true,
+    "note": "한 문장씩 끊어 말하는 짧은 영어 자기소개입니다."
+  },
+  {
+    "id": "cu-ask-company",
+    "category": "인성",
+    "question": "안진회계법인에 궁금한것은?",
+    "answer": "AI를 실제 업무에 활용하는 과정에서는 다양한 법률·규제 및 윤리적 이슈가 발생할 수 있다고 생각합니다. 안진에서는 이러한 문제를 어떤 기준과 절차로 관리하고 있는지, 개발팀은 현업 담당자들과 어떻게 협업하는지 궁금합니다.",
     "original": true,
     "note": ""
   },
   {
-    "id": "cu-intro-programs",
-    "category": "자소서꼬리질문",
-    "question": "LLM을 활용한 로그 분석 프로그램과 고객사 환경 재현 시스템이 무엇인가요?",
-    "answer": "LLM을 활용한 로그 분석 프로그램은 Jira에 고객사 이슈가 등록되면, 솔루션에서 발생한 버그와 관련 로그를 추적하고 LLM을 활용해 오류 원인을 분석한 뒤 핵심 내용을 요약해서 제공하는 프로그램입니다.\n고객사 환경 재현 시스템은 고객사마다 운영체제와 DB 종류가 달라 동일한 환경에서 문제를 재현하기 어려웠던 점을 해결하기 위한 프로그램입니다. 고객사의 환경 정보를 입력하면, Linux 서버와 Docker를 활용해 해당 환경을 자동으로 구축합니다.",
+    "id": "cu-last",
+    "category": "인성",
+    "question": "마지막 할말",
+    "answer": "회계법인에는 축적된 데이터와 전문성을 바탕으로 AI를 활용해 개선할 수 있는 업무가 많다고 생각합니다. 실무에서 쌓은 대규모 데이터 처리 경험과 AI 역량을 바탕으로 안진의 다양한 문제를 해결하고 싶습니다.",
     "original": true,
-    "note": "자기소개에서 언급한 두 프로그램에 대한 통합 꼬리질문입니다."
-  },
-  {
-    "id": "cu-log-program",
-    "category": "자소서꼬리질문",
-    "question": "LLM을 활용한 로그 분석 프로그램은 무엇인가요?",
-    "answer": "Jira에 고객사 이슈가 등록되면, 솔루션에서 발생한 버그와 관련 로그를 추적하고 LLM을 활용해 오류 원인을 분석한 뒤 핵심 내용을 요약해서 제공하는 프로그램입니다.",
-    "original": true,
-    "note": ""
-  },
-  {
-    "id": "cu-environment-system",
-    "category": "자소서꼬리질문",
-    "question": "고객사 환경 재현 시스템은 무엇인가요?",
-    "answer": "고객사마다 운영체제와 DB 종류가 달라 동일한 환경에서 문제를 재현하기 어려웠습니다. 이를 해결하기 위해 고객사의 환경 정보를 입력하면, Linux 서버와 Docker를 활용해 해당 환경을 자동으로 구축하는 프로그램입니다.",
-    "original": true,
-    "note": ""
-  },
-  {
-    "id": "cu-ai-ml-concept",
-    "category": "기술",
-    "topic": "기초 개념",
-    "question": "AI 모델과 머신러닝 모델의 차이는 무엇인가요?",
-    "answer": "AI는 지능적인 작업을 수행하는 기술의 넓은 범위이고, 머신러닝은 데이터에서 패턴을 학습하는 AI의 한 분야입니다. AI 시스템은 ML 모델뿐 아니라 규칙 엔진이나 검색 기능도 함께 사용할 수 있습니다.",
-    "original": false,
     "note": ""
   },
   {
@@ -191,15 +239,6 @@ export const CHANUNG_QUESTIONS = [
     "note": ""
   },
   {
-    "id": "cu-api-ai-concept",
-    "category": "기술",
-    "topic": "기초 개념",
-    "question": "API 기반 AI 시스템이란 무엇인가요?",
-    "answer": "외부 서비스가 제공하는 모델을 API로 호출해 사용하는 시스템입니다. 모델 서버를 직접 운영하는 부담은 줄지만 데이터 전송 정책, 비용, 호출 제한과 장애 처리는 관리해야 합니다.",
-    "original": false,
-    "note": ""
-  },
-  {
     "id": "cu-finetuning-concept",
     "category": "기술",
     "topic": "기초 개념",
@@ -223,15 +262,6 @@ export const CHANUNG_QUESTIONS = [
     "topic": "검색·평가",
     "question": "임베딩이란 무엇이며, 어떻게 사용하나요?",
     "answer": "텍스트나 이미지 등의 특징을 숫자로 이루어진 벡터로 표현하는 것입니다. 벡터 간 유사도를 비교해 관련 문서 검색이나 추천 등에 사용합니다.",
-    "original": false,
-    "note": ""
-  },
-  {
-    "id": "cu-llm-evaluation-concept",
-    "category": "기술",
-    "topic": "검색·평가",
-    "question": "LLM 시스템은 어떻게 평가하나요?",
-    "answer": "실제 업무를 대표하는 질문과 기대 결과로 평가셋을 만들고, 정확성·근거 충실도·관련성 등을 평가합니다. 사람 검토와 함께 비용·응답시간·업무 성과도 확인하고 변경 전후를 비교합니다.",
     "original": false,
     "note": ""
   },
@@ -290,15 +320,6 @@ export const CHANUNG_QUESTIONS = [
     "note": ""
   },
   {
-    "id": "cu-prompt-engineering-concept",
-    "category": "기술",
-    "topic": "LLM·프롬프트",
-    "question": "프롬프트 엔지니어링이란 무엇인가요?",
-    "answer": "원하는 동작을 얻기 위해 지시·예시·문맥·출력 형식을 설계하고 평가하며 개선하는 과정입니다. 모델이나 프롬프트 변경에 따른 결과를 비교하고 버전을 관리합니다.",
-    "original": false,
-    "note": ""
-  },
-  {
     "id": "cu-system-user-prompt-concept",
     "category": "기술",
     "topic": "LLM·프롬프트",
@@ -313,51 +334,6 @@ export const CHANUNG_QUESTIONS = [
     "topic": "LLM·프롬프트",
     "question": "툴 사용 또는 함수 호출이란 무엇인가요?",
     "answer": "모델이 사용할 도구와 인자를 정해진 형식으로 요청하는 기능입니다. 일반적인 사용자 정의 도구는 애플리케이션이 권한과 인자를 검증한 뒤 실행하고, 결과를 모델에 전달해 다음 답변에 활용합니다.",
-    "original": false,
-    "note": ""
-  },
-  {
-    "id": "cu-cot-concept",
-    "category": "기술",
-    "topic": "LLM·프롬프트",
-    "question": "체인 오브 소트 프롬프팅은 성능을 어떻게 향상시키나요?",
-    "answer": "복잡한 문제를 중간 단계로 나누어 검토하도록 유도하면 일부 작업의 성능을 높일 수 있습니다. 효과는 모델과 작업에 따라 다르므로 권장 프롬프트 방식을 따르고 최종 결과를 별도로 검증해야 합니다.",
-    "original": false,
-    "note": ""
-  },
-  {
-    "id": "cu-chatbot-design-concept",
-    "category": "기술",
-    "topic": "AI 시스템 설계",
-    "question": "LLM을 사용해 챗봇을 설계해 보세요.",
-    "answer": "요청을 받은 서버가 대화 기록과 필요한 근거를 준비해 LLM을 호출하고, 출력을 검증해 응답하도록 설계합니다. 인증·권한, 호출 제한, 개인정보 보호, 비용·오류 모니터링도 함께 구성합니다.",
-    "original": false,
-    "note": ""
-  },
-  {
-    "id": "cu-document-search-concept",
-    "category": "기술",
-    "topic": "AI 시스템 설계",
-    "question": "임베딩을 사용한 문서 검색 시스템을 설계해 보세요.",
-    "answer": "문서를 수집·정제·분할하고 임베딩과 메타데이터를 벡터 DB에 저장합니다. 질문도 임베딩해 검색하고, 사용자 권한에 맞는 결과만 반환하며 필요하면 키워드 검색과 재순위화를 결합합니다.",
-    "original": false,
-    "note": ""
-  },
-  {
-    "id": "cu-rag-design-concept",
-    "category": "기술",
-    "topic": "AI 시스템 설계",
-    "question": "RAG 파이프라인을 설계해 보세요.",
-    "answer": "수집·정제·청킹 → 임베딩·저장 → 질문 검색 → 관련 근거를 프롬프트에 추가 → LLM 생성 → 검증·출처 표시 순서로 구성합니다. 검색 품질에 따라 필터·재순위화를 추가하고, 근거가 부족하면 답변을 제한합니다.",
-    "original": false,
-    "note": ""
-  },
-  {
-    "id": "cu-high-traffic-concept",
-    "category": "기술",
-    "topic": "AI 시스템 설계",
-    "question": "고트래픽 추론은 어떻게 처리하나요?",
-    "answer": "먼저 API 호출 한도와 처리시간·처리량을 측정하고 요청 제한, 큐, 캐싱과 부하 분산을 적용합니다. 자체 호스팅이라면 배칭이나 서버 확장도 검토하며 품질·비용·지연시간을 함께 비교합니다.",
     "original": false,
     "note": ""
   },
@@ -398,56 +374,11 @@ export const CHANUNG_QUESTIONS = [
     "note": ""
   },
   {
-    "id": "cu-model-monitoring-concept",
-    "category": "기술",
-    "topic": "AI 배포·운영",
-    "question": "프로덕션에서 모델 성능은 어떻게 모니터링하나요?",
-    "answer": "응답시간, 처리량, 오류율, 토큰 사용량과 비용을 관찰합니다. 정기 평가와 사용자 피드백으로 답변 품질을 확인하고 기준을 벗어나면 원인을 점검하도록 알림을 설정합니다.",
-    "original": false,
-    "note": ""
-  },
-  {
-    "id": "cu-drift-concept",
-    "category": "기술",
-    "topic": "AI 배포·운영",
-    "question": "AI 시스템에서 드리프트란 무엇인가요?",
-    "answer": "시간이 지나 입력 데이터의 분포나 데이터와 정답의 관계 등이 달라지는 현상입니다. 이 변화로 성능이 저하될 수 있어 실제 요청과 평가 결과를 비교하고 데이터·검색·모델을 점검합니다.",
-    "original": false,
-    "note": ""
-  },
-  {
-    "id": "cu-inference-scaling-concept",
-    "category": "기술",
-    "topic": "AI 배포·운영",
-    "question": "추론을 어떻게 확장하나요?",
-    "answer": "API 방식에서는 공급자 한도, 큐와 동시 요청 수를 조절합니다. 자체 호스팅에서는 배칭·수평 확장·양자화나 모델 분산을 검토하며, 메모리·처리량·답변 품질의 변화를 측정합니다.",
-    "original": false,
-    "note": ""
-  },
-  {
-    "id": "cu-ai-tools-concept",
-    "category": "기술",
-    "topic": "AI 배포·운영",
-    "question": "AI 배포에 사용하는 도구는 무엇인가요?",
-    "answer": "애플리케이션 패키징에는 Docker, 규모에 따라 오케스트레이션 도구를 사용할 수 있습니다. 자체 모델 서빙에는 vLLM 같은 엔진, 검색에는 벡터 DB, 운영에는 모니터링 도구를 조합하며 API 방식에서는 클라우드 모델 서비스를 활용할 수 있습니다.",
-    "original": false,
-    "note": ""
-  },
-  {
     "id": "cu-wrong-answer-concept",
     "category": "기술",
     "topic": "상황별 대응",
     "question": "LLM 챗봇이 틀린 답을 합니다. 어떻게 하시겠습니까?",
     "answer": "문제를 재현하고 입력·검색 근거·프롬프트·생성 결과 중 어디서 오류가 났는지 나눠 확인하겠습니다. 원인에 맞게 개선하고 같은 유형의 질문을 평가셋에 추가해 재발 여부를 확인하겠습니다.",
-    "original": false,
-    "note": ""
-  },
-  {
-    "id": "cu-latency-spike-concept",
-    "category": "기술",
-    "topic": "상황별 대응",
-    "question": "지연 시간이 갑자기 증가했습니다. 어떻게 디버그하나요?",
-    "answer": "검색 시간, 큐 대기, 네트워크, 모델 응답 시간과 토큰 수를 나눠 비교하겠습니다. 최근 변경과 공급자 상태·호출 제한도 확인한 뒤 병목 구간부터 완화하겠습니다.",
     "original": false,
     "note": ""
   },
@@ -461,29 +392,11 @@ export const CHANUNG_QUESTIONS = [
     "note": ""
   },
   {
-    "id": "cu-user-hallucination-concept",
-    "category": "기술",
-    "topic": "상황별 대응",
-    "question": "사용자가 환각을 보고합니다. 어떻게 완화하나요?",
-    "answer": "문제가 된 응답과 근거를 확인하고 영향이 큰 기능은 답변을 제한하거나 사람 검토로 연결하겠습니다. 검색과 출처 검증을 개선하고 근거가 부족할 때 답하지 않도록 한 뒤 회귀 평가를 진행하겠습니다.",
-    "original": false,
-    "note": ""
-  },
-  {
     "id": "cu-irrelevant-retrieval-concept",
     "category": "기술",
     "topic": "상황별 대응",
     "question": "RAG가 관련 없는 결과를 반환합니다. 무엇이 문제일까요?",
     "answer": "원문과 청크에 필요한 정보가 있는지, 질문·문서 임베딩이 호환되는지 확인하겠습니다. 메타데이터 필터·유사도 기준·검색 순위를 점검하고 평가셋으로 개선 전후를 비교하겠습니다.",
-    "original": false,
-    "note": ""
-  },
-  {
-    "id": "cu-ai-ml-role-concept",
-    "category": "기술",
-    "topic": "직무 이해",
-    "question": "AI 엔지니어와 머신러닝 엔지니어는 어떻게 다른가요?",
-    "answer": "일반적으로 AI 엔지니어는 모델을 서비스와 업무에 통합하고, ML 엔지니어는 학습·추론 파이프라인과 모델 운영·최적화에 더 집중하는 경우가 많습니다. 실제 역할은 겹치며 회사의 JD에 따라 달라지고, ML 엔지니어가 반드시 기반 모델 연구를 하는 것은 아닙니다.",
     "original": false,
     "note": ""
   },
