@@ -65,7 +65,7 @@ const flowQuestions = INTERVIEW_STAGES.flatMap(stage => stage.ids.map(id => ques
     } catch { return {}; }
   });
   const { completed, status: completionStatus, toggle: toggleCompleted, retry: retryCompletion } = useChanungCompletion(user, allQuestions.map(q => q.id), snapshot?.id);
-  const [showCompleted, setShowCompleted] = useState(Boolean(snapshot));
+  const [showCompleted, setShowCompleted] = useState(false);
   const [saveError, setSaveError] = useState(false);
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('');
