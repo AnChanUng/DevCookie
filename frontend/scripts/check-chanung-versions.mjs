@@ -1,0 +1,53 @@
+import assert from 'node:assert/strict';
+import React from 'react';
+import TestRenderer, {act} from 'react-test-renderer';
+import {MemoryRouter, useLocation} from 'react-router-dom';
+import {createServer} from 'vite';
+import {readFile} from 'node:fs/promises';
+const saved=new Map();
+globalThis.localStorage={getItem:k=>saved.get(k)||null,setItem:(k,v)=>saved.set(k,v)};
+globalThis.window=new EventTarget(); window.location={href:'http://localhost/chanung',origin:'http://localhost'};
+globalThis.document={getElementById:()=>({scrollIntoView(){}})};
+globalThis.IS_REACT_ACT_ENVIRONMENT=true;
+const server=await createServer({server:{middlewareMode:true,hmr:false},appType:'custom'});
+let view,location;
+function Probe(){location=useLocation();return null;}
+const text=n=>typeof n==='string'?n:(n?.children||[]).map(text).join('');
+try {
+ const {default:Page}=await server.ssrLoadModule('/src/pages/ChanungPage.jsx');
+ const {default:api}=await server.ssrLoadModule('/src/api.js');api.get=async()=>({data:{available:true}});
+ const {CHANUNG_QUESTIONS:current}=await server.ssrLoadModule('/src/data/chanung.js');
+ const snapshot=JSON.parse(await readFile('src/data/interview-versions/20261103_ver1.json','utf8'));
+ assert.deepEqual(snapshot.questions,current,'snapshot captures all current answers exactly');
+ const snapshotIntro=snapshot.questions.find(q=>q.id==='cu-intro').answer;
+ current.find(q=>q.id==='cu-intro').answer='Future revised answer';
+ const mount=async path=>{
+   if(view)await act(async()=>view.unmount());
+   await act(async()=>{view=TestRenderer.create(React.createElement(MemoryRouter,{initialEntries:[path]},React.createElement(Page),React.createElement(Probe)));});
+ };
+ await mount('/chanung?view=versions');
+ assert.ok(view.root.findByProps({'aria-label':'답변 버전 관리'}));
+ assert.ok(view.root.findAllByProps({to:'/chanung?version=20261103_ver1'}).length);
+ saved.set('chanung:practice:v1:guest',JSON.stringify({'cu-intro':'latest draft'}));
+ await mount('/chanung?version=20261103_ver1');
+ const intro=view.root.findByProps({id:'cu-intro'});
+ await act(async()=>intro.findAllByType('button').find(b=>text(b)==='기억 안 나요 · 답변 보기').props.onClick());
+ assert.equal(intro.findByProps({className:'chanung-original'}).children.join(''),snapshotIntro,'archive does not follow future edits');
+ assert.equal(view.root.findByProps({id:'draft-cu-intro'}).props.value,'','archive has independent drafts');
+ await act(async()=>view.root.findByProps({id:'draft-cu-intro'}).props.onChange({target:{value:'archive draft'}}));
+ await act(async()=>view.root.findByProps({'aria-label':'자기소개 학습 완료'}).props.onChange());
+ assert.ok(saved.has('chanung:practice:v1:guest:version:20261103_ver1:completed:v2'));
+ assert.ok(!saved.has('chanung:practice:v1:guest:completed:v2'));
+ const nav=view.root.findByProps({'aria-label':'면접 질문 목차'});
+ await act(async()=>nav.findAllByType('button')[1].props.onClick());
+ assert.equal(location.search,'?version=20261103_ver1','navigation retains snapshot');
+ await mount('/chanung?version=20261103_ver1');
+ assert.equal(view.root.findByProps({id:'draft-cu-intro'}).props.value,'archive draft','archive draft survives reload');
+ assert.equal(view.root.findByProps({'aria-label':'자기소개 학습 완료'}).props.checked,true);
+ await mount('/chanung');
+ assert.equal(view.root.findByProps({id:'draft-cu-intro'}).props.value,'latest draft','latest draft unaffected');
+ assert.equal(view.root.findByProps({'aria-label':'자기소개 학습 완료'}).props.checked,false);
+ await mount('/chanung?version=missing');
+ assert.ok(text(view.root.findByProps({role:'alert'})).includes('찾을 수 없는'));
+ console.log('PASS: exact snapshot, future-edit isolation, version navigation/reload, independent drafts/completion, missing version');
+} finally {if(view)await act(async()=>view.unmount());await server.close();}

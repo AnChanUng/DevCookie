@@ -4,13 +4,38 @@ import ReactMarkdown from 'react-markdown';
 import InterviewAudio from '../components/InterviewAudio';
 import InterviewCamera from '../components/InterviewCamera';
 import { account, onAccountChange } from '../sync';
-import { CHANUNG_QUESTIONS, CHANUNG_CATEGORIES, INTERVIEW_STAGES } from '../data/chanung';
-import { PORTFOLIO_GROUPS } from '../data/portfolioFollowups';
+import { CHANUNG_QUESTIONS as currentQuestions, CHANUNG_CATEGORIES as currentCategories, INTERVIEW_STAGES as currentStages } from '../data/chanung';
+import { PORTFOLIO_GROUPS as currentPortfolio } from '../data/portfolioFollowups';
+import snapshot from '../data/interview-versions/20261103_ver1.json';
+import AnswerVersions from '../components/AnswerVersions';
 import useChanungCompletion from '../hooks/useChanungCompletion';
 import './CsNotesPage.css';
 import './ChanungPage.css';
 
 const isConcept = q => q.id === 'cu-rag' || q.id.endsWith('-concept');
+
+const identity = () => account()?.token || '';
+export default function ChanungPage() {
+  const token = useSyncExternalStore(onAccountChange, identity, () => '');
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
+  const version = params.get('version');
+  const archived = version === snapshot.id;
+  const versionMissing = version && !archived;
+  return <div className="cs-notes chanung-page">
+    <header className="notes-heading"><div><h1>찬웅의 면접 연습</h1><p>딜로이트 안진 · 경영지원부문 IT AI 엔지니어</p></div><Link to="/">홈으로</Link></header>
+    {params.get('view') === 'versions' ? <AnswerVersions snapshot={snapshot} /> : versionMissing
+      ? <p role="alert">찾을 수 없는 답변 버전입니다. <Link to="/chanung?view=versions">저장된 버전 보기</Link></p>
+      : <><p><Link to="/chanung?view=versions">답변 버전 관리</Link> · 현재 답변: <strong>{archived ? snapshot.id : '최신 답변'}</strong> {archived && <Link to="/chanung">최신 답변으로 돌아가기</Link>}</p>
+      <Practice key={token + ':' + (archived ? snapshot.id : 'latest')} snapshot={archived ? snapshot : null} /></>}
+  </div>;
+}
+
+function Practice({ snapshot }) {
+  const CHANUNG_QUESTIONS = snapshot?.questions || currentQuestions;
+  const CHANUNG_CATEGORIES = snapshot?.categories || currentCategories;
+  const INTERVIEW_STAGES = snapshot?.stages || currentStages;
+  const PORTFOLIO_GROUPS = snapshot?.portfolioGroups || currentPortfolio;
 const concepts = CHANUNG_QUESTIONS.filter(isConcept);
 const conceptTopics = [...new Set(concepts.map(q => q.topic))];
 const portfolioQuestions = PORTFOLIO_GROUPS.flatMap(group => group.questions);
@@ -22,31 +47,22 @@ const questionById = new Map([
 ]);
 const flowQuestions = INTERVIEW_STAGES.flatMap(stage => stage.ids.map(id => questionById.get(id)));
 
-const identity = () => account()?.token || '';
-export default function ChanungPage() {
-  const token = useSyncExternalStore(onAccountChange, identity, () => '');
-  return <div className="cs-notes chanung-page">
-    <header className="notes-heading"><div><h1>찬웅의 면접 연습</h1><p>딜로이트 안진 · 경영지원부문 IT AI 엔지니어</p></div><Link to="/">홈으로</Link></header>
-    <Practice key={token} />
-  </div>;
-}
 
-function Practice() {
   const [cameraWidth, setCameraWidth] = useState(320);
   const [recordings, setRecordings] = useState({});
   const saveRecording = (id, recording) => setRecordings(prev => ({ ...prev, [id]: recording }));
   const { hash } = useLocation();
   const navigate = useNavigate();
   const user = account();
-  const storageKey = `chanung:practice:v1:${user ? `user:${user.id || user.nickname}` : 'guest'}`;
+  const storageKey = `chanung:practice:v1:${user ? `user:${user.id || user.nickname}` : 'guest'}${snapshot ? `:version:${snapshot.id}` : ''}`;
   const [drafts, setDrafts] = useState(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(storageKey));
       return Object.fromEntries(allQuestions.filter(q => typeof saved?.[q.id] === 'string').map(q => [q.id, saved[q.id]]));
     } catch { return {}; }
   });
-  const { completed, status: completionStatus, toggle: toggleCompleted, retry: retryCompletion } = useChanungCompletion(user, allQuestions.map(q => q.id));
-  const [showCompleted, setShowCompleted] = useState(false);
+  const { completed, status: completionStatus, toggle: toggleCompleted, retry: retryCompletion } = useChanungCompletion(user, allQuestions.map(q => q.id), snapshot?.id);
+  const [showCompleted, setShowCompleted] = useState(Boolean(snapshot));
   const [saveError, setSaveError] = useState(false);
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('');
@@ -57,7 +73,7 @@ function Practice() {
     if (hash) document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start' });
   }, [hash]);
   const select = id => {
-    navigate(`/chanung#${id}`, { replace: true });
+    navigate(`/chanung${snapshot ? `?version=${snapshot.id}` : ''}#${id}`, { replace: true });
     document.getElementById(id)?.scrollIntoView({ block: 'start' });
   };
   const write = (id, value) => {
@@ -101,7 +117,7 @@ function Practice() {
             <h2>{stage.title}</h2>
             {list.map(q => q.portfolio
               ? <PortfolioQuestion key={q.id} q={q} draft={drafts[q.id] || ''} write={write} done={completed.includes(q.id)} toggleDone={() => toggleCompleted(q.id)} />
-              : <PracticeQuestion key={q.id} q={q} draft={drafts[q.id] || ''} write={write} recording={recordings[q.id]} saveRecording={saveRecording} active={selected?.id === q.id} activate={() => select(q.id)} done={completed.includes(q.id)} toggleDone={() => toggleCompleted(q.id)} />)}
+              : <PracticeQuestion key={q.id} archived={Boolean(snapshot)} q={q} draft={drafts[q.id] || ''} write={write} recording={recordings[q.id]} saveRecording={saveRecording} active={selected?.id === q.id} activate={() => select(q.id)} done={completed.includes(q.id)} toggleDone={() => toggleCompleted(q.id)} />)}
           </section> : null;
         })}
         {!visible.length && <p className="notes-empty">표시할 답변이 없습니다. 완료한 답변 표시를 켜거나 검색 조건을 바꿔 주세요.</p>}
@@ -120,12 +136,12 @@ function Practice() {
   </>;
 }
 
-function PracticeQuestion({ q, draft, write, recording, saveRecording, active, activate, done, toggleDone }) {
+function PracticeQuestion({ archived, q, draft, write, recording, saveRecording, active, activate, done, toggleDone }) {
   const [open, setOpen] = useState(false);
   return <article className={`notes-detail-card ${done ? 'is-done' : ''}`} id={q.id}>
     <div className="notes-detail-top"><span>{q.category}</span><span>{q.original ? '내가 작성한 원문' : '모범답변 예시'}</span><label><input type="checkbox" aria-label={`${q.question} 학습 완료`} checked={done} onChange={toggleDone} /> 학습 완료</label></div>
     <h2 className="notes-question">{q.question}</h2>
-    {active ? <InterviewAudio questionId={q.id} recording={recording} saveRecording={saveRecording} /> : <button type="button" className="exam-btn sm" onClick={activate}>이 질문 녹음 연습</button>}
+    {active ? <InterviewAudio gradingDisabled={archived} questionId={q.id} recording={recording} saveRecording={saveRecording} /> : <button type="button" className="exam-btn sm" onClick={activate}>이 질문 녹음 연습</button>}
     <details className="chanung-draft-panel">
       <summary>직접 적어보기{draft.trim() ? ' · 작성한 답변 있음' : ' (선택)'}</summary>
       <label className="chanung-label" htmlFor={`draft-${q.id}`}>내 연습 답변</label>

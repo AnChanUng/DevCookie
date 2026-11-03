@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { account, fetchRemote, pushRemoteNow } from '../sync';
 
-const bank = 'chanung-completion-v1';
+
 export function mergeCompletion(a = {}, b = {}) {
   const merged = { ...a };
   for (const [id, value] of Object.entries(b)) {
@@ -10,10 +10,11 @@ export function mergeCompletion(a = {}, b = {}) {
   }
   return merged;
 }
-export default function useChanungCompletion(user, ids) {
+export default function useChanungCompletion(user, ids, version = '') {
+  const bank = version ? `chanung-completion-${version}` : 'chanung-completion-v1';
   const allowed = new Set(ids);
   const owner = user ? `user:${user.id || user.nickname}` : 'guest';
-  const legacyKey = `chanung:practice:v1:${owner}:completed`;
+  const legacyKey = `chanung:practice:v1:${owner}${version ? `:version:${version}` : ''}:completed`;
   const key = `${legacyKey}:v2`;
   const read = () => {
     try {

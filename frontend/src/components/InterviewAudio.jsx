@@ -3,7 +3,7 @@ import api from '../api';
 import { account } from '../sync';
 import { InterviewRecorder, toWav } from '../interviewAudio';
 
-export default function InterviewAudio({ questionId, recording, saveRecording }) {
+export default function InterviewAudio({ questionId, recording, saveRecording, gradingDisabled = false }) {
   const [phase, setPhase] = useState('idle');
   const [seconds, setSeconds] = useState(0);
   const [error, setError] = useState('');
@@ -46,7 +46,7 @@ export default function InterviewAudio({ questionId, recording, saveRecording })
     catch (e) { if (live.current && recorder.current === session && !session.disposed) { setError(e.name === 'NotAllowedError' ? '마이크 권한이 거부되었습니다. 브라우저 사이트 설정에서 마이크를 허용해 주세요.' : e.name === 'NotFoundError' ? '마이크를 찾지 못했습니다.' : e.message); setPhase('idle'); } }
   };
   const request = async mode => {
-    if (busy) return;
+    if (busy || (mode === 'grading' && gradingDisabled)) return;
     const user = account();
     if (!user) { setError('AI 음성 인식과 채점은 로그인 후 사용할 수 있습니다.'); return; }
     setError(''); setPhase(mode); controller.current = new AbortController();
@@ -85,8 +85,9 @@ export default function InterviewAudio({ questionId, recording, saveRecording })
     {recording?.transcribed && <>
       <label className="chanung-label" htmlFor="audio-transcript">인식된 답변 · 잘못 들린 부분을 수정한 뒤 채점하세요</label>
       <textarea id="audio-transcript" rows={5} maxLength={12000} disabled={busy} value={recording.transcript} onChange={e => update({ transcript: e.target.value, result: null })} />
-      <button type="button" className="exam-btn sm" disabled={aiDisabled || !recording.transcript.trim()} onClick={() => request('grading')}>확인한 답변으로 채점</button>
+      <button type="button" className="exam-btn sm" disabled={aiDisabled || gradingDisabled || !recording.transcript.trim()} onClick={() => request('grading')}>확인한 답변으로 채점</button>
     </>}
+    {gradingDisabled && <p className="audio-hint">저장된 버전에서는 녹음·재생·음성 인식을 사용할 수 있습니다. AI 채점은 최신 답변 기준이므로 최신 버전에서 이용하세요.</p>}
     {error && <p role="alert" className="audio-error">{error}</p>}
     {result && <section className="audio-result" aria-label="음성 답변 채점 결과"><h3>연습 점수 {result.total} / 100</h3>
       <ul><li>핵심 내용 {result.relevance}/40</li><li>정확성 {result.accuracy}/30</li><li>구성 {result.structure}/20</li><li>명료성 {result.clarity}/10</li></ul>
