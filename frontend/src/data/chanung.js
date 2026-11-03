@@ -78,7 +78,7 @@ export const CHANUNG_QUESTIONS = [
     "id": "cu-intro",
     "category": "인성",
     "question": "자기소개",
-    "answer": "안녕하십니까. 현업의 문제를 파악해 AI로 해결하는 지원자 안찬웅입니다.\n\n데이터스트림즈에서 LLM을 활용해 로그 분석 프로그램과 고객사 환경 재현 시스템을 개발했습니다. 그 결과 유지보수 시간을 50% 단축했습니다.\n\n또한 시중은행에서는 다양한 연령대의 고객들과 소통하며, 모바일뱅킹 앱 이용에 어려움을 겪는 고객들에게 AI 챗봇 사용 방법을 안내해 스스로 문제를 해결할 수 있도록 도왔습니다. 그 결과 영업점 혼잡도를 20% 개선했습니다.\n\n이러한 AI 활용 역량과 소통 역량을 바탕으로 딜로이트 안진에서도 업무 효율성을 높이는 데 기여하겠습니다.",
+    "answer": "안녕하십니까. 현업의 문제를 파악해 AI로 해결하는 지원자 안찬웅입니다.\n데이터스트림즈에서 LLM을 활용해 로그 분석 프로그램과 고객사 환경 재현 시스템을 개발했습니다. 그 결과 유지보수 시간을 50% 단축했습니다.\n또한 시중은행에서는 다양한 연령대의 고객들과 소통하며, 모바일뱅킹 앱 이용에 어려움을 겪는 고객들에게 AI 챗봇 사용 방법을 안내해 스스로 문제를 해결할 수 있도록 도왔습니다. 그 결과 영업점 혼잡도를 20% 개선했습니다.\n이러한 AI 활용 역량과 소통 역량을 바탕으로 딜로이트 안진에서도 업무 효율성을 높이는 데 기여하겠습니다.",
     "original": true,
     "note": ""
   },
@@ -86,7 +86,7 @@ export const CHANUNG_QUESTIONS = [
     "id": "cu-motivation",
     "category": "인성",
     "question": "왜 딜로이트 안진회계법인인가요?",
-    "answer": "변화를 주도하는 딜로이트 안진에서 LLM을 활용한 데이터 처리 프로그램을 개발하고 싶어 지원했습니다.\n\n제가 실무에서 쌓은 데이터 처리 경험과 현재 학습하고 있는 AI 기술을 함께 활용할 수 있는 직무라는 점에 관심을 가졌습니다.",
+    "answer": "변화를 주도하는 딜로이트 안진에서 LLM을 활용한 데이터 처리 프로그램을 개발하고 싶어 지원했습니다.\n제가 실무에서 쌓은 데이터 처리 경험과 현재 학습하고 있는 AI 기술을 함께 활용할 수 있는 직무라는 점에 관심을 가졌습니다.",
     "original": true,
     "note": ""
   },
@@ -102,7 +102,7 @@ export const CHANUNG_QUESTIONS = [
     "id": "cu-snd-work",
     "category": "자소서꼬리질문",
     "question": "에스앤디에서 어떤 일을 했나요?",
-    "answer": "에스앤디에서는 경기도 자율주행 플랫폼의 개발과 유지보수를 담당했습니다.\n\n장애가 발생하면 로그를 확인해 원인을 좁히고, 관련 업체와 협의해 해결했습니다. 또한 도로에서 검지한 이벤트를 서버로 전달하는 통신 모듈과, 장비가 다운되면 담당자에게 문자로 알리는 기능을 개발했습니다.\n\n이외에도 서버에 로그가 과도하게 쌓이지 않도록 자동으로 정리하는 기능을 개발하며 플랫폼이 안정적으로 운영되도록 관리했습니다.",
+    "answer": "에스앤디에서는 경기도 자율주행 플랫폼의 개발과 유지보수를 담당했습니다.\n장애가 발생하면 로그를 확인해 원인을 좁히고, 관련 업체와 협의해 해결했습니다. 또한 도로에서 검지한 이벤트를 서버로 전달하는 통신 모듈과, 장비가 다운되면 담당자에게 문자로 알리는 기능을 개발했습니다.\n이외에도 서버에 로그가 과도하게 쌓이지 않도록 자동으로 정리하는 기능을 개발하며 플랫폼이 안정적으로 운영되도록 관리했습니다.",
     "original": true,
     "note": ""
   },
@@ -182,7 +182,7 @@ export const CHANUNG_QUESTIONS = [
     "id": "cu-intro-en",
     "category": "인성",
     "question": "영어로 자기소개를 해주세요. (Please introduce yourself in English.)",
-    "answer": "Hello, my name is Chan-Ung An.\nI use AI to solve problems.\n\nPreviously, I worked at DataStreams, where I developed AI tools.\n\nI also worked at KB Kookmin Bank, helping customers use an AI chatbot.\n\nI hope to use these skills at Deloitte Anjin.\nThank you.",
+    "answer": "Hello, my name is Chan-Ung An.\nI use AI to solve problems.\nPreviously, I worked at DataStreams, where I developed AI tools.\nI also worked at KB Kookmin Bank, helping customers use an AI chatbot.\nI hope to use these skills at Deloitte Anjin.\nThank you.",
     "original": true,
     "note": "한 문장씩 끊어 말하는 짧은 영어 자기소개입니다."
   },

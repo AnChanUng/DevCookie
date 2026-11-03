@@ -28,8 +28,8 @@
 .audio-result h4 { margin-top: 14px !important; }
 .chanung-page textarea { display: block; width: 100%; box-sizing: border-box; resize: vertical; min-height: 180px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-secondary); color: var(--text-primary); padding: 16px; font: inherit; line-height: 1.8; }
 .chanung-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
-.chanung-original { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.65; }
-.chanung-page .notes-answer h3 { font-size: 1rem; margin-bottom: 16px; }
+.chanung-original { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; text-indent: 0; }
+.chanung-page .notes-answer h3 { font-size: 1rem; margin-bottom: 8px; }
 .chanung-note { padding: 12px; border-left: 3px solid var(--accent-blue); background: var(--bg-secondary); font-size: .85rem; line-height: 1.8; margin-top: 18px; }
 .chanung-note strong { display: block; }
 .chanung-page .notes-questions a { display: block; padding: 10px 0; font-size: .82rem; color: var(--text-primary); }
