@@ -14,6 +14,8 @@ const SHOW_CHAOS_CHAT = false;
 
 // 화면 모드. swatch는 고르는 창에 보여 줄 견본 색(바탕 절반 + 강조색 절반), dark는 어두운 계열 여부
 const THEMES = [
+  { key: 'warm-gray', name: '웜 그레이', icon: '📖', swatch: 'linear-gradient(135deg, #E8E6E1 50%, #326B65 50%)' },
+  { key: 'soft-charcoal', name: '소프트 차콜', icon: '🌘', swatch: 'linear-gradient(135deg, #252827 50%, #9BCAC0 50%)', dark: true },
   { key: 'light', name: '화이트', icon: '☀️', swatch: 'linear-gradient(135deg, #FFFFFF 50%, #6366F1 50%)' },
   { key: 'sepia', name: '크림', icon: '📜', swatch: 'linear-gradient(135deg, #F6EFE0 50%, #B4662A 50%)' },
   { key: 'mint', name: '민트', icon: '🌿', swatch: 'linear-gradient(135deg, #EFF8F4 50%, #0E9F77 50%)' },
