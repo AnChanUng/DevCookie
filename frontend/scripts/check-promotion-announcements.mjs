@@ -22,15 +22,21 @@ try{
  await act(()=>{view=TestRenderer.create(React.createElement(React.Fragment,null,React.createElement(Notice),React.createElement(Notice)));});
  assert.equal(sources.length,2);assert.ok(sources.every(s=>s.url.endsWith('/promotions/stream')));
  await act(()=>sources.forEach(s=>s.emit({id:'notice-1',nickname:'다른사람',tierName:'다이아 Ⅴ'})));
- assert.equal(view.root.findAllByProps({role:'status'}).length,2);
+ assert.equal(view.root.findAllByProps({role:'dialog'}).length,2);
  assert.ok(text(view.toJSON()).includes('다른사람님이 다이아 Ⅴ로 승급했습니다'));
  await act(()=>sources.forEach(s=>s.emit({id:'notice-1',nickname:'다른사람',tierName:'다이아 Ⅴ'})));
- assert.equal(view.root.findAllByProps({role:'status'}).length,2);
+ assert.equal(view.root.findAllByProps({role:'dialog'}).length,2);
  await act(()=>sources.forEach(s=>{s.emit('invalid-json');s.emit({id:'bad'});}));
- assert.equal(view.root.findAllByProps({role:'status'}).length,2);
+ assert.equal(view.root.findAllByProps({role:'dialog'}).length,2);
+ await act(()=>sources.forEach(s=>s.emit({id:'notice-2',nickname:'다음사람',tierName:'골드 I'})));
+ assert.ok(!text(view.toJSON()).includes('다음사람'));
  await act(()=>view.root.findAllByType('button').forEach(b=>b.props.onClick()));
- assert.equal(view.root.findAllByProps({role:'status'}).length,0);
+ assert.ok(text(view.toJSON()).includes('다음사람'));
+ assert.equal(view.root.findAllByProps({role:'dialog'}).length,2);
+ await act(()=>view.root.findAllByType('button').forEach(b=>b.props.onClick()));
+ assert.equal(view.root.findAllByProps({role:'dialog'}).length,0);
  await act(()=>view.unmount());view=null;
  assert.ok(sources.every(s=>s.closed));assert.deepEqual(errors,[]);
  console.log('Promotion announcements passed: two live viewers see another person, duplicate/malformed events ignored, dismiss and disconnect cleanup.');
 }finally{if(view)await act(()=>view.unmount());await server.close();console.error=original;}
+

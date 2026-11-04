@@ -1,3 +1,21 @@
-.promotion-announcements { position: fixed; top: 78px; right: 20px; z-index: 1100; display: grid; gap: 8px; width: min(410px, calc(100vw - 32px)); pointer-events: none; }
-.promotion-announcement { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid #b69242; border-radius: 12px; background: var(--bg-primary, #fff); color: var(--text-primary, #1f2937); box-shadow: 0 6px 24px #0002; pointer-events: auto; overflow-wrap: anywhere; }
-.promotion-announcement button { flex-shrink: 0; border: 0; background: transparent; color: inherit; font-size: 22px; cursor: pointer; }
+.promotion-celebration { position: fixed; inset: 0; z-index: 10000; isolation: isolate; display: grid; place-items: center; overflow: auto; padding: 28px 20px; color: #fff; background: radial-gradient(ellipse at 50% 38%, #44346c 0%, #17152beF 62%, #101222fa 100%); backdrop-filter: blur(14px); animation: promotion-enter .4s ease-out both; }
+.promotion-stage { position: relative; z-index: 2; width: min(100%, 1000px); text-align: center; margin: auto; }
+.promotion-eyebrow { color: #f8dc96; font-size: clamp(11px, 1.4vw, 16px); font-weight: 800; letter-spacing: .26em; }
+.promotion-medal { font-size: clamp(76px, 15vh, 164px); line-height: 1.2; margin: 14px 0; filter: drop-shadow(0 0 40px #ffd86a66); animation: promotion-medal .8s cubic-bezier(.2,.8,.3,1.2) both; }
+.promotion-stage h2 { color: #fff; font-size: clamp(46px, 8vw, 100px); font-weight: 950; letter-spacing: -.06em; line-height: 1.1; margin: 0 0 10px; }
+.promotion-tier { color: #ffe29b; font-size: clamp(32px, 6vw, 72px); font-weight: 900; line-height: 1.25; text-shadow: 0 0 40px #ffc96855; overflow-wrap: anywhere; }
+.promotion-stage p { font-size: clamp(17px, 2.5vw, 27px); line-height: 1.5; margin: 18px 0 0; overflow-wrap: anywhere; }
+.promotion-stage .promotion-cheer { color: #ded8ee; font-size: clamp(14px, 1.7vw, 19px); margin: 12px 0 24px; }
+.promotion-dismiss { display: inline-flex; align-items: center; justify-content: center; gap: 22px; max-width: 100%; padding: 17px 28px; border: 1px solid #ffefbe; border-radius: 16px; background: #ffe29b; color: #292039; font: inherit; font-weight: 850; cursor: pointer; box-shadow: 0 8px 40px #faca5940; }
+.promotion-dismiss:hover { background: #fff0c9; }
+.promotion-dismiss:focus-visible { outline: 3px solid white; outline-offset: 6px; }
+.promotion-stage small { display: block; margin: 16px 0 0; color: #c3bed4; font-size: 12px; }
+.promotion-halo { position: fixed; z-index: -1; width: min(85vw, 900px); aspect-ratio: 1; border-radius: 50%; border: 1px solid #ffdf8b35; box-shadow: 0 0 0 50px #ffdf8b06, 0 0 0 110px #ffdf8b04, inset 0 0 100px #a88bff13; pointer-events: none; }
+.promotion-confetti { position: fixed; inset: 0; overflow: hidden; pointer-events: none; }
+.promotion-confetti i { position: absolute; top: -30px; width: 10px; height: 19px; background: var(--piece); border-radius: 2px; animation: promotion-fall var(--duration) var(--delay) linear infinite; }
+.promotion-confetti i:nth-child(3n) { border-radius: 50%; width: 9px; height: 9px; }
+@keyframes promotion-fall { from { transform: translate3d(-20px, -5vh, 0) rotate(0deg); } to { transform: translate3d(65px, 110vh, 0) rotate(640deg); } }
+@keyframes promotion-enter { from { opacity: 0; } to { opacity: 1; } }
+@keyframes promotion-medal { from { transform: scale(.45) translateY(30px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+@media (max-height: 700px) { .promotion-medal { font-size: 64px; margin: 8px 0; } .promotion-stage h2 { font-size: 46px; } .promotion-tier { font-size: 34px; } .promotion-stage p { margin-top: 10px; } .promotion-stage .promotion-cheer { margin-bottom: 16px; } }
+@media (prefers-reduced-motion: reduce) { .promotion-celebration, .promotion-medal, .promotion-confetti i { animation: none; } .promotion-confetti i { top: 12%; transform: rotate(25deg); } .promotion-confetti i:nth-child(2n) { top: 78%; } .promotion-confetti i:nth-child(3n) { top: 45%; } }
