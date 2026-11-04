@@ -1,3 +1,4 @@
+import { SSAFY_DB_QUESTIONS } from './ssafyDbQuestions';
 import { PEARL_QUESTIONS, PEARL_SECTIONS } from './pearlQuestions';
 // HF(한국주택금융공사) IT직무 전공필기 대비 자체 제작 문제 60문항 (5지선다)
 // 2021~2026 응시 후기에서 반복 언급된 주제를 기준으로 구성. 실제 시험 문항의 복제가 아님.
@@ -394,6 +395,14 @@ export const COMPANIES = [
     source: { kind: "predicted", label: "자체 제작 문제", detail: "사이트의 스프링 이론 글과 기술 면접에서 자주 나오는 주제를 바탕으로 새로 만든 문제입니다. Spring Boot 3 / Spring 6 동작 기준입니다." },
     questions: SPRING_QUESTIONS, sections: SPRING_SECTIONS, minutes: 60,
     lede: "스프링 코어 15문제, 웹 MVC·시큐리티 15문제, JPA·트랜잭션 18문제, 스프링 부트·테스트·설계 12문제. 총 60문제, 60분, 4지선다. IoC·DI, 빈 스코프, AOP, MVC 요청 흐름, 필터·인터셉터·AOP 구분, 영속성 컨텍스트, N+1과 fetch join, OSIV, @Transactional 전파·롤백 규칙과 프록시 내부 호출, 자동 설정과 슬라이스 테스트를 다룹니다. 개념 문제에 코드를 읽고 동작 결과를 예측하는 문제 16개를 섞었습니다.",
+  },
+  {
+    key: "ssafydb", category: "major", abbr: "SSAFY", name: "DB", meta: "객관식 30문제 · 4지선다", ready: true,
+    source: { kind: "predicted", label: "요청 범위 기반 예상문제" },
+    questions: SSAFY_DB_QUESTIONS,
+    sections: { obj: { name: "객관식", short: "DB", sub: "Servlet · JSP · SQL", count: 30 } },
+    minutes: 40,
+    lede: "Servlet 생명주기·매핑·Filter, JSP·세션, SQL·트랜잭션·서브쿼리, 정규화·인덱스와 forward/redirect·WHERE/HAVING 비교를 다룹니다. SQL은 MySQL 8.4 / InnoDB 기준입니다. 4지선다 30문제와 정답·해설을 제공합니다.",
   },
   {
     key: "ssafyalgo", category: "major", abbr: "SSAFY", name: "SSAFY 알고리즘 과목평가", meta: "객관식 21 · 단답형 9 · 서술형 2 × 2회 + 기초 다지기 30문제 · 60분", ready: true,

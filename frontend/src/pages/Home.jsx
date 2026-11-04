@@ -12,6 +12,7 @@ const MENUS = [
   { to: '/exam', tone: 'indigo', tag: '전공필기', title: '기업별 기출문제', desc: '금융공기업, 공기업, 컴퓨터일반 기출 모의고사' },
   { to: '/aptitude', tone: 'cyan', tag: '직업기초 · 적성검사', title: 'NCS/인적성', desc: 'NCS · 다우기술 · SKCT · 삼성 GSAT' },
   { to: '/web', tone: 'emerald', tag: '웹 개발', title: '웹', desc: 'Spring · JPA 문제풀이와 웹 필수지식', isNew: true },
+  { to: '/ssafy', tone: 'indigo', tag: '과목평가 대비', title: 'SSAFY', desc: 'DB 객관식 30문제 · Servlet · JSP · SQL', isNew: true },
 ];
 
 export default function Home() {
