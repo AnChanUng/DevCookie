@@ -58,6 +58,7 @@ function App() {
           <Route path="stats" element={<StatsPage />} />
           <Route path="interview" element={<InterviewPracticePage />} />
           <Route path="technical-interview" element={<TechnicalInterviewPage />} />
+          <Route path="p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9/technical" element={<TechnicalInterviewPage />} />
           <Route path="chanung" element={<PracticeEntry suffix="/companies" />} />
           <Route path="p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9/companies" element={<CompanyPrepPage />} />
           <Route path="p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9/ai-focus" element={<DeloitteAiFocusPage />} />
