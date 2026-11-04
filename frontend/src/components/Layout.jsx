@@ -74,10 +74,6 @@ export default function Layout() {
               <Link to="/aptitude" className={location.pathname.startsWith('/aptitude') || location.pathname === '/ncs' ? 'active' : ''}>
                 NCS/인적성
               </Link>
-              <Link to="/web" className={location.pathname.startsWith('/web') || location.pathname === '/notes/web-essentials' || location.pathname === '/major/spring' ? 'active' : ''}>
-                웹
-              </Link>
-              <Link to="/ssafy" className={location.pathname.startsWith('/ssafy') ? 'active' : ''}>SSAFY</Link>
             </nav>
             {/* 지금 모드의 아이콘을 보여 주고, 누르면 색 견본이 펼쳐진다 */}
             <div className="theme-pick">
