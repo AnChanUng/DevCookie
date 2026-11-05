@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import './SsafyPage.css';
 export default function SsafyPage() {
   return <div className="fade-in ssafy">
     <Link to="/" className="back-link">← 홈으로</Link>

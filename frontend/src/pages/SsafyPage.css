@@ -1,0 +1,35 @@
+.ssafy .ssafy-hero-text {
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.ssafy .ssafy-hero-text .home-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  max-width: 100%;
+  min-height: 44px;
+  margin-top: 18px;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.5;
+  text-decoration: none;
+}
+
+.ssafy .ssafy-desc {
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.ssafy .ssafy-foot {
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  line-height: 1.5;
+}
+
+.ssafy .ssafy-go {
+  flex-shrink: 0;
+}
