@@ -296,7 +296,7 @@ export function CompanyExamWithProgress({ company, back, progress, initialIds })
   const setsBlock = (
     <>
       <div className="section-title">{hasSets ? '회차별 모의고사' : '모의고사'}</div>
-      {hasSets && <p className="exam-lede">실제 시험과 같은 문항 수·영역 구성으로 묶은 고정 세트입니다. {splitSets && '복기 기반 회차는 응시 후기에 복원된 문항을 따라 만들었고, 예상문제 회차는 같은 경향으로 새로 만든 문제입니다. '}각 회차는 같은 문제를 같은 순서로 출제하므로 다시 풀었을 때 점수를 비교할 수 있습니다.</p>}
+      {hasSets && <p className="exam-lede">{company.setsDescription || <>실제 시험과 같은 문항 수·영역 구성으로 묶은 고정 세트입니다. {splitSets && '복기 기반 회차는 응시 후기에 복원된 문항을 따라 만들었고, 예상문제 회차는 같은 경향으로 새로 만든 문제입니다. '}각 회차는 같은 문제를 같은 순서로 출제하므로 다시 풀었을 때 점수를 비교할 수 있습니다.</>}</p>}
       <div className="exam-sections">
         {examSets.map(s => {
           const qs = hasSets ? Q.filter(q => q.set === s.key) : Q;
@@ -350,6 +350,7 @@ export function CompanyExamWithProgress({ company, back, progress, initialIds })
         </div>
       )}
       <p className="exam-lede">{company.lede}</p>
+      {company.references?.map(ref => <p key={ref.url}><a href={ref.url} target="_blank" rel="noreferrer">{ref.title} ↗</a></p>)}
 
       {/* 실제 시험을 복원한 문제는 예상문제보다 먼저 보이게 맨 위에 둔다 */}
       {RECALL && (

@@ -1,4 +1,4 @@
-import { CU_SECTIONS, CU_QUESTIONS } from './cuQuestions';
+import { CU_SECTIONS, CU_QUESTIONS, CU_SETS } from './cuQuestions';
 import { SSAFY_DB_QUESTIONS } from './ssafyDbQuestions';
 import { PEARL_QUESTIONS, PEARL_SECTIONS } from './pearlQuestions';
 // HF(한국주택금융공사) IT직무 전공필기 대비 자체 제작 문제 60문항 (5지선다)
@@ -175,10 +175,12 @@ export const companyPath = (company) => `/${hubOf(company) || 'exam'}/${company.
 export const COMPANIES = [
   {
     key: 'cu', category: 'finance', abbr: '신협중앙회', name: '신협중앙회 IT', ready: true,
-    meta: '자체 예상 30문항 · 4지선다 · 연습 40분',
-    source: { kind: 'predicted', label: '자체 제작 예상문제', detail: '2020~2025 채용 안내와 공개 후기의 접근 범위를 조사했습니다. 연도별 IT 전공 기출 원문과 세부 출제 빈도는 확인하지 못했습니다. IT 개발·관리 직무를 위한 전산 기본 개념으로 새로 만든 연습문제이며 30문항·40분은 연습용 설정입니다.' },
-    questions: CU_QUESTIONS, sections: CU_SECTIONS, minutes: 40,
-    lede: 'DB, 운영체제·구조, 네트워크, 정보보호·설계, 프로그래밍·자료구조 각 6문항. 계산·SQL·코드 추적과 금융 시스템 상황을 포함했습니다. 정답과 해설로 복습하세요.',
+    meta: '40문항 × 3세트 · 총 120문항 · 4지선다',
+    source: { kind: 'predicted', label: '공고 범위 기반 예상·선별 문제', detail: '2026년 11월 7일 필기 공고(공식 명칭: 2027년 신입직원 채용)의 IT 직무상식 40문항·40분과 4개 출제영역을 반영했습니다. 자체 작성 문항과 사이트의 컴퓨터일반·저축은행중앙회 예상문제를 선별해 구성했습니다. 실제 기출 복원이나 출제 확률을 뜻하지 않으며 과목별 배분은 학습용입니다.' },
+    questions: CU_QUESTIONS, sections: CU_SECTIONS, sets: CU_SETS, minutes: 40,
+    setsDescription: '회차마다 객관식 40문항입니다. 공고의 전공 범위에 맞춰 구성했으며 과목별 비중은 학습용입니다. 목표 시간은 회차당 40분이고 화면에서는 시간 제한 없이 풀 수 있습니다.',
+    references: [{title:'신협중앙회 공식 채용공고 · 2026.11.7 필기',url:'https://cu2.saramin.co.kr/service/cu2/3984/applicant/apply/recruit_default.asp'}],
+    lede: '소프트웨어 설계·개발, 데이터베이스 구축, 프로그래밍 언어 활용, 정보시스템 구축 관리. SQL·코드 실행·계산·옳은 설명 고르기·실무 상황 판단을 연습합니다. 별도 온라인 코딩테스트는 공고상 알고리즘·SQL 4문항/120분입니다. 이 문제집은 객관식 전공필기 대비용입니다.',
   },
   {
     key: 'pearl', category: 'tech', abbr: '펄어비스', name: '펄어비스 웹 백엔드', ready: true,
