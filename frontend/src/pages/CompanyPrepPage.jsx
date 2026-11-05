@@ -8,5 +8,9 @@ export default function CompanyPrepPage(){
  <Link className="company-card" to={BASE+'/technical?track=aws'}><span className="prep-eyebrow">CLOUD</span><h2>AWS</h2><p>Solutions Architect · 클라우드 설계</p><span className="prep-go">면접 준비 들어가기 →</span></Link>
  <Link className="company-card" to={BASE+'/technical?track=autoever'}><span className="prep-eyebrow">IT</span><h2>현대오토에버</h2><p>1차 면접 · 시스템 운영</p><span className="prep-go">면접 준비 들어가기 →</span></Link></section>
  <Link className="prep-secondary" to={BASE+'/experience'}>내 경험 정리 보기 →</Link>
+ <h2>학습 바로가기</h2>
+ <nav className="company-cards" aria-label="학습 바로가기">
+ {[['/web','웹 전체 내용'],['/notes','전공노트'],['/web-essentials#web-topic-9','Spring 면접 문답']].map(([to,title]) => <Link key={to} className="company-card" to={to}>{title} →</Link>)}
+ </nav>
  </div>;
 }

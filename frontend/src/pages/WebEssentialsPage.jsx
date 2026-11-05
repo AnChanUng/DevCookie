@@ -7,7 +7,7 @@ import NoteAnswer from '../components/NoteAnswer';
 import './CsNotesPage.css';
 import './WebEssentialsPage.css';
 
-const topics = ['웹 통신', '데이터와 저장소', '동시성과 실행 모델', '보안', '테스트', '설계', '개발과 운영', '학습 방향'];
+const topics = ['웹 통신', '데이터와 저장소', '동시성과 실행 모델', '보안', '테스트', '설계', '개발과 운영', '학습 방향', 'Spring'];
 const entries = WEB_ESSENTIALS.items;
 const sections = topics.map((title, index) => ({ id: `web-topic-${index + 1}`, title, items: entries.filter(entry => entry.topic === title) }));
 const numbers = new Map(sections.flatMap(section => section.items).map((entry, index) => [entry.id, index + 1]));
