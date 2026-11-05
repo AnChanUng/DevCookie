@@ -83,8 +83,9 @@ export function CompanyExamWithProgress({ company, back, progress, initialIds })
   const UNITS = company.units; // 단원별 문제집 (모의고사 미포함). 단원은 sections에 extra로 들어 있다
   const SETS = company.sets || []; // 실제 시험처럼 한 번에 치르는 고정 회차
   // 복기 회차와 예상 회차를 합친 은행은 모의고사·영역별 연습이 둘을 섞어 뽑고, 복원 문제가 따로 있는 은행은 나머지가 예상문제다
-  const splitSets = SETS.some(s => s.kind);
-  const mainKind = splitSets ? 'mixed' : RECALL ? 'predicted' : null;
+  const setKinds = [...new Set(SETS.map(s => s.kind).filter(Boolean))];
+  const splitSets = setKinds.length > 1;
+  const mainKind = splitSets ? 'mixed' : setKinds[0] || (RECALL ? 'predicted' : null);
   const label = (mode, sec) => (mode === 'recall' && RECALL ? RECALL.title : modeLabel(SECTIONS, mode, sec, SETS));
   const ALL = useMemo(() => [...Q, ...CPP, ...(RECALL?.questions || []), ...(UNITS?.questions || [])], [Q, CPP, RECALL, UNITS]); // 오답노트·오답 다시 풀기 범위
   const byId = useMemo(() => {
