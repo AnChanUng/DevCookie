@@ -1,6 +1,7 @@
 // Original study answers inspired by the topics in the user-supplied D2 article.
 // Do not import the article's prose or attribute these answers to NAVER.
 const references = {
+  springTx: { title: 'Spring — Declarative Transactions', url: 'https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative.html' },
   springDi: { title: 'Spring — Dependency Injection', url: 'https://docs.spring.io/spring-framework/reference/core/beans/dependencies/factory-collaborators.html' },
   springAop: { title: 'Spring — AOP Proxies', url: 'https://docs.spring.io/spring-framework/reference/core/aop/proxying.html' },
   d2: { title: 'NAVER D2 — 백엔드 개발자를 꿈꾸는 학생개발자에게 (2018)', url: 'https://d2.naver.com/news/3435170' },
@@ -470,13 +471,15 @@ JVM 힙 외에도 스레드 스택·메타스페이스·직접 메모리 등이 
 
 선택할 때는 운영 부담 외에도 장애 대응 범위, 데이터 위치, 이식성·종속성과 복구 목표를 확인합니다. 서비스 이름만으로 모든 계층의 책임을 판단하지 않습니다.`, ['cloud']),
     note('spring-aop', 'Spring', '관점 지향 프로그래밍', 'AOP가 무엇인가요?',
-      'AOP는 여러 메서드에 반복되는 공통 처리를 업무 로직에서 분리하는 방식입니다. 예를 들어 송금 메서드에는 출금과 입금을 작성하고, @Transactional을 적용하면 Spring이 프록시를 통해 트랜잭션의 시작과 종료를 관리합니다.', ['springAop']),
+      'AOP는 여러 메서드에 반복되는 **공통 처리를 업무 로직에서 분리**하는 방식입니다. 예를 들어 송금 메서드에는 출금과 입금을 작성하고, @Transactional을 적용하면 Spring이 프록시를 통해 트랜잭션의 시작과 종료를 관리합니다.', ['springAop']),
     note('spring-di', 'Spring', '의존성 주입', 'DI가 무엇이고 왜 사용하나요?',
-      'DI는 객체가 필요한 의존 객체를 외부에서 전달받는 방식입니다. 예를 들어 주문 서비스가 저장소를 생성자로 받으면, 운영에서는 DB 저장소를 쓰고 테스트에서는 메모리 저장소를 전달할 수 있습니다.', ['springDi']),
+      'DI는 객체가 필요한 의존 객체를 **외부에서 전달**받는 방식입니다. 예를 들어 주문 서비스가 저장소를 **생성자**로 받으면, 운영에서는 DB 저장소를 쓰고 테스트에서는 메모리 저장소를 전달할 수 있습니다.', ['springDi']),
     note('spring-ioc', 'Spring', 'IoC와 빈', 'IoC와 DI는 어떤 관계인가요?',
-      'IoC는 객체 생성과 연결을 컨테이너에 맡기는 원칙이고, DI는 이를 구현하는 방법입니다. Spring 컨테이너가 관리하는 객체를 빈이라고 합니다. 컨테이너는 서비스를 생성하면서 필요한 저장소 빈을 생성자에 전달합니다.', ['springDi']),
+      'IoC는 **객체 생성과 연결을 컨테이너에 맡기는** 원칙이고, DI는 이를 구현하는 방법입니다. Spring 컨테이너가 관리하는 객체를 **빈**이라고 합니다. 컨테이너는 서비스를 생성하면서 필요한 저장소 빈을 생성자에 전달합니다.', ['springDi']),
     note('spring-proxy', 'Spring', '프록시와 내부 호출', '같은 객체 안에서 @Transactional 메서드를 호출하면 어떻게 되나요?',
-      'Spring의 기본 프록시 방식에서는 같은 객체의 메서드를 직접 호출하면 프록시를 거치지 않습니다. 따라서 내부 메서드에 선언한 트랜잭션 설정은 그 호출에 적용되지 않습니다. 별도의 트랜잭션 경계가 필요하면 해당 작업을 다른 빈으로 분리하고 그 빈을 통해 호출할 수 있습니다.', ['springAop']),
+      'Spring의 기본 프록시 방식에서는 같은 객체의 메서드를 직접 호출하면 **프록시를 거치지 않습니다**. 따라서 내부 메서드에 선언한 트랜잭션 설정은 그 호출에 적용되지 않습니다. 별도의 트랜잭션 경계가 필요하면 해당 작업을 **다른 빈으로 분리**하고 그 빈을 통해 호출할 수 있습니다.', ['springAop']),
+    note('spring-transaction', 'Spring', '트랜잭션 동작 원리', '@Transactional은 어떻게 동작하나요?',
+      '외부에서 빈의 메서드를 호출하면 Spring의 **프록시**가 먼저 요청을 받습니다. 기본 설정에서는 **트랜잭션 매니저**를 통해 기존 트랜잭션에 참여하거나 새로 시작한 뒤 메서드를 실행합니다. 새 트랜잭션이라면 정상 종료 시 **커밋**하고, RuntimeException이나 Error가 밖으로 전파되면 기본적으로 **롤백**합니다. 기존 트랜잭션에 참여했다면 최종 커밋은 바깥 트랜잭션이 끝날 때 결정됩니다.', ['springTx']),
     note('serverless', '개발과 운영', 'Serverless의 의미와 한계',
       'Serverless는 서버가 없다는 뜻인가요? 어떤 작업에 적합한가요?',
       `**서버 운영의 많은 부분을 공급자가 추상화하고 애플리케이션을 실행하는 방식입니다.** FaaS와 관리형 백엔드 조합이 대표적이며 실제 서버와 자원 한도는 여전히 존재합니다.
