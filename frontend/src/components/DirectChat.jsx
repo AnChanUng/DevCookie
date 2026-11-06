@@ -82,7 +82,7 @@ export default function DirectChat({ participants, self }) {
     });
   };
   if (!account()) return <div className="direct-panel"><p>1:1 대화와 친구 목록은 계정에 저장됩니다.</p><Link to="/account">로그인하고 이용하기 →</Link></div>;
-  return <div className="direct-panel">
+  return <div className={`direct-panel${selected ? ' direct-conversation' : ''}`}>
     {error && <p role="alert" className="lounge-error">{error}</p>}
     {selected ? <>
       <div className="direct-heading"><button disabled={busy} onClick={() => { setSelected(null); setMessages([]); }}>← 목록</button><strong>{selected.nickname}님과 1:1 대화</strong></div>
