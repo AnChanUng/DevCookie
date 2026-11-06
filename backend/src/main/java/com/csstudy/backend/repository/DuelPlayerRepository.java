@@ -10,6 +10,7 @@ import java.util.Optional;
 @Repository
 public interface DuelPlayerRepository extends JpaRepository<DuelPlayer, Long> {
     List<DuelPlayer> findByDuelCode(String duelCode);
+    List<DuelPlayer> findByVisitorIdOrderByUpdatedAtDesc(String visitorId);
 
     Optional<DuelPlayer> findByDuelCodeAndVisitorId(String duelCode, String visitorId);
 

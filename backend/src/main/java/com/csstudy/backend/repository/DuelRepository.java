@@ -11,6 +11,9 @@ import java.util.Optional;
 @Repository
 public interface DuelRepository extends JpaRepository<Duel, Long> {
     Optional<Duel> findByCode(String code);
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query("select d from Duel d where d.code = :code")
+    Optional<Duel> findForUpdate(@org.springframework.data.repository.query.Param("code") String code);
 
     boolean existsByCode(String code);
 

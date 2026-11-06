@@ -44,6 +44,52 @@ public class DuelController {
     private final DuelPlayerRepository playerRepository;
     private final ObjectMapper json;
 
+    private boolean active(DuelPlayer p) {
+        return !Boolean.FALSE.equals(p.getStarted()) || p.getUpdatedAt().isAfter(Instant.now().minusSeconds(45));
+    }
+
+    @GetMapping("/record")
+    public Map<String,Object> record(@RequestHeader("X-Visitor-Id") String visitor) {
+        int wins=0, losses=0, draws=0;
+        List<Map<String,Object>> recent=new ArrayList<>();
+        for (DuelPlayer me : playerRepository.findByVisitorIdOrderByUpdatedAtDesc(visitor)) {
+            if (!me.isDone()) continue;
+            List<DuelPlayer> players=playerRepository.findByDuelCode(me.getDuelCode()).stream().filter(this::active).toList();
+            if (players.size()<2 || players.stream().anyMatch(p -> !p.isDone())) continue;
+            boolean beaten=players.stream().anyMatch(p -> p.getScore()>me.getScore() || p.getScore()==me.getScore() && p.getSeconds()<me.getSeconds());
+            long tied=players.stream().filter(p -> p.getScore()==me.getScore() && p.getSeconds()==me.getSeconds()).count();
+            String result=beaten ? "loss" : tied>1 ? "draw" : "win";
+            if(beaten) losses++; else if(tied>1) draws++; else wins++;
+            if(recent.size()<10) recent.add(Map.of("code",me.getDuelCode(),"result",result,"score",me.getScore(),"seconds",me.getSeconds(),"players",players.size()));
+        }
+        return Map.of("wins",wins,"losses",losses,"draws",draws,"total",wins+losses+draws,"recent",recent);
+    }
+
+    // Entering the room registers presence without starting the quiz or its timer.
+    @PostMapping("/{code}/join")
+    @org.springframework.transaction.annotation.Transactional
+    public ResponseEntity<?> join(@PathVariable String code, @RequestBody Map<String,Object> body) {
+        Optional<Duel> found=duelRepository.findForUpdate(code.toUpperCase());
+        if(found.isEmpty()) return ResponseEntity.notFound().build();
+        String visitor=body.get("visitorId") instanceof String s && !s.isBlank() && s.length()<=40 ? s.trim() : null;
+        if(visitor==null) return ResponseEntity.badRequest().build();
+        String nickname=VisitorProfileService.nickname(body.get("nickname"));
+        if(nickname==null) nickname=VisitorProfileService.anonymous(visitor);
+        String roomCode=found.get().getCode();
+        var existing=playerRepository.findByDuelCodeAndVisitorId(roomCode,visitor);
+        var participants=playerRepository.findByDuelCode(roomCode).stream().filter(this::active).toList();
+        if(existing.isEmpty()) {
+            if(participants.size()>=2 && participants.stream().allMatch(DuelPlayer::isDone))
+                return ResponseEntity.status(409).body(Map.of("error","종료된 대결입니다. 새 대결 방에 참가해 주세요."));
+            int limit=Boolean.TRUE.equals(found.get().getOpen()) ? MAX_OPEN_PLAYERS : MAX_PLAYERS;
+            if(participants.size()>=limit) return ResponseEntity.status(409).body(Map.of("error","정원이 찼습니다."));
+        }
+        DuelPlayer p=existing.orElseGet(() -> DuelPlayer.builder().duelCode(roomCode).visitorId(visitor).started(false).build());
+        if(!p.isDone()) { p.setNickname(nickname); p.setUpdatedAt(Instant.now()); }
+        try { playerRepository.save(p); } catch(DataIntegrityViolationException ignored) { }
+        return ResponseEntity.ok(Map.of("players",board(roomCode,visitor)));
+    }
+
     @PostMapping
     public ResponseEntity<?> create(@RequestBody Map<String, Object> body) throws JsonProcessingException {
         List<String> ids = questionIds(body);
@@ -57,11 +103,13 @@ public class DuelController {
     public List<Map<String, Object>> openRooms() throws JsonProcessingException {
         List<Map<String, Object>> rows = new ArrayList<>();
         for (Duel d : duelRepository.findTop20ByOpenTrueAndCreatedAtAfterOrderByCreatedAtDesc(Instant.now().minusSeconds(OPEN_LIST_MINUTES * 60L))) {
+            var participants = playerRepository.findByDuelCode(d.getCode()).stream().filter(this::active).toList();
+            if (participants.size() >= 2 && participants.stream().allMatch(DuelPlayer::isDone)) continue;
             Map<String, Object> row = new LinkedHashMap<>();
             row.put("code", d.getCode());
             row.put("title", d.getTitle());
             row.put("total", json.readValue(d.getQuestionIds(), new TypeReference<List<String>>() {}).size());
-            row.put("players", playerRepository.countByDuelCode(d.getCode()));
+            row.put("players", participants.size());
             row.put("createdAt", d.getCreatedAt().toEpochMilli());
             rows.add(row);
         }
@@ -119,8 +167,9 @@ public class DuelController {
 
     // 문제를 풀 때마다 본인의 진행 상황을 올린다. 처음 올릴 때 방에 들어온 것으로 친다
     @PutMapping("/{code}/players")
+    @org.springframework.transaction.annotation.Transactional
     public ResponseEntity<?> report(@PathVariable String code, @RequestBody Map<String, Object> body) throws JsonProcessingException {
-        Optional<Duel> found = duelRepository.findByCode(code.toUpperCase());
+        Optional<Duel> found = duelRepository.findForUpdate(code.toUpperCase());
         if (found.isEmpty()) return ResponseEntity.notFound().build();
         Duel duel = found.get();
         int total = json.readValue(duel.getQuestionIds(), new TypeReference<List<String>>() {}).size();
@@ -147,6 +196,8 @@ public class DuelController {
         DuelPlayer player = existing.orElseGet(() -> DuelPlayer.builder().duelCode(duel.getCode()).visitorId(visitorId).build());
         // 이미 끝낸 사람의 기록은 다시 고치지 못하게 한다
         if (!player.isDone()) {
+            player.setStarted(true);
+            if (answered < player.getAnswered()) return ResponseEntity.ok(Map.of("players", board(duel.getCode(), visitorId)));
             player.setNickname(nickname);
             player.setScore(score);
             player.setAnswered(answered);
@@ -165,7 +216,7 @@ public class DuelController {
 
     // 점수가 높은 순, 같으면 빨리 푼 순
     private List<Map<String, Object>> board(String code, String visitorId) {
-        List<DuelPlayer> players = new ArrayList<>(playerRepository.findByDuelCode(code));
+        List<DuelPlayer> players = new ArrayList<>(playerRepository.findByDuelCode(code).stream().filter(this::active).toList());
         players.sort(Comparator.comparingInt(DuelPlayer::getScore).reversed()
                 .thenComparingInt(DuelPlayer::getSeconds)
                 .thenComparing(DuelPlayer::getId));
@@ -178,6 +229,8 @@ public class DuelController {
             row.put("score", p.getScore());
             row.put("answered", p.getAnswered());
             row.put("done", p.isDone());
+            row.put("started", !Boolean.FALSE.equals(p.getStarted()));
+            row.put("online", p.getUpdatedAt().isAfter(Instant.now().minusSeconds(45)));
             row.put("seconds", p.getSeconds());
             row.put("me", p.getVisitorId().equals(visitorId));
             row.put("marks", reveal && p.isDone() ? p.getMarks() : null);

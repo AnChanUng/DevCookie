@@ -6,6 +6,8 @@ import { myNickname } from '../nickname';
 import { recordAnswer, useExamProgress } from '../hooks/useExamProgress';
 import { visitorId } from '../track';
 import Code from '../components/Code';
+import { account } from '../sync';
+import './DuelPage.css';
 
 const CIRC = ['①', '②', '③', '④', '⑤'];
 const SIZE = 10;
@@ -49,6 +51,15 @@ function Lobby() {
   const [error, setError] = useState('');
   const [join, setJoin] = useState('');
   const [rooms, setRooms] = useState(null); // 지금 열려 있는 단체전
+  const [record, setRecord] = useState(null);
+  const [recordError, setRecordError] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    api.get('/duels/record', { ...SLOW, headers: { 'X-Visitor-Id': visitorId() } })
+      .then(({data}) => { if(alive) setRecord(data); })
+      .catch(() => { if(alive) setRecordError(true); });
+    return () => { alive = false; };
+  }, []);
 
   // 열린 단체전 목록은 몇 초마다 새로 받는다
   useEffect(() => {
@@ -83,6 +94,15 @@ function Lobby() {
         <h1>대결</h1>
         <p>같은 {SIZE}문제를 풀고 점수를 겨룹니다. 친구와 붙으려면 1:1 방을, 여럿이 붙으려면 누구나 들어오는 단체전을 여세요.</p>
       </div>
+
+      <section className="duel-career" aria-label="누적 대결 전적">
+        <h2>나의 누적 전적</h2>
+        <p>현재 브라우저 참가 기록 · 2명 이상이 모두 완료한 대결 기준</p>
+        {!record && <p>{recordError ? '전적을 불러오지 못했습니다. 새로고침해 주세요.' : '전적을 불러오는 중…'}</p>}
+        {record && <><div className="duel-stats"><div><b>{record.total}</b><span>총 대결</span></div><div className="win"><b>{record.wins}</b><span>승리</span></div><div className="loss"><b>{record.losses}</b><span>패배</span></div><div><b>{record.draws}</b><span>무승부</span></div><div><b>{record.total ? Math.round(record.wins/record.total*100) : 0}%</b><span>승률</span></div></div>
+        <div className="duel-recent">{record.recent.map(r => <Link key={r.code} to={`/duel/${r.code}`}><strong className={r.result}>{({win:'승리',loss:'패배',draw:'무승부'})[r.result]}</strong><span>{r.code} · {r.score}점 · {fmt(r.seconds)}</span><span>결과 보기 →</span></Link>)}</div>
+        {!record.total && <p>첫 대결을 완료하고 전적을 쌓아 보세요.</p>}</>}
+      </section>
 
       <div className="section-title">과목 고르기</div>
       <div className="exam-filters">
@@ -122,7 +142,7 @@ function Lobby() {
 }
 
 function Room({ code }) {
-  const me = useMemo(() => ({ visitorId: visitorId(), nickname: myNickname() }), []);
+  const me = useMemo(() => ({ visitorId: visitorId(), nickname: account()?.nickname || myNickname() }), []);
   const [room, setRoom] = useState(null); // { questions, players }
   const [status, setStatus] = useState('loading'); // loading | missing | error | ready
   const [started, setStarted] = useState(false);
@@ -141,19 +161,23 @@ function Room({ code }) {
   const [savedWrong, setSavedWrong] = useState(false);
   const navigate = useNavigate();
   const startedAt = useRef(0);
+  const lastReport = useRef(null);
+  const reportBusy = useRef(false);
+  const [reportError, setReportError] = useState(false);
   const link = `${window.location.origin}/duel/${code}`;
   const headers = { 'X-Visitor-Id': me.visitorId };
 
   useEffect(() => {
     let alive = true;
-    api.get(`/duels/${code}`, { ...SLOW, headers })
+    api.post(`/duels/${code}/join`, me, SLOW)
+      .then(() => api.get(`/duels/${code}`, { ...SLOW, headers }))
       .then(({ data }) => {
         if (!alive) return;
         const questions = data.questionIds.map(id => BY_ID[id]).filter(Boolean);
         if (questions.length !== data.questionIds.length) { setStatus('missing'); return; }
         // 풀다가 새로고침했으면 서버에 남은 진행 상황에서 이어 간다
         const mine = data.players.find(p => p.me);
-        if (mine) {
+        if (mine?.started) {
           setStarted(true);
           setIdx(mine.answered);
           setScore(mine.score);
@@ -172,12 +196,19 @@ function Room({ code }) {
   // 상대의 진행 상황을 몇 초마다 다시 받아 온다
   useEffect(() => {
     if (status !== 'ready') return undefined;
+    let alive = true, fetching = false;
     const timer = setInterval(() => {
+      flushReport();
+      if (fetching || document.hidden) return;
+      fetching = true;
       api.get(`/duels/${code}`, { headers, timeout: 8000 })
-        .then(({ data }) => setRoom(r => (r ? { ...r, players: data.players, nextCode: data.nextCode } : r)))
-        .catch(() => { /* 잠깐 끊겨도 다음 차례에 다시 받는다 */ });
-    }, 3000);
-    return () => clearInterval(timer);
+        .then(({ data }) => { if(alive) setRoom(r => (r ? { ...r, players: data.players, nextCode: data.nextCode } : r)); })
+        .catch(() => { /* Retry on next poll. */ }).finally(() => { fetching = false; });
+    }, 1500);
+    const heartbeat = setInterval(() => {
+      if(!document.hidden) api.post(`/duels/${code}/join`, me, {timeout:10000}).catch(() => {});
+    }, 15000);
+    return () => { alive = false; clearInterval(timer); clearInterval(heartbeat); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, code]);
 
@@ -200,13 +231,23 @@ function Room({ code }) {
     setRecord(next);
   }, [room, code]);
 
+  const flushReport = () => {
+    const payload = lastReport.current;
+    if (!payload || reportBusy.current) return;
+    reportBusy.current = true;
+    api.put(`/duels/${code}/players`, payload, {timeout:15000})
+      .then(({data}) => {
+        if(lastReport.current === payload) lastReport.current = null;
+        setReportError(false);
+        setRoom(r => r ? {...r, players:data.players} : r);
+      }).catch(() => setReportError(true)).finally(() => { reportBusy.current = false; });
+  };
   const report = (nextScore, answered, finished, nextMarks) => {
     const seconds = Math.floor((Date.now() - startedAt.current) / 1000);
     // 새로고침 뒤에는 앞 문제의 정오답을 모르므로, 길이가 맞을 때만 함께 올린다
     const withMarks = nextMarks.length === answered ? { marks: nextMarks } : {};
-    api.put(`/duels/${code}/players`, { ...me, score: nextScore, answered, done: finished, seconds, ...withMarks }, { timeout: 15000 })
-      .then(({ data }) => setRoom(r => (r ? { ...r, players: data.players } : r)))
-      .catch(() => { /* 다음 문제에서 다시 올라간다 */ });
+    lastReport.current = { ...me, score: nextScore, answered, done: finished, seconds, ...withMarks };
+    flushReport();
   };
 
   if (status === 'loading') return <div className="loading"><div className="loading-spinner" />대결 방을 여는 중...</div>;
@@ -223,6 +264,11 @@ function Room({ code }) {
   }
 
   const total = room.questions.length;
+  const settled = room.players.length >= 2 && room.players.every(p => p.done);
+  const mine = room.players.find(p => p.me);
+  const top = room.players[0];
+  const tiedTop = top ? room.players.filter(p => p.score === top.score && p.seconds === top.seconds) : [];
+  const outcome = !settled || !mine?.done ? 'waiting' : tiedTop.some(p => p.me) ? (tiedTop.length > 1 ? 'draw' : 'win') : 'loss';
   const q = room.questions[idx];
 
   const start = () => {
@@ -332,14 +378,14 @@ function Room({ code }) {
 
   const board = (
     <aside className="duel-board">
-      <div className="duel-board-title">점수판 <span>{room.players.length}명</span></div>
+      <div className="duel-board-title">{!started ? '실시간 대기실' : '실시간 점수판'} <span>{room.players.length}명</span></div>
       {room.players.length === 0 && <p className="duel-wait">아직 시작한 사람이 없습니다.</p>}
       <ol>
         {room.players.map((p, i) => (
           <li key={i} className={p.me ? 'me' : ''}>
-            <span className="no">{i + 1}</span>
-            <span className="nick">{p.nickname}{p.me && <em>나</em>}{!p.me && tallyText(tallyOf(record, p.nickname)) && <small>{tallyText(tallyOf(record, p.nickname))}</small>}</span>
-            <span className="st">{p.done ? fmt(p.seconds) : `${p.answered}/${total}`}</span>
+            <span className="no">{p.started ? i + 1 : '·'}</span>
+            <span className="nick">{p.nickname}{p.me && <em>나</em>}{!p.me && tallyText(tallyOf(record, p.nickname)) && <small>내 상대전적 {tallyText(tallyOf(record, p.nickname))}</small>}</span>
+            <span className="st">{p.done ? (settled ? (tiedTop.includes(p) ? (tiedTop.length > 1 ? '공동 1위' : '승리') : '패배') : '완료') : !p.started ? '대기 중' : `${p.answered}/${total}`}</span>
             <b>{p.score}</b>
           </li>
         ))}
@@ -355,7 +401,7 @@ function Room({ code }) {
   );
 
   return (
-    <div className="fade-in exam-quiz">
+    <div className="fade-in exam-quiz duel-page">
       <div className="page-header">
         <Link to="/duel" className="back-link">← 대결</Link>
         <h1>{room.open ? '단체전' : '1:1 대결'} · {room.title ? `${room.title} · ` : ''}방 {code}</h1>
@@ -414,10 +460,14 @@ function Room({ code }) {
               </div>
             </>
           )}
+          {reportError && <p role="alert" className="exam-note">진행 기록 전송을 다시 시도하고 있습니다. 저장될 때까지 이 화면을 유지해 주세요.</p>}
           {started && done && (
-            <div className="exam-qcard duel-ready">
+            <div className={`exam-qcard duel-ready duel-result ${outcome}`}>
+              <span className="duel-result-icon" aria-hidden="true">{({win:'🏆',loss:'🌱',draw:'🤝',waiting:'⏳'})[outcome]}</span>
+              <h2>{({win:'승리했습니다!',loss:'아쉽게 패배했습니다',draw:'무승부입니다!',waiting:'결과를 기다리고 있어요'})[outcome]}</h2>
               <div className="exam-score"><span className="big">{score}</span><span className="of">/ {total}문제</span></div>
-              <p>다 풀었습니다. 상대가 끝내면 점수판에 순위가 정해지고, 상대 이름 옆에 지금까지의 전적이 쌓입니다.</p>
+              <p>{settled ? `우승: ${tiedTop.map(p => p.nickname).join(', ')} · ${top.score}점 · ${fmt(top.seconds)}. 점수 우선, 동점이면 소요 시간으로 결정합니다.` : '참가자들이 모두 완료하면 승패가 표시됩니다. 혼자 푼 대결은 전적에 포함되지 않습니다.'}</p>
+              {mine?.done && <p>나의 기록 · {fmt(mine.seconds)} · {room.players.length}명 참가</p>}
               <div className="exam-actions">
                 {room.nextCode
                   ? <Link className="exam-btn primary" to={`/duel/${room.nextCode}`}>열린 재대결 방으로 →</Link>
