@@ -30,16 +30,22 @@ try {
  const {default:api}=await server.ssrLoadModule('/src/api.js');
  let deferred;let duelRequest;
  const posts=[];
+ const presenceRequests=[];
  api.defaults.adapter=async config=>{
   if(config.url==='/duels'){duelRequest=JSON.parse(config.data);return {data:{code:'ABC234'},status:200,statusText:'OK',headers:{},config};}
-  if(config.url==='/lounge/presence') return {data:{self:'self',participants:[{id:'self',nickname:'나'},{id:'other',nickname:'상대'}]},status:200,statusText:'OK',headers:{},config};
+  if(config.url==='/lounge/presence') { presenceRequests.push(config.method); return {data:{self:'self',participants:[{id:'self',nickname:'나'},{id:'other',nickname:'상대'}]},status:200,statusText:'OK',headers:{},config}; }
   if(config.method==='post') {posts.push(JSON.parse(config.data));return new Promise((resolve,reject)=>{deferred={resolve:data=>resolve({data,status:200,statusText:'OK',headers:{},config}),reject};});}
   return {data:{messages:[],epoch:1,online:2},status:200,statusText:'OK',headers:{},config};
  };
  const {default:Chat}=await server.ssrLoadModule('/src/components/LoungeChat.jsx');
  globalThis.setTimeout=(fn,delay,...args)=>{const id=originalTimeout(fn,delay,...args);if(delay===1000)midnight={fn,id};return id;};
  const props={open:true,online:2,onOnline(){},onUnread(){},onClose(){}};
- await act(()=>{view=TestRenderer.create(React.createElement(MemoryRouter,null,React.createElement(Chat,props)));});
+ await act(()=>{view=TestRenderer.create(React.createElement(MemoryRouter,null,React.createElement(Chat,{...props,open:false})));});
+ assert.ok(presenceRequests.includes('post'),'closed chat registers site presence');
+ await act(()=>view.update(React.createElement(MemoryRouter,null,React.createElement(Chat,props))));
+ await act(()=>view.update(React.createElement(MemoryRouter,null,React.createElement(Chat,{...props,open:false}))));
+ assert.ok(!presenceRequests.includes('delete'),'closing chat retains site presence');
+ await act(()=>view.update(React.createElement(MemoryRouter,null,React.createElement(Chat,props))));
  const stream=Stream.instances.at(-1);assert.ok(stream.url.endsWith('/lounge/stream'));
  const input=()=>view.root.findByProps({'aria-label':'메시지'});
  const send=async value=>{await act(()=>input().props.onChange({target:{value}}));await act(()=>view.root.findByProps({className:'lounge-form'}).props.onSubmit({preventDefault(){}}));};

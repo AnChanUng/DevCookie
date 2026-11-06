@@ -135,8 +135,8 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
     return () => { source.close(); setStreaming(false); };
   }, [open, take, onOnline]);
 
+  // Site presence stays active while the chat panel is closed.
   useEffect(() => {
-    if (!open) return undefined;
     let active = true;
     const id = visitorId();
     const beat = () => {
@@ -150,9 +150,9 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
     document.addEventListener('visibilitychange', beat);
     return () => {
       active = false; clearInterval(timer); document.removeEventListener('visibilitychange', beat);
-      api.delete('/lounge/presence', { data: { visitorId: id }, timeout: 10000 }).catch(() => {});
+      // Expire on the server so closing one tab does not remove another active tab.
     };
-  }, [open, nickname, identity]);
+  }, [nickname, identity]);
 
   // Clear yesterday's messages at Korean midnight, even with a disconnected server.
   useEffect(() => {
@@ -251,8 +251,8 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
         <button type="button" className="lounge-close" onClick={onClose} aria-label="채팅 닫기">×</button>
       </header>
 
-      <div className="lounge-participants" aria-label="채팅방 접속자">
-        <strong>채팅 참여 중 {participants.length}명</strong>
+      <div className="lounge-participants" aria-label="사이트 접속자">
+        <strong>사이트 접속 중 {participants.length}명</strong>
         {participants.map(person => <div key={person.id}><span>{person.nickname}{person.id === self ? ' (나)' : ''}</span>
           {person.id !== self && <button type="button" disabled={!self || challenging || sending} onClick={() => challenge(person)}>대결 신청</button>}
         </div>)}
