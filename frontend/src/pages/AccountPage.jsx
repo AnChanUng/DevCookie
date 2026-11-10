@@ -106,9 +106,9 @@ function AccountDashboard({ user }) {
         누적 {tierStatus.membership.solvedCount.toLocaleString()}문제
         {tierStatus.membership.nextTier ? ` · ${tierStatus.membership.nextTierName || TIER_NAMES[tierStatus.membership.nextTier]} 승급 기준: 누적 ${tierStatus.membership.nextThreshold.toLocaleString()}문제 이상 · 앞으로 ${tierStatus.membership.remaining.toLocaleString()}문제` : ' · 최고 등급입니다!'}
       </p>}
-      <p>브론즈: 기본 방문자 · 실버: 50문제 · 골드: SSAFY 16기 교육생 · 다이아: 300문제 · 루비: 1,000문제</p>
+      <p>동 쿠키: 기본 방문자 · 은 쿠키: 50문제 · 금 쿠키: SSAFY 16기 교육생 · 다이아 쿠키: 300문제 · 루비 쿠키: 1,000문제</p>
       <p>같은 문제의 반복 풀이는 1문제로 집계합니다.</p>
-      <p>골드 Ⅴ·Ⅳ·Ⅲ·Ⅱ·Ⅰ은 각각 누적 0·30·60·100·200문제부터입니다. 골드를 부여받아도 기존 풀이 수를 그대로 사용합니다. 시험 승급으로 획득한 최소 등급은 유지됩니다.</p>
+      <p>금 쿠키 Ⅴ·Ⅳ·Ⅲ·Ⅱ·Ⅰ은 각각 누적 0·30·60·100·200문제부터입니다. 금 쿠키를 부여받아도 기존 풀이 수를 그대로 사용합니다. 시험 승급으로 획득한 최소 등급은 유지됩니다.</p>
     </section>
     <div className="account-record-heading"><p>{user ? '계정에 저장된 기록' : '현재 브라우저의 비로그인 풀이 기록'} · 문제집별 문항 기준</p><button className="exam-btn sm" disabled={loading} onClick={() => { setLoading(true); setRevision(v => v + 1); }}>새로고침</button></div>
     {loading && <p role="status">학습 기록을 불러오는 중… 서버가 깨어나는 데 시간이 걸릴 수 있습니다.</p>}

@@ -68,7 +68,7 @@ class PromotionExamTest {
         String passed=start("exam-gold").path("id").asText();
         var result=submit("exam-gold",passed,answers(passed,29));
         assertEquals(96.7,result.path("score").asDouble());assertTrue(result.path("promoted").asBoolean());
-        assertEquals("골드 Ⅳ",result.path("tierName").asText());
+        assertEquals("금 쿠키 Ⅳ",result.path("tierName").asText());
         assertEquals(11,awards.findById("visitor:exam-gold").orElseThrow().getTierLevel());
         assertEquals(result,submit("exam-gold",passed,answers(passed,0)));
         assertEquals(11,awards.findById("visitor:exam-gold").orElseThrow().getTierLevel());
@@ -76,7 +76,7 @@ class PromotionExamTest {
                 .andExpect(jsonPath("$.tier").value("GOLD")).andExpect(jsonPath("$.division").value(4))
                 .andExpect(jsonPath("$.solvedCount").value(0));
         String next=start("exam-gold").path("id").asText();
-        assertEquals("골드 Ⅲ",submit("exam-gold",next,answers(next,30)).path("tierName").asText());
+        assertEquals("금 쿠키 Ⅲ",submit("exam-gold",next,answers(next,30)).path("tierName").asText());
     }
     @Test void incompleteOrInvalidAnswersCannotEarnPromotionAndHighestTierIsCapped() throws Exception {
         String id=start("exam-cap").path("id").asText();
@@ -91,7 +91,7 @@ class PromotionExamTest {
         awards.findById("visitor:exam-cap").orElseThrow().setTierLevel(24);awards.flush();
         var result=submit("exam-cap",id,answers(id,30));
         assertTrue(result.path("passed").asBoolean());assertFalse(result.path("promoted").asBoolean());
-        assertEquals("루비 Ⅰ",result.path("tierName").asText());
+        assertEquals("루비 쿠키 Ⅰ",result.path("tierName").asText());
     }
     @Test void guestAwardSurvivesRegistrationAndCannotBeSubmittedAsAnotherAccount() throws Exception {
         String id=start("exam-guest").path("id").asText();submit("exam-guest",id,answers(id,30));

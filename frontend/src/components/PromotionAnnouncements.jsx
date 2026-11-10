@@ -34,8 +34,8 @@ function Celebration({ notice, dismiss }) {
     <div className="promotion-halo" aria-hidden="true" />
     <section className="promotion-stage">
       <div className="promotion-eyebrow">A NEW LEVEL UNLOCKED</div>
-      <div className="promotion-medal" aria-hidden="true">🏆</div>
-      <h2 id="promotion-title">티어 승급!</h2>
+      <div className="promotion-medal" aria-hidden="true">🍪</div>
+      <h2 id="promotion-title">쿠키 티어 승급!</h2>
       <div className="promotion-tier">{notice.tierName}</div>
       <p id="promotion-description"><strong>{notice.nickname}</strong>님이 <strong>{notice.tierName}</strong>로 승급했습니다!</p>
       <p className="promotion-cheer">차곡차곡 쌓은 실력, 드디어 빛나는 순간.<br />정말 축하합니다! 🎉</p>

@@ -1,5 +1,6 @@
-.tier-badge { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 15px; height: 20px; padding: 0; margin-left: 5px; vertical-align: middle; }
-.tier-badge img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.tier-badge { position: relative; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 27px; height: 27px; padding: 0; margin-left: 5px; vertical-align: middle; }
+.tier-badge svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.cookie-division { position: absolute; right: -3px; bottom: -2px; display: grid; place-items: center; width: 13px; height: 13px; border-radius: 50%; background: var(--bg-primary,white); border: 1px solid currentColor; color: inherit; font: 800 9px/1 system-ui,sans-serif; }
 .tier-bronze { color: #b87942; }
 .tier-silver { color: #8b9db2; }
 .tier-gold { color: #c99710; }

@@ -27,7 +27,7 @@ try {
     if (fail) throw new Error('offline');
     let data;
     if (config.url === '/membership') data = checkingAccount
-      ? { tier: 'GOLD', division: 2, nickname: guestName, solvedCount: 125, nextTier: 'GOLD', nextTierName: '골드 Ⅰ', nextThreshold: 200, remaining: 75 }
+      ? { tier: 'GOLD', division: 2, nickname: guestName, solvedCount: 125, nextTier: 'GOLD', nextTierName: '금 쿠키 Ⅰ', nextThreshold: 200, remaining: 75 }
       : { tier: config.headers.Authorization ? 'GOLD' : 'SILVER', nickname: config.headers.Authorization ? JSON.parse(localStorage.getItem('sync:account')).nickname : guestName, solvedCount: 50 };
     else if (config.url === '/profile/badges') data = [{ name: '16기 대전 4반' }];
     else if (config.url === '/auth/nickname') data = { nickname: JSON.parse(config.data).nickname };
@@ -37,31 +37,32 @@ try {
     return { data, status: 200, statusText: 'OK', headers: {}, config };
   };
   await mount(Menu);
-  assert.equal(view.root.findAllByProps({ 'aria-label': '등급 실버 Ⅴ' }).length, 1); assert.ok(text(view.toJSON()).includes('기존방문자'));
+  assert.equal(view.root.findAllByProps({ 'aria-label': '등급 은 쿠키 Ⅴ' }).length, 1); assert.ok(text(view.toJSON()).includes('기존방문자'));
   assert.equal(view.root.findByType('a').props.href, '/account#settings');
   guestName = '변경한방문자'; await act(() => saveNickname(guestName));
   assert.ok(text(view.toJSON()).includes(guestName));
   await act(() => { localStorage.setItem('sync:account',JSON.stringify({ token: 'test-account', nickname: '회원닉네임' })); window.dispatchEvent(new Event('sync:change')); });
-  assert.equal(view.root.findAllByProps({ 'aria-label': '등급 골드 Ⅴ' }).length, 1); assert.ok(text(view.toJSON()).includes('회원닉네임'));
+  assert.equal(view.root.findAllByProps({ 'aria-label': '등급 금 쿠키 Ⅴ' }).length, 1); assert.ok(text(view.toJSON()).includes('회원닉네임'));
   await act(async () => { await changeNickname('바꾼회원'); });
   assert.ok(text(view.toJSON()).includes('바꾼회원'));
   fail = true;
   await act(() => { localStorage.removeItem('sync:account'); window.dispatchEvent(new Event('sync:change')); });
-  assert.ok(text(view.toJSON()).includes('등급 확인 필요')); assert.equal(view.root.findAllByProps({ 'aria-label': '등급 골드 Ⅴ' }).length, 0);
+  assert.ok(text(view.toJSON()).includes('등급 확인 필요')); assert.equal(view.root.findAllByProps({ 'aria-label': '등급 금 쿠키 Ⅴ' }).length, 0);
   await unmount(); fail = false;
   await mount(Rank);
   assert.equal(view.root.findAll(n => n.type === 'span' && String(n.props.className || '').startsWith('tier-badge')).length, 5);
-  assert.deepEqual(view.root.findAllByType('img').map(n => n.props.src), [1,7,13,24,30].map(id => `https://static.solved.ac/tier_small/${id}.svg`));
-  for (const tier of ['브론즈','실버','골드','다이아','루비']) assert.ok(!text(view.toJSON()).includes(tier), 'rank displays icons instead of tier names');
+  assert.equal(view.root.findAllByType('svg').length, 5);
+  assert.deepEqual(view.root.findAllByProps({ className: 'cookie-division' }).map(n => n.children.join('')), ['5','4','3','2','1']);
+  for (const tier of ['동 쿠키','은 쿠키','금 쿠키','다이아 쿠키','루비 쿠키']) assert.ok(!text(view.toJSON()).includes(tier), 'rank displays icons instead of tier names');
   assert.ok(!text(view.toJSON()).includes('대전 4반'));
   const info = () => view.root.findByProps({ 'aria-label': '티어 기준 보기' });
   assert.equal(info().props['aria-expanded'], false);
   await act(() => info().props.onClick());
   assert.equal(info().props['aria-expanded'], true);
   const content = text(view.root.findByProps({ 'aria-label': '티어 등급 기준' }));
-  for (const word of ['브론즈','실버','골드','다이아','루비','50개','300개','1,000개','필기이론']) assert.ok(content.includes(word), word);
+  for (const word of ['동 쿠키','은 쿠키','금 쿠키','다이아 쿠키','루비 쿠키','50개','300개','1,000개']) assert.ok(content.includes(word), word);
   for (const range of ['0~29', '30~59', '60~99', '100~199', '200~299']) assert.ok(content.includes(range));
-  assert.ok(content.includes('누적 30문제부터 골드 Ⅳ'));
+  assert.ok(content.includes('누적 30문제부터 금 쿠키 Ⅳ'));
   assert.ok(content.includes('승급해도 초기화되지 않습니다'));
   await act(() => info().props.onKeyDown({ key: 'Escape' }));
   assert.equal(view.root.findAllByProps({ 'aria-label': '티어 등급 기준' }).length, 0);
@@ -73,7 +74,7 @@ try {
   await mount(AccountPage);
   assert.ok(text(view.toJSON()).includes('본인 설정'));
   assert.ok(text(view.toJSON()).includes('누적 125문제'));
-  assert.ok(text(view.toJSON()).includes('골드 Ⅰ 승급 기준: 누적 200문제 이상 · 앞으로 75문제'));
+  assert.ok(text(view.toJSON()).includes('금 쿠키 Ⅰ 승급 기준: 누적 200문제 이상 · 앞으로 75문제'));
   assert.ok(text(view.root.findByProps({ 'aria-label': '내 교육생 배지' })).includes('16기 대전 4반'));
   const nicknameInput = () => view.root.findByProps({ 'aria-label': '방문자 닉네임' });
   await act(() => nicknameInput().props.onChange({ target: { value: '설정에서변경' } }));
