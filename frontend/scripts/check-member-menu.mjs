@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import React from 'react';
 import TestRenderer, { act } from 'react-test-renderer';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { createServer } from 'vite';
 const memory = () => { const m = new Map(); return { getItem: k => m.get(k) ?? null, setItem: (k,v) => m.set(k,String(v)), removeItem: k => m.delete(k) }; };
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -39,10 +39,13 @@ try {
   };
   await mount(Menu);
   assert.equal(view.root.findAllByProps({ 'aria-label': '등급 은 쿠키 Ⅴ' }).length, 1); assert.ok(text(view.toJSON()).includes('기존방문자'));
-  assert.equal(view.root.findByType('a').props.href, '/account#settings');
+  const resetLink = () => view.root.findAllByType('a').find(link => text(link) === '비밀번호 찾기');
+  assert.ok(view.root.findAllByType('a').some(link => link.props.href === '/account#settings'));
+  assert.equal(resetLink()?.props.href, '/account?reset=1#settings');
   guestName = '변경한방문자'; await act(() => saveNickname(guestName));
   assert.ok(text(view.toJSON()).includes(guestName));
   await act(() => { localStorage.setItem('sync:account',JSON.stringify({ token: 'test-account', nickname: '회원닉네임' })); window.dispatchEvent(new Event('sync:change')); });
+  assert.equal(resetLink(), undefined);
   assert.equal(view.root.findAllByProps({ 'aria-label': '등급 금 쿠키 Ⅴ' }).length, 1); assert.ok(text(view.toJSON()).includes('회원닉네임'));
   await act(async () => { await changeNickname('바꾼회원'); });
   assert.ok(text(view.toJSON()).includes('바꾼회원'));
@@ -72,6 +75,19 @@ try {
   assert.equal(info().props['aria-expanded'], false);
   await unmount();
   checkingAccount = true;
+  await act(async () => {
+    view = TestRenderer.create(React.createElement(MemoryRouter, null,
+      React.createElement(Routes, null,
+        React.createElement(Route, { path: '/', element: React.createElement(Menu) }),
+        React.createElement(Route, { path: '/account', element: React.createElement(AccountPage) }),
+      ),
+    ));
+  });
+  await act(async () => {
+    resetLink().props.onClick({ button: 0, preventDefault() {} });
+  });
+  assert.equal(view.root.findByProps({ 'aria-label': '새 비밀번호' }).props.autoComplete, 'new-password');
+  await unmount();
   await mount(AccountPage);
   assert.ok(text(view.toJSON()).includes('본인 설정'));
   assert.ok(text(view.toJSON()).includes('누적 125문제'));
