@@ -12,6 +12,7 @@ import { membershipHeaders, TIER_NAMES, useMembership } from '../membership';
 import { savedNickname, saveNickname } from '../nickname';
 import api from '../api';
 import { visitorId } from '../track';
+import { RecoveryEmailSettings, RecoveryLink } from './RecoveryEmail';
 
 const snapshot = () => account() ? `${account().token}:${account().nickname}` : '';
 export default function AccountPage() {
@@ -23,7 +24,13 @@ export default function AccountPage() {
     settings?.scrollIntoView?.({ block: 'start' });
     settings?.focus?.({ preventScroll: true });
   }, [location.hash, location.key]);
-  const openReset = new URLSearchParams(location.search).get('reset') === '1';
+  const params = new URLSearchParams(location.search);
+  const recovery = params.get('recovery');
+  if (recovery === 'verify' || recovery === 'reset') {
+    const linkToken = new URLSearchParams(location.hash.slice(1)).get('token');
+    return <RecoveryLink key={location.key} action={recovery} token={linkToken} />;
+  }
+  const openReset = params.get('reset') === '1';
   return <AccountDashboard key={`${token}:${location.search}`} user={token ? account() : null} openReset={openReset} />;
 }
 function AccountDashboard({ user, openReset }) {
@@ -69,12 +76,10 @@ function AccountDashboard({ user, openReset }) {
     setAuthBusy(true);
     setMessage('');
     try {
-      await api.post('/auth/reset-password', {
+      await api.post('/auth/reset-password/request', {
         nickname: form.nickname.trim(),
-        password: form.password,
       }, { timeout: 90000 });
-      showPasswordReset(false);
-      setMessage('비밀번호를 변경했습니다. 새 비밀번호로 로그인해 주세요.');
+      setMessage('인증된 복구 이메일이 있는 계정이면 재설정 링크를 보내드립니다.');
     } catch (error) {
       setMessage(error?.response?.data?.error || '비밀번호를 재설정하지 못했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
@@ -99,10 +104,11 @@ function AccountDashboard({ user, openReset }) {
         }}>
           <input aria-label="새 닉네임" maxLength={20} value={nicknameDraft} onChange={e => setNicknameDraft(e.target.value)} />
           <button className="exam-btn sm" disabled={authBusy || !nicknameDraft.trim() || nicknameDraft.trim() === user.nickname}>닉네임 변경</button>
-        </form></> : resettingPassword ? <form onSubmit={e => { e.preventDefault(); resetPassword(); }}>
+        </form>
+        <RecoveryEmailSettings token={user.token} />
+      </> : resettingPassword ? <form onSubmit={e => { e.preventDefault(); resetPassword(); }}>
         <input aria-label="닉네임" placeholder="닉네임" autoComplete="username" maxLength={20} required disabled={authBusy} value={form.nickname} onChange={e => setForm({ ...form, nickname: e.target.value })} />
-        <input aria-label="새 비밀번호" type="password" placeholder="새 비밀번호" autoComplete="new-password" maxLength={72} required disabled={authBusy} value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
-        <button type="submit" className="exam-btn sm primary" disabled={authBusy || !form.nickname.trim() || !form.password.trim()}>새 비밀번호 저장</button>
+        <button type="submit" className="exam-btn sm primary" disabled={authBusy || !form.nickname.trim()}>재설정 링크 보내기</button>
         <button type="button" className="exam-btn sm" disabled={authBusy} onClick={() => showPasswordReset(false)}>로그인으로 돌아가기</button>
       </form> : <form onSubmit={e => { e.preventDefault(); authenticate('login'); }}>
         <input aria-label="닉네임" placeholder="닉네임" autoComplete="username" maxLength={20} value={form.nickname} onChange={e => setForm({ ...form, nickname: e.target.value })} />

@@ -29,11 +29,15 @@ public class AuthService {
 
     @Transactional
     public String issueToken(User user) {
-        byte[] bytes = new byte[32];
-        RANDOM.nextBytes(bytes);
-        String token = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+        String token = newToken();
         authTokenRepository.save(AuthToken.builder().tokenHash(hash(token)).user(user).build());
         return token;
+    }
+
+    static String newToken() {
+        byte[] bytes = new byte[32];
+        RANDOM.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
     @Transactional
@@ -67,7 +71,7 @@ public class AuthService {
         return token.isEmpty() ? Optional.empty() : Optional.of(token);
     }
 
-    private static String hash(String token) {
+    static String hash(String token) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             return HexFormat.of().formatHex(digest.digest(token.getBytes(StandardCharsets.UTF_8)));

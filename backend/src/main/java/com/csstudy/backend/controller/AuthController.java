@@ -3,17 +3,20 @@ package com.csstudy.backend.controller;
 import com.csstudy.backend.dto.UserResponse;
 import com.csstudy.backend.entity.User;
 import com.csstudy.backend.repository.UserRepository;
+import com.csstudy.backend.service.AccountRecoveryService;
+import com.csstudy.backend.service.RecoveryMailer;
 import com.csstudy.backend.service.AuthService;
 import com.csstudy.backend.service.MembershipService;
 import com.csstudy.backend.service.NicknameService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,6 +30,8 @@ public class AuthController {
     private final AuthService authService;
     private final MembershipService membershipService;
     private final NicknameService nicknames;
+    private final AccountRecoveryService recovery;
+    private final RecoveryMailer recoveryMailer;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @PostMapping("/register")
@@ -79,25 +84,51 @@ public class AuthController {
         return ResponseEntity.ok(UserResponse.from(user, authService.issueToken(user), membershipService.membership(user)));
     }
 
-    @PostMapping("/reset-password")
-    @Transactional
-    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
-        String nickname = Objects.toString(body.get("nickname"), "").trim();
-        String password = Objects.toString(body.get("password"), "").trim();
-        if (nickname.isEmpty() || password.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "닉네임과 새 비밀번호를 입력해주세요."));
-        }
-        if (password.getBytes(StandardCharsets.UTF_8).length > 72) {
-            return ResponseEntity.badRequest().body(Map.of("error", "새 비밀번호는 UTF-8 기준 72바이트 이하여야 합니다."));
-        }
+    @GetMapping("/recovery-email")
+    public Map<String, Object> recoveryEmail(HttpServletRequest request) {
+        User user = authService.requireUser(request);
+        return Map.of("email", Objects.toString(user.getRecoveryEmail(), ""), "available", recoveryMailer.configured());
+    }
 
-        Optional<User> user = userRepository.findByNicknameForUpdate(nickname);
-        if (user.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "존재하지 않는 닉네임입니다."));
+    @PostMapping("/recovery-email")
+    public ResponseEntity<?> requestRecoveryEmail(@RequestBody Map<String, String> body, HttpServletRequest request) {
+        User user = authService.requireUser(request);
+        requireRecoveryMail();
+        var link = recovery.prepareVerification(user.getId(), input(body, "email"), input(body, "password"));
+        if (!recoveryMailer.send(link.recipient(), "verify", link.token())) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "메일 발송이 혼잡합니다. 잠시 후 다시 시도해 주세요.");
         }
-        user.get().setPassword(passwordEncoder.encode(password));
-        authService.revokeAll(user.get());
+        return ResponseEntity.accepted().body(Map.of("ok", true));
+    }
+
+    @PostMapping("/recovery-email/verify")
+    public Map<String, Boolean> verifyRecoveryEmail(@RequestBody Map<String, String> body) {
+        recovery.verifyEmail(input(body, "token"));
+        return Map.of("ok", true);
+    }
+
+    @PostMapping("/reset-password/request")
+    public ResponseEntity<?> requestPasswordReset(@RequestBody Map<String, String> body) {
+        requireRecoveryMail();
+        var link = recovery.prepareReset(input(body, "nickname"));
+        if (link != null) recoveryMailer.send(link.recipient(), "reset", link.token());
+        return ResponseEntity.accepted().body(Map.of("ok", true));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
+        recovery.resetPassword(input(body, "token"), input(body, "password"));
         return ResponseEntity.ok(Map.of("ok", true));
+    }
+
+    private void requireRecoveryMail() {
+        if (!recoveryMailer.configured()) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "복구 이메일 발송을 준비 중입니다.");
+        }
+    }
+
+    private static String input(Map<String, String> body, String key) {
+        return Objects.toString(body.get(key), "").trim();
     }
 
     @GetMapping("/me")

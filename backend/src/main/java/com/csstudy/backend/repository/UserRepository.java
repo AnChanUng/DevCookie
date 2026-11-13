@@ -23,6 +23,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByNicknameForUpdate(@Param("nickname") String nickname);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<User> findByRecoveryVerificationHash(String hash);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<User> findByPasswordResetHash(String hash);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select u from User u where u.id = :id")
     Optional<User> findForUpdate(@Param("id") Long id);
 

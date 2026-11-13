@@ -2,12 +2,14 @@ package com.csstudy.backend;
 
 import com.csstudy.backend.entity.User;
 import com.csstudy.backend.repository.UserRepository;
+import com.csstudy.backend.service.RecoveryMailer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -15,6 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -29,6 +33,7 @@ class AccountRecordsTest {
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper json;
     @Autowired UserRepository userRepository;
+    @MockBean RecoveryMailer recoveryMailer;
 
     private JsonNode auth(String path, String nickname, String password) throws Exception {
         String body = mvc.perform(post("/api/v1/auth/" + path)
@@ -56,37 +61,51 @@ class AccountRecordsTest {
     }
 
     @Test
-    void nicknameCanResetAnExistingAccountAndRevokeItsSessions() throws Exception {
-        JsonNode existing = auth("register", "reset-existing", "old-password");
-        String secondToken = auth("login", "reset-existing", "old-password").get("token").asText();
-        String otherToken = auth("register", "reset-other", "other-password").get("token").asText();
-
-        auth("reset-password", "reset-existing", "new-password");
-
-        for (String token : new String[]{existing.get("token").asText(), secondToken}) {
-            mvc.perform(get("/api/v1/auth/me").header("Authorization", bearer(token)))
-                    .andExpect(status().isUnauthorized());
-        }
-        mvc.perform(get("/api/v1/auth/me").header("Authorization", bearer(otherToken)))
-                .andExpect(status().isOk());
-        mvc.perform(post("/api/v1/auth/login").contentType(MediaType.APPLICATION_JSON)
-                        .content(json.writeValueAsString(Map.of("nickname", "reset-existing", "password", "old-password"))))
+    void nicknameAloneCannotResetAnExistingAccount() throws Exception {
+        auth("register", "reset-existing", "old-password");
+        mvc.perform(post("/api/v1/auth/reset-password").contentType(MediaType.APPLICATION_JSON)
+                        .content(json.writeValueAsString(Map.of("nickname", "reset-existing", "password", "new-password"))))
                 .andExpect(status().isBadRequest());
-        assertThat(auth("login", "reset-existing", "new-password").get("id")).isEqualTo(existing.get("id"));
+        auth("login", "reset-existing", "old-password");
     }
 
     @Test
-    void resetRejectsUnknownAccountsAndInvalidPasswords() throws Exception {
-        auth("register", "reset-invalid", "original-password");
-        mvc.perform(post("/api/v1/auth/reset-password").contentType(MediaType.APPLICATION_JSON)
-                        .content(json.writeValueAsString(Map.of("nickname", "reset-missing", "password", "new-password"))))
+    void verifiedEmailReceivesOneTimeResetLinkAndResetRevokesSessions() throws Exception {
+        when(recoveryMailer.configured()).thenReturn(true);
+        var tokens = new java.util.HashMap<String, String>();
+        when(recoveryMailer.send(anyString(), anyString(), anyString())).thenAnswer(call -> {
+            assertThat(call.<String>getArgument(0)).isEqualTo("owner@example.org");
+            tokens.put(call.getArgument(1), call.getArgument(2));
+            return true;
+        });
+        JsonNode account = auth("register", "email-owner", "old-password");
+        String session = bearer(account.get("token").asText());
+        var enrollment = Map.of("email", "owner@example.org", "password", "old-password");
+        recoveryPost("recovery-email", enrollment, null).andExpect(status().isUnauthorized());
+        recoveryPost("recovery-email", Map.of("email", "owner@example.org", "password", "wrong"), session)
                 .andExpect(status().isBadRequest());
-        for (String password : new String[]{" ", "가".repeat(25)}) {
-            mvc.perform(post("/api/v1/auth/reset-password").contentType(MediaType.APPLICATION_JSON)
-                            .content(json.writeValueAsString(Map.of("nickname", "reset-invalid", "password", password))))
-                    .andExpect(status().isBadRequest());
-        }
-        auth("login", "reset-invalid", "original-password");
+        recoveryPost("recovery-email", enrollment, session).andExpect(status().isAccepted());
+        var nickname = Map.of("nickname", "email-owner");
+        recoveryPost("reset-password/request", nickname, null).andExpect(status().isAccepted());
+        assertThat(tokens).containsOnlyKeys("verify");
+        recoveryPost("recovery-email/verify", Map.of("token", tokens.get("verify")), null).andExpect(status().isOk());
+        recoveryPost("recovery-email/verify", Map.of("token", tokens.get("verify")), null).andExpect(status().isBadRequest());
+        recoveryPost("reset-password/request", nickname, null).andExpect(status().isAccepted());
+        assertThat(userRepository.findByNickname("email-owner").orElseThrow().getPasswordResetHash())
+                .isNotBlank().isNotEqualTo(tokens.get("reset"));
+        var reset = Map.of("token", tokens.get("reset"), "password", "new-password");
+        recoveryPost("reset-password", reset, null).andExpect(status().isOk());
+        recoveryPost("reset-password", reset, null).andExpect(status().isBadRequest());
+        mvc.perform(get("/api/v1/auth/me").header("Authorization", session)).andExpect(status().isUnauthorized());
+        assertThat(auth("login", "email-owner", "new-password").get("id")).isEqualTo(account.get("id"));
+    }
+
+    private org.springframework.test.web.servlet.ResultActions recoveryPost(
+            String path, Map<String, String> body, String authorization) throws Exception {
+        var request = post("/api/v1/auth/" + path).contentType(MediaType.APPLICATION_JSON)
+                .content(json.writeValueAsString(body));
+        if (authorization != null) request.header("Authorization", authorization);
+        return mvc.perform(request);
     }
 
     @Test
