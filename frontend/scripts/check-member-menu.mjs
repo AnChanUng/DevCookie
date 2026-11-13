@@ -21,7 +21,7 @@ try {
   const { default: Menu } = await server.ssrLoadModule('/src/components/MemberMenu.jsx');
   const { default: Rank } = await server.ssrLoadModule('/src/components/SolveRank.jsx');
   const { default: AccountPage } = await server.ssrLoadModule('/src/pages/AccountPage.jsx');
-  let guestName = '기존방문자', fail = false, checkingAccount = false;
+  let guestName = '기존방문자', fail = false, checkingAccount = false, resetRequest;
   const tiers = ['BRONZE','SILVER','GOLD','DIAMOND','RUBY'];
   api.defaults.adapter = async config => {
     if (fail) throw new Error('offline');
@@ -31,6 +31,7 @@ try {
       : { tier: config.headers.Authorization ? 'GOLD' : 'SILVER', nickname: config.headers.Authorization ? JSON.parse(localStorage.getItem('sync:account')).nickname : guestName, solvedCount: 50 };
     else if (config.url === '/profile/badges') data = [{ name: '16기 대전 4반' }];
     else if (config.url === '/auth/nickname') data = { nickname: JSON.parse(config.data).nickname };
+    else if (config.url === '/auth/reset-password') { resetRequest = JSON.parse(config.data); data = { ok: true }; }
     else if (config.url === '/profile') { guestName = JSON.parse(config.data).nickname; data = { nickname: guestName }; }
     else if (config.url === '/rank/solved') data = { top: tiers.map((tier,i) => ({ tier, division: 5-i, rank: i+1, nickname: '매우긴닉네임'+i, count: i*250, me: false })), totalSolved: 2500, totalSolvers: 5, me: null };
     else data = {};
@@ -76,6 +77,19 @@ try {
   assert.ok(text(view.toJSON()).includes('누적 125문제'));
   assert.ok(text(view.toJSON()).includes('금 쿠키 Ⅰ 승급 기준: 누적 200문제 이상 · 앞으로 75문제'));
   assert.ok(text(view.root.findByProps({ 'aria-label': '내 교육생 배지' })).includes('16기 대전 4반'));
+  const resetButton = view.root.findAllByType('button').find(b => text(b) === '비밀번호 재설정');
+  assert.ok(resetButton, 'account login exposes password reset');
+  const loginNickname = () => view.root.findByProps({ 'aria-label': '닉네임' });
+  await act(() => loginNickname().props.onChange({ target: { value: '복구할닉네임' } }));
+  await act(() => resetButton.props.onClick());
+  assert.equal(loginNickname().props.value, '복구할닉네임');
+  const newPassword = () => view.root.findByProps({ 'aria-label': '새 비밀번호' });
+  await act(() => newPassword().props.onChange({ target: { value: 'new-password' } }));
+  await act(async () => { await newPassword().parent.props.onSubmit({ preventDefault() {} }); });
+  assert.deepEqual(resetRequest, { nickname: '복구할닉네임', password: 'new-password' });
+  assert.equal(view.root.findByProps({ 'aria-label': '비밀번호' }).props.value, '');
+  assert.equal(loginNickname().props.value, '복구할닉네임');
+  assert.ok(text(view.toJSON()).includes('새 비밀번호로 로그인해 주세요.'));
   const nicknameInput = () => view.root.findByProps({ 'aria-label': '방문자 닉네임' });
   await act(() => nicknameInput().props.onChange({ target: { value: '설정에서변경' } }));
   await act(async () => { await nicknameInput().parent.props.onSubmit({ preventDefault() {} }); });

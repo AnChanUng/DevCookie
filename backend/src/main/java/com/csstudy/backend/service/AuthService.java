@@ -41,6 +41,11 @@ public class AuthService {
         extractToken(request).ifPresent(token -> authTokenRepository.deleteByTokenHash(hash(token)));
     }
 
+    @Transactional
+    public void revokeAll(User user) {
+        authTokenRepository.deleteAllForUser(user.getId());
+    }
+
     /** 로그인하지 않은 요청이면 비어 있다. */
     public Optional<User> currentUser(HttpServletRequest request) {
         return extractToken(request)

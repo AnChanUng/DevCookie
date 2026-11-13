@@ -56,6 +56,40 @@ class AccountRecordsTest {
     }
 
     @Test
+    void nicknameCanResetAnExistingAccountAndRevokeItsSessions() throws Exception {
+        JsonNode existing = auth("register", "reset-existing", "old-password");
+        String secondToken = auth("login", "reset-existing", "old-password").get("token").asText();
+        String otherToken = auth("register", "reset-other", "other-password").get("token").asText();
+
+        auth("reset-password", "reset-existing", "new-password");
+
+        for (String token : new String[]{existing.get("token").asText(), secondToken}) {
+            mvc.perform(get("/api/v1/auth/me").header("Authorization", bearer(token)))
+                    .andExpect(status().isUnauthorized());
+        }
+        mvc.perform(get("/api/v1/auth/me").header("Authorization", bearer(otherToken)))
+                .andExpect(status().isOk());
+        mvc.perform(post("/api/v1/auth/login").contentType(MediaType.APPLICATION_JSON)
+                        .content(json.writeValueAsString(Map.of("nickname", "reset-existing", "password", "old-password"))))
+                .andExpect(status().isBadRequest());
+        assertThat(auth("login", "reset-existing", "new-password").get("id")).isEqualTo(existing.get("id"));
+    }
+
+    @Test
+    void resetRejectsUnknownAccountsAndInvalidPasswords() throws Exception {
+        auth("register", "reset-invalid", "original-password");
+        mvc.perform(post("/api/v1/auth/reset-password").contentType(MediaType.APPLICATION_JSON)
+                        .content(json.writeValueAsString(Map.of("nickname", "reset-missing", "password", "new-password"))))
+                .andExpect(status().isBadRequest());
+        for (String password : new String[]{" ", "가".repeat(25)}) {
+            mvc.perform(post("/api/v1/auth/reset-password").contentType(MediaType.APPLICATION_JSON)
+                            .content(json.writeValueAsString(Map.of("nickname", "reset-invalid", "password", password))))
+                    .andExpect(status().isBadRequest());
+        }
+        auth("login", "reset-invalid", "original-password");
+    }
+
+    @Test
     void plaintextPasswordFromBeforeEncryptionIsUpgradedOnLogin() throws Exception {
         userRepository.save(User.builder().nickname("legacy-user").password("oldpw").build());
 
