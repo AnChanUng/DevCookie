@@ -1,8 +1,9 @@
 import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 
-// 리뉴얼 기간 동안 사이트 전체를 안내 화면으로 바꾼다. 끝나면 MAINTENANCE를 false로 돌리면 원래 화면이 돌아온다.
-export const MAINTENANCE = true;
+// 리뉴얼 기간 동안 배포된 사이트 전체를 안내 화면으로 바꾼다. 로컬 개발 서버(npm run dev)에서는 꺼져 있어 전체 화면으로 개발한다.
+// 리뉴얼이 끝나면 false로 바꾸면 배포된 사이트도 원래 화면으로 돌아온다.
+export const MAINTENANCE = import.meta.env.PROD;
 
 // 안내 기간에도 열어 두는 화면(/private/chanung)의 바깥 틀. 다른 메뉴로 가는 링크를 두지 않는다
 export function RenewalShell() {
