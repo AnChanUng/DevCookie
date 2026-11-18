@@ -34,18 +34,21 @@ public class RagService {
             """);
     private static final PromptTemplate EMPTY = new PromptTemplate(REFUSAL);
 
-    public record Source(String source, String title, String section, Double score) {}
-    public record Answer(String answer, boolean refused, List<Source> sources) {}
+    public record Source(String source, String title, String section, Double score, String snippet) {}
+    public record Answer(String answer, boolean refused, List<Source> sources, GroundingChecker.Report grounding) {}
+    public record Evidence(boolean refused, List<Source> sources) {}
 
     private final VectorStore vectorStore;
     private final TeiReranker reranker;
     private final RagProperties props;
     private final ChatClient chat;
+    private final GroundingChecker grounder;
 
     public RagService(VectorStore vectorStore, TeiReranker reranker, RagProperties props, ObjectProvider<ChatModel> chatModel) {
         this.vectorStore = vectorStore;
         this.reranker = reranker;
         this.props = props;
+        this.grounder = new GroundingChecker(reranker, props.minSupportScore());
         ChatModel model = chatModel.getIfAvailable();
         this.chat = model == null ? null : ChatClient.builder(model)
                 .defaultAdvisors(RetrievalAugmentationAdvisor.builder()
@@ -71,25 +74,35 @@ public class RagService {
         return reranker.rerank(question, vectorSearch(question, props.firstK()), props.finalK(), threshold);
     }
 
+    // 답변 없이 재정렬된 근거만. 기준 점수를 넘는 근거가 없으면 refused
+    public Evidence evidence(String question) {
+        List<Document> docs = retrieve(question, props.minRerankScore());
+        return new Evidence(docs.isEmpty(), sources(docs));
+    }
+
     public Answer ask(String question) {
         if (chat == null) throw new IllegalStateException("답변 모델이 설정되지 않았습니다.");
         // 근거가 없으면 LLM을 부르지 않는다(비용과 지어낸 답변을 함께 줄인다)
         List<Document> evidence = retrieve(question, props.minRerankScore());
-        if (evidence.isEmpty()) return new Answer(REFUSAL, true, List.of());
+        if (evidence.isEmpty()) return new Answer(REFUSAL, true, List.of(), null);
         ChatClientResponse response = chat.prompt().user(question).call().chatClientResponse();
         String text = response.chatResponse() == null || response.chatResponse().getResult() == null ? ""
                 : response.chatResponse().getResult().getOutput().getText();
         @SuppressWarnings("unchecked")
         List<Document> used = (List<Document>) response.context().getOrDefault(RetrievalAugmentationAdvisor.DOCUMENT_CONTEXT, List.of());
         boolean refused = used.isEmpty() || text == null || text.contains("근거를 찾지 못했습니다");
-        return new Answer(text, refused, sources(used));
+        // 답변 문장이 실제로 근거에서 나왔는지 다시 확인한다
+        GroundingChecker.Report grounding = refused ? null : grounder.check(text, used);
+        return new Answer(text, refused, sources(used), grounding);
     }
 
     static List<Source> sources(List<Document> docs) {
         List<Source> out = new ArrayList<>();
         for (Document d : docs) {
             Map<String, Object> m = d.getMetadata();
-            out.add(new Source(String.valueOf(m.get("source")), String.valueOf(m.get("title")), String.valueOf(m.get("section")), d.getScore()));
+            String text = d.getText() == null ? "" : d.getText().replaceFirst("^\\[[^\\]]*]\\n", "");
+            out.add(new Source(String.valueOf(m.get("source")), String.valueOf(m.get("title")), String.valueOf(m.get("section")), d.getScore(),
+                    text.length() > 280 ? text.substring(0, 280) + "…" : text));
         }
         return out;
     }
