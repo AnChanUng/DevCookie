@@ -1,0 +1,99 @@
+// 개발 패치노트. /private/chanung/patch-notes 에서 비밀번호를 확인한 뒤에만 불러온다.
+// 새 패치는 맨 위에 추가한다. 항목 type: 'feature' 새 기능 | 'improve' 개선 | 'fix' 수정 | 'security' 보안 | 'infra' 인프라·개발 환경 | 'docs' 문서
+// status: 'released' 배포됨(master) | 'dev' 개발 브랜치에만 있음 | 'wip' 작업 중
+export const PATCH_NOTES = [
+  {
+    version: '0.7.0',
+    date: '2026-11-18',
+    title: 'RAG 학습 도우미 화면과 출처 검증',
+    status: 'wip',
+    summary: '학습 도우미를 직접 써 볼 수 있는 화면을 만들고, 답변 문장마다 근거가 있는지 다시 확인하는 출처 검증을 붙이는 중입니다.',
+    items: [
+      { type: 'feature', text: 'RAG 학습 도우미 화면(/private/chanung/assistant): 질문 입력, 답변, 근거 자료(제목 · 단락 · 관련도 · 발췌) 표시. 답변 모델이 없으면 찾은 근거만 보여 준다.' },
+      { type: 'feature', text: '출처 검증: LLM 답변을 문장으로 나눠 cross-encoder로 근거 조각과 대조하고, 근거가 약한 문장은 "근거 확인 안 됨"으로 표시한다.' },
+      { type: 'feature', text: 'LLM 없이 근거만 찾는 검색 API(GET /api/v1/rag/search).' },
+      { type: 'improve', text: '재정렬 후보 수(20 → 10)에 따른 정확도 · 지연 비교 실험 진행 중.' },
+    ],
+  },
+  {
+    version: '0.6.0',
+    date: '2026-11-18',
+    title: 'RAG 학습 도우미 검색 파이프라인',
+    status: 'released',
+    summary: '전공 학습 문서 109개에서 근거를 찾아 답하고, 근거가 없으면 답하지 않는 RAG 검색 단계를 만들었습니다. 운영에서는 아직 꺼져 있습니다.',
+    items: [
+      { type: 'infra', text: 'Spring Boot 3.2.5 → 3.5.16, Spring AI 1.1.8 도입. 기본 설정에서는 Spring AI 자동 설정을 모두 꺼서 운영 서버가 그대로 시작한다.' },
+      { type: 'feature', text: '문서 분할(538개 조각) → bge-m3 임베딩 → ChromaDB → 1차 Top-20 → bge-reranker-v2-m3 재정렬 → 2차 Top-5.' },
+      { type: 'feature', text: '재정렬 점수가 0.05보다 낮으면 LLM을 부르지 않고 답을 거부한다.' },
+      { type: 'improve', text: '평가셋 113문항 기준 Hit@1 86.4% → 96.6%, 학습 자료에 없는 질문에 답하려 한 비율 12% → 0%.' },
+      { type: 'infra', text: '로컬 RAG 서비스 구성(rag/docker-compose.yml): ChromaDB 1.5.9, TEI 임베딩 · 재정렬 컨테이너.' },
+      { type: 'docs', text: 'docs/rag-assistant.md: 구성, 평가 방법, 결과, 남은 과제(재정렬 지연 25초).' },
+    ],
+  },
+  {
+    version: '0.5.0',
+    date: '2026-11-18',
+    title: '개발 기록 페이지',
+    status: 'released',
+    summary: '개발하면서 겪은 기술 문제를 기록하는 트러블슈팅 페이지와 이 패치노트를 만들었습니다.',
+    items: [
+      { type: 'feature', text: '트러블슈팅 기록(/private/chanung/trouble): 증상 · 원인 · 해결 · 측정 결과 · 측정 환경 · 배운 점, 분야별 보기.' },
+      { type: 'feature', text: '개발 패치노트(/private/chanung/patch-notes).' },
+    ],
+  },
+  {
+    version: '0.4.0',
+    date: '2026-11-18',
+    title: 'DB 커넥션 풀 병목 개선',
+    status: 'released',
+    summary: '로그인 직후 문제집 기록 동기화가 몰리면 HikariCP 풀이 가득 차서 다른 API까지 느려지던 문제를 고쳤습니다.',
+    items: [
+      { type: 'improve', text: '문제집마다 푼 문제 수(solved_count)를 저장하고 등급 계산을 SUM 쿼리 하나로 바꿈(모든 문제집 JSON 재파싱 제거).' },
+      { type: 'improve', text: 'Open-Session-In-View 끄기, 같은 사용자의 저장은 DB 커넥션을 얻기 전에 애플리케이션 안에서 줄 세우기.' },
+      { type: 'fix', text: 'OSIV를 끄며 드러난 지연 로딩 오류를 @EntityGraph로 수정(문제 목록 N+1 쿼리도 제거).' },
+      { type: 'improve', text: '30명 동시 동기화 기준 일반 조회 p95 976ms → 99ms, 커넥션 대기 요청 평균 160개 → 16개.' },
+      { type: 'infra', text: 'Actuator 추가: 운영은 health만, 부하테스트 프로필은 루프백 관리 포트에서만 HikariCP 지표 공개.' },
+      { type: 'docs', text: 'load-tests/progress-sync.js(k6), docs/hikaricp-pool.md.' },
+    ],
+  },
+  {
+    version: '0.3.0',
+    date: '2026-11-18',
+    title: '실시간 대결 동시성 제어와 서버 채점',
+    status: 'released',
+    summary: '동시에 재대결을 누르면 방이 여러 개 생기던 문제와, 점수를 클라이언트가 정하던 문제를 고쳤습니다.',
+    items: [
+      { type: 'fix', text: '재대결: 앞 방 행을 SELECT … FOR UPDATE로 잠그고 다음 방을 한 번만 만든다. 동시 100건 중복 9개 → 0개, 매칭률 23.6% → 100%.' },
+      { type: 'feature', text: '방 만들기 멱등성: Idempotency-Key 헤더 + 유일 제약. 같은 키 100건에서 방 1개.' },
+      { type: 'security', text: '서버 채점: 클라이언트는 고른 보기 번호만 보내고 서버가 정답표(duel-bank.json)로 채점. 걸린 시간도 서버가 본 시간보다 줄일 수 없음.' },
+      { type: 'infra', text: 'Testcontainers PostgreSQL 동시성 테스트, 재대결 매칭 벤치마크.' },
+      { type: 'docs', text: 'docs/duel-concurrency.md.' },
+    ],
+  },
+  {
+    version: '0.2.0',
+    date: '2026-11-18',
+    title: '사이트 리뉴얼 안내',
+    status: 'released',
+    summary: '개발자 취업 준비 사이트로 리뉴얼하는 동안 배포 사이트를 안내 화면으로 바꿨습니다.',
+    items: [
+      { type: 'feature', text: '모든 주소에 리뉴얼 공지(예상 오픈 11월 말), 비공개 페이지만 열어 둠. 로컬 개발 서버에서는 공지가 꺼진다.' },
+      { type: 'improve', text: '홈 공지의 문제집 우선순위 문구를 공개 문제집 기준으로 수정.' },
+      { type: 'infra', text: '개발은 dev 브랜치, master 푸시가 곧 배포(Vercel · Render).' },
+    ],
+  },
+  {
+    version: '0.1.0',
+    date: '2026-11-18',
+    title: '문제집 구성 정비와 저장소 정리',
+    status: 'released',
+    summary: '실제 시험 복기 자료와 저작권 문제가 있을 수 있는 자료를 정리했습니다.',
+    items: [
+      { type: 'security', text: '원본 시험 · 교재 파일 40개를 저장소와 모든 브랜치 · 태그 히스토리에서 제거.' },
+      { type: 'feature', text: '비공개 문제집(/private/chanung, 비밀번호 잠금): 복기 문제집 12개와 컴퓨터일반 310문항을 공개 메뉴에서 분리.' },
+      { type: 'security', text: '비공개 문항의 해설을 별도 파일로 분리(해설 키에 문제 본문이 들어 있어 공개 번들에 남던 문제).' },
+      { type: 'improve', text: '신협 문제집에 복사돼 있던 79문항을 새 문항으로 교체(코드 9개 · 계산 14개는 실행 · 시뮬레이션으로 정답 검증).' },
+      { type: 'fix', text: '아케이드 문제 데이터 생성 스크립트 오류 수정.' },
+    ],
+  },
+];

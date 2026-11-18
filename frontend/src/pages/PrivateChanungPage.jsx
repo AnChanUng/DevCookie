@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { CompanyExam } from './ExamCompanyPage';
+import RagAssistant from './RagAssistant';
 
 // 비공개 문제집 입구. 비밀번호는 저장소에 원문으로 두지 않고 해시만 비교한다.
 // 화면 잠금일 뿐 서버 인증이 아니므로, 문제 데이터는 잠금을 푼 뒤에만 따로 불러와 공개 화면 번들과 분리한다.
@@ -25,18 +26,22 @@ export default function PrivateChanungPage() {
   const [loadError, setLoadError] = useState(false);
 
   const trouble = id === 'trouble';
+  const assistant = id === 'assistant';
+  const patches = id === 'patch-notes';
 
   useEffect(() => {
-    if (!unlocked || data || trouble) return;
+    if (!unlocked || data || trouble || assistant || patches) return;
     let alive = true;
     import('../data/privateBanks')
       .then(m => { if (alive) setData(m); })
       .catch(() => { if (alive) setLoadError(true); });
     return () => { alive = false; };
-  }, [unlocked, data, trouble]);
+  }, [unlocked, data, trouble, assistant, patches]);
 
   if (!unlocked) return <Gate onUnlock={() => setUnlocked(true)} />;
   if (trouble) return <TroubleLog />;
+  if (assistant) return <RagAssistant />;
+  if (patches) return <PatchNotes />;
   if (loadError) return <div className="fade-in"><p role="alert">문제집을 불러오지 못했습니다. 새로고침해 주세요.</p></div>;
   if (!data) return <div className="fade-in"><p role="status">문제집을 불러오는 중…</p></div>;
 
@@ -49,6 +54,49 @@ export default function PrivateChanungPage() {
 }
 
 const STATUS = { solved: '해결', open: '진행 중', note: '관찰' };
+const PATCH_STATUS = { released: '배포됨', dev: '개발 중', wip: '작업 중' };
+const PATCH_TYPE = { feature: '새 기능', improve: '개선', fix: '수정', security: '보안', infra: '인프라', docs: '문서' };
+
+// 개발 패치노트. 데이터는 잠금을 푼 뒤에만 불러온다
+function PatchNotes() {
+  const [notes, setNotes] = useState(null);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    import('../data/patchNotes').then(m => { if (alive) setNotes(m.PATCH_NOTES); }).catch(() => { if (alive) setFailed(true); });
+    return () => { alive = false; };
+  }, []);
+  if (failed) return <div className="fade-in"><p role="alert">패치노트를 불러오지 못했습니다. 새로고침해 주세요.</p></div>;
+  if (!notes) return <div className="fade-in"><p role="status">패치노트를 불러오는 중…</p></div>;
+  const counts = notes.flatMap(n => n.items).reduce((m, i) => ({ ...m, [i.type]: (m[i.type] || 0) + 1 }), {});
+  return (
+    <div className="fade-in">
+      <div className="page-header">
+        <Link to={BASE} className="back-link">← 비공개 문제집</Link>
+        <h1>개발 패치노트</h1>
+        <p>버전 {notes.length}개 · {Object.entries(PATCH_TYPE).filter(([k]) => counts[k]).map(([k, v]) => `${v} ${counts[k]}`).join(' · ')}</p>
+      </div>
+      {notes.map(n => (
+        <article key={n.version} style={{ marginTop: 16, padding: '16px 18px', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-lg)' }}>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', fontSize: 13, opacity: 0.8 }}>
+            <strong>v{n.version}</strong>
+            <time dateTime={n.date}>{n.date}</time>
+            <span className={`exam-tag${n.status === 'released' ? '' : ' soon'}`}>{PATCH_STATUS[n.status] || n.status}</span>
+          </div>
+          <h2 style={{ fontSize: 18, margin: '8px 0 6px' }}>{n.title}</h2>
+          {n.summary && <p style={{ margin: '0 0 10px', lineHeight: 1.6, wordBreak: 'keep-all' }}>{n.summary}</p>}
+          <ul style={{ margin: 0, paddingLeft: 18, display: 'grid', gap: 6 }}>
+            {n.items.map((it, i) => (
+              <li key={i} style={{ lineHeight: 1.6, wordBreak: 'keep-all' }}>
+                <span className="exam-tag" style={{ marginRight: 6 }}>{PATCH_TYPE[it.type] || it.type}</span>{it.text}
+              </li>
+            ))}
+          </ul>
+        </article>
+      ))}
+    </div>
+  );
+}
 
 // 개발하면서 겪은 기술 문제 기록. 데이터는 잠금을 푼 뒤에만 불러온다
 function TroubleLog() {
@@ -156,6 +204,16 @@ function PrivateList({ data, onLock }) {
             <span className="exam-company-abbr">LOG</span>
             <span className="exam-company-name">트러블슈팅 기록</span>
             <span className="exam-company-meta">개발하면서 겪은 기술 문제 · 원인 · 해결 · 측정 결과</span>
+          </Link>
+          <Link to={`${BASE}/patch-notes`} className="exam-company-card">
+            <span className="exam-company-abbr">NOTE</span>
+            <span className="exam-company-name">개발 패치노트</span>
+            <span className="exam-company-meta">버전별 새 기능 · 개선 · 수정 · 보안 · 인프라 변경</span>
+          </Link>
+          <Link to={`${BASE}/assistant`} className="exam-company-card">
+            <span className="exam-company-abbr">RAG</span>
+            <span className="exam-company-name">RAG 학습 도우미</span>
+            <span className="exam-company-meta">학습 자료 근거로만 답하고, 근거 없는 질문은 거부</span>
           </Link>
         </div>
       </section>
