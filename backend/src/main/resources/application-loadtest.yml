@@ -7,6 +7,8 @@ spring:
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
+      # 2초 넘게 반납되지 않은 커넥션은 가져간 위치의 스택과 함께 경고 로그를 남긴다
+      leak-detection-threshold: 2000
   jpa:
     show-sql: false
 server:
@@ -21,3 +23,13 @@ slack:
   enabled: false
 gemini:
   api-key: ""
+# 부하 중 커넥션 풀 상태(hikaricp.connections.*)를 /actuator/metrics로 읽는다.
+# 서비스 포트의 /actuator는 보안 필터가 계속 막고, 지표는 루프백의 별도 관리 포트에서만 연다
+management:
+  server:
+    port: 18081
+    address: 127.0.0.1
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics

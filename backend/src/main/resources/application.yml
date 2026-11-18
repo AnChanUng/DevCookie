@@ -6,6 +6,8 @@ spring:
     driver-class-name: org.postgresql.Driver
 
   jpa:
+    # 요청이 끝날 때까지 영속성 컨텍스트와 DB 커넥션을 붙잡지 않는다. 커넥션은 트랜잭션이 끝나면 바로 반납한다
+    open-in-view: false
     hibernate:
       ddl-auto: update
     show-sql: true
@@ -52,3 +54,13 @@ app:
 
 gemini:
   api-key: ${GEMINI_API_KEY:}
+
+# 운영에서는 상태 확인만 연다. 커넥션 풀 같은 내부 지표는 로컬 부하테스트 프로필에서만 연다
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never

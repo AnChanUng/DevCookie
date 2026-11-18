@@ -27,6 +27,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    // HikariCP 커넥션 풀 지표(active · idle · pending · 획득 시간)를 Micrometer로 본다
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.security:spring-security-crypto")
 
     runtimeOnly("org.postgresql:postgresql")

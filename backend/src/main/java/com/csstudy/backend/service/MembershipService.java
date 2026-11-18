@@ -65,7 +65,9 @@ public class MembershipService {
     }
 
     public Membership membership(User user) {
-        long saved = progressRepository.findByUserId(user.getId()).stream().mapToLong(p -> count(p.getData())).sum();
+        // 문제집마다 저장해 둔 푼 문제 수를 DB에서 더한다. 값이 없는 예전 행만 JSON을 읽어 계산한다
+        long saved = progressRepository.sumSolvedCount(user.getId())
+                + progressRepository.findByUserIdAndSolvedCountIsNull(user.getId()).stream().mapToLong(p -> solvedIn(p.getData())).sum();
         // Reuse the existing rank count for historical/coding progress; devices are merged by max, not sum.
         long reported = solvedRepository.findByUserId(user.getId()).stream().mapToLong(v -> v.getCount()).max().orElse(0);
         return describe(baseTier(user), Math.max(saved, reported), "user:" + user.getId()).withNickname(user.getNickname());
@@ -113,11 +115,12 @@ public class MembershipService {
 
     public Map<Long, Long> savedCounts() {
         Map<Long, Long> counts = new HashMap<>();
-        progressRepository.dataByUser().forEach(row -> counts.merge((Long) row[0], count((String) row[1]), Long::sum));
+        progressRepository.dataByUser().forEach(row -> counts.merge((Long) row[0], solvedIn((String) row[1]), Long::sum));
         return counts;
     }
 
-    private long count(String data) {
+    // 문제집 기록(JSON)에서 한 번이라도 푼 문제 수
+    public long solvedIn(String data) {
         try {
             var stats = json.readTree(data).path("stats");
             if (!stats.isObject()) return 0;
