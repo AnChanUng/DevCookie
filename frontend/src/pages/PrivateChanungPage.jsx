@@ -24,16 +24,19 @@ export default function PrivateChanungPage() {
   const [data, setData] = useState(null);
   const [loadError, setLoadError] = useState(false);
 
+  const trouble = id === 'trouble';
+
   useEffect(() => {
-    if (!unlocked || data) return;
+    if (!unlocked || data || trouble) return;
     let alive = true;
     import('../data/privateBanks')
       .then(m => { if (alive) setData(m); })
       .catch(() => { if (alive) setLoadError(true); });
     return () => { alive = false; };
-  }, [unlocked, data]);
+  }, [unlocked, data, trouble]);
 
   if (!unlocked) return <Gate onUnlock={() => setUnlocked(true)} />;
+  if (trouble) return <TroubleLog />;
   if (loadError) return <div className="fade-in"><p role="alert">문제집을 불러오지 못했습니다. 새로고침해 주세요.</p></div>;
   if (!data) return <div className="fade-in"><p role="status">문제집을 불러오는 중…</p></div>;
 
@@ -43,6 +46,61 @@ export default function PrivateChanungPage() {
     return <CompanyExam company={found.bank} back={{ to: BASE, label: '← 비공개 문제집' }} />;
   }
   return <PrivateList data={data} onLock={() => { try { sessionStorage.removeItem(STORE); } catch { /* 저장소를 못 쓰면 새로고침으로 잠긴다 */ } setUnlocked(false); }} />;
+}
+
+const STATUS = { solved: '해결', open: '진행 중', note: '관찰' };
+
+// 개발하면서 겪은 기술 문제 기록. 데이터는 잠금을 푼 뒤에만 불러온다
+function TroubleLog() {
+  const [items, setItems] = useState(null);
+  const [area, setArea] = useState('all');
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    import('../data/troubleLog').then(m => { if (alive) setItems(m.TROUBLES); }).catch(() => { if (alive) setFailed(true); });
+    return () => { alive = false; };
+  }, []);
+  if (failed) return <div className="fade-in"><p role="alert">기록을 불러오지 못했습니다. 새로고침해 주세요.</p></div>;
+  if (!items) return <div className="fade-in"><p role="status">기록을 불러오는 중…</p></div>;
+  const areas = [...new Set(items.map(t => t.area))];
+  const shown = items.filter(t => area === 'all' || t.area === area);
+  const open = items.filter(t => t.status === 'open').length;
+  return (
+    <div className="fade-in">
+      <div className="page-header">
+        <Link to={BASE} className="back-link">← 비공개 문제집</Link>
+        <h1>트러블슈팅 기록</h1>
+        <p>개발하면서 실제로 겪은 기술 문제와 원인, 해결, 측정 결과입니다. 전체 {items.length}건 · 해결 {items.length - open}건 · 진행 중 {open}건</p>
+      </div>
+      <div className="exam-filters" role="group" aria-label="분야">
+        {['all', ...areas].map(a => (
+          <button key={a} type="button" className={`exam-btn${area === a ? ' primary' : ''}`} aria-pressed={area === a} onClick={() => setArea(a)}>
+            {a === 'all' ? '전체' : a}
+          </button>
+        ))}
+      </div>
+      {shown.map(t => (
+        <article key={t.id} style={{ marginTop: 16, padding: '16px 18px', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-lg)' }}>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', fontSize: 13, opacity: 0.8 }}>
+            <time dateTime={t.date}>{t.date}</time>
+            <span>· {t.area}</span>
+            <span className={`exam-tag${t.status === 'open' ? ' soon' : ''}`}>{STATUS[t.status] || t.status}</span>
+          </div>
+          <h2 style={{ fontSize: 18, margin: '8px 0 10px' }}>{t.title}</h2>
+          <dl style={{ margin: 0, display: 'grid', gap: 8, lineHeight: 1.6 }}>
+            {[['증상', t.symptom], ['원인', t.cause], ['해결', t.fix], ['결과', t.result], ['측정 환경', t.env], ['배운 점', t.lesson]]
+              .filter(([, v]) => v)
+              .map(([k, v]) => (
+                <div key={k}>
+                  <dt style={{ fontWeight: 700, fontSize: 13 }}>{k}</dt>
+                  <dd style={{ margin: 0, wordBreak: 'keep-all' }}>{v}</dd>
+                </div>
+              ))}
+          </dl>
+        </article>
+      ))}
+    </div>
+  );
 }
 
 function Gate({ onUnlock }) {
@@ -91,6 +149,16 @@ function PrivateList({ data, onLock }) {
         <p>실제 응시 후기·복기 자료로 만든 문제집과 컴퓨터일반 문제집입니다. 공개 메뉴에는 나오지 않습니다.</p>
         <button type="button" className="exam-btn" onClick={onLock}>잠그기</button>
       </div>
+      <section style={{ marginTop: 24 }}>
+        <div className="section-title">개발 기록</div>
+        <div className="exam-company-grid">
+          <Link to={`${BASE}/trouble`} className="exam-company-card">
+            <span className="exam-company-abbr">LOG</span>
+            <span className="exam-company-name">트러블슈팅 기록</span>
+            <span className="exam-company-meta">개발하면서 겪은 기술 문제 · 원인 · 해결 · 측정 결과</span>
+          </Link>
+        </div>
+      </section>
       {data.PRIVATE_GROUPS.map(group => (
         <section key={group.key} style={{ marginTop: 24 }}>
           <div className="section-title">{group.name}</div>
