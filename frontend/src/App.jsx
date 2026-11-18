@@ -3,7 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import PracticeEntry from './components/PracticeEntry';
 import Layout from './components/Layout';
 import Home from './pages/Home';
-import { MAINTENANCE, RenewalNotice, RenewalShell } from './Renewal';
+import { RenewalNotice, RenewalShell } from './Renewal';
+import { MAINTENANCE } from './maintenance';
 import './App.css';
 import './exam.css';
 
