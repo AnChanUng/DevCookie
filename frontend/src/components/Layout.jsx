@@ -68,7 +68,7 @@ export default function Layout() {
               <a href="https://gitseon.github.io/study-space/" target="_blank" rel="noopener noreferrer" aria-label="gs study (새 탭에서 열림)">
                 gs study <span aria-hidden="true">↗</span>
               </a>
-              <Link to="/exam" className={location.pathname.startsWith('/exam') || location.pathname === '/computer-general' || location.pathname === '/topics' || location.pathname === '/calc' ? 'active' : ''}>
+              <Link to="/exam" className={location.pathname.startsWith('/exam') || location.pathname === '/topics' || location.pathname === '/calc' ? 'active' : ''}>
                 기업별 기출
               </Link>
               <Link to="/aptitude" className={location.pathname.startsWith('/aptitude') || location.pathname === '/ncs' ? 'active' : ''}>

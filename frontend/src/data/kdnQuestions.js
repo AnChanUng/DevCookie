@@ -1,12 +1,6 @@
 // 한전KDN 전산직 필기(1차) 대비 자체 제작 문제 50문항 (5지선다)
 // 공기업 필기/2026_한전KDN_전산필기_1차.hwp 의 응시 후기(복원 문항 50개)를 기준으로 구성. 실제 시험 문항의 복제가 아님.
-export const KDN_SECTIONS = {
-  sw:  {name:'소프트웨어공학', short:'SW', sub:'XP · LOC · 결합도/응집도 · SOLID · 디자인 패턴 · 오버로딩 · 형상관리', count:7},
-  pl:  {name:'프로그래밍·자료구조', short:'PL/DS', sub:'포인터 · 트리 순회 · 스택/큐 · 그래프 간선 · 레지스터', count:5},
-  os:  {name:'운영체제', short:'OS', sub:'은행가 알고리즘 · LFU · 페이징/세그먼테이션 · HRN · PC 레지스터', count:5},
-  db:  {name:'데이터베이스', short:'DB', sub:'조인 차수·카디널리티 · COUNT · SQL 순서 · 함수 종속 · 정규화 · 무결성 · 설계 단계 · 회복 · ACID · 투명성 · 뷰 · DML', count:17},
-  net: {name:'네트워크', short:'NW', sub:'서브넷 · 해밍코드 · CSMA/CA · OSPF · 지연시간 · 혼잡제어 · IPv6 · HDLC · 전송계층 · RTS/CTS · ARP · SDN · 토폴로지', count:16},
-};
+export { KDN_SECTIONS } from './splitSections';
 
 export const KDN_QUESTIONS = [
 /* ===== 소프트웨어공학 7 ===== */

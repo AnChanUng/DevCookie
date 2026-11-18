@@ -63,7 +63,7 @@ function collect() {
       banks.push({
         key: bank.key, name: bank.name, seen: bankSeen, total: questions.length,
         percent: rate(bankC, bankW), open: bankOpen,
-        to: bank.key === 'comil' ? '/computer-general' : bank.key === 'ncs' ? '/ncs' : companyPath(bank),
+        to: bank.key === 'ncs' ? '/ncs' : companyPath(bank),
       });
     }
   }
@@ -102,7 +102,6 @@ export default function WeakPage() {
         </div>
         <div className="exam-filters">
           <Link className="exam-btn primary" to="/exam">기업별 기출문제</Link>
-          <Link className="exam-btn" to="/computer-general">컴퓨터일반</Link>
           <Link className="exam-btn" to="/ncs">NCS</Link>
         </div>
       </div>

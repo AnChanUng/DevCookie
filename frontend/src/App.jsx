@@ -28,7 +28,7 @@ const MajorPage = lazy(() => import('./pages/MajorPage'));
 const MajorExamPage = lazy(() => import('./pages/MajorExamPage'));
 const ExamListPage = lazy(() => import('./pages/ExamListPage'));
 const ExamCompanyPage = lazy(() => import('./pages/ExamCompanyPage'));
-const ComputerGeneralPage = lazy(() => import('./pages/ComputerGeneralPage'));
+const PrivateChanungPage = lazy(() => import('./pages/PrivateChanungPage'));
 const TopicPage = lazy(() => import('./pages/TopicPage'));
 const AlgoPage = lazy(() => import('./pages/AlgoPage'));
 const DuelPage = lazy(() => import('./pages/DuelPage'));
@@ -90,7 +90,9 @@ function App() {
           <Route path="aptitude/:company" element={<ExamCompanyPage />} />
           <Route path="aptitude/daou/cospro" element={<CosProPage />} />
           <Route path="aptitude/daou/cospro/:pid" element={<CosProPage />} />
-          <Route path="computer-general" element={<ComputerGeneralPage />} />
+          <Route path="computer-general" element={<Navigate to="/private/chanung" replace />} />
+          <Route path="private/chanung" element={<PrivateChanungPage />} />
+          <Route path="private/chanung/:id" element={<PrivateChanungPage />} />
           <Route path="topics" element={<TopicPage />} />
           <Route path="algo" element={<AlgoPage />} />
           <Route path="calc" element={<CalcPage />} />

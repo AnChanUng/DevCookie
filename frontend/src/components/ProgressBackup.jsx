@@ -1,12 +1,12 @@
 import { useRef, useState, useSyncExternalStore } from 'react';
 import { Link } from 'react-router-dom';
-import { BANKS } from '../data/examQuestions';
+import { BANKS, PRIVATE_BANK_KEYS } from '../data/examQuestions';
 import { mergeProgress, syncAllProgress } from '../hooks/useExamProgress';
 import { account, onAccountChange, signIn, signOut } from '../sync';
 
 const localKey = (company) => `exam-progress:${company}`;
 // 백업·동기화 대상. 주제별 통합 문제집은 문제은행 목록에 없지만 기록은 따로 쌓이므로 함께 챙긴다
-const KEYS = [...BANKS.map(b => b.key), 'topics', 'bug-hunt'];
+const KEYS = [...BANKS.map(b => b.key), ...PRIVATE_BANK_KEYS, 'topics', 'bug-hunt'];
 
 function readAll() {
   const out = {};
