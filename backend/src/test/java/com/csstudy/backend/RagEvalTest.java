@@ -32,7 +32,8 @@ import java.util.HashSet;
 @EnabledIfEnvironmentVariable(named = "RAG_EVAL", matches = "1")
 class RagEvalTest {
 
-    static final int FIRST_K = 20, FINAL_K = 5;
+    // 1차 후보 수는 RAG_FIRST_K로 바꿔 가며 정확도와 지연을 비교한다. 이미 넣은 문서는 RAG_SKIP_INGEST=1로 다시 넣지 않는다
+    static final int FIRST_K = Integer.parseInt(System.getenv().getOrDefault("RAG_FIRST_K", "20")), FINAL_K = 5;
 
     @Autowired RagService rag;
     @Autowired TeiReranker reranker;
@@ -45,7 +46,7 @@ class RagEvalTest {
     @Test
     void evaluateRetrieval() throws Exception {
         long t0 = System.currentTimeMillis();
-        RagIngestService.Result indexed = ingest.ingest();
+        RagIngestService.Result indexed = "1".equals(System.getenv("RAG_SKIP_INGEST")) ? null : ingest.ingest();
         long ingestMs = System.currentTimeMillis() - t0;
 
         JsonNode items = json.readTree(new ClassPathResource("rag/eval-set.json").getInputStream()).get("items");
@@ -71,6 +72,7 @@ class RagEvalTest {
         }
 
         Map<String, Object> report = new LinkedHashMap<>();
+        report.put("firstK", FIRST_K);
         report.put("indexed", indexed);
         report.put("ingestMs", ingestMs);
         List<Row> answerable = rows.stream().filter(Row::answerable).toList();
@@ -86,7 +88,7 @@ class RagEvalTest {
                 "withRerankP50", pct(rows.stream().map(Row::rerankMs).toList(), 50), "withRerankP95", pct(rows.stream().map(Row::rerankMs).toList(), 95)));
         report.put("rows", rows);
 
-        File out = new File("build/reports/rag-eval.json");
+        File out = new File("build/reports/rag-eval-k" + FIRST_K + ".json");
         out.getParentFile().mkdirs();
         json.copy().enable(SerializationFeature.INDENT_OUTPUT).writeValue(out, report);
         Map<String, Object> summary = new LinkedHashMap<>(report);
