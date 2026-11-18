@@ -4,6 +4,7 @@ import com.csstudy.backend.dto.UserResponse;
 import com.csstudy.backend.entity.User;
 import com.csstudy.backend.repository.UserRepository;
 import com.csstudy.backend.service.AuthService;
+import com.csstudy.backend.service.CredentialService;
 import com.csstudy.backend.service.MembershipService;
 import com.csstudy.backend.service.NicknameService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,6 +28,7 @@ public class AuthController {
     private final AuthService authService;
     private final MembershipService membershipService;
     private final NicknameService nicknames;
+    private final CredentialService credentials;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @PostMapping("/register")
@@ -48,34 +50,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @Transactional
     public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
-        final String nickname = body.getOrDefault("nickname", "").trim();
-        final String password = body.getOrDefault("password", "").trim();
-
-        if (nickname.isEmpty() || password.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "닉네임과 비밀번호를 입력해주세요."));
-        }
-
-        Optional<User> userOpt = userRepository.findByNicknameForUpdate(nickname);
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "존재하지 않는 닉네임입니다."));
-        }
-
-        User user = userOpt.get();
-        if (isHashed(user.getPassword())) {
-            if (!passwordEncoder.matches(password, user.getPassword())) {
-                return ResponseEntity.badRequest().body(Map.of("error", "비밀번호가 틀렸습니다."));
-            }
-        } else {
-            // 암호화 도입 전에 가입한 계정: 평문 비교 후 해시로 교체
-            if (!user.getPassword().equals(password)) {
-                return ResponseEntity.badRequest().body(Map.of("error", "비밀번호가 틀렸습니다."));
-            }
-            user.setPassword(passwordEncoder.encode(password));
-            userRepository.save(user);
-        }
-
+        User user = credentials.authenticate(body.getOrDefault("nickname", "").trim(), body.getOrDefault("password", "").trim());
         return ResponseEntity.ok(UserResponse.from(user, authService.issueToken(user), membershipService.membership(user)));
     }
 
@@ -117,9 +93,5 @@ public class AuthController {
     public ResponseEntity<?> logout(HttpServletRequest request) {
         authService.revoke(request);
         return ResponseEntity.ok(Map.of("ok", true));
-    }
-
-    private static boolean isHashed(String stored) {
-        return stored != null && stored.matches("^\\$2[aby]\\$\\d{2}\\$.{53}$");
     }
 }

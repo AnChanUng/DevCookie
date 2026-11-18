@@ -3220,46 +3220,7 @@ a.goal-exam:hover { border-color: var(--accent-blue); }
   }
 }
 
-/* ===== 분위기 요소: 비 · 눈, 응원 문구, 지금 공부 중인 사람 수 ===== */
-.ambience-sky {
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 5;
-}
-
-.ambience-sky i {
-  position: absolute;
-  top: -12vh;
-  display: block;
-  animation: ambience-fall linear infinite;
-}
-
-.ambience-sky.rain i {
-  width: 1px;
-  height: 56px;
-  background: linear-gradient(to bottom, transparent, rgba(99, 132, 241, 0.45));
-}
-
-.ambience-sky.snow i {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 6px rgba(140, 160, 220, 0.7);
-  animation-name: ambience-drift;
-}
-
-@keyframes ambience-fall {
-  to { transform: translateY(125vh); }
-}
-
-@keyframes ambience-drift {
-  50% { transform: translate(22px, 60vh); }
-  100% { transform: translate(-12px, 125vh); }
-}
-
+/* ===== 분위기 요소: 응원 문구, 지금 공부 중인 사람 수 ===== */
 .ambience-notes {
   position: fixed;
   left: 50%;
@@ -3296,7 +3257,6 @@ a.goal-exam:hover { border-color: var(--accent-blue); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ambience-sky { display: none; }
   .ambience-note.toast { animation: none; }
 }
 

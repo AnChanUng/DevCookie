@@ -5,6 +5,7 @@ import { loadAccountRecords, summarizeAccount } from '../accountRecords';
 import { CS_NOTES, migrateNotesCompletion } from '../data/csNotes';
 import { WEB_ESSENTIALS } from '../data/webEssentials';
 import QuestionExplanation from '../components/QuestionExplanation';
+import SocialLogin from '../components/SocialLogin';
 import { buildAccountRetry } from '../accountRetry';
 import './AccountPage.css';
 import TierBadge from '../components/TierBadge';
@@ -111,6 +112,7 @@ function AccountDashboard({ user, openReset }) {
         <button type="button" className="exam-btn sm" disabled={authBusy || !form.nickname.trim() || !form.password} onClick={() => authenticate('register')}>새 계정 만들기</button>
         <button type="button" className="exam-btn sm" disabled={authBusy} onClick={() => showPasswordReset(true)}>비밀번호 재설정</button>
       </form>}
+      {!resettingPassword && <SocialLogin user={user} />}
       {!user && <form onSubmit={async e => {
         e.preventDefault(); setAuthBusy(true); setMessage('');
         try {
