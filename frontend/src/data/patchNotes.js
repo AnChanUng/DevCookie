@@ -3,6 +3,20 @@
 // status: 'released' 배포됨(master) | 'dev' 개발 브랜치에만 있음 | 'wip' 작업 중
 export const PATCH_NOTES = [
   {
+    version: '0.9.0',
+    date: '2026-11-18',
+    title: '공개 패치노트 · 약관 · 토스 스타일 푸터',
+    status: 'dev',
+    summary: '사이트 맨 아래에 토스 스타일 푸터를 넣고, 연 · 월별 공개 패치노트와 서비스 이용약관 · 개인정보 처리방침을 만들었습니다. 이번부터 이슈 → PR → 병합 흐름으로 작업합니다.',
+    items: [
+      { type: 'feature', text: '공개 패치노트(/changelog): 2026년 4월 첫 출시부터 월별로 무엇이 바뀌었는지 정리. 비공개 내용은 빼고 쓴다.' },
+      { type: 'feature', text: '서비스 이용약관(/terms) · 개인정보 처리방침(/privacy): 실제로 저장하는 정보(닉네임, 비밀번호 해시, 학습 · 이용 · 보안 기록)와 외부 서비스(Vercel · Render · Neon · Gemini)를 적었다.' },
+      { type: 'feature', text: '토스 스타일 푸터: 그라데이션 배경, 큰 문구, 링크 묶음, 흐린 대형 브랜드 글자. 리뉴얼 기간에도 패치노트 · 약관은 공개.' },
+      { type: 'docs', text: 'README를 리뉴얼 상태 · 최근 개선 수치 · 개발 흐름 중심으로 다시 썼다.' },
+      { type: 'infra', text: '한글 이슈 · PR 템플릿 추가, GitHub CLI로 이슈 → PR → 병합 흐름 시작.' },
+    ],
+  },
+  {
     version: '0.8.0',
     date: '2026-11-18',
     title: '관리자 모니터링을 비공개 영역으로 이동',
