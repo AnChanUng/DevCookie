@@ -36,7 +36,7 @@ try {
   const modal = { open: false, showModal() { this.open = true; }, close() { this.open = false; } };
   await act(()=>{view=TestRenderer.create(React.createElement(Notice),{createNodeMock: el => el.type==='dialog' ? modal : null});});
   assert.equal(modal.open,true,'Notice opens on first render');
-  assert.deepEqual(view.root.findAllByType('li').map(text),['기업별 복기 문제집','컴퓨터일반 100제','예상문제집']);
+  assert.deepEqual(view.root.findAllByType('li').map(text),['기업별 예상문제집','주제별 통합 문제집','전공노트 복습']);
   assert.ok(!text(view.toJSON()).includes('오늘 시험'));
   assert.ok(!text(view.toJSON()).includes('D-DAY'));
   assert.ok(!text(view.toJSON()).includes('지난 시험'));

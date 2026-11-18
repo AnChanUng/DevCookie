@@ -19,9 +19,9 @@ export default function StudyNotice() {
         <span className="study-notice-label">공지사항</span>
         <h2 id="study-notice-title">문제집 풀이 우선순위</h2>
         <ol className="study-notice-priorities">
-          <li>기업별 복기 문제집</li>
-          <li>컴퓨터일반 100제</li>
-          <li>예상문제집</li>
+          <li>기업별 예상문제집</li>
+          <li>주제별 통합 문제집</li>
+          <li>전공노트 복습</li>
         </ol>
         <div className="study-notice-update">
           <time dateTime="2026-10-15">2026.10.15</time>
