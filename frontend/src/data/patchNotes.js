@@ -6,7 +6,7 @@ export const PATCH_NOTES = [
     version: '0.9.0',
     date: '2026-11-18',
     title: '공개 패치노트 · 약관 · 토스 스타일 푸터',
-    status: 'dev',
+    status: 'released',
     summary: '사이트 맨 아래에 토스 스타일 푸터를 넣고, 연 · 월별 공개 패치노트와 서비스 이용약관 · 개인정보 처리방침을 만들었습니다. 이번부터 이슈 → PR → 병합 흐름으로 작업합니다.',
     items: [
       { type: 'feature', text: '공개 패치노트(/changelog): 2026년 4월 첫 출시부터 월별로 무엇이 바뀌었는지 정리. 비공개 내용은 빼고 쓴다.' },
