@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import PracticeEntry from './components/PracticeEntry';
 import Layout from './components/Layout';
 import Home from './pages/Home';
+import { MAINTENANCE, RenewalNotice, RenewalShell } from './Renewal';
 import './App.css';
 import './exam.css';
 
@@ -47,6 +48,17 @@ function WebEssentialsRedirect() {
 }
 
 function App() {
+  if (MAINTENANCE) return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="private/chanung" element={<RenewalShell />}>
+          <Route index element={<PrivateChanungPage />} />
+          <Route path=":id" element={<PrivateChanungPage />} />
+        </Route>
+        <Route path="*" element={<RenewalNotice />} />
+      </Routes>
+    </BrowserRouter>
+  );
   return (
     <BrowserRouter>
       <Routes>
