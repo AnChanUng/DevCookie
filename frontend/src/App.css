@@ -4395,3 +4395,11 @@ a.goal-exam:hover { border-color: var(--accent-blue); }
   .ct-site { padding: 14px; }
 }
 @media (prefers-reduced-motion: reduce) { .ct-panel { animation: none; } .ct-caret { transition: none; } }
+
+/* 좁은 화면에서 "새 글" 점이 화면 밖으로 2px 나가 가로 스크롤이 생기던 문제 */
+@media (max-width: 640px) {
+  .study-count-new { right: 0; }
+}
+
+/* 메인(/)은 웹 2단 배치라 넓은 컨테이너를 쓴다 */
+.container.container-wide { max-width: 1208px; }

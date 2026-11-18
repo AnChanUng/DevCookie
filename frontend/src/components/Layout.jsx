@@ -137,7 +137,7 @@ export default function Layout() {
         )}
       </header>
 
-      <main className="container">
+      <main className={location.pathname === "/" ? "container container-wide" : "container"}>
         <Suspense fallback={<div className="loading"><div className="loading-spinner" />불러오는 중...</div>}>
           <Outlet />
         </Suspense>
