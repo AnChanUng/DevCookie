@@ -1,7 +1,7 @@
 plugins {
     java
-    id("org.springframework.boot") version "3.2.5"
-    id("io.spring.dependency-management") version "1.1.5"
+    id("org.springframework.boot") version "3.5.16"
+    id("io.spring.dependency-management") version "1.1.7"
 }
 
 group = "com.csstudy"
@@ -22,6 +22,15 @@ repositories {
     mavenCentral()
 }
 
+// Spring AI 1.1.x는 Spring Boot 3.5 계열을 기준으로 한다
+extra["springAiVersion"] = "1.1.8"
+
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.ai:spring-ai-bom:${property("springAiVersion")}")
+    }
+}
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -30,6 +39,12 @@ dependencies {
     // HikariCP 커넥션 풀 지표(active · idle · pending · 획득 시간)를 Micrometer로 본다
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.security:spring-security-crypto")
+
+    // RAG 학습 도우미: ChromaDB 벡터 저장소, OpenAI 호환 임베딩(로컬 TEI의 bge-m3), Gemini 답변 생성, RAG 어드바이저
+    implementation("org.springframework.ai:spring-ai-starter-vector-store-chroma")
+    implementation("org.springframework.ai:spring-ai-starter-model-openai")
+    implementation("org.springframework.ai:spring-ai-starter-model-google-genai")
+    implementation("org.springframework.ai:spring-ai-rag")
 
     runtimeOnly("org.postgresql:postgresql")
 
