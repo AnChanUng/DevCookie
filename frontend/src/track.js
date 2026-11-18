@@ -36,6 +36,7 @@ function referrer() {
 // extra: 풀이 완료일 때의 { score, total, seconds }
 export function track(type, path, detail, extra) {
   const id = visitorId();
-  if (!id || path.startsWith('/admin')) return;
+  // 관리자 · 비공개 화면(운영자 본인) 열람은 이용 집계에서 뺀다
+  if (!id || path.startsWith('/admin') || path.startsWith('/private')) return;
   api.post('/track', { visitorId: id, type, path, detail, device: device(), referrer: referrer(), ...extra }, { timeout: 180000 }).catch(() => {});
 }

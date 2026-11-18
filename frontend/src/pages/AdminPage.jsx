@@ -43,9 +43,15 @@ const fmtUptime = (s) => {
 };
 const pct = (score, total) => (total ? Math.round(score / total * 100) : null);
 
-const savedKey = () => { try { return sessionStorage.getItem(KEY) || ''; } catch { return ''; } };
+// 관리자 키는 이 기기에 기억해 둔다. 비공개 페이지 비밀번호만 넣으면 모니터링까지 바로 보이게 하려는 것이다.
+// 공용 PC에서는 "이 기기에서 키 지우기"로 지운다
+const savedKey = () => { try { return localStorage.getItem(KEY) || sessionStorage.getItem(KEY) || ''; } catch { return ''; } };
+const storeKey = (v) => { try { localStorage.setItem(KEY, v); } catch { /* 저장소를 못 쓰면 이번 화면에서만 쓴다 */ } };
+const forgetKey = () => { try { localStorage.removeItem(KEY); sessionStorage.removeItem(KEY); } catch { /* 무시 */ } };
 
-export default function AdminPage() {
+const HOME = { to: '/', label: '← 홈으로' };
+
+export default function AdminPage({ back = HOME }) {
   const [metrics, setMetrics] = useState(null);
   const [metricsError, setMetricsError] = useState('');
   useEffect(() => {
@@ -73,11 +79,11 @@ export default function AdminPage() {
         <p className="exam-note">{metrics.from} ~ {metrics.through} · {new Date(metrics.asOf).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })} KST 기준. 방문자는 페이지를 조회한 익명 브라우저 ID 기준으로, 가입자 수와 다릅니다. 기기 변경·브라우저 초기화 시 중복될 수 있으며 자동화 방문이 포함될 수 있습니다.</p>
       </> : <p role="status">{metricsError || '이용 통계를 불러오는 중입니다. 서버 시작에 1~2분 걸릴 수 있습니다.'}</p>}
     </section>
-    <AdminControls />
+    <AdminControls back={back} />
   </>;
 }
 
-function AdminControls() {
+function AdminControls({ back }) {
   const [key, setKey] = useState(savedKey);
   const [input, setInput] = useState('');
   const [days, setDays] = useState(30);
@@ -113,7 +119,7 @@ function AdminControls() {
         if (stale) return;
         const status = err.response?.status;
         if (status === 401) {
-          try { sessionStorage.removeItem(KEY); } catch { /* 무시 */ }
+          forgetKey();
           setKey('');
           setData(null);
           setSys(null);
@@ -142,14 +148,14 @@ function AdminControls() {
     e.preventDefault();
     const v = input.trim();
     if (!v) return;
-    try { sessionStorage.setItem(KEY, v); } catch { /* 무시 */ }
+    storeKey(v);
     begin();
     setKey(v);
     setInput('');
   };
 
   const logout = () => {
-    try { sessionStorage.removeItem(KEY); } catch { /* 무시 */ }
+    forgetKey();
     setKey('');
     setData(null);
     setSys(null);
@@ -162,9 +168,9 @@ function AdminControls() {
     return (
       <div className="fade-in">
         <div className="page-header">
-          <Link to="/" className="back-link">← 홈으로</Link>
+          <Link to={back.to} className="back-link">{back.label}</Link>
           <h1>관리자</h1>
-          <p>모니터링 화면을 보려면 관리자 키를 입력하세요.</p>
+          <p>모니터링 화면을 보려면 서버 관리자 키를 입력하세요. 이 기기에서는 한 번만 입력하면 됩니다.</p>
         </div>
         <form className="admin-login" onSubmit={submit}>
           <input type="password" value={input} onChange={e => setInput(e.target.value)} placeholder="관리자 키" autoFocus autoComplete="off" />
@@ -178,12 +184,12 @@ function AdminControls() {
   return (
     <div className="fade-in">
       <div className="page-header exam-page-header">
-        <Link to="/" className="back-link">← 홈으로</Link>
+        <Link to={back.to} className="back-link">{back.label}</Link>
         <div className="exam-toplinks">
           {RANGES.map(r => <button key={r} type="button" className={days === r ? 'on' : ''} onClick={() => { if (r !== days) { begin(); setDays(r); } }}>최근 {r}일</button>)}
           <button type="button" onClick={() => { begin(); setTick(t => t + 1); }}>{loading ? '불러오는 중' : '새로고침'}</button>
           <button type="button" className={auto ? 'on' : ''} onClick={() => setAuto(a => !a)}>자동 {auto ? '켜짐' : '꺼짐'}</button>
-          <button type="button" onClick={logout}>잠그기</button>
+          <button type="button" onClick={logout}>이 기기에서 키 지우기</button>
         </div>
         <h1>관리자 모니터링</h1>
         <p>

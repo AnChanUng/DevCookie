@@ -103,7 +103,7 @@ export default function Layout() {
       </main>
 
       <PromotionAnnouncements />
-      {!location.pathname.startsWith('/admin') && <RankWelcome />}
+      {!location.pathname.startsWith('/admin') && !location.pathname.startsWith('/private') && <RankWelcome />}
       <StudyAmbience />
       {SHOW_CHAOS_CHAT && <ChaosChat />}
     </>

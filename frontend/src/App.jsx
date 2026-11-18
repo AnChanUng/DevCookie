@@ -35,7 +35,6 @@ const TopicPage = lazy(() => import('./pages/TopicPage'));
 const AlgoPage = lazy(() => import('./pages/AlgoPage'));
 const DuelPage = lazy(() => import('./pages/DuelPage'));
 const CalcPage = lazy(() => import('./pages/CalcPage'));
-const AdminPage = lazy(() => import('./pages/AdminPage'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
 const NcsPage = lazy(() => import('./pages/NcsPage'));
 const WeakPage = lazy(() => import('./pages/WeakPage'));
@@ -56,6 +55,7 @@ function App() {
           <Route index element={<PrivateChanungPage />} />
           <Route path=":id" element={<PrivateChanungPage />} />
         </Route>
+        <Route path="admin/cu" element={<Navigate to="/private/chanung/admin" replace />} />
         <Route path="*" element={<RenewalNotice />} />
       </Routes>
     </BrowserRouter>
@@ -116,7 +116,7 @@ function App() {
           <Route path="ncs" element={<NcsPage />} />
           <Route path="search" element={<SearchPage />} />
           <Route path="weak" element={<WeakPage />} />
-          <Route path="admin/cu" element={<AdminPage />} />
+          <Route path="admin/cu" element={<Navigate to="/private/chanung/admin" replace />} />
         </Route>
       </Routes>
     </BrowserRouter>

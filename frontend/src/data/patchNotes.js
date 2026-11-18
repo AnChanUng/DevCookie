@@ -3,6 +3,19 @@
 // status: 'released' 배포됨(master) | 'dev' 개발 브랜치에만 있음 | 'wip' 작업 중
 export const PATCH_NOTES = [
   {
+    version: '0.8.0',
+    date: '2026-11-18',
+    title: '관리자 모니터링을 비공개 영역으로 이동',
+    status: 'released',
+    summary: '리뉴얼 안내 때문에 열 수 없던 관리자 화면을 비공개 영역으로 옮겨, 비밀번호 하나로 모든 개발 · 운영 기록을 볼 수 있게 했습니다.',
+    items: [
+      { type: 'feature', text: '관리자 모니터링(/private/chanung/admin): 공개 이용 통계와 풀이 · 방문자 · 보안 · 제보 · 채팅 · 계정 · 시스템 탭. 예전 주소 /admin/cu는 새 주소로 넘어간다.' },
+      { type: 'improve', text: '서버 관리자 키를 이 기기에 기억해 두어, 한 번 입력한 뒤로는 비공개 비밀번호만 넣으면 모니터링까지 바로 보인다("이 기기에서 키 지우기" 제공).' },
+      { type: 'improve', text: '비공개 영역 열람은 방문 집계와 순위 알림에서 제외.' },
+      { type: 'feature', text: '비공개 목록에 개발 기록 카드(트러블슈팅 · 패치노트 · RAG 학습 도우미 · 관리자 모니터링)를 모았다.' },
+    ],
+  },
+  {
     version: '0.7.0',
     date: '2026-11-18',
     title: 'RAG 학습 도우미 화면과 출처 검증',

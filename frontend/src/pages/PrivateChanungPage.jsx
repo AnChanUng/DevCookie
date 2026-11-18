@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { CompanyExam } from './ExamCompanyPage';
 import RagAssistant from './RagAssistant';
+
+const AdminPage = lazy(() => import('./AdminPage'));
 
 // 비공개 문제집 입구. 비밀번호는 저장소에 원문으로 두지 않고 해시만 비교한다.
 // 화면 잠금일 뿐 서버 인증이 아니므로, 문제 데이터는 잠금을 푼 뒤에만 따로 불러와 공개 화면 번들과 분리한다.
@@ -28,20 +30,22 @@ export default function PrivateChanungPage() {
   const trouble = id === 'trouble';
   const assistant = id === 'assistant';
   const patches = id === 'patch-notes';
+  const admin = id === 'admin';
 
   useEffect(() => {
-    if (!unlocked || data || trouble || assistant || patches) return;
+    if (!unlocked || data || trouble || assistant || patches || admin) return;
     let alive = true;
     import('../data/privateBanks')
       .then(m => { if (alive) setData(m); })
       .catch(() => { if (alive) setLoadError(true); });
     return () => { alive = false; };
-  }, [unlocked, data, trouble, assistant, patches]);
+  }, [unlocked, data, trouble, assistant, patches, admin]);
 
   if (!unlocked) return <Gate onUnlock={() => setUnlocked(true)} />;
   if (trouble) return <TroubleLog />;
   if (assistant) return <RagAssistant />;
   if (patches) return <PatchNotes />;
+  if (admin) return <Suspense fallback={<p role="status">관리자 화면을 불러오는 중…</p>}><AdminPage back={{ to: BASE, label: '← 비공개 문제집' }} /></Suspense>;
   if (loadError) return <div className="fade-in"><p role="alert">문제집을 불러오지 못했습니다. 새로고침해 주세요.</p></div>;
   if (!data) return <div className="fade-in"><p role="status">문제집을 불러오는 중…</p></div>;
 
@@ -204,6 +208,11 @@ function PrivateList({ data, onLock }) {
             <span className="exam-company-abbr">LOG</span>
             <span className="exam-company-name">트러블슈팅 기록</span>
             <span className="exam-company-meta">개발하면서 겪은 기술 문제 · 원인 · 해결 · 측정 결과</span>
+          </Link>
+          <Link to={`${BASE}/admin`} className="exam-company-card">
+            <span className="exam-company-abbr">ADMIN</span>
+            <span className="exam-company-name">관리자 모니터링</span>
+            <span className="exam-company-meta">이용 현황 · 풀이 · 방문자 · 보안 · 제보 · 채팅 · 계정 · 시스템</span>
           </Link>
           <Link to={`${BASE}/patch-notes`} className="exam-company-card">
             <span className="exam-company-abbr">NOTE</span>
