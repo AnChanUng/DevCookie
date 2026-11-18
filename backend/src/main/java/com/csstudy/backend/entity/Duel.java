@@ -42,4 +42,8 @@ public class Duel {
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
+
+    // 방 만들기 요청의 멱등 키(Idempotency-Key). 같은 키로 다시 와도 방을 새로 만들지 않는다
+    @Column(name = "create_key", length = 64, unique = true)
+    private String createKey;
 }

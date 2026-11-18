@@ -53,4 +53,12 @@ public class DuelPlayer {
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    // 푼 순서대로 고른 보기 번호(예: "2031"). 점수와 정오답은 서버가 이 값과 정답표로 계산한다
+    @Column(length = 30)
+    private String picks;
+
+    // 처음 진행 상황을 올린 시각. 이보다 짧게 걸렸다고 올려도 받지 않는다
+    @Column(name = "first_report_at")
+    private Instant firstReportAt;
 }

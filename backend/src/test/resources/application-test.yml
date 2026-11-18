@@ -16,3 +16,6 @@ app:
   security:
     rate-limit-enabled: false
     min-admin-key-length: 0
+  duel:
+    # 테스트용 정답표. 모든 문제의 정답은 0번 보기다
+    bank: classpath:duel-bank-test.json

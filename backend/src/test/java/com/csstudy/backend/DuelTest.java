@@ -80,7 +80,8 @@ class DuelTest {
         Map<String, Object> body = new HashMap<>();
         body.put("visitorId", visitor);
         body.put("nickname", nickname);
-        body.put("score", score);
+        // 테스트 정답표는 모두 0번이 정답이다. 앞에서부터 score개를 맞히고 나머지는 틀린 답을 고른다
+        body.put("picks", "0".repeat(Math.max(0, Math.min(score, answered))) + "1".repeat(Math.max(0, answered - score)));
         body.put("answered", answered);
         body.put("done", done);
         body.put("seconds", seconds);
@@ -140,21 +141,51 @@ class DuelTest {
     @Test
     void perQuestionMarksAreShownOnlyToPlayersWhoFinished() throws Exception {
         String code = create(List.of("a:1", "a:2", "a:3"));
-        Map<String, Object> done = new HashMap<>(Map.of("visitorId", "v-a", "nickname", "수달", "score", 2, "answered", 3, "done", true, "seconds", 20, "marks", "101"));
+        Map<String, Object> done = new HashMap<>(Map.of("visitorId", "v-a", "nickname", "수달", "picks", "020", "answered", 3, "done", true, "seconds", 20));
         mvc.perform(put("/api/v1/duels/" + code + "/players").contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(done)))
                 .andExpect(jsonPath("$.players[0].marks").value("101"));
-        Map<String, Object> playing = new HashMap<>(Map.of("visitorId", "v-b", "nickname", "여우", "score", 1, "answered", 1, "done", false, "seconds", 5, "marks", "1"));
+        Map<String, Object> playing = new HashMap<>(Map.of("visitorId", "v-b", "nickname", "여우", "picks", "0", "answered", 1, "done", false, "seconds", 5));
         mvc.perform(put("/api/v1/duels/" + code + "/players").contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(playing)))
                 .andExpect(status().isOk());
 
-        // 아직 푸는 사람과 구경하는 사람에게는 가린다
-        mvc.perform(get("/api/v1/duels/" + code).header("X-Visitor-Id", "v-b")).andExpect(jsonPath("$.players[0].marks").doesNotExist());
+        // 아직 푸는 사람과 구경하는 사람에게는 남의 정오답을 가린다(본인 것은 보인다)
+        mvc.perform(get("/api/v1/duels/" + code).header("X-Visitor-Id", "v-b"))
+                .andExpect(jsonPath("$.players[0].marks").doesNotExist())
+                .andExpect(jsonPath("$.players[1].marks").value("1"))
+                .andExpect(jsonPath("$.players[1].picks").value("0"));
         mvc.perform(get("/api/v1/duels/" + code)).andExpect(jsonPath("$.players[0].marks").doesNotExist());
         mvc.perform(get("/api/v1/duels/" + code).header("X-Visitor-Id", "v-a")).andExpect(jsonPath("$.players[0].marks").value("101"));
 
-        // 맞힌 수와 맞지 않는 정오답은 받지 않는다
-        Map<String, Object> wrong = new HashMap<>(Map.of("visitorId", "v-c", "nickname", "판다", "score", 3, "answered", 3, "done", true, "seconds", 9, "marks", "100"));
-        mvc.perform(put("/api/v1/duels/" + code + "/players").contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(wrong)))
+        // 클라이언트가 점수와 정오답을 꾸며 보내도 서버가 고른 보기로 다시 채점한다
+        Map<String, Object> forged = new HashMap<>(Map.of("visitorId", "v-c", "nickname", "판다", "picks", "123", "answered", 3, "done", true,
+                "seconds", 9, "score", 3, "marks", "111"));
+        mvc.perform(put("/api/v1/duels/" + code + "/players").contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(forged)))
+                .andExpect(status().isOk());
+        mvc.perform(get("/api/v1/duels/" + code).header("X-Visitor-Id", "v-c"))
+                .andExpect(jsonPath("$.players[?(@.nickname == '판다')].score").value(0))
+                .andExpect(jsonPath("$.players[?(@.nickname == '판다')].marks").value("000"));
+        // 없는 보기를 고르면 받지 않는다
+        Map<String, Object> invalid = new HashMap<>(Map.of("visitorId", "v-d", "nickname", "곰", "picks", "9", "answered", 1, "done", false, "seconds", 3));
+        mvc.perform(put("/api/v1/duels/" + code + "/players").contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(invalid)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void reportedTimeCannotGoBelowWhatTheServerObserved() throws Exception {
+        String code = create(List.of("a:1", "a:2", "a:3"));
+        report(code, "v-t", "거북", 1, 1, false, 50).andExpect(status().isOk());
+        // 앞서 올린 시간보다 짧게 다시 올려도 줄어들지 않는다
+        report(code, "v-t", "거북", 3, 3, true, 5).andExpect(jsonPath("$.players[0].seconds").value(50));
+    }
+
+    @Test
+    void sameIdempotencyKeyReturnsTheSameRoom() throws Exception {
+        String body = json.writeValueAsString(Map.of("questionIds", List.of("a:1", "a:2", "a:3")));
+        String first = json.readTree(mvc.perform(post("/api/v1/duels").header("Idempotency-Key", "key-12345678")
+                .contentType(MediaType.APPLICATION_JSON).content(body)).andReturn().getResponse().getContentAsString()).get("code").asText();
+        mvc.perform(post("/api/v1/duels").header("Idempotency-Key", "key-12345678").contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(jsonPath("$.code").value(first));
+        mvc.perform(post("/api/v1/duels").header("Idempotency-Key", "bad key").contentType(MediaType.APPLICATION_JSON).content(body))
                 .andExpect(status().isBadRequest());
     }
 
@@ -189,9 +220,16 @@ class DuelTest {
                 .andExpect(status().isBadRequest());
         mvc.perform(get("/api/v1/duels/ZZZZZZ")).andExpect(status().isNotFound());
 
+        // 서버 정답표에 없는 문제로는 방을 만들 수 없다
+        mvc.perform(post("/api/v1/duels").contentType(MediaType.APPLICATION_JSON)
+                .content(json.writeValueAsString(Map.of("questionIds", List.of("x:1", "x:2", "x:3")))))
+                .andExpect(status().isBadRequest());
+
         String code = create(List.of("a:1", "a:2", "a:3"));
-        // 맞힌 수가 답한 수보다 많거나 문제 수를 넘으면 받지 않는다
-        report(code, "v-1", "수달", 3, 2, false, 10).andExpect(status().isBadRequest());
+        // 문제 수보다 많이 답했거나, 답한 수와 고른 보기 수가 다르면 받지 않는다
         report(code, "v-1", "수달", 4, 4, true, 10).andExpect(status().isBadRequest());
+        Map<String, Object> mismatch = new HashMap<>(Map.of("visitorId", "v-1", "nickname", "수달", "picks", "00", "answered", 3, "done", false, "seconds", 3));
+        mvc.perform(put("/api/v1/duels/" + code + "/players").contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(mismatch)))
+                .andExpect(status().isBadRequest());
     }
 }

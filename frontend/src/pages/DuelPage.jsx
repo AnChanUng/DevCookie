@@ -25,6 +25,8 @@ const shuffle = (arr) => {
   }
   return a;
 };
+// 방 만들기 요청을 구분하는 키. 같은 시도를 다시 보낼 때는 같은 키를 쓴다
+const requestKey = () => (globalThis.crypto?.randomUUID?.() || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`);
 
 // 상대와의 전적. 방마다 상대 닉네임별 결과(w·l·d)를 이 브라우저에 적어 두고 닉네임 기준으로 합친다
 const RECORD_KEY = 'duel:record';
@@ -73,13 +75,20 @@ function Lobby() {
   }, []);
 
   // open이면 목록에 올라가 누구나 들어오는 단체전, 아니면 링크를 받은 사람만 들어오는 방
+  // 같은 과목 · 같은 방식으로 다시 누르면(응답을 못 받은 경우 등) 같은 요청 키와 문제를 보내 방이 두 번 생기지 않게 한다
+  const attempt = useRef(null);
   const create = async (open) => {
     setBusy(true);
     setError('');
-    const pool = TOPICS.questions.filter(q => subject === 'all' || q.sec === subject);
+    if (attempt.current?.subject !== subject || attempt.current?.open !== open) {
+      const pool = TOPICS.questions.filter(q => subject === 'all' || q.sec === subject);
+      attempt.current = { subject, open, key: requestKey(), questionIds: shuffle(pool).slice(0, SIZE).map(q => q.id) };
+    }
     const title = subject === 'all' ? '전체 과목' : TOPICS.sections[subject].name;
+    const { key, questionIds } = attempt.current;
     try {
-      const { data } = await api.post('/duels', { questionIds: shuffle(pool).slice(0, SIZE).map(q => q.id), open, title }, SLOW);
+      const { data } = await api.post('/duels', { questionIds, open, title }, { ...SLOW, headers: { 'Idempotency-Key': key } });
+      attempt.current = null;
       navigate(`/duel/${data.code}`);
     } catch {
       setError('방을 만들지 못했습니다. 서버가 깨어나는 중일 수 있으니 잠시 뒤에 다시 눌러 주세요.');
@@ -155,6 +164,7 @@ function Room({ code }) {
   const [record, setRecord] = useState(loadRecord);
   const [rematching, setRematching] = useState(false);
   const [marks, setMarks] = useState(''); // 내가 푼 순서대로의 정오답 ("1011…")
+  const [picks, setPicks] = useState(''); // 내가 푼 순서대로 고른 보기 번호 ("2031…"). 채점은 서버가 한다
   const [openRow, setOpenRow] = useState(null); // 복기 표에서 펼친 문제
   // 대결 문제는 주제별 통합 문제집의 문제라서, 틀린 것을 그 문제집의 오답으로 넘길 수 있다
   const { save: saveTopics } = useExamProgress('topics');
@@ -182,6 +192,7 @@ function Room({ code }) {
           setIdx(mine.answered);
           setScore(mine.score);
           setMarks(mine.marks || '');
+          setPicks(mine.picks || '');
           setDone(mine.done || mine.answered >= questions.length);
           startedAt.current = Date.now() - mine.seconds * 1000;
         }
@@ -242,11 +253,10 @@ function Room({ code }) {
         setRoom(r => r ? {...r, players:data.players} : r);
       }).catch(() => setReportError(true)).finally(() => { reportBusy.current = false; });
   };
-  const report = (nextScore, answered, finished, nextMarks) => {
+  // 점수는 서버가 고른 보기로 다시 채점한다. 화면의 점수는 바로 보여 주기 위한 것이다
+  const report = (nextPicks, finished) => {
     const seconds = Math.floor((Date.now() - startedAt.current) / 1000);
-    // 새로고침 뒤에는 앞 문제의 정오답을 모르므로, 길이가 맞을 때만 함께 올린다
-    const withMarks = nextMarks.length === answered ? { marks: nextMarks } : {};
-    lastReport.current = { ...me, score: nextScore, answered, done: finished, seconds, ...withMarks };
+    lastReport.current = { ...me, picks: nextPicks, answered: nextPicks.length, done: finished, seconds };
     flushReport();
   };
 
@@ -274,16 +284,17 @@ function Room({ code }) {
   const start = () => {
     startedAt.current = Date.now();
     setStarted(true);
-    report(0, 0, false, '');
+    report('', false);
   };
   const choose = (i) => {
     if (picked !== null) return;
     setPicked(i);
     const nextScore = score + (i === q.a ? 1 : 0);
     setScore(nextScore);
-    const nextMarks = marks + (i === q.a ? '1' : '0');
-    setMarks(nextMarks);
-    report(nextScore, idx + 1, idx + 1 === total, nextMarks);
+    setMarks(marks + (i === q.a ? '1' : '0'));
+    const nextPicks = picks + i;
+    setPicks(nextPicks);
+    report(nextPicks, idx + 1 === total);
   };
   const next = () => {
     setPicked(null);

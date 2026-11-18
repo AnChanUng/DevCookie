@@ -36,6 +36,9 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("com.h2database:h2")
+    // 동시성 검증은 운영과 같은 PostgreSQL에서 한다. Docker가 없으면 해당 테스트는 건너뛴다
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:postgresql")
 }
 
 tasks.withType<Test> {

@@ -4,6 +4,8 @@ import com.csstudy.backend.entity.Duel;
 import com.csstudy.backend.entity.DuelPlayer;
 import com.csstudy.backend.repository.DuelPlayerRepository;
 import com.csstudy.backend.repository.DuelRepository;
+import com.csstudy.backend.service.DuelAnswerKey;
+import com.csstudy.backend.service.DuelService;
 import com.csstudy.backend.service.VisitorProfileService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -13,7 +15,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -23,7 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 
 // 1:1 대결. 방을 만든 사람이 고른 문제 번호를 저장해 두고, 링크로 들어온 사람들이 같은 문제를 풀어 점수를 겨룬다.
-// 문제 내용과 채점은 프런트에서 하고, 여기서는 문제 번호 목록과 각자의 진행 상황만 맡는다
+// 문제 내용은 프런트에 있고, 채점은 서버의 정답표(DuelAnswerKey)로 한다. 클라이언트가 보낸 점수는 믿지 않는다
 @RestController
 @RequestMapping("/api/v1/duels")
 @RequiredArgsConstructor
@@ -35,13 +36,10 @@ public class DuelController {
     // 단체전은 더 많이 들어올 수 있고, 연 지 이만큼 지나면 목록에서 내린다
     private static final int MAX_OPEN_PLAYERS = 100;
     private static final int OPEN_LIST_MINUTES = 120;
-    // 헷갈리는 글자(0·O, 1·I·L)는 빼고 방 번호를 만든다
-    private static final String CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-    private static final int CODE_LENGTH = 6;
-    private static final SecureRandom RANDOM = new SecureRandom();
-
     private final DuelRepository duelRepository;
     private final DuelPlayerRepository playerRepository;
+    private final DuelService duelService;
+    private final DuelAnswerKey answerKey;
     private final ObjectMapper json;
 
     private boolean active(DuelPlayer p) {
@@ -90,11 +88,14 @@ public class DuelController {
         return ResponseEntity.ok(Map.of("players",board(roomCode,visitor)));
     }
 
+    // Idempotency-Key를 주면 같은 키로 다시 와도 방을 하나만 만든다
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody Map<String, Object> body) throws JsonProcessingException {
+    public ResponseEntity<?> create(@RequestBody Map<String, Object> body,
+                                    @RequestHeader(value = "Idempotency-Key", required = false) String key) throws JsonProcessingException {
         List<String> ids = questionIds(body);
         if (ids == null) return ResponseEntity.badRequest().body(Map.of("error", "문제 번호를 확인해 주세요. " + MIN_QUESTIONS + "~" + MAX_QUESTIONS + "개여야 합니다."));
-        Duel duel = open(ids, Boolean.TRUE.equals(body.get("open")), VisitorProfileService.nickname(body.get("title")));
+        if (key != null && !key.matches("[A-Za-z0-9_-]{8,64}")) return ResponseEntity.badRequest().body(Map.of("error", "요청 키를 확인해 주세요."));
+        Duel duel = duelService.create(ids, Boolean.TRUE.equals(body.get("open")), VisitorProfileService.nickname(body.get("title")), key);
         return ResponseEntity.ok(Map.of("code", duel.getCode()));
     }
 
@@ -116,36 +117,25 @@ public class DuelController {
         return rows;
     }
 
-    // 끝난 방에서 "한 판 더"를 누르면 새 방을 열어 이어 준다. 이미 열려 있으면 그 방을 돌려준다
+    // 끝난 방에서 "한 판 더"를 누르면 새 방을 열어 이어 준다. 이미 열려 있으면 그 방을 돌려준다(여럿이 동시에 눌러도 한 방)
     @PostMapping("/{code}/rematch")
     public ResponseEntity<?> rematch(@PathVariable String code, @RequestBody Map<String, Object> body) throws JsonProcessingException {
-        Optional<Duel> found = duelRepository.findByCode(code.toUpperCase());
-        if (found.isEmpty()) return ResponseEntity.notFound().build();
-        Duel duel = found.get();
-        if (duel.getNextCode() == null) {
-            List<String> ids = questionIds(body);
-            if (ids == null) return ResponseEntity.badRequest().body(Map.of("error", "문제 번호를 확인해 주세요."));
-            // 재대결 방은 앞 방의 공개 여부와 이름을 그대로 물려받는다
-            duel.setNextCode(open(ids, Boolean.TRUE.equals(duel.getOpen()), duel.getTitle()).getCode());
-            duelRepository.save(duel);
-        }
-        return ResponseEntity.ok(Map.of("code", duel.getNextCode()));
+        List<String> ids = questionIds(body);
+        if (ids == null) return ResponseEntity.badRequest().body(Map.of("error", "문제 번호를 확인해 주세요."));
+        return duelService.rematch(code.toUpperCase(), ids)
+                .<ResponseEntity<?>>map(next -> ResponseEntity.ok(Map.of("code", next)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    private Duel open(List<String> ids, boolean open, String title) throws JsonProcessingException {
-        return duelRepository.save(Duel.builder().code(newCode()).questionIds(json.writeValueAsString(ids))
-                .open(open).title(title).createdAt(Instant.now()).build());
-    }
-
-    // 쓸 수 없는 목록이면 null
-    private static List<String> questionIds(Map<String, Object> body) {
+    // 쓸 수 없는 목록이면 null. 서버 정답표에 없는 문제는 채점할 수 없으므로 받지 않는다
+    private List<String> questionIds(Map<String, Object> body) {
         if (!(body.get("questionIds") instanceof List<?> raw) || raw.size() < MIN_QUESTIONS || raw.size() > MAX_QUESTIONS) return null;
         List<String> ids = new ArrayList<>();
         for (Object o : raw) {
             if (!(o instanceof String s) || s.isBlank() || s.length() > 60) return null;
             ids.add(s);
         }
-        return ids;
+        return answerKey.knowsAll(ids) ? ids : null;
     }
 
     // 방문자 ID를 헤더로 주면 순위표에서 본인 줄을 표시해 준다
@@ -172,19 +162,20 @@ public class DuelController {
         Optional<Duel> found = duelRepository.findForUpdate(code.toUpperCase());
         if (found.isEmpty()) return ResponseEntity.notFound().build();
         Duel duel = found.get();
-        int total = json.readValue(duel.getQuestionIds(), new TypeReference<List<String>>() {}).size();
+        List<String> ids = json.readValue(duel.getQuestionIds(), new TypeReference<List<String>>() {});
+        int total = ids.size();
 
         String visitorId = body.get("visitorId") instanceof String s && !s.isBlank() && s.length() <= 40 ? s.trim() : null;
-        Integer score = number(body.get("score"), total);
-        Integer answered = number(body.get("answered"), total);
         Integer seconds = number(body.get("seconds"), 24 * 60 * 60);
-        // 문제별 정오답은 보내지 않아도 되지만, 보냈다면 답한 수 · 맞힌 수와 맞아야 한다
-        String marks = body.get("marks") instanceof String m && m.matches("[01]*") ? m : null;
-        boolean marksOk = marks == null || (answered != null && score != null
-                && marks.length() == answered && marks.chars().filter(ch -> ch == '1').count() == score);
-        if (visitorId == null || score == null || answered == null || seconds == null || score > answered || !marksOk) {
+        // 고른 보기 번호만 받고, 맞힌 수와 정오답은 서버가 계산한다. 클라이언트가 보낸 score · marks는 쓰지 않는다
+        String picks = body.get("picks") instanceof String p && p.matches("[0-9]*") ? p : null;
+        DuelAnswerKey.Graded graded = answerKey.grade(ids, picks);
+        Integer claimed = body.get("answered") == null ? null : number(body.get("answered"), total);
+        if (visitorId == null || seconds == null || graded == null
+                || (body.get("answered") != null && (claimed == null || claimed != picks.length()))) {
             return ResponseEntity.badRequest().body(Map.of("error", "진행 상황을 확인해 주세요."));
         }
+        int answered = picks.length();
         String nickname = VisitorProfileService.nickname(body.get("nickname"));
         if (nickname == null) nickname = VisitorProfileService.anonymous(visitorId);
 
@@ -198,13 +189,18 @@ public class DuelController {
         if (!player.isDone()) {
             player.setStarted(true);
             if (answered < player.getAnswered()) return ResponseEntity.ok(Map.of("players", board(duel.getCode(), visitorId)));
+            Instant now = Instant.now();
+            if (player.getFirstReportAt() == null) player.setFirstReportAt(now);
+            // 걸린 시간은 서버가 지켜본 시간보다 짧게 줄일 수 없고, 앞서 올린 시간보다 줄어들지도 않는다
+            int observed = (int) java.time.Duration.between(player.getFirstReportAt(), now).getSeconds();
             player.setNickname(nickname);
-            player.setScore(score);
+            player.setScore(graded.score());
             player.setAnswered(answered);
-            player.setSeconds(seconds);
-            if (marks != null) player.setMarks(marks);
+            player.setSeconds(Math.max(seconds, Math.max(observed, player.getSeconds())));
+            player.setPicks(picks);
+            player.setMarks(graded.marks());
             player.setDone(Boolean.TRUE.equals(body.get("done")) && answered == total);
-            player.setUpdatedAt(Instant.now());
+            player.setUpdatedAt(now);
             try {
                 playerRepository.save(player);
             } catch (DataIntegrityViolationException e) {
@@ -233,7 +229,10 @@ public class DuelController {
             row.put("online", p.getUpdatedAt().isAfter(Instant.now().minusSeconds(45)));
             row.put("seconds", p.getSeconds());
             row.put("me", p.getVisitorId().equals(visitorId));
-            row.put("marks", reveal && p.isDone() ? p.getMarks() : null);
+            boolean mine = p.getVisitorId().equals(visitorId);
+            // 본인 기록은 새로고침 뒤 이어 풀 수 있게 늘 돌려주고, 남의 정오답은 내가 끝낸 뒤에만 보여 준다
+            row.put("marks", mine || (reveal && p.isDone()) ? p.getMarks() : null);
+            row.put("picks", mine ? p.getPicks() : null);
             rows.add(row);
         }
         return rows;
@@ -243,12 +242,4 @@ public class DuelController {
         return value instanceof Number n && n.intValue() >= 0 && n.intValue() <= max ? n.intValue() : null;
     }
 
-    private String newCode() {
-        while (true) {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < CODE_LENGTH; i++) sb.append(CODE_CHARS.charAt(RANDOM.nextInt(CODE_CHARS.length())));
-            String code = sb.toString();
-            if (!duelRepository.existsByCode(code)) return code;
-        }
-    }
 }

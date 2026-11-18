@@ -16,6 +16,7 @@ public interface DuelRepository extends JpaRepository<Duel, Long> {
     Optional<Duel> findForUpdate(@org.springframework.data.repository.query.Param("code") String code);
 
     boolean existsByCode(String code);
+    Optional<Duel> findByCreateKey(String createKey);
 
     // 최근에 열린 단체전 방
     List<Duel> findTop20ByOpenTrueAndCreatedAtAfterOrderByCreatedAtDesc(Instant after);
