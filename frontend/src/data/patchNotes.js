@@ -39,6 +39,7 @@ export const PATCH_NOTES = [
       { type: 'feature', text: 'RAG 학습 도우미 화면(/private/chanung/assistant): 질문 입력, 답변, 근거 자료(제목 · 단락 · 관련도 · 발췌) 표시. 답변 모델이 없으면 찾은 근거만 보여 준다.' },
       { type: 'feature', text: '출처 검증: LLM 답변을 문장으로 나눠 cross-encoder로 근거 조각과 대조하고, 근거가 약한 문장은 "근거 확인 안 됨"으로 표시한다.' },
       { type: 'feature', text: 'LLM 없이 근거만 찾는 검색 API(GET /api/v1/rag/search).' },
+      { type: 'improve', text: '출처 검증 기준 0.3으로 보정: 근거 있는 문장 오판 0/30, 근거 없는 문장 통과 0/30(원문 문장 기준, 실제 LLM 답변으로 재보정 예정).' },
       { type: 'improve', text: '재정렬 1차 후보 수 20 → 10: 평가셋 정확도(Hit@1 96.6%) · 거부율은 같고 지연 p50 25.4초 → 12.9초.' },
     ],
   },
