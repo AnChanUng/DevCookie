@@ -1,0 +1,37 @@
+# RAG 학습 도우미 로컬 개발용 서비스. 모두 루프백(127.0.0.1)에만 연다.
+#   docker compose -f rag/docker-compose.yml up -d
+# chroma : 벡터 저장소 (Spring AI ChromaVectorStore)
+# embed  : 다국어 임베딩 BAAI/bge-m3 (TEI, OpenAI 호환 /v1/embeddings)
+# rerank : cross-encoder BAAI/bge-reranker-v2-m3 (TEI /rerank)
+# 모델은 처음 시작할 때 Hugging Face에서 내려받아 tei-models 볼륨에 저장한다.
+# 기본 배치(16,384토큰)로 워밍업하면 메모리가 크게 튀어 OOM(137)으로 죽으므로 배치 토큰을 줄이고,
+# 두 모델이 동시에 워밍업하면 메모리가 겹쳐 튄다. rerank가 준비된 뒤 embed를 띄운다(rag/up.sh).
+services:
+  chroma:
+    image: chromadb/chroma:1.5.9
+    ports:
+      - "127.0.0.1:18200:8000"
+    volumes:
+      - chroma-data:/data
+    environment:
+      ANONYMIZED_TELEMETRY: "FALSE"
+
+  embed:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.9.4
+    command: ["--model-id", "BAAI/bge-m3", "--max-client-batch-size", "64", "--max-batch-tokens", "2048"]
+    ports:
+      - "127.0.0.1:18201:80"
+    volumes:
+      - tei-models:/data
+
+  rerank:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.9.4
+    command: ["--model-id", "BAAI/bge-reranker-v2-m3", "--max-batch-tokens", "2048"]
+    ports:
+      - "127.0.0.1:18202:80"
+    volumes:
+      - tei-models:/data
+
+volumes:
+  chroma-data:
+  tei-models:

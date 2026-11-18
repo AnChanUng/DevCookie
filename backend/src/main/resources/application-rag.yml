@@ -1,0 +1,41 @@
+# RAG 학습 도우미 (로컬 개발 · 평가). 서비스는 rag/docker-compose.yml로 띄운다.
+#   임베딩  : 로컬 TEI의 BAAI/bge-m3 (OpenAI 호환 /v1/embeddings)
+#   재정렬  : 로컬 TEI의 BAAI/bge-reranker-v2-m3 (/rerank)
+#   벡터 DB : ChromaDB
+#   답변    : Gemini (GEMINI_API_KEY가 있을 때 RAG_CHAT_MODEL=google-genai로 켠다)
+spring.ai:
+  model:
+    embedding: openai
+    chat: ${RAG_CHAT_MODEL:none}
+  openai:
+    base-url: ${RAG_EMBED_URL:http://127.0.0.1:18201}
+    # TEI는 키를 검사하지 않는다. OpenAI 클라이언트가 빈 값을 거부해서 자리만 채운다
+    api-key: tei-local
+    embedding:
+      options:
+        model: BAAI/bge-m3
+  google:
+    genai:
+      api-key: ${GEMINI_API_KEY:}
+      chat:
+        options:
+          model: ${RAG_GEMINI_MODEL:gemini-2.5-flash}
+          temperature: 0.2
+  vectorstore:
+    type: chroma
+    chroma:
+      client:
+        host: ${RAG_CHROMA_HOST:http://127.0.0.1}
+        port: ${RAG_CHROMA_PORT:18200}
+      collection-name: cs_study_notes
+      initialize-schema: true
+
+app:
+  rag:
+    enabled: true
+    rerank-url: ${RAG_RERANK_URL:http://127.0.0.1:18202}
+    # 1차 벡터 검색 후보 수와 재정렬 후 남길 수
+    first-k: 20
+    final-k: 5
+    # 재정렬 점수가 이보다 낮으면 근거가 없다고 보고 답하지 않는다. 평가셋에서 0.03~0.057이 같은 결과(오거부 1/88, 무근거 응답 0/25)여서 여유 있게 0.05로 둔다
+    min-rerank-score: 0.05
