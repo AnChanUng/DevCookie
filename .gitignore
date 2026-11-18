@@ -23,3 +23,11 @@ backend/data/
 # OS
 .DS_Store
 Thumbs.db
+
+# 원본 시험·교재 자료 (저장소에 올리지 않음)
+공기업 필기/
+면접/
+SSAFY A형 기출/
+전공필기/
+backend/src/main/resources/private-notes/
+frontend/public/notes/

@@ -2,7 +2,7 @@ import questions from './technicalInterviewQuestions.json' with { type: 'json' }
 
 export const INTERVIEW_TRACKS = [
   { id: 'autoever', name: '현대오토에버', subtitle: '1차 면접 / 시스템 운영', file: '면접/오토에버1차.txt' },
-  { id: 'aws', name: 'AWS Solutions Architect', subtitle: '폰 스크리닝 / 클라우드 설계', file: '면접/aws_sa_interview_questions_only.pdf' },
+  { id: 'aws', name: 'AWS', subtitle: '폰 스크리닝 / 클라우드 설계', file: '면접/aws_sa_interview_questions_only.pdf' },
 ];
 
 // Answers are newly written study material, not the applicant's history or employer answers.

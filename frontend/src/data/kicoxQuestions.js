@@ -1,11 +1,6 @@
 // 한국산업단지공단 정보기술 전공시험 대비 자체 제작 문제 39문항 (5지선다)
 // 공기업 필기/산업단지공단 복기 문제.pdf 의 복원 문항 39개(주제·유형·정답 근거)를 기준으로 구성. 실제 시험 문항의 복제가 아님.
-export const KICOX_SECTIONS = {
-  db: {name:'데이터베이스', short:'DB', sub:'인덱스 선택도 · 비트맵 인덱스 · 관계대수 · 권한 · 저장 구조 · 회복 · 2PL · ACID · NoSQL · 분산 투명성 · 이상 현상 · 기본키', count:14},
-  ds: {name:'자료구조·알고리즘', short:'DS', sub:'재귀 · 트리 순회 · BST · AVL/Red-Black · 그래프 · 위상 정렬 · DP · 정렬 성질 · 시간복잡도', count:12},
-  se: {name:'소프트웨어공학', short:'SW', sub:'형상 관리 · Scrum · 디자인 패턴 · 코드 스멜 · V-모델 · 테스트 커버리지', count:6},
-  ai: {name:'AI·보안', short:'AI/보안', sub:'Adam · 역전파 · 활성화 함수 · Self-Attention · K-means · 웹 공격 · 대칭키 암호', count:7},
-};
+export { KICOX_SECTIONS } from './splitSections';
 
 export const KICOX_QUESTIONS = [
 /* ===== 데이터베이스 14 ===== */

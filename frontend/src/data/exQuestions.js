@@ -1,12 +1,6 @@
 // 한국도로공사 전산직 전공필기 대비 자체 제작 문제 40문항 (5지선다)
 // 공기업 필기/2026_한국도로공사_상반기전산전공.hwp 의 응시 후기(복원 문항 40개)를 기준으로 구성. 실제 시험 문항의 복제가 아님.
-export const EX_SECTIONS = {
-  db:  {name:'데이터베이스', short:'DB', sub:'카디널리티 · 파티셔닝 · 무결성 · TCL · 물리 설계 · 이상 현상 · B-트리 · 회복', count:8},
-  sw:  {name:'소프트웨어공학', short:'SW', sub:'간트차트 · 유지보수 · 칸반 · UML · 요구사항 명세 · GoF · 테스트 · 재공학', count:8},
-  os:  {name:'운영체제', short:'OS', sub:'모니터 · 최적적합 · 경쟁 조건 · 상태 전이 · 스레드 · HRN · 클럭 · SSTF · 교착상태', count:9},
-  sec: {name:'정보보호', short:'보안', sub:'ISMS-P · 눈사태 효과 · 무결성 · 로그 · XSS · 시큐어 코딩 · SQL 인젝션', count:7},
-  net: {name:'네트워크', short:'NW', sub:'노드 · 데이터링크 · 캡슐화 · 데이터그램 · 흐름 제어 · 서브넷 · IPsec · SSL VPN', count:8},
-};
+export { EX_SECTIONS } from './splitSections';
 
 export const EX_QUESTIONS = [
 /* ===== 데이터베이스 8 ===== */

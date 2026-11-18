@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import api from '../api';
 import { visitorId } from '../track';
 import { NICKNAME_MAX, cleanNickname, saveNickname, savedNickname } from '../nickname';
-import { BANKS } from '../data/examQuestions';
+import { BANKS, PRIVATE_BANK_KEYS } from '../data/examQuestions';
 import { syncAllProgress } from '../hooks/useExamProgress';
 import { account, onAccountChange } from '../sync';
 import TierBadge from './TierBadge';
@@ -33,7 +33,7 @@ function solvedCount() {
 
 // 로그인해 있으면 다른 기기에서 푼 기록을 모두 받아 온다. 문제은행을 하나씩 열지 않아도 푼 문제 수가 맞게 나온다.
 // 문제은행 수만큼 서버를 부르므로 한동안은 다시 하지 않는다
-const SYNC_KEYS = [...BANKS.map(b => b.key), 'topics', 'bug-hunt'];
+const SYNC_KEYS = [...BANKS.map(b => b.key), ...PRIVATE_BANK_KEYS, 'topics', 'bug-hunt'];
 const SYNC_AT = 'sync:all-at';
 const SYNC_EVERY_MS = 10 * 60 * 1000;
 
@@ -55,7 +55,23 @@ function pullOtherDevices() {
 // 문제를 많이 푼 사람 순위. 지금까지 푼 문제 수를 서버에 알리고 순위를 받아 온다
 export default function SolveRank() {
   const identity = useSyncExternalStore(onAccountChange, identitySnapshot, () => '');
-  const [rank, setRank] = useState(null);
+  const user = account();
+  const cacheKey = `rank:last:v1:${user ? `user:${user.id || user.nickname}` : `visitor:${visitorId()}`}`;
+  return <SolveRankContent key={identity} cacheKey={cacheKey} />;
+}
+
+function validRank(value) {
+  const row = r => r && Number.isFinite(r.rank) && Number.isFinite(r.count) && typeof r.nickname === 'string';
+  return value && Array.isArray(value.top) && value.top.every(row) && (!value.me || row(value.me));
+}
+function readRank(key) {
+  try { const value = JSON.parse(localStorage.getItem(key)); return validRank(value) ? value : null; }
+  catch { return null; }
+}
+
+function SolveRankContent({ cacheKey }) {
+  const [rank, setRank] = useState(() => readRank(cacheKey));
+  const [settledTick, setSettledTick] = useState(-1);
   const [expanded, setExpanded] = useState(false);
   const [naming, setNaming] = useState(false);
   const [draft, setDraft] = useState('');
@@ -77,19 +93,26 @@ export default function SolveRank() {
         : Promise.resolve();
       report
         .then(() => api.get('/rank/solved', { params: { all: true }, headers: { ...(id ? { 'X-Visitor-Id': id } : {}), ...(token ? { Authorization: `Bearer ${token}` } : {}) }, timeout: 180000 }))
-        .then(res => { if (!stale) setRank(res.data); })
+        .then(res => {
+          if (stale) return;
+          if (!validRank(res.data)) throw new Error('Invalid ranking response');
+          setRank(res.data);
+          setFailed(false);
+          setSettledTick(tick);
+          try { localStorage.setItem(cacheKey, JSON.stringify(res.data)); } catch { /* display works without storage */ }
+        })
         .catch(() => {
           if (stale) return;
           // 깨어나는 중인 서버는 요청을 한두 번 놓치기도 한다. 잠시 뒤 다시 받아 본다
           if (attempt < MAX_RETRIES) timer = setTimeout(() => load(attempt + 1), RETRY_DELAY_MS);
-          else setFailed(true);
+          else { setFailed(true); setSettledTick(tick); }
         });
     };
     load(0);
     // 다른 기기 기록을 받아 푼 문제 수가 달라졌으면 순위를 다시 받는다
     pullOtherDevices()?.then(() => { if (!stale && solvedCount() !== count) setTick(t => t + 1); }).catch(() => {});
     return () => { stale = true; clearTimeout(timer); };
-  }, [tick, identity]);
+  }, [tick, cacheKey]);
 
   // 여러 번 다시 받아 봐도 순위를 주지 못하면 자리만 차지하지 않게 비워 둔다
   if (failed && !rank) return null;
@@ -117,6 +140,7 @@ export default function SolveRank() {
         {rank && Number.isFinite(rank.totalSolved) && <p className="solve-rank-total" aria-label={`전체 총 ${rank.totalSolved.toLocaleString()}문제 풀이 완료`}>전체 <strong>{rank.totalSolved.toLocaleString()}</strong>문제</p>}
       </div>
 
+      {rank && <p className="solve-rank-empty" role="status">{settledTick !== tick ? '저장된 순위 · 업데이트 중…' : failed ? '업데이트하지 못했어요 · 마지막 순위 표시 중' : '최신 조회 결과'}</p>}
       <div id="solve-rank-results" className={expanded ? 'solve-rank-expanded' : undefined}>
       {!rank && <p className="solve-rank-empty">순위를 불러오는 중...</p>}
       {rank && rows.length === 0 && <p className="solve-rank-empty">아직 순위가 없습니다. 첫 번째로 이름을 올려 보세요.</p>}

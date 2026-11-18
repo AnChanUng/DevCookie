@@ -4,6 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "check:interview-audio": "node scripts/check-interview-audio.mjs",
+    "check:chanung": "node scripts/check-chanung.mjs",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
@@ -27,7 +29,8 @@
     "check:today-cs": "node --import ./scripts/extensionless-loader.mjs scripts/check-today-cs.mjs",
     "check:bug-hunt": "node --import ./scripts/extensionless-loader.mjs scripts/check-bug-hunt.mjs",
     "check:technical-interview": "node --import ./scripts/extensionless-loader.mjs scripts/check-technical-interview.mjs",
-    "check:cross-device-sync": "node scripts/check-cross-device-sync.mjs"
+    "check:cross-device-sync": "node scripts/check-cross-device-sync.mjs",
+    "check:chanung-completion": "node scripts/check-chanung-completion.mjs"
   },
   "dependencies": {
     "axios": "^1.14.0",

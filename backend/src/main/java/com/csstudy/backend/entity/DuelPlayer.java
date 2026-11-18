@@ -44,6 +44,9 @@ public class DuelPlayer {
     @Column(nullable = false)
     private boolean done;
 
+    // null denotes a legacy participant, who had already pressed start.
+    private Boolean started;
+
     // 시작부터 걸린 시간(초)
     @Column(nullable = false)
     private int seconds;

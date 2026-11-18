@@ -1,7 +1,7 @@
 package com.csstudy.backend.entity;
 
 public enum UserTier {
-    BRONZE("브론즈"), SILVER("실버"), GOLD("골드"), DIAMOND("다이아"), RUBY("루비");
+    BRONZE("동 쿠키"), SILVER("은 쿠키"), GOLD("금 쿠키"), DIAMOND("다이아 쿠키"), RUBY("루비 쿠키");
 
     private final String label;
     UserTier(String label) { this.label = label; }

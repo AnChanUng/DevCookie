@@ -5,6 +5,7 @@ import { visitorId } from '../track';
 import { NICKNAME_MAX, cleanNickname, myNickname, saveNickname, savedNickname } from '../nickname';
 import { account, changeNickname, onAccountChange } from '../sync';
 import { membershipHeaders } from '../membership';
+import DirectChat from './DirectChat';
 
 const accountSnapshot = () => `${account()?.token || ''}:${account()?.nickname || ''}`;
 
@@ -33,7 +34,7 @@ const readSeen = () => { try { return Number(localStorage.getItem(SEEN_KEY)) || 
 const writeSeen = (id) => { try { localStorage.setItem(SEEN_KEY, String(id)); } catch { /* storage unavailable */ } };
 
 // 접속해 있는 사람들이 함께 쓰는 채팅 창. 닫혀 있을 때도 가끔 새 글을 확인해 헤더에 알림 점을 띄운다
-export default function LoungeChat({ open, online, onClose, onOnline, onUnread }) {
+export default function LoungeChat({ open, online, onClose, onOnline, onUnread, directUnread = 0 }) {
   const identity = useSyncExternalStore(onAccountChange, accountSnapshot, () => '');
   const [messages, setMessages] = useState([]);
   const [ready, setReady] = useState(false);
@@ -49,6 +50,7 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
   const [self, setSelf] = useState('');
   const [challenging, setChallenging] = useState(false);
   const [room, setRoom] = useState(null);
+  const [tab, setTab] = useState('public');
   const displayName = account()?.nickname || nickname;
 
   const lastId = useRef(0);
@@ -135,8 +137,8 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
     return () => { source.close(); setStreaming(false); };
   }, [open, take, onOnline]);
 
+  // Site presence stays active while the chat panel is closed.
   useEffect(() => {
-    if (!open) return undefined;
     let active = true;
     const id = visitorId();
     const beat = () => {
@@ -150,9 +152,9 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
     document.addEventListener('visibilitychange', beat);
     return () => {
       active = false; clearInterval(timer); document.removeEventListener('visibilitychange', beat);
-      api.delete('/lounge/presence', { data: { visitorId: id }, timeout: 10000 }).catch(() => {});
+      // Expire on the server so closing one tab does not remove another active tab.
     };
-  }, [open, nickname, identity]);
+  }, [nickname, identity]);
 
   // Clear yesterday's messages at Korean midnight, even with a disconnected server.
   useEffect(() => {
@@ -251,8 +253,11 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
         <button type="button" className="lounge-close" onClick={onClose} aria-label="채팅 닫기">×</button>
       </header>
 
-      <div className="lounge-participants" aria-label="채팅방 접속자">
-        <strong>채팅 참여 중 {participants.length}명</strong>
+      <div className="lounge-tabs"><button aria-pressed={tab === 'public'} onClick={() => setTab('public')}>전체 채팅</button><button aria-pressed={tab === 'direct'} onClick={() => setTab('direct')}>1:1 대화 · 친구{directUnread > 0 ? ` (${directUnread})` : ''}</button></div>
+      {tab === 'direct' ? <DirectChat key={identity} participants={participants} self={self} /> : <>
+
+      <div className="lounge-participants" aria-label="사이트 접속자">
+        <strong>사이트 접속 중 {participants.length}명</strong>
         {participants.map(person => <div key={person.id}><span>{person.nickname}{person.id === self ? ' (나)' : ''}</span>
           {person.id !== self && <button type="button" disabled={!self || challenging || sending} onClick={() => challenge(person)}>대결 신청</button>}
         </div>)}
@@ -295,6 +300,7 @@ export default function LoungeChat({ open, online, onClose, onOnline, onUnread }
         <button type="submit" disabled={sending || !text.trim()}>보내기</button>
       </form>
       <p className="lounge-rule">한국시간 00시에 전날 대화가 화면에서 사라집니다. 서로 존중하는 대화를 부탁드려요.</p>
+      </>}
     </section>
   );
 }

@@ -1,13 +1,20 @@
 import { lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import PracticeEntry from './components/PracticeEntry';
 import Layout from './components/Layout';
 import Home from './pages/Home';
+import { MAINTENANCE, RenewalNotice, RenewalShell } from './Renewal';
 import './App.css';
 import './exam.css';
 
 const PromotionExamPage = lazy(() => import('./pages/PromotionExamPage'));
 const BugHuntPage = lazy(() => import('./pages/BugHuntPage'));
 const TechnicalInterviewPage = lazy(() => import('./pages/TechnicalInterviewPage'));
+const ExperiencePage = lazy(() => import('./pages/ExperiencePage'));
+const CompanyPrepPage = lazy(() => import('./pages/CompanyPrepPage'));
+const DeloitteAiFocusPage = lazy(() => import('./pages/DeloitteAiFocusPage'));
+const DeloitteLoyaltyPage = lazy(() => import('./pages/DeloitteLoyaltyPage'));
+const ChanungPage = lazy(() => import('./pages/ChanungPage'));
 const CategoryPage = lazy(() => import('./pages/CategoryPage'));
 const QuestionPage = lazy(() => import('./pages/QuestionPage'));
 const AccountPage = lazy(() => import('./pages/AccountPage'));
@@ -17,11 +24,12 @@ const InterviewPracticePage = lazy(() => import('./pages/InterviewPracticePage')
 const CsNotesPage = lazy(() => import('./pages/CsNotesPage'));
 const WebEssentialsPage = lazy(() => import('./pages/WebEssentialsPage'));
 const WebPage = lazy(() => import('./pages/WebPage'));
+const TechBlogsPage = lazy(() => import('./pages/TechBlogsPage'));
 const MajorPage = lazy(() => import('./pages/MajorPage'));
 const MajorExamPage = lazy(() => import('./pages/MajorExamPage'));
 const ExamListPage = lazy(() => import('./pages/ExamListPage'));
 const ExamCompanyPage = lazy(() => import('./pages/ExamCompanyPage'));
-const ComputerGeneralPage = lazy(() => import('./pages/ComputerGeneralPage'));
+const PrivateChanungPage = lazy(() => import('./pages/PrivateChanungPage'));
 const TopicPage = lazy(() => import('./pages/TopicPage'));
 const AlgoPage = lazy(() => import('./pages/AlgoPage'));
 const DuelPage = lazy(() => import('./pages/DuelPage'));
@@ -40,6 +48,17 @@ function WebEssentialsRedirect() {
 }
 
 function App() {
+  if (MAINTENANCE) return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="private/chanung" element={<RenewalShell />}>
+          <Route index element={<PrivateChanungPage />} />
+          <Route path=":id" element={<PrivateChanungPage />} />
+        </Route>
+        <Route path="*" element={<RenewalNotice />} />
+      </Routes>
+    </BrowserRouter>
+  );
   return (
     <BrowserRouter>
       <Routes>
@@ -52,10 +71,24 @@ function App() {
           <Route path="stats" element={<StatsPage />} />
           <Route path="interview" element={<InterviewPracticePage />} />
           <Route path="technical-interview" element={<TechnicalInterviewPage />} />
+          <Route path="p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9/technical" element={<TechnicalInterviewPage />} />
+          <Route path="chanung" element={<PracticeEntry suffix="/companies" />} />
+          <Route path="p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9/companies" element={<CompanyPrepPage />} />
+          <Route path="p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9/ai-focus" element={<DeloitteAiFocusPage />} />
+          <Route path="p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9/loyalty" element={<DeloitteLoyaltyPage />} />
+          <Route path="chanung/deloitte/loyalty" element={<PracticeEntry suffix="/loyalty" />} />
+          <Route path="chanung/deloitte" element={<PracticeEntry />} />
+          <Route path="chanung/deloitte/ai" element={<PracticeEntry suffix="/ai-focus" />} />
+          <Route path="p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9" element={<ChanungPage />} />
+          <Route path="chanung/experience" element={<PracticeEntry suffix="/experience" />} />
+          <Route path="p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9/experience" element={<ExperiencePage />} />
+          <Route path="chanung/company" element={<PracticeEntry />} />
+          <Route path="ai-interview" element={<Navigate to="/" replace />} />
           <Route path="notes" element={<CsNotesPage />} />
           <Route path="web-essentials" element={<WebEssentialsPage />} />
           <Route path="notes/web-essentials" element={<WebEssentialsRedirect />} />
           <Route path="web" element={<WebPage />} />
+          <Route path="tech-blogs" element={<TechBlogsPage />} />
           <Route path="web/:company" element={<ExamCompanyPage />} />
           <Route path="major" element={<MajorPage />} />
           <Route path="major/:company" element={<ExamCompanyPage />} />
@@ -69,7 +102,9 @@ function App() {
           <Route path="aptitude/:company" element={<ExamCompanyPage />} />
           <Route path="aptitude/daou/cospro" element={<CosProPage />} />
           <Route path="aptitude/daou/cospro/:pid" element={<CosProPage />} />
-          <Route path="computer-general" element={<ComputerGeneralPage />} />
+          <Route path="computer-general" element={<Navigate to="/private/chanung" replace />} />
+          <Route path="private/chanung" element={<PrivateChanungPage />} />
+          <Route path="private/chanung/:id" element={<PrivateChanungPage />} />
           <Route path="topics" element={<TopicPage />} />
           <Route path="algo" element={<AlgoPage />} />
           <Route path="calc" element={<CalcPage />} />

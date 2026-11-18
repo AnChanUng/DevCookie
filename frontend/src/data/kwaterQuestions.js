@@ -1,12 +1,6 @@
 // 한국수자원공사 전산직 전공필기(2차) 대비 자체 제작 문제 30문항 (4지선다)
 // 공기업 필기/2026_한국수자원공사_상반기2차전산전공.hwp 의 응시 후기(복원 문항 30개)를 기준으로 구성. 실제 시험 문항의 복제가 아님.
-export const KWATER_SECTIONS = {
-  pl:   {name:'프로그래밍', short:'PL', sub:'C · Python · Java 실행 결과', count:6},
-  ds:   {name:'자료구조', short:'DS', sub:'트리 차수 · 후위식 변환 · 레드-블랙 트리', count:3},
-  net:  {name:'네트워크', short:'NW', sub:'패킷 교환 · ARQ · OSPF', count:3},
-  os:   {name:'운영체제', short:'OS', sub:'SJF · 워킹셋 · 임계구역 · C-SCAN · LRU · TLB · exec', count:8},
-  arch: {name:'컴퓨터구조', short:'CA', sub:'GPU · 불 대수 · RAID · 주소지정 · 논리회로 · RISC · 지역성 · DMA · 슈퍼스칼라 · 마이크로프로그램', count:10},
-};
+export { KWATER_SECTIONS } from './splitSections';
 
 export const KWATER_QUESTIONS = [
 /* ===== 프로그래밍 6 ===== */

@@ -30,3 +30,4 @@
   #web-session-jwt .notes-markdown th:first-child, #web-session-jwt .notes-markdown td:first-child,
   #web-cookie-session .notes-markdown th:first-child, #web-cookie-session .notes-markdown td:first-child { min-width: 96px; }
 }
+.web-channel .notes-markdown strong { color: light-dark(#1555b5, #8fc4ff); }

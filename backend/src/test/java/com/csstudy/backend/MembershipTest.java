@@ -138,12 +138,12 @@ class MembershipTest {
             }
         }
         var gold = MembershipService.describe(UserTier.GOLD, 125);
-        assertEquals("골드 Ⅱ", gold.tierName());
-        assertEquals("골드 Ⅰ", gold.nextTierName());
+        assertEquals("금 쿠키 Ⅱ", gold.tierName());
+        assertEquals("금 쿠키 Ⅰ", gold.nextTierName());
         assertEquals(200, gold.nextThreshold());
         assertEquals(75, gold.remaining());
         assertEquals(300, MembershipService.describe(UserTier.GOLD, 299).nextThreshold());
-        assertEquals("다이아 Ⅴ", MembershipService.describe(UserTier.GOLD, 299).nextTierName());
+        assertEquals("다이아 쿠키 Ⅴ", MembershipService.describe(UserTier.GOLD, 299).nextTierName());
         var top = MembershipService.describe(UserTier.GOLD, 2300);
         assertNull(top.nextTier()); assertNull(top.nextDivision()); assertNull(top.nextThreshold());
         assertEquals(0, top.remaining());

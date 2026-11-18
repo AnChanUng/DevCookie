@@ -7,7 +7,7 @@ import { BANKS, allQuestions } from '../src/data/examQuestions.js';
 
 // 떨어지는 카드 안에서 읽혀야 하므로 지문·코드가 딸린 문제와 긴 선지는 뺀다
 const playable = (q) =>
-  !q.code && !q.ctx && q.q.length <= 110 && !q.q.includes('\n') &&
+  Array.isArray(q.o) && !q.code && !q.ctx && q.q.length <= 110 && !q.q.includes('\n') &&
   q.o.every(o => o.length <= 34 && !o.includes('\n'));
 
 const items = [];

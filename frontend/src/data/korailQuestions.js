@@ -1,12 +1,6 @@
 // 코레일(한국철도공사) 전산직 전공필기 대비 자체 제작 문제 40문항 (5지선다)
 // 공기업 필기/2026 상반기 코레일.hwpx 의 응시 후기(복원 문항 목록)를 기준으로 구성. 실제 시험 문항의 복제가 아님.
-export const KORAIL_SECTIONS = {
-  sw:  {name:'소프트웨어공학', short:'SW', sub:'애자일 · 결합도 · UML · GoF · 임계경로 · 테스트', count:9},
-  db:  {name:'데이터베이스', short:'DB', sub:'관계대수 · SQL · 조인 · 정규화 · ACID · 인덱스', count:9},
-  os:  {name:'운영체제·컴퓨터구조', short:'OS/CA', sub:'SJF · 페이지 교체 · 단편화 · 쉘 · 파이프라인 · AMAT · 2의 보수 · I/O', count:10},
-  net: {name:'네트워크', short:'NW', sub:'OSI 계층 · TCP · CSMA/CA · OSPF · 서브넷 · IPv6 애니캐스트', count:6},
-  sec: {name:'정보보호', short:'보안', sub:'포렌식 · 블록 암호 운영 모드 · AES · 스니핑 · SQL 인젝션 · 리눅스 권한', count:6},
-};
+export { KORAIL_SECTIONS } from './splitSections';
 
 export const KORAIL_QUESTIONS = [
 /* ===== 소프트웨어공학 9 ===== */

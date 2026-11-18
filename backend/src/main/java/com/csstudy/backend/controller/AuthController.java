@@ -5,15 +5,17 @@ import com.csstudy.backend.entity.User;
 import com.csstudy.backend.repository.UserRepository;
 import com.csstudy.backend.service.AuthService;
 import com.csstudy.backend.service.MembershipService;
-import com.csstudy.backend.entity.UserTier;
 import com.csstudy.backend.service.NicknameService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -46,6 +48,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @Transactional
     public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
         final String nickname = body.getOrDefault("nickname", "").trim();
         final String password = body.getOrDefault("password", "").trim();
@@ -54,7 +57,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("error", "닉네임과 비밀번호를 입력해주세요."));
         }
 
-        Optional<User> userOpt = userRepository.findByNickname(nickname);
+        Optional<User> userOpt = userRepository.findByNicknameForUpdate(nickname);
         if (userOpt.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("error", "존재하지 않는 닉네임입니다."));
         }
@@ -74,6 +77,27 @@ public class AuthController {
         }
 
         return ResponseEntity.ok(UserResponse.from(user, authService.issueToken(user), membershipService.membership(user)));
+    }
+
+    @PostMapping("/reset-password")
+    @Transactional
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
+        String nickname = Objects.toString(body.get("nickname"), "").trim();
+        String password = Objects.toString(body.get("password"), "").trim();
+        if (nickname.isEmpty() || password.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "닉네임과 새 비밀번호를 입력해주세요."));
+        }
+        if (password.getBytes(StandardCharsets.UTF_8).length > 72) {
+            return ResponseEntity.badRequest().body(Map.of("error", "새 비밀번호는 UTF-8 기준 72바이트 이하여야 합니다."));
+        }
+
+        Optional<User> user = userRepository.findByNicknameForUpdate(nickname);
+        if (user.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "존재하지 않는 닉네임입니다."));
+        }
+        user.get().setPassword(passwordEncoder.encode(password));
+        authService.revokeAll(user.get());
+        return ResponseEntity.ok(Map.of("ok", true));
     }
 
     @GetMapping("/me")

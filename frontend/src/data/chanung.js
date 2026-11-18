@@ -1,0 +1,475 @@
+export const CHANUNG_CATEGORIES = ['인성', '자소서꼬리질문', '기술'];
+
+export const INTERVIEW_STAGES = [
+  {
+    "title": "1. 자기소개·지원동기",
+    "ids": [
+      "cu-intro",
+      "cu-motivation",
+      "cu-ai-career"
+    ]
+  },
+  {
+    "title": "2. 이전 회사·실무 경험",
+    "ids": [
+      "cu-resignation",
+      "cu-snd-work",
+      "pf-platform-1",
+      "pf-platform-2",
+      "pf-platform-3",
+      "cu-log-program",
+      "pf-log-ai-2",
+      "pf-log-ai-3",
+      "cu-environment-system",
+      "pf-environment-2",
+      "pf-environment-3"
+    ]
+  },
+  {
+    "title": "3. StarRoad·AI 기술",
+    "ids": [
+      "pf-rag-stack-1",
+      "pf-rag-stack-2",
+      "pf-rag-stack-3",
+      "cu-pipeline",
+      "cu-search-quality",
+      "pf-rag-quality-1",
+      "pf-rag-quality-2",
+      "pf-rag-quality-3",
+      "cu-rag-test",
+      "cu-threshold-standard",
+      "cu-threshold"
+    ]
+  },
+  {
+    "title": "4. 문제 해결·보안",
+    "ids": [
+      "pf-batch-1",
+      "pf-batch-2",
+      "pf-batch-3",
+      "pf-encryption-1",
+      "pf-encryption-2",
+      "pf-encryption-3",
+      "pf-sql-security-1",
+      "pf-sql-security-2",
+      "pf-sql-security-3"
+    ]
+  },
+  {
+    "title": "5. 협업·인성",
+    "ids": [
+      "pf-ownership-2",
+      "pf-ownership-3",
+      "cu-low-gpa",
+      "cu-overtime"
+    ]
+  },
+  {
+    "title": "6. 영어·마무리",
+    "ids": [
+      "cu-intro-en",
+      "cu-ask-company",
+      "cu-last"
+    ]
+  }
+];
+
+export const CHANUNG_QUESTIONS = [
+  {
+    "id": "cu-intro",
+    "category": "인성",
+    "question": "자기소개",
+    "answer": "안녕하십니까. 현업의 문제를 파악해 AI로 해결하는 지원자 안찬웅입니다.\n데이터스트림즈에서 LLM을 활용해 로그 분석 프로그램과 고객사 환경 재현 시스템을 개발했습니다. 그 결과 유지보수 시간을 50% 단축했습니다.\n또한 시중은행에서는 다양한 연령대의 고객들과 소통하며, 모바일뱅킹 앱 이용에 어려움을 겪는 고객들에게 AI 챗봇 사용 방법을 안내해 스스로 문제를 해결할 수 있도록 도왔습니다. 그 결과 같은 문제로 재방문하는 고객이 줄어, 영업점 혼잡도를 20% 개선했습니다.\n이러한 AI 활용 역량과 소통 역량을 바탕으로 딜로이트 안진에서도 업무 효율성을 높이는 데 기여하겠습니다.",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-motivation",
+    "category": "인성",
+    "question": "왜 딜로이트 안진회계법인인가요?",
+    "answer": "변화를 주도하는 딜로이트 안진에서 LLM을 활용한 데이터 처리 프로그램을 개발하고 싶어 지원했습니다.\n안진은 2016년 국내 회계법인 최초로 회계 전담 데이터 분석 조직을 신설했고, 감사 플랫폼인 옴니아에 에이전틱 AI를 도입하며 실제 업무에 AI 활용을 확대하고 있습니다. 이러한 행보를 보며, 제가 실무에서 쌓은 대규모 데이터 처리 경험과 SSAFY에서 배운 AI 기술을 함께 활용할 수 있다는 점에 관심을 갖고 지원했습니다.",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-ai-career",
+    "category": "인성",
+    "question": "왜 AI 엔지니어 직무를 선택하셨나요?",
+    "answer": "실무에서 AI를 활용하면서, 서비스에서 반복되거나 시간이 많이 드는 업무를 찾아 자동화하는 일에 흥미를 느껴 AI 엔지니어 직무를 선택했습니다.\n특히 LLM을 활용한 로그 분석 프로그램을 개발하며, 기존에 사람이 확인하던 업무를 AI로 도울 수 있다는 점이 인상적이었습니다. 이 과정에서 AI를 실제 업무에 활용하려면 모델에 대한 이해뿐 아니라, 기존 시스템과 연결하고 안정적으로 운영하는 개발 역량도 중요하다고 느꼈습니다.\n그래서 제가 쌓아 온 서버 개발과 데이터 처리 경험에 AI 역량을 더해, 현업의 반복 업무를 줄이는 서비스를 개발하고 싶습니다.",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-resignation",
+    "category": "인성",
+    "question": "퇴사사유",
+    "answer": "실무에서 LLM을 활용한 서비스를 개발하면서, AI를 더 잘 활용하려면 이론적인 이해도 함께 갖춰야 한다고 느꼈습니다. 그래서 AI를 체계적으로 학습하는 데 집중하고자 퇴사를 결정했고, 이후 SSAFY에 참여해 AI의 기본 원리와 서비스에 적용하는 방법을 배우고 있습니다.",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-snd-work",
+    "category": "자소서꼬리질문",
+    "question": "에스앤디에서 어떤 일을 했나요?",
+    "answer": "에스앤디에서는 경기도 자율주행 플랫폼의 개발과 유지보수를 담당했습니다.\n장애가 발생하면 로그를 확인해 원인을 좁히고, 관련 업체와 협의해 해결했습니다. 또한 도로에서 검지한 이벤트를 서버로 전달하는 통신 모듈과, 장비가 다운되면 담당자에게 문자로 알리는 기능을 개발했습니다.\n이외에도 서버에 로그가 과도하게 쌓이지 않도록 자동으로 정리하는 기능을 개발하며 플랫폼이 안정적으로 운영되도록 관리했습니다.",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-log-program",
+    "category": "자소서꼬리질문",
+    "question": "LLM을 활용한 로그 분석 프로그램은 무엇인가요?",
+    "answer": "Jira에 고객사 이슈가 등록되면, 솔루션에서 발생한 버그와 관련 로그를 추적하고 LLM을 활용해 오류 원인을 분석한 뒤 핵심 내용을 요약해서 제공하는 프로그램입니다.",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-environment-system",
+    "category": "자소서꼬리질문",
+    "question": "고객사 환경 재현 시스템은 무엇인가요?",
+    "answer": "고객사의 운영체제와 DB를 입력하면 해당 서버에 맞게 구축해주는 프로그램입니다.",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-pipeline",
+    "category": "기술",
+    "question": "RAG는 어떻게 동작하나요?",
+    "answer": "데이터를 청크 단위로 나누고 임베딩해서 VectorDB에 저장합니다. 사용자가 질문하면 관련 문서를 검색하고, 유사도 임계값을 통과하면 해당 문서를 전달해 LLM을 호출합니다.",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-search-quality",
+    "category": "기술",
+    "question": "검색품질을 어떻게 개선했나요?",
+    "answer": "Chunk Size와 Overlap을 적절하게 조정해서 답변의 정확도를 올렸습니다.",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-rag-test",
+    "category": "기술",
+    "question": "RAG 검색 성능은 어떻게 테스트했나요?",
+    "answer": "청년정책 데이터 100개를 대상으로 검색 성능을 평가했습니다. 평가 지표는 Hit@3(히트 앳 쓰리)와 Recall@3(리콜 앳 쓰리)를 사용했습니다.\n\nHit@3는 상위 3개 검색 결과에 정답 문서가 하나라도 포함됐는지를 확인하는 지표입니다. Recall@3는 실제 관련 문서 전체 중 상위 3개 결과로 검색한 문서의 비율을 확인하는 지표입니다.",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-threshold-standard",
+    "category": "기술",
+    "question": "유사도 임계값을 정하는 기준은 무엇인가요?",
+    "answer": "관련 질문과 무관한 질문으로 평가셋을 만들고, 유사도 임계값을 높이거나 낮추며 답변 결과를 비교했습니다. 관련 질문에는 적절히 답하고 무관한 질문에는 답변을 제한하는 동작이 가장 안정적인 0.85를 기준으로 설정했습니다.",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-threshold",
+    "category": "기술",
+    "question": "유사도 임계값을 높이면 어떤 문제가 발생하나요?",
+    "answer": "임계값이 높으면 관련 있는 질문도 기준을 통과하지 못해 답변이 제한될 수 있습니다. 반대로 낮으면 관련 없는 문서가 검색되어 잘못된 답변을 생성할 가능성이 높아집니다.",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-low-gpa",
+    "category": "인성",
+    "question": "학점이 낮은 이유",
+    "answer": "네, 학점이 낮은 것은 사실입니다.\n군 복무 전에는 동아리와 학생회 활동, 학비 마련을 위한 아르바이트를 병행했습니다. 그 과정에서 학업에 소홀했던 점은 제 책임입니다.\n군 전역 이후에는 학업에 집중해 성적 장학금을 수상했습니다. 또한 연구실 활동과 인턴십을 통해 부족한 전공 역량을 보완했습니다.",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-overtime",
+    "category": "인성",
+    "question": "야근은 괜찮으신가요?",
+    "answer": "네, 필요한 경우에는 야근할 수 있습니다. 저는 고객과 약속한 일정을 지키는 것이 중요하다고 생각합니다. 이전 회사에서도 고객사 일정에 맞춰 업무를 마무리한 경험이 있습니다. 필요한 상황에서는 야근을 해서라도 약속한 기한 안에 맡은 일을 마무리하는 것이 제 책임이라고 생각합니다.",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-intro-en",
+    "category": "인성",
+    "question": "영어로 자기소개를 해주세요. (Please introduce yourself in English.)",
+    "answer": "Hello, my name is Chan-Ung An.\nI use AI to solve problems.\nPreviously, I worked at DataStreams, where I developed AI tools.\nI also worked at KB Kookmin Bank, helping customers use an AI chatbot.\nI hope to use these skills at Deloitte Anjin.\nThank you.\n\n[한글 뜻 · 같은 순서로 연습]\n안녕하십니까. 안찬웅입니다.\n저는 AI를 활용해 문제를 해결합니다.\n이전에 데이터스트림즈에서 근무하며 AI 도구를 개발했습니다.\n또한 KB국민은행에서 고객들이 AI 챗봇을 사용할 수 있도록 도왔습니다.\n이러한 역량을 딜로이트 안진에서 활용하고 싶습니다.\n감사합니다.",
+    "original": true,
+    "note": "한 문장씩 끊어 말하는 짧은 영어 자기소개입니다."
+  },
+  {
+    "id": "cu-ask-company",
+    "category": "인성",
+    "question": "안진회계법인에 궁금한것은?",
+    "answer": "AI를 실제 업무에 활용하는 과정에서는 다양한 법률·규제 및 윤리적 이슈가 발생할 수 있다고 생각합니다. 안진에서는 이러한 문제를 어떤 기준과 절차로 관리하고 있는지 궁금합니다.",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-last",
+    "category": "인성",
+    "question": "마지막 할말",
+    "answer": "회계법인에는 축적된 데이터와 전문성을 바탕으로 AI를 활용해 개선할 수 있는 업무가 많다고 생각합니다. 실무에서 쌓은 대규모 데이터 처리 경험과 AI 역량을 바탕으로 안진의 다양한 문제를 해결하고 싶습니다.",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-llm-concept",
+    "category": "기술",
+    "topic": "기초 개념",
+    "question": "LLM이란 무엇인가요?",
+    "answer": "LLM은 대규모 데이터로 학습해 언어를 이해하고 생성하는 대규모 언어 모델입니다. 대표적인 생성형 LLM은 트랜스포머를 기반으로 다음 토큰을 예측하며, 챗봇·요약·문서 분석 등에 활용됩니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-tokenization-concept",
+    "category": "기술",
+    "topic": "기초 개념",
+    "question": "토크나이제이션이란 무엇인가요?",
+    "answer": "텍스트를 토큰 단위로 나누고 각 토큰을 숫자 ID로 변환하는 과정입니다. 토큰은 단어 전체나 일부, 문자 등이 될 수 있으며 토큰 수는 입력 한도·비용·처리시간에 영향을 줍니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-prompt-concept",
+    "category": "기술",
+    "topic": "기초 개념",
+    "question": "프롬프트란 무엇인가요?",
+    "answer": "모델에 전달하는 지시, 질문, 예시, 참고 정보입니다. 원하는 작업과 답변 조건을 명확하게 전달하기 위해 구성합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-inference-concept",
+    "category": "기술",
+    "topic": "기초 개념",
+    "question": "추론과 학습의 차이는 무엇인가요?",
+    "answer": "학습은 데이터를 이용해 모델의 가중치를 조정하는 과정이고, 추론은 학습된 모델로 입력에 대한 출력을 만드는 과정입니다. 프롬프트에 문서를 추가하는 일반적인 RAG는 모델 가중치를 바꾸는 학습과 다릅니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-finetuning-concept",
+    "category": "기술",
+    "topic": "기초 개념",
+    "question": "파인튜닝과 프롬프트의 차이는 무엇인가요?",
+    "answer": "프롬프트는 모델 가중치를 바꾸지 않고 입력으로 동작을 유도합니다. 파인튜닝은 추가 데이터로 가중치를 조정하는 방법이며, 필요한 품질과 데이터·비용을 고려해 선택합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-rag",
+    "category": "기술",
+    "topic": "기초 개념",
+    "question": "검색 증강 생성(RAG)이란 무엇인가요?",
+    "answer": "관련 문서를 검색해 모델의 입력에 함께 제공하고, 그 근거를 참고해 답변하도록 하는 방식입니다. 최신·내부 정보를 활용하고 환각을 줄이는 데 도움이 되지만, 검색 결과나 생성 과정이 잘못되면 오답이 나올 수 있습니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-embedding-concept",
+    "category": "기술",
+    "topic": "검색·평가",
+    "question": "임베딩이란 무엇이며, 어떻게 사용하나요?",
+    "answer": "텍스트나 이미지 등의 특징을 숫자로 이루어진 벡터로 표현하는 것입니다. 벡터 간 유사도를 비교해 관련 문서 검색이나 추천 등에 사용합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-hallucination-concept",
+    "category": "기술",
+    "topic": "검색·평가",
+    "question": "LLM의 환각은 무엇이며 왜 발생하나요?",
+    "answer": "모델이 사실과 다르거나 근거가 없는 내용을 사실처럼 생성하는 현상입니다. 학습 데이터의 한계, 부족하거나 잘못된 문맥, 그럴듯한 다음 토큰을 생성하는 특성 등이 원인이 될 수 있습니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-reduce-hallucination-concept",
+    "category": "기술",
+    "topic": "검색·평가",
+    "question": "환각을 어떻게 줄이나요?",
+    "answer": "신뢰할 수 있는 문서를 검색해 제공하고, 근거가 부족하면 답변을 제한하며, 중요한 주장은 출처와 대조합니다. 구조화된 출력은 형식 검증에 도움을 주지만 내용의 사실성을 보장하지는 않습니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-transformer-concept",
+    "category": "기술",
+    "topic": "LLM·프롬프트",
+    "question": "트랜스포머는 높은 수준에서 어떻게 동작하나요?",
+    "answer": "어텐션으로 입력의 각 토큰이 다른 토큰과 어떤 관계가 있는지 반영해 표현을 만듭니다. 대표적인 생성형 LLM은 디코더 기반으로 이전 토큰을 참고해 다음 토큰을 순차적으로 생성합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-attention-concept",
+    "category": "기술",
+    "topic": "LLM·프롬프트",
+    "question": "어텐션이란 무엇인가요?",
+    "answer": "현재 처리하는 토큰과 다른 토큰의 관련성을 계산해 필요한 정보에 더 큰 가중치를 주는 방식입니다. 떨어져 있는 단어 사이의 관계도 반영할 수 있습니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-context-window-concept",
+    "category": "기술",
+    "topic": "LLM·프롬프트",
+    "question": "컨텍스트 윈도우란 무엇인가요?",
+    "answer": "한 요청에서 모델이 다룰 수 있는 토큰 범위의 한도입니다. 시스템 지시, 대화 기록, 검색 문서와 생성할 답변을 고려해 길이를 관리해야 하며 구체적인 제한은 모델마다 다릅니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-temperature-concept",
+    "category": "기술",
+    "topic": "LLM·프롬프트",
+    "question": "생성에서 온도(Temperature)란 무엇인가요?",
+    "answer": "다음 토큰을 샘플링할 때 확률 분포를 조정하는 값입니다. 낮으면 높은 확률의 토큰을 더 선호하고 높으면 선택이 다양해질 수 있지만, 낮다고 사실성이 보장되거나 항상 같은 답이 나오는 것은 아닙니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-system-user-prompt-concept",
+    "category": "기술",
+    "topic": "LLM·프롬프트",
+    "question": "시스템 프롬프트와 사용자 프롬프트의 차이는 무엇인가요?",
+    "answer": "시스템 프롬프트는 역할·동작 기준·제약 등을 지정하고, 사용자 프롬프트는 개별 요청을 전달합니다. 시스템 지시만으로 보안이 보장되는 것은 아니므로 권한과 도구 실행은 애플리케이션에서도 검증해야 합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-tool-calling-concept",
+    "category": "기술",
+    "topic": "LLM·프롬프트",
+    "question": "툴 사용 또는 함수 호출이란 무엇인가요?",
+    "answer": "모델이 사용할 도구와 인자를 정해진 형식으로 요청하는 기능입니다. 일반적인 사용자 정의 도구는 애플리케이션이 권한과 인자를 검증한 뒤 실행하고, 결과를 모델에 전달해 다음 답변에 활용합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-latency-concept",
+    "category": "기술",
+    "topic": "AI 시스템 설계",
+    "question": "AI 시스템의 지연 시간을 어떻게 줄이나요?",
+    "answer": "검색·대기·모델 호출·출력 생성 시간을 나눠 병목을 찾습니다. 불필요한 입력과 출력 길이를 줄이고 캐싱이나 작은 모델을 검토하며, 스트리밍은 사용자가 첫 응답을 빨리 보도록 하는 데 활용합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-output-monitoring-concept",
+    "category": "기술",
+    "topic": "AI 시스템 설계",
+    "question": "출력을 어떻게 평가하고 모니터링하나요?",
+    "answer": "정확성·근거 충실도 평가와 표본 기반 사람 검토를 수행하고, 응답시간·오류율·토큰 비용도 추적합니다. 요청과 응답을 기록할 때는 민감정보를 제거하고 접근 권한과 보관 기간을 관리합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-ai-deployment-concept",
+    "category": "기술",
+    "topic": "AI 배포·운영",
+    "question": "LLM 기반 애플리케이션은 어떻게 배포하나요?",
+    "answer": "모델 API를 호출하는 서버와 화면을 배포하고, 비밀 키·권한·환경 설정을 관리합니다. 검증을 거쳐 점진적으로 반영하고 오류와 비용을 관찰하며, 모델 직접 호스팅은 GPU·모델 서버 운영까지 추가로 고려합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-model-versioning-concept",
+    "category": "기술",
+    "topic": "AI 배포·운영",
+    "question": "모델 버저닝은 어떻게 처리하나요?",
+    "answer": "모델·임베딩 모델·프롬프트·검색 데이터와 설정의 버전을 함께 기록합니다. 변경 전후 평가 결과를 남기고 문제가 생기면 이전 구성으로 되돌릴 수 있도록 합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-wrong-answer-concept",
+    "category": "기술",
+    "topic": "상황별 대응",
+    "question": "LLM 챗봇이 틀린 답을 합니다. 어떻게 하시겠습니까?",
+    "answer": "문제를 재현하고 입력·검색 근거·프롬프트·생성 결과 중 어디서 오류가 났는지 나눠 확인하겠습니다. 원인에 맞게 개선하고 같은 유형의 질문을 평가셋에 추가해 재발 여부를 확인하겠습니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-cost-spike-concept",
+    "category": "기술",
+    "topic": "상황별 대응",
+    "question": "프로덕션 비용이 급증했습니다. 어떻게 접근하나요?",
+    "answer": "요청 수와 모델별 입력·출력 토큰, 재시도 횟수를 먼저 확인하겠습니다. 원인에 따라 길이 제한·캐싱·요청 제한·모델 선택을 조정하고 예산 알림을 설정하되 품질도 다시 검증하겠습니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-irrelevant-retrieval-concept",
+    "category": "기술",
+    "topic": "상황별 대응",
+    "question": "RAG가 관련 없는 결과를 반환합니다. 무엇이 문제일까요?",
+    "answer": "원문과 청크에 필요한 정보가 있는지, 질문·문서 임베딩이 호환되는지 확인하겠습니다. 메타데이터 필터·유사도 기준·검색 순위를 점검하고 평가셋으로 개선 전후를 비교하겠습니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-chunk-size-concept",
+    "category": "기술",
+    "topic": "검색·평가",
+    "question": "Chunk Size가 뭐예요?",
+    "answer": "문서를 나누는 단위의 크기",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-chunk-overlap-concept",
+    "category": "기술",
+    "topic": "검색·평가",
+    "question": "Chunk Overlap이 뭐예요?",
+    "answer": "인접한 청크 사이에 중복으로 포함하는 내용의 크기",
+    "original": true,
+    "note": ""
+  },
+  {
+    "id": "cu-vectordb-concept",
+    "category": "기술",
+    "topic": "검색·평가",
+    "question": "VectorDB가 뭐예요?",
+    "answer": "VectorDB는 텍스트나 이미지 등의 데이터를 임베딩한 벡터를 저장하고, 유사도를 기준으로 관련 데이터를 검색하는 데이터베이스입니다. RAG에서는 사용자의 질문과 관련된 문서를 찾는 데 활용합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-threshold-concept",
+    "category": "기술",
+    "topic": "검색·평가",
+    "question": "유사도 임계값이 뭐예요?",
+    "answer": "검색 결과를 답변의 근거로 사용할지 판단하는 기준값입니다. 점수의 의미와 방향은 검색 방식에 따라 다르므로 평가셋으로 적절한 기준을 정하며, 기준을 넘었다고 내용이 반드시 맞는 것은 아닙니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-evaluation-concept",
+    "category": "기술",
+    "topic": "검색·평가",
+    "question": "평가셋이 뭐예요?",
+    "answer": "시스템의 동작을 검증하기 위해 준비한 질문과 기대 결과의 모음입니다. 정상 질문뿐 아니라 무관한 질문, 근거가 없는 질문과 경계 사례도 포함해 검증합니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-hit-at-3-concept",
+    "category": "기술",
+    "topic": "검색·평가",
+    "question": "Hit@3(히트 앳 쓰리)는 무엇인가요?",
+    "answer": "상위 3개 검색 결과에 정답 문서가 하나라도 포함됐는지를 확인하는 지표입니다. 질문별로 포함되면 1, 없으면 0으로 기록하고 전체 질문의 평균을 구합니다. 예를 들어 질문 10개 중 8개에서 정답 문서를 찾았다면 Hit@3는 0.8입니다.",
+    "original": false,
+    "note": ""
+  },
+  {
+    "id": "cu-recall-at-3-concept",
+    "category": "기술",
+    "topic": "검색·평가",
+    "question": "Recall@3(리콜 앳 쓰리)는 무엇인가요?",
+    "answer": "실제 관련 문서 전체 중 상위 3개 검색 결과로 찾은 관련 문서의 비율입니다. 예를 들어 관련 문서가 총 4개이고 상위 3개 결과에서 그중 2개를 찾았다면 Recall@3는 2/4, 즉 0.5입니다. Hit@3가 정답 문서를 하나라도 찾았는지 본다면, Recall@3는 관련 문서를 얼마나 빠짐없이 찾았는지 봅니다.",
+    "original": false,
+    "note": "평가하려면 질문별 관련 문서를 미리 지정해야 합니다. 관련 문서가 질문마다 하나뿐이면 Hit@3와 Recall@3 값이 같아집니다."
+  }
+];

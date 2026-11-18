@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import React from 'react';
 import TestRenderer, { act } from 'react-test-renderer';
@@ -24,10 +24,12 @@ try {
   assert.equal(questions.length, 152); assert.equal(new Set(questions.map(q => q.id)).size, 152);
   assert.equal(questions.filter(q => q.source === 'autoever').length, 38);
   assert.equal(questions.filter(q => q.source === 'aws').length, 114);
-  const sources = { autoever: readFileSync('../면접/오토에버1차.txt', 'utf8'), aws: execFileSync('pdftotext', ['-raw', '../면접/aws_sa_interview_questions_only.pdf', '-'], { encoding: 'utf8' }) };
+  // 원본 면접 자료는 저장소에 두지 않는다. 로컬에 있을 때만 원문 대조를 한다.
+  const hasSources = existsSync('../면접/오토에버1차.txt') && existsSync('../면접/aws_sa_interview_questions_only.pdf');
+  const sources = hasSources ? { autoever: readFileSync('../면접/오토에버1차.txt', 'utf8'), aws: execFileSync('pdftotext', ['-raw', '../면접/aws_sa_interview_questions_only.pdf', '-'], { encoding: 'utf8' }) } : null;
   const normalize = value => value.normalize('NFKC').replace(/\s/g, '');
   for (const q of questions) {
-    assert.ok(normalize(sources[q.source]).includes(normalize(q.question)), `question matches uploaded source: ${q.id}`);
+    if (sources) assert.ok(normalize(sources[q.source]).includes(normalize(q.question)), `question matches uploaded source: ${q.id}`);
     assert.ok(q.answer.length > 60 && !/TODO|작성 예정/.test(q.answer));
     assert.ok(q.followUps.length && q.followUps.every(([question, answer]) => question && answer));
   }

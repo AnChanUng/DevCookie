@@ -31,6 +31,44 @@ class DuelTest {
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper json;
 
+    @Test
+    void enteringShowsWaitingPlayersAndCompletedGamesAppearInRecord() throws Exception {
+        String code=create(List.of("a:1","a:2","a:3"));
+        for (String visitor : List.of("waiting-a","waiting-b")) {
+            mvc.perform(post("/api/v1/duels/"+code+"/join").contentType(MediaType.APPLICATION_JSON)
+                .content(json.writeValueAsString(Map.of("visitorId",visitor,"nickname",visitor))))
+                .andExpect(status().isOk());
+        }
+        mvc.perform(get("/api/v1/duels/"+code).header("X-Visitor-Id","waiting-a"))
+            .andExpect(jsonPath("$.players.length()").value(2))
+            .andExpect(jsonPath("$.players[0].started").value(false));
+        report(code,"waiting-a","A",3,3,true,40).andExpect(status().isOk());
+        mvc.perform(get("/api/v1/duels/record").header("X-Visitor-Id","waiting-a"))
+            .andExpect(jsonPath("$.total").value(0));
+        report(code,"waiting-b","B",2,3,true,20).andExpect(status().isOk());
+        mvc.perform(get("/api/v1/duels/record").header("X-Visitor-Id","waiting-a"))
+            .andExpect(jsonPath("$.wins").value(1)).andExpect(jsonPath("$.total").value(1));
+        mvc.perform(get("/api/v1/duels/record").header("X-Visitor-Id","waiting-b"))
+            .andExpect(jsonPath("$.losses").value(1));
+        mvc.perform(post("/api/v1/duels/"+code+"/join").contentType(MediaType.APPLICATION_JSON)
+            .content("{\"visitorId\":\"waiting-a\",\"nickname\":\"A\"}"))
+            .andExpect(jsonPath("$.players[0].score").value(3));
+        mvc.perform(post("/api/v1/duels/"+code+"/join").contentType(MediaType.APPLICATION_JSON)
+            .content("{\"visitorId\":\"late-newcomer\",\"nickname\":\"late\"}"))
+            .andExpect(status().isConflict());
+    }
+
+    @Test
+    void identicalScoreAndTimeIsDrawAndDelayedProgressCannotRewind() throws Exception {
+        String code=create(List.of("a:1","a:2","a:3"));
+        report(code,"draw-a","A",2,2,false,20).andExpect(status().isOk());
+        report(code,"draw-a","A",0,0,false,0).andExpect(jsonPath("$.players[0].answered").value(2));
+        report(code,"draw-a","A",2,3,true,40).andExpect(status().isOk());
+        report(code,"draw-b","B",2,3,true,40).andExpect(status().isOk());
+        mvc.perform(get("/api/v1/duels/record").header("X-Visitor-Id","draw-a"))
+            .andExpect(jsonPath("$.draws").value(1)).andExpect(jsonPath("$.wins").value(0));
+    }
+
     private String create(List<String> ids) throws Exception {
         String body = mvc.perform(post("/api/v1/duels").contentType(MediaType.APPLICATION_JSON)
                         .content(json.writeValueAsString(Map.of("questionIds", ids))))

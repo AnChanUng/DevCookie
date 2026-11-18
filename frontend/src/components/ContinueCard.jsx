@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+const isVisibleBank = to => typeof to === 'string' && !/^\/(ssafy(?:\/|$)|exam\/ssafy)/.test(to);
+
 // 가장 최근에 풀다 만 문제(문제은행마다 한 건씩 저장됨) 가운데 제일 나중 것
 function latestUnfinished() {
   let best = null;
@@ -9,7 +11,7 @@ function latestUnfinished() {
       if (!key.startsWith('exam-resume:')) continue;
       try {
         const r = JSON.parse(localStorage.getItem(key));
-        if (r?.to && Array.isArray(r.ids) && (!best || (r.at || 0) > (best.at || 0))) best = r;
+        if (isVisibleBank(r?.to) && Array.isArray(r.ids) && (!best || (r.at || 0) > (best.at || 0))) best = r;
       } catch { /* 깨진 항목은 건너뛴다 */ }
     }
   } catch { /* storage unavailable */ }
@@ -19,7 +21,7 @@ function latestUnfinished() {
 function lastBank() {
   try {
     const r = JSON.parse(localStorage.getItem('exam:last'));
-    return r?.to && r?.name ? r : null;
+    return isVisibleBank(r?.to) && r?.name ? r : null;
   } catch {
     return null;
   }

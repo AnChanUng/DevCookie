@@ -83,8 +83,9 @@ export function CompanyExamWithProgress({ company, back, progress, initialIds })
   const UNITS = company.units; // 단원별 문제집 (모의고사 미포함). 단원은 sections에 extra로 들어 있다
   const SETS = company.sets || []; // 실제 시험처럼 한 번에 치르는 고정 회차
   // 복기 회차와 예상 회차를 합친 은행은 모의고사·영역별 연습이 둘을 섞어 뽑고, 복원 문제가 따로 있는 은행은 나머지가 예상문제다
-  const splitSets = SETS.some(s => s.kind);
-  const mainKind = splitSets ? 'mixed' : RECALL ? 'predicted' : null;
+  const setKinds = [...new Set(SETS.map(s => s.kind).filter(Boolean))];
+  const splitSets = setKinds.length > 1;
+  const mainKind = splitSets ? 'mixed' : setKinds[0] || (RECALL ? 'predicted' : null);
   const label = (mode, sec) => (mode === 'recall' && RECALL ? RECALL.title : modeLabel(SECTIONS, mode, sec, SETS));
   const ALL = useMemo(() => [...Q, ...CPP, ...(RECALL?.questions || []), ...(UNITS?.questions || [])], [Q, CPP, RECALL, UNITS]); // 오답노트·오답 다시 풀기 범위
   const byId = useMemo(() => {
@@ -296,7 +297,7 @@ export function CompanyExamWithProgress({ company, back, progress, initialIds })
   const setsBlock = (
     <>
       <div className="section-title">{hasSets ? '회차별 모의고사' : '모의고사'}</div>
-      {hasSets && <p className="exam-lede">실제 시험과 같은 문항 수·영역 구성으로 묶은 고정 세트입니다. {splitSets && '복기 기반 회차는 응시 후기에 복원된 문항을 따라 만들었고, 예상문제 회차는 같은 경향으로 새로 만든 문제입니다. '}각 회차는 같은 문제를 같은 순서로 출제하므로 다시 풀었을 때 점수를 비교할 수 있습니다.</p>}
+      {hasSets && <p className="exam-lede">{company.setsDescription || <>실제 시험과 같은 문항 수·영역 구성으로 묶은 고정 세트입니다. {splitSets && '복기 기반 회차는 응시 후기에 복원된 문항을 따라 만들었고, 예상문제 회차는 같은 경향으로 새로 만든 문제입니다. '}각 회차는 같은 문제를 같은 순서로 출제하므로 다시 풀었을 때 점수를 비교할 수 있습니다.</>}</p>}
       <div className="exam-sections">
         {examSets.map(s => {
           const qs = hasSets ? Q.filter(q => q.set === s.key) : Q;
@@ -350,6 +351,7 @@ export function CompanyExamWithProgress({ company, back, progress, initialIds })
         </div>
       )}
       <p className="exam-lede">{company.lede}</p>
+      {company.references?.map(ref => <p key={ref.url}><a href={ref.url} target="_blank" rel="noreferrer">{ref.title} ↗</a></p>)}
 
       {/* 실제 시험을 복원한 문제는 예상문제보다 먼저 보이게 맨 위에 둔다 */}
       {RECALL && (

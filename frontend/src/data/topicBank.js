@@ -1,6 +1,6 @@
 // 주제별 통합 문제집: 기업별 문제은행과 컴퓨터일반에 흩어진 객관식 문제를 과목으로 다시 묶는다.
 // 문제를 새로 만들지 않고 기존 문제를 그대로 가져오며, 풀이 기록은 원래 문제은행과 따로('topics') 쌓인다.
-import { COMPANIES, COMIL, allQuestions } from './examQuestions';
+import { COMPANIES, allQuestions } from './examQuestions';
 
 const SUBJECTS = {
   db:  { name: '데이터베이스', short: 'DB', sub: '정규화 · 트랜잭션 · SQL · 인덱스 · 회복' },
@@ -27,7 +27,7 @@ const RULES = [
 const subjectOf = (text) => RULES.find(([, re]) => re.test(text || ''))?.[0];
 
 // 전산 전공 필기가 아닌 문제은행(NCS · 인적성 · 경제/금융상식 · SSAFY 서술형 · Spring 같은 개발 스택)은 뺀다
-const SOURCES = [...COMPANIES.filter(c => c.ready && c.category !== 'aptitude' && c.category !== 'major' && c.category !== 'monthly' && c.category !== 'stack' && !['ibk', 'bnk'].includes(c.key)), COMIL];
+const SOURCES = [...COMPANIES.filter(c => c.ready && c.category !== 'aptitude' && c.category !== 'major' && c.category !== 'monthly' && c.category !== 'stack')];
 
 const QUESTIONS = SOURCES.flatMap(bank => allQuestions(bank)
   .filter(q => !q.kind && Array.isArray(q.o))

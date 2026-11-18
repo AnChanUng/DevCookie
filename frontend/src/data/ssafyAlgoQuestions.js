@@ -1,3 +1,4 @@
+import { SSAFY_DB_QUESTIONS } from './ssafyDbQuestions';
 // SSAFY 알고리즘 과목평가 대비 문제 94문항 (객관식 21 · 단답형 9 · 서술형 2 × 2회 + 기초 다지기 객관식 21 · 단답형 9)
 // 응시자 복기로 남은 출제 범위(시간복잡도 · 빅오, 큐 메서드, 트리 용어 · 순회, 힙, 재귀 · 완전탐색,
 // 순열 · 조합 · 부분집합과 next_permutation, 그래프 표현 · 차수 · BFS/DFS, 비트마스킹, Union-Find · 경로 압축,
@@ -5,7 +6,7 @@
 // 단답형(kind:'short')은 acc 중 하나와 같으면 자동 정답, 아니면 모범답안(ans)을 보고 스스로 채점한다.
 // 서술형(kind:'essay')은 모범답안과 채점 포인트(pts)를 보고 스스로 채점한다.
 export const SSAFY_ALGO_SECTIONS = {
-  obj:   {name:'객관식', short:'객관식', sub:'4지선다 · 개념 · 코드 추적 · 계산', count:63},
+  obj:   {name:'객관식', short:'객관식', sub:'4지선다 · 개념 · 코드 추적 · 계산', count:93},
   short: {name:'단답형', short:'단답', sub:'계산 결과 · 용어 · 메서드 이름을 직접 입력', count:27},
   essay: {name:'서술형', short:'서술', sub:'비트마스킹 장점 · 경로 압축 · 분할 정복 · 탐욕', count:4},
 };
@@ -15,9 +16,11 @@ export const SSAFY_ALGO_SETS = [
   { key:'a', name:'과목평가 대비 1회', sub:'객관식 21 · 단답형 9 · 서술형 2 · 비트마스킹 장점과 경로 압축 서술' },
   { key:'b', name:'과목평가 대비 2회', sub:'객관식 21 · 단답형 9 · 서술형 2 · 분할 정복 설계와 탐욕 조건 서술' },
   { key:'c', name:'기초 다지기', sub:'객관식 21 · 단답형 9 · 같은 출제 범위를 쉬운 난이도로' },
+  { key:'db', name:'DB', sub:'Servlet · JSP · MySQL 8.4/InnoDB · 정규화 · 인덱스 · 객관식 30문제' },
 ];
 
 export const SSAFY_ALGO_QUESTIONS = [
+...SSAFY_DB_QUESTIONS,
 /* ================= 1회 ================= */
 /* --- 객관식 21 --- */
 {id:'sa1o01',set:'a',sec:'obj',topic:'시간복잡도 계산',q:'다음 코드의 시간복잡도로 옳은 것은?',code:`int cnt = 0;

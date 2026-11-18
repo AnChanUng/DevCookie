@@ -1,20 +1,14 @@
+import { CU_SECTIONS, CU_QUESTIONS, CU_SETS } from './cuQuestions';
+import { SSAFY_DB_QUESTIONS } from './ssafyDbQuestions';
 import { PEARL_QUESTIONS, PEARL_SECTIONS } from './pearlQuestions';
 // HF(한국주택금융공사) IT직무 전공필기 대비 자체 제작 문제 60문항 (5지선다)
 // 2021~2026 응시 후기에서 반복 언급된 주제를 기준으로 구성. 실제 시험 문항의 복제가 아님.
-import { IBK_SECTIONS, IBK_QUESTIONS } from './ibkQuestions';
-import { KFSB_SECTIONS, KFSB_QUESTIONS } from './kfsbQuestions';
-import { KORAIL_SECTIONS, KORAIL_QUESTIONS } from './korailQuestions';
-import { EX_SECTIONS, EX_QUESTIONS } from './exQuestions';
-import { KWATER_SECTIONS, KWATER_QUESTIONS } from './kwaterQuestions';
-import { KDN_SECTIONS, KDN_QUESTIONS } from './kdnQuestions';
-import { KICOX_SECTIONS, KICOX_QUESTIONS } from './kicoxQuestions';
+import { KORAIL_SECTIONS, EX_SECTIONS, KWATER_SECTIONS, KDN_SECTIONS, KICOX_SECTIONS } from './splitSections';
 import { KORAIL_PRED_QUESTIONS } from './korailPredictedQuestions';
 import { EX_PRED_QUESTIONS } from './exPredictedQuestions';
 import { KWATER_PRED_QUESTIONS } from './kwaterPredictedQuestions';
 import { KDN_PRED_QUESTIONS } from './kdnPredictedQuestions';
 import { KICOX_PRED_QUESTIONS } from './kicoxPredictedQuestions';
-import { KOSCOM_SECTIONS, KOSCOM_QUESTIONS } from './koscomQuestions';
-import { BNK_SECTIONS, BNK_QUESTIONS } from './bnkQuestions';
 import { KFTC_SECTIONS, KFTC_QUESTIONS } from './kftcQuestions';
 import { KFTC_SET2_QUESTIONS } from './kftcSet2Questions';
 import { FSEC_SECTIONS, FSEC_QUESTIONS } from './fsecQuestions';
@@ -42,17 +36,10 @@ import { IBKDT_SECTIONS, IBKDT_QUESTIONS, IBKDT_SETS } from './ibkDigitalQuestio
 import { IBK_BIGDATA } from './ibkBigdata';
 import { IBKIT_SECTIONS, IBKIT_QUESTIONS, IBKIT_SETS } from './ibkItQuestions';
 import { HF_CPP_QUESTIONS } from './hfCppQuestions';
-import { COMIL as COMIL_BANK } from './comilQuestions';
-import { COMIL_UNITS } from './comilUnits';
 import { NCS } from './ncsQuestions';
-import { HF_RECALL_2026B } from './hfRecall2026bQuestions';
-import { SSAFY_ALGO_SECTIONS, SSAFY_ALGO_QUESTIONS, SSAFY_ALGO_SETS } from './ssafyAlgoQuestions';
 import { DAOU_SECTIONS, DAOU_QUESTIONS, DAOU_SETS } from './daouQuestions';
-import { SSAFY_MONTHLY_SECTIONS, SSAFY_MONTHLY_QUESTIONS, SSAFY_MONTHLY_SETS } from './ssafyMonthlyQuestions';
 export { HF_CPP_QUESTIONS, CPP_GROUPS } from './hfCppQuestions';
 export { NCS };
-// 컴퓨터일반은 모의고사 문제은행에 단원별 문제집을 붙인다. 단원은 모의고사 영역과 따로 센다(extra)
-export const COMIL = { ...COMIL_BANK, sections: { ...COMIL_BANK.sections, ...COMIL_UNITS.sections }, units: COMIL_UNITS };
 
 export const SECTIONS = {
   cs:  {name:'전산학일반', short:'전산', sub:'OS · 컴퓨터구조 · 정보보호 · SW공학 · 자료구조', count:36},
@@ -127,13 +114,6 @@ export const HF_QUESTIONS = [
 {id:'pl12',sec:'pl',topic:'Python·딕셔너리·정렬',q:'다음 Python 코드의 출력 결과는?',code:'d = {}\nfor w in "banana":\n    d[w] = d.get(w, 0) + 1\nprint(sorted(d.items(), key=lambda x: -x[1])[0])',o:["('a', 3)","('n', 2)","('b', 1)","('a', 2)","('n', 3)"],a:0,e:'문자 빈도: b=1, a=3, n=2. dict.get(key, 0)은 키가 없으면 기본값 0을 반환한다. 빈도 내림차순(−x[1])으로 정렬한 첫 항목은 (\'a\', 3).'},
 ];
 
-// 복기 문제집이 있는 공기업은 복기 기반 회차(r)와 같은 경향으로 새로 만든 예상문제 회차(p)를 한 문제은행으로 합친다.
-const withPredicted = (recall, predicted) => [...recall.map(q => ({ ...q, set: 'r' })), ...predicted.map(q => ({ ...q, set: 'p' }))];
-const recallSets = (rSub, pSub) => [
-  { key: 'r', name: '복기 기반 문제 1회', sub: rSub, kind: 'recall' },
-  { key: 'p', name: '예상문제 1회', sub: pSub, kind: 'predicted' },
-];
-
 // 문제은행이 무엇을 근거로 만들어졌는지. 저장소에 복기·복원 원본 파일이 있으면 recall, 없으면 predicted.
 // 목록 화면과 회사 화면이 같은 문구를 쓰도록 여기에 모아 둔다
 export const SOURCE_KINDS = {
@@ -172,6 +152,15 @@ export const companyPath = (company) => `/${hubOf(company) || 'exam'}/${company.
 
 export const COMPANIES = [
   {
+    key: 'cu', category: 'finance', abbr: '신협중앙회', name: '신협중앙회 IT', ready: true,
+    meta: '40문항 × 3세트 · 총 120문항 · 4지선다',
+    source: { kind: 'predicted', label: '공고 범위 기반 예상문제', detail: '2026년 11월 7일 필기 공고(공식 명칭: 2027년 신입직원 채용)의 IT 직무상식 40문항·40분과 4개 출제영역을 반영했습니다. 모든 문항을 이 문제집을 위해 새로 작성했습니다. 실제 기출 복원이나 출제 확률을 뜻하지 않으며 과목별 배분은 학습용입니다.' },
+    questions: CU_QUESTIONS, sections: CU_SECTIONS, sets: CU_SETS, minutes: 40,
+    setsDescription: '회차마다 객관식 40문항입니다. 공고의 전공 범위에 맞춰 구성했으며 과목별 비중은 학습용입니다. 목표 시간은 회차당 40분이고 화면에서는 시간 제한 없이 풀 수 있습니다.',
+    references: [{title:'신협중앙회 공식 채용공고 · 2026.11.7 필기',url:'https://cu2.saramin.co.kr/service/cu2/3984/applicant/apply/recruit_default.asp'}],
+    lede: '소프트웨어 설계·개발, 데이터베이스 구축, 프로그래밍 언어 활용, 정보시스템 구축 관리. SQL·코드 실행·계산·옳은 설명 고르기·실무 상황 판단을 연습합니다. 별도 온라인 코딩테스트는 공고상 알고리즘·SQL 4문항/120분입니다. 이 문제집은 객관식 전공필기 대비용입니다.',
+  },
+  {
     key: 'pearl', category: 'tech', abbr: '펄어비스', name: '펄어비스 웹 백엔드', ready: true,
     meta: '자체 예상 50문항 · 객관식 40 + 서술형 10 · 연습 70분',
     source: { kind: 'predicted', label: '자체 제작 예상문제', detail: '사용자가 제공한 준비 범위를 바탕으로 만든 학습용 문제입니다. 실제 기출이나 공식 시험 구성의 복원이 아니며, 문항 수와 70분은 연습용 설정입니다.' },
@@ -180,9 +169,9 @@ export const COMPANIES = [
     lede: '웹·네트워크, DB, 운영체제·동시성, 자료구조·알고리즘, C#·객체지향을 각 10문항씩 연습합니다. 객관식 40문항과 서술형 10문항으로 구성했고 SQL·C# 코드 읽기와 실무 상황 판단을 포함했습니다. 각 문제에서 정답 이유와 함정을 바로 확인할 수 있습니다. 서술형은 모범답안과 채점 포인트를 보고 직접 채점합니다. 시간이 부족하면 영역별 연습부터 시작하세요.',
   },
   {
-    key: "hf", category: "finance", abbr: "HF", name: "한국주택금융공사", meta: "전공필기 60문제 · 80분 · 5지선다 · C++ 집중 48문제 · 2026 하반기 복원 41문제", ready: true,
-    source: { kind: "recall", label: "2026 하반기 복기문제", detail: "2026 하반기 전공필기 응시 후기를 바탕으로 복원한 41문제가 바로 아래에 있습니다. 그 밑의 모의고사와 영역별 연습, C++ 집중 문제집은 출제범위를 반영해 새로 만든 예상문제입니다." },
-    questions: HF_QUESTIONS, sections: SECTIONS, minutes: 80, extra: HF_CPP_QUESTIONS, recall: HF_RECALL_2026B,
+    key: "hf", category: "finance", abbr: "HF", name: "한국주택금융공사", meta: "전공필기 60문제 · 80분 · 5지선다 · C++ 집중 48문제", ready: true,
+    source: { kind: "predicted", label: "출제범위 기반 예상문제", detail: "모의고사와 영역별 연습, C++ 집중 문제집은 출제범위를 반영해 새로 만든 예상문제입니다." },
+    questions: HF_QUESTIONS, sections: SECTIONS, minutes: 80, extra: HF_CPP_QUESTIONS,
     lede: "전산학일반(정보보호 포함) 36문제, 데이터베이스·네트워크 12문제, 프로그래밍(C++ · Java · Python) 12문제. 총 60문제, 80분, 5지선다. 코딩테스트 이후 치르는 전공필기 범위만 다룹니다. 프로그래밍 영역은 C++ 코드 실행 결과 문제 비중이 높아 아래에 C++ 집중 문제집을 따로 두었습니다.",
   },
   {
@@ -292,18 +281,6 @@ export const COMPANIES = [
     lede: "소프트웨어공학 6문제, 데이터베이스 7문제, 프로그래밍 7문제, 운영체제 5문제, 정보보호 5문제, 서민금융법 5문제. 총 35문제, 60분, 4지선다. 채용공고에 안내된 직무수행능력평가 구성(전공 30문항 + 법률 5문항, 60분)과 전산일반 출제범위(소프트웨어공학 · 데이터베이스 · 프로그래밍 · 운영체제 · 정보보호), 「서민의 금융생활 지원에 관한 법률」을 기준으로 새로 만든 예상문제입니다. 실제 기출의 복원이 아닙니다.",
   },
   {
-    key: "koscom", category: "finance", abbr: "KOSCOM", name: "코스콤", meta: "전산 전공 35문제 · 45분 · 4지선다", ready: true,
-    source: { kind: "recall", label: "2026 상반기 복기문제", file: "공기업 필기/2026 상반기 코스콤 필기전형 복기.pdf" },
-    questions: KOSCOM_QUESTIONS, sections: KOSCOM_SECTIONS, minutes: 45,
-    lede: "소프트웨어공학 6문제, 운영체제 7문제, 데이터베이스 7문제, 네트워크·데이터통신 8문제, 자료구조 7문제. 총 35문제, 45분, 4지선다. 2026 상반기 응시 후기에 복원된 35문항(CMMI 순서, COCOMO II, 격리 수준, 2PL 변형, 포트 번호 등 명칭·순서·예외를 묻는 경향)을 바탕으로 새로 만든 문제입니다.",
-  },
-  {
-    key: "ibk", category: "finance", abbr: "IBK", name: "기업은행", meta: "NCS 40 + 전공 35 · 120분 · 4지선다", ready: true,
-    source: { kind: "recall", label: "2026 상반기 복기문제", file: "공기업 필기/IBK기업은행 2026 상반기 필기 기출복원 문제지.pdf" },
-    questions: IBK_QUESTIONS, sections: IBK_SECTIONS, minutes: 120,
-    lede: "NCS 직업기초능력(의사소통·수리·문제해결·자료해석·명제논리) 40문제, 직무수행능력 35문제(경제학 12 · 재무관리 8 · 회계 8 · 경영·금융상식 7). 총 75문제, 120분, 4지선다. 출제 구성만 참고해 새로 만든 문제입니다.",
-  },
-  {
     key: "ibkdt", category: "finance", abbr: "IBK 디지털", name: "IBK기업은행 디지털", meta: "직무수행(디지털) 30문제 × 3회 · 45분 · 4지선다 · 빅데이터 집중 80문제", ready: true,
     source: { kind: "predicted" },
     questions: IBKDT_QUESTIONS, sections: { ...IBKDT_SECTIONS, ...IBK_BIGDATA.sections }, minutes: 45,
@@ -325,12 +302,6 @@ export const COMPANIES = [
     lede: "농업·농촌·농협 5문제, 손해보험·디지털금융 5문제, 데이터베이스 6문제, 전자계산기구조·운영체제 5문제, 소프트웨어공학 5문제, 데이터통신·정보보호 4문제. 한 회 30문제, 25분, 4지선다로 3회분을 준비했습니다. NH 계열사 공통 필기(인적성 + 직무능력평가 50문제·70분 + 직무상식평가 30문제·25분) 중 직무상식평가를 대상으로 하며, IT직 출제범위로 공개된 농업·농촌 및 디지털 상식과 데이터베이스·전자계산기 구조·운영체제·소프트웨어공학·데이터통신에 손해보험 도메인을 더해 새로 만든 예상문제입니다.",
   },
   {
-    key: "kfsb", category: "finance", abbr: "KFSB", name: "저축은행중앙회", meta: "IT직무 전공 50문제 · 60분 · 4지선다", ready: true,
-    source: { kind: "recall", label: "복기문제", file: "공기업 필기/저은중IT필기복원.txt" },
-    questions: KFSB_QUESTIONS, sections: KFSB_SECTIONS, minutes: 60,
-    lede: "데이터베이스 11문제, 운영체제·인프라 10문제, 네트워크·분산통신 8문제, 정보보호 11문제, 자료구조·설계·아키텍처 10문제. 총 50문제, 60분, 4지선다. 계좌·입출금·결제 같은 실무 상황을 제시하고 '왜 이 기술을 택하는가'를 묻는 응시 후기 경향을 따라 새로 만든 문제입니다.",
-  },
-  {
     key: "kepco", category: "public", abbr: "KEPCO", name: "한국전력공사", meta: "전산 전공 30문제 · 45분 · 4지선다", ready: true,
     source: { kind: "predicted" },
     questions: KEPCO_QUESTIONS, sections: KEPCO_SECTIONS, minutes: 45,
@@ -349,45 +320,34 @@ export const COMPANIES = [
     lede: "데이터베이스 6문제, 자료구조·알고리즘 6문제, 소프트웨어공학 5문제, 운영체제 5문제, 네트워크 5문제, 정보보호·신기술 3문제. 총 30문제, 45분, 4지선다. 전산 전공 범위에 공간정보(GIS) 주제를 더해 새로 만든 예상문제입니다.",
   },
   {
-    key: "korail", category: "public", abbr: "KORAIL", name: "코레일", meta: "전산 전공 40문제 × 2회(복기 기반 + 예상) · 50분 · 5지선다", ready: true,
-    source: { kind: "recall", label: "2026 상반기 복기문제", file: "공기업 필기/2026 상반기 코레일.hwpx" },
-    questions: withPredicted(KORAIL_QUESTIONS, KORAIL_PRED_QUESTIONS), sections: KORAIL_SECTIONS, minutes: 50,
-    sets: recallSets('복원 문항을 바탕으로 만든 40문제 · 포렌식·블록 암호 모드·파이프라인·관계대수 중심', '같은 경향의 새 40문제 · 스크럼·PERT·SRT·LRU·세마포어·ARP 스푸핑·umask 중심'),
-    lede: "소프트웨어공학 9문제, 데이터베이스 9문제, 운영체제·컴퓨터구조 10문제, 네트워크 6문제, 정보보호 6문제. 총 40문제, 50분, 5지선다. 2026 상반기 응시 후기에 복원된 문항(포렌식, 블록 암호 모드, 파이프라인·AMAT 계산, 관계대수, 서브넷 등)을 바탕으로 만든 1회분에, 같은 출제 경향(결합도·응집도 판별, 일정·비용 계산, 스케줄링·페이지 교체 계산, 서브넷 계산)을 따라 새로 만든 예상문제 1회분을 더했습니다.",
+    key: "korail", category: "public", abbr: "KORAIL", name: "코레일", meta: "전산 전공 40문제 (예상문제) · 50분 · 5지선다", ready: true,
+    source: { kind: "predicted", label: "출제 경향 기반 예상문제" },
+    questions: KORAIL_PRED_QUESTIONS, sections: KORAIL_SECTIONS, minutes: 50,
+    lede: "소프트웨어공학 9문제, 데이터베이스 9문제, 운영체제·컴퓨터구조 10문제, 네트워크 6문제, 정보보호 6문제. 총 40문제, 50분, 5지선다. 응시 후기에서 확인한 출제 경향을 따라 새로 만든 예상문제입니다.",
   },
   {
-    key: "ex", category: "public", abbr: "EX", name: "한국도로공사", meta: "전산 전공 40문제 × 2회(복기 기반 + 예상) · 50분 · 5지선다", ready: true,
-    source: { kind: "recall", label: "2026 상반기 복기문제", file: "공기업 필기/2026_한국도로공사_상반기전산전공.hwp" },
-    questions: withPredicted(EX_QUESTIONS, EX_PRED_QUESTIONS), sections: EX_SECTIONS, minutes: 50,
-    sets: recallSets('복원된 40문항의 주제와 보기 구성을 따른 40문제', '같은 경향의 새 40문제 · 키·뷰·SAVEPOINT·합성 관계·최악 적합·SSTF·Go-Back-N·IPsec 중심'),
-    lede: "데이터베이스 8문제, 소프트웨어공학 8문제, 운영체제 9문제, 정보보호 7문제, 네트워크 8문제. 총 40문제, 50분, 5지선다. 2026 상반기 응시 후기에 복원된 40문항의 주제와 보기 구성을 따라 만든 1회분에, 같은 출제 경향으로 새로 만든 예상문제 1회분을 더했습니다.",
+    key: "ex", category: "public", abbr: "EX", name: "한국도로공사", meta: "전산 전공 40문제 (예상문제) · 50분 · 5지선다", ready: true,
+    source: { kind: "predicted", label: "출제 경향 기반 예상문제" },
+    questions: EX_PRED_QUESTIONS, sections: EX_SECTIONS, minutes: 50,
+    lede: "데이터베이스 8문제, 소프트웨어공학 8문제, 운영체제 9문제, 정보보호 7문제, 네트워크 8문제. 총 40문제, 50분, 5지선다. 응시 후기에서 확인한 출제 경향을 따라 새로 만든 예상문제입니다.",
   },
   {
-    key: "kwater", category: "public", abbr: "K-water", name: "한국수자원공사", meta: "전산 전공(2차) 30문제 × 2회(복기 기반 + 예상) · 40분 · 4지선다", ready: true,
-    source: { kind: "recall", label: "2026 상반기 복기문제", file: "공기업 필기/2026_한국수자원공사_상반기2차전산전공.hwp" },
-    questions: withPredicted(KWATER_QUESTIONS, KWATER_PRED_QUESTIONS), sections: KWATER_SECTIONS, minutes: 40,
-    sets: recallSets('복원 문항을 바탕으로 만든 30문제 · C·Python·Java 코드·C-SCAN·LRU·RAID 중심', '같은 경향의 새 30문제 · 코드 실행 6·AVL·슬라이딩 윈도우·LOOK·TLB·fork·반가산기·암달 중심'),
-    lede: "프로그래밍 실행 결과 6문제, 자료구조 3문제, 네트워크 3문제, 운영체제 8문제, 컴퓨터구조 10문제. 총 30문제, 40분, 4지선다. 2026 상반기 2차 응시 후기에 복원된 문항(C·Python·Java 코드, C-SCAN, LRU, 논리회로, RAID 등)을 바탕으로 만든 1회분에, 같은 출제 경향(코드 실행 결과, 주소 변환·접근 시간 계산, 논리회로·캐시 계산)을 따라 새로 만든 예상문제 1회분을 더했습니다.",
+    key: "kwater", category: "public", abbr: "K-water", name: "한국수자원공사", meta: "전산 전공(2차) 30문제 (예상문제) · 40분 · 4지선다", ready: true,
+    source: { kind: "predicted", label: "출제 경향 기반 예상문제" },
+    questions: KWATER_PRED_QUESTIONS, sections: KWATER_SECTIONS, minutes: 40,
+    lede: "프로그래밍 실행 결과 6문제, 자료구조 3문제, 네트워크 3문제, 운영체제 8문제, 컴퓨터구조 10문제. 총 30문제, 40분, 4지선다. 응시 후기에서 확인한 출제 경향을 따라 새로 만든 예상문제입니다.",
   },
   {
-    key: "kdn", category: "public", abbr: "KDN", name: "한전KDN", meta: "전산 필기(1차) 50문제 × 2회(복기 기반 + 예상) · 60분 · 5지선다", ready: true,
-    source: { kind: "recall", label: "2026 복기문제", file: "공기업 필기/2026_한전KDN_전산필기_1차.hwp" },
-    questions: withPredicted(KDN_QUESTIONS, KDN_PRED_QUESTIONS), sections: KDN_SECTIONS, minutes: 60,
-    sets: recallSets('복원된 50문항의 주제 순서를 따른 50문제', '같은 경향의 새 50문제 · COCOMO·은행가 안전 순서·OPT·외부 조인·후보키·해밍 코드·혼잡 제어·DHCP 중심'),
-    lede: "소프트웨어공학 7문제, 프로그래밍·자료구조 5문제, 운영체제 5문제, 데이터베이스 17문제, 네트워크 16문제. 총 50문제, 60분, 5지선다. 2026 1차 응시 후기에 복원된 50문항의 주제 순서를 따라 만든 1회분에, 같은 출제 경향으로 새로 만든 예상문제 1회분을 더했습니다. DB와 네트워크 비중이 높습니다.",
+    key: "kdn", category: "public", abbr: "KDN", name: "한전KDN", meta: "전산 필기(1차) 50문제 (예상문제) · 60분 · 5지선다", ready: true,
+    source: { kind: "predicted", label: "출제 경향 기반 예상문제" },
+    questions: KDN_PRED_QUESTIONS, sections: KDN_SECTIONS, minutes: 60,
+    lede: "소프트웨어공학 7문제, 프로그래밍·자료구조 5문제, 운영체제 5문제, 데이터베이스 17문제, 네트워크 16문제. 총 50문제, 60분, 5지선다. 응시 후기에서 확인한 출제 경향을 따라 새로 만든 예상문제입니다. DB와 네트워크 비중이 높습니다.",
   },
   {
-    key: "kicox", category: "public", abbr: "KICOX", name: "한국산업단지공단", meta: "정보기술 전공 39문제 × 2회(복기 기반 + 예상) · 55분 · 5지선다", ready: true,
-    source: { kind: "recall", label: "복기문제", file: "공기업 필기/산업단지공단 복기 문제.pdf" },
-    questions: withPredicted(KICOX_QUESTIONS, KICOX_PRED_QUESTIONS), sections: KICOX_SECTIONS, minutes: 55,
-    sets: recallSets('복원된 39문항의 주제를 따른 39문제', '같은 경향의 새 39문제 · 복합 인덱스·격리 수준·MVCC·CAP·다익스트라·MST·MC/DC·위치 인코딩 중심'),
-    lede: "데이터베이스 14문제, 자료구조·알고리즘 12문제, 소프트웨어공학 6문제, AI·보안 7문제. 총 39문제, 55분, 5지선다. 응시 후기에 복원된 39문항의 주제(인덱스 선택도, 비트맵 인덱스, Strict 2PL, 체크포인트, AVL·Red-Black 트리, 정렬 성질, V-모델, 결정 커버리지, Adam, Self-Attention, K-means 등)를 따라 만든 1회분에, 같은 출제 경향으로 새로 만든 예상문제 1회분을 더했습니다. DB와 자료구조 비중이 높고 딥러닝 기초가 함께 나옵니다.",
-  },
-  {
-    key: "bnk", category: "finance", abbr: "BNK", name: "BNK캐피탈", meta: "금융상식 15 + NCS 15 · 40분 · 4지선다", ready: true,
-    source: { kind: "recall", label: "2024 하반기 복기문제", file: "공기업 필기/2024_하반기_BNK_IT직무_필기복기.pdf" },
-    questions: BNK_QUESTIONS, sections: BNK_SECTIONS, minutes: 40,
-    lede: "금융·경제·경영 기초상식 15문제, 직무기초소양(NCS) 15문제. 총 30문제, 40분, 4지선다. 2024 하반기 IT직무 응시 후기의 키워드 정리(예금자보호, CD, 롱숏펀드, 레그테크, 환헤지, 재정환율, 피셔 방정식, MR=MC, BCG 등)와 NCS 기록 유형을 바탕으로 새로 만든 문제입니다. 코딩테스트(SQL·알고리즘)는 포함하지 않습니다.",
+    key: "kicox", category: "public", abbr: "KICOX", name: "한국산업단지공단", meta: "정보기술 전공 39문제 (예상문제) · 55분 · 5지선다", ready: true,
+    source: { kind: "predicted", label: "출제 경향 기반 예상문제" },
+    questions: KICOX_PRED_QUESTIONS, sections: KICOX_SECTIONS, minutes: 55,
+    lede: "데이터베이스 14문제, 자료구조·알고리즘 12문제, 소프트웨어공학 6문제, AI·보안 7문제. 총 39문제, 55분, 5지선다. 응시 후기에서 확인한 출제 경향을 따라 새로 만든 예상문제입니다. DB와 자료구조 비중이 높고 딥러닝 기초가 함께 나옵니다.",
   },
   {
     key: "spring", category: "stack", abbr: "Spring", name: "Spring · JPA", meta: "코어 · 웹 · JPA · 부트 60문제 · 60분 · 4지선다", ready: true,
@@ -396,18 +356,12 @@ export const COMPANIES = [
     lede: "스프링 코어 15문제, 웹 MVC·시큐리티 15문제, JPA·트랜잭션 18문제, 스프링 부트·테스트·설계 12문제. 총 60문제, 60분, 4지선다. IoC·DI, 빈 스코프, AOP, MVC 요청 흐름, 필터·인터셉터·AOP 구분, 영속성 컨텍스트, N+1과 fetch join, OSIV, @Transactional 전파·롤백 규칙과 프록시 내부 호출, 자동 설정과 슬라이스 테스트를 다룹니다. 개념 문제에 코드를 읽고 동작 결과를 예측하는 문제 16개를 섞었습니다.",
   },
   {
-    key: "ssafyalgo", category: "major", abbr: "SSAFY", name: "SSAFY 알고리즘 과목평가", meta: "객관식 21 · 단답형 9 · 서술형 2 × 2회 + 기초 다지기 30문제 · 60분", ready: true,
-    source: { kind: "recall", label: "복기 범위" },
-    questions: SSAFY_ALGO_QUESTIONS, sections: SSAFY_ALGO_SECTIONS, minutes: 60,
-    sets: SSAFY_ALGO_SETS,
-    lede: "객관식 21문제, 단답형 9문제, 서술형 2문제. 시간복잡도·빅오 계산, 큐 메서드, 트리 용어·순회, 힙 구조, 재귀 구조와 완전탐색, 순열·조합·부분집합 구분과 next_permutation, 그래프 표현·차수·BFS/DFS, 비트마스킹 상태관리와 장점, Union-Find와 경로 압축, 분할 정복 설계, 위상 정렬 전제 조건, 백트래킹 가지치기, 탐욕 알고리즘 특징, 이진 탐색 조건 처리, 투 포인터까지 복기된 출제 범위를 따라 2회분을 만들었고, 같은 범위를 쉬운 난이도로 다시 짚는 기초 다지기 30문제(객관식 21 · 단답형 9)를 더했습니다. 단답형은 답을 입력하면 자동 채점하고(표기가 다르면 모범답안을 보고 직접 채점), 서술형은 답안을 써 본 뒤 모범답안·채점 포인트와 비교해 스스로 채점합니다.",
-  },
-  {
-    key: "ssafymonthly", category: "monthly", abbr: "SSAFY", name: "SSAFY 알고리즘 월말평가", meta: "복기 서술형 3문항 · 20분", ready: true,
-    source: { kind: "recall", label: "복기 범위" },
-    questions: SSAFY_MONTHLY_QUESTIONS, sections: SSAFY_MONTHLY_SECTIONS, minutes: 20,
-    sets: SSAFY_MONTHLY_SETS,
-    lede: "월말평가는 구현 3문제(과제 복기 2 + 기본 알고리즘 1)와 서술형 1문제로 치러지며, 여기서는 구현을 빼고 서술형만 연습합니다. 복기된 서술형 소문항 3개(BFS·DFS 진행 방식 차이와 핵심 자료구조, 그래프 표현 방식에 따른 탐색 소요시간과 이유, 위상 정렬 대상 그래프의 구조적 제한 2가지)만 그대로 담았습니다.",
+    key: "ssafydb", category: "major", abbr: "SSAFY", name: "DB", meta: "객관식 30문제 · 4지선다", ready: true,
+    source: { kind: "predicted", label: "요청 범위 기반 예상문제" },
+    questions: SSAFY_DB_QUESTIONS,
+    sections: { obj: { name: "객관식", short: "DB", sub: "Servlet · JSP · SQL", count: 30 } },
+    minutes: 40,
+    lede: "Servlet 생명주기·매핑·Filter, JSP·세션, SQL·트랜잭션·서브쿼리, 정규화·인덱스와 forward/redirect·WHERE/HAVING 비교를 다룹니다. SQL은 MySQL 8.4 / InnoDB 기준입니다. 4지선다 30문제와 정답·해설을 제공합니다.",
   },
   {
     key: "daou", category: "aptitude", abbr: "DAOU", name: "다우기술", meta: "언어 · 수리 · 추리 · 문제해결력 60문제 × 3회 · 60분 · 5지선다", ready: true,
@@ -428,8 +382,11 @@ export const COMPANIES = [
   },
 ];
 
-// 풀이 기록을 남기는 모든 문제은행 (회사별 + 컴퓨터일반). 백업·복원 범위
-export const BANKS = [...COMPANIES, COMIL, NCS];
+// 풀이 기록을 남기는 모든 공개 문제은행. 백업·복원 범위
+export const BANKS = [...COMPANIES, NCS];
+
+// 비공개 문제집(/private/chanung)의 풀이 기록 키. 문항 데이터는 비공개 화면에서만 불러오고, 기록 동기화·백업에는 키만 쓴다
+export const PRIVATE_BANK_KEYS = ['koscom', 'ibk', 'kfsb', 'bnk', 'ssafyalgo', 'ssafymonthly', 'comil'];
 
 // 모의고사 문제에 더해 별도 문제집(extra), 응시 후기 복원 문제(recall), 단원별 문제집(units)까지 합친 전체 문항
 export const allQuestions = (bank) => [...bank.questions, ...(bank.extra || []), ...(bank.recall?.questions || []), ...(bank.units?.questions || [])];

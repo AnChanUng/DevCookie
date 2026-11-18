@@ -1,5 +1,5 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { COMIL, COMPANIES, EXAM_CATEGORIES, SOURCE_KINDS, allQuestions, companyPath } from '../data/examQuestions';
+import { COMPANIES, EXAM_CATEGORIES, SOURCE_KINDS, allQuestions, companyPath } from '../data/examQuestions';
 import ProgressBackup from '../components/ProgressBackup';
 
 function summary(company) {
@@ -25,7 +25,7 @@ export default function ExamListPage() {
   const { category: key } = useParams();
   if (!key) return <CategoryPicker />;
   const category = EXAM_CATEGORIES.find(c => c.key === key);
-  if (!category) return <Navigate to="/exam" replace />;
+  if (!category || category.key === 'tech') return <Navigate to="/exam" replace />;
   if (category.hub) return <Navigate to={`/${category.hub}`} replace />;
   return <CompanyList category={category} />;
 }
@@ -43,7 +43,6 @@ function CategoryPicker() {
         {EXAM_CATEGORIES.filter(cat => !cat.hub && cat.key !== 'tech').map(cat => (
           <CategoryCard key={cat.key} category={cat} />
         ))}
-        <ComilCard />
         {/* 문제 수는 문제은행 데이터를 다 읽어야 나오므로 여기서는 세지 않는다 */}
         <Link to="/topics" className="exam-company-card exam-category-card">
           <span className="exam-category-name">주제별 통합</span>
@@ -55,9 +54,6 @@ function CategoryPicker() {
           <span className="exam-company-meta">숫자가 매번 바뀌는 계산 문제 · 그림 해설</span>
           <span className="exam-category-count">스케줄링 · 페이지 교체 · 서브넷 등 19종</span>
         </Link>
-        {EXAM_CATEGORIES.filter(cat => cat.key === 'tech').map(cat => (
-          <CategoryCard key={cat.key} category={cat} />
-        ))}
       </div>
 
       <ProgressBackup />
@@ -75,16 +71,6 @@ function CategoryCard({ category }) {
   );
 }
 
-// 컴퓨터일반은 회사가 아니라 문제은행 하나지만, 기출문제라 분류 카드와 나란히 둔다
-function ComilCard() {
-  return (
-    <Link to="/computer-general" className="exam-company-card exam-category-card">
-      <span className="exam-category-name">컴퓨터일반</span>
-      <span className="exam-company-meta">전산직 9급 컴퓨터일반 기출</span>
-      <span className="exam-category-count">모의고사 {COMIL.questions.length}문항 · 단원별 {COMIL.units.questions.length}문항</span>
-    </Link>
-  );
-}
 
 export function CompanyCard({ company }) {
   const s = company.ready ? summary(company) : null;

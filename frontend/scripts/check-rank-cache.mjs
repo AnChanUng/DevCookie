@@ -1,0 +1,32 @@
+import assert from 'node:assert/strict';
+import React from 'react';
+import TestRenderer,{act} from 'react-test-renderer';
+import {MemoryRouter} from 'react-router-dom';
+import {createServer} from 'vite';
+const saved=new Map([['visitor-id','test']]);
+globalThis.localStorage={getItem:k=>saved.get(k)||null,setItem:(k,v)=>saved.set(k,v)};
+globalThis.sessionStorage={getItem:()=>String(Date.now()),setItem:()=>{}};
+globalThis.window=new EventTarget();
+globalThis.IS_REACT_ACT_ENVIRONMENT=true;
+const server=await createServer({server:{middlewareMode:true,hmr:false},appType:'custom'});
+let view;
+const board=name=>({top:[{rank:1,count:10,nickname:name}],me:null,totalSolved:10});
+const text=()=>JSON.stringify(view.toJSON());
+try {
+ const {default:Rank}=await server.ssrLoadModule('/src/components/SolveRank.jsx');
+ const {default:api}=await server.ssrLoadModule('/src/api.js');
+ let resolve;
+ api.get=()=>new Promise(r=>{resolve=r;});
+ saved.set('rank:last:v1:visitor:test',JSON.stringify(board('cached-person')));
+ const mount=async()=>{await act(async()=>{view=TestRenderer.create(React.createElement(MemoryRouter,null,React.createElement(Rank)));});};
+ await mount();assert.ok(text().includes('cached-person'));assert.ok(text().includes('업데이트 중'));
+ await act(async()=>resolve({data:board('fresh-person')}));assert.ok(text().includes('fresh-person'));assert.ok(!text().includes('cached-person'));
+ await act(()=>view.unmount());await mount();assert.ok(text().includes('fresh-person'),'reload restores successful response');
+ saved.set('sync:account',JSON.stringify({id:2,nickname:'other',token:'other-token'}));
+ await act(()=>window.dispatchEvent(new Event('sync:change')));
+ assert.ok(!text().includes('fresh-person'),'account change must not show guest cached ranking');
+ saved.set('sync:account',JSON.stringify({id:3,nickname:'third',token:'third-token'}));
+ saved.set('rank:last:v1:user:3','broken json');
+ await act(()=>window.dispatchEvent(new Event('sync:change')));assert.ok(text().includes('순위를 불러오는 중'));
+ console.log('PASS: immediate cached display, fresh replacement, reload persistence, account isolation, corrupt cache fallback');
+} finally {if(view)await act(()=>view.unmount());await server.close();}

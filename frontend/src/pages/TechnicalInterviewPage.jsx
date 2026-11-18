@@ -13,10 +13,11 @@ export default function TechnicalInterviewPage() {
   return <InterviewWorkspace key={token} />;
 }
 function InterviewWorkspace() {
-  const { hash } = useLocation();
+  const { hash, search } = useLocation();
+  const requestedTrack = new URLSearchParams(search).get('track');
   const navigate = useNavigate();
   const selected = TECHNICAL_INTERVIEW.find(q => q.id === hash.slice(1));
-  const [track, setTrack] = useState(selected?.source || 'aws');
+  const [track, setTrack] = useState(selected?.source || (INTERVIEW_TRACKS.some(t => t.id === requestedTrack) ? requestedTrack : 'aws'));
   const [category, setCategory] = useState('');
   const [query, setQuery] = useState('');
   const [hideDone, setHideDone] = useState(false);
@@ -42,7 +43,7 @@ function InterviewWorkspace() {
     catch { setStorageError(true); }
   };
   const choose = id => {
-    navigate(`/technical-interview#${id}`, { replace: true });
+    navigate(`/p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9/technical?track=${track}#${id}`, { replace: true });
     document.getElementById(id)?.scrollIntoView({ block: 'start' });
   };
   useEffect(() => {
@@ -50,7 +51,7 @@ function InterviewWorkspace() {
   }, [hash]);
   const chooseTrack = id => {
     setTrack(id); setCategory(''); setQuery('');
-    navigate('/technical-interview', { replace: true });
+    navigate(`/p/7b92e1c4-a6d8-4f03-9c51-26de8a740bf9/technical?track=${id}`, { replace: true });
   };
   const chooseRandom = () => {
     if (!visible.length) return;
@@ -59,7 +60,7 @@ function InterviewWorkspace() {
   };
   return <div className="cs-notes technical-interview-notes">
     <header className="notes-heading">
-      <div><h1>기술면접 준비</h1><p>{INTERVIEW_TRACKS.length}개 자료 / 총 {TECHNICAL_INTERVIEW.length}개 질문</p></div>
+      <div><Link to="/chanung">← 기업별 면접 준비</Link><h1>{source.name}</h1><p>{INTERVIEW_TRACKS.length}개 자료 / 총 {TECHNICAL_INTERVIEW.length}개 질문</p></div>
       <div className="notes-progress"><strong>학습 완료 {completed.length} / {TECHNICAL_INTERVIEW.length}</strong><progress value={completed.length} max={TECHNICAL_INTERVIEW.length} aria-label="기술면접 학습 완료" /></div>
       <Link to="/account">내 계정 →</Link>
     </header>

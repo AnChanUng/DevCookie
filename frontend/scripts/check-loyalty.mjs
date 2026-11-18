@@ -1,0 +1,6 @@
+import assert from 'node:assert/strict';import React from 'react';import R,{act} from 'react-test-renderer';import {MemoryRouter} from 'react-router-dom';import {createServer} from 'vite';
+globalThis.IS_REACT_ACT_ENVIRONMENT=true;const s=await createServer({server:{middlewareMode:true,hmr:false},appType:'custom'});let v;const text=n=>typeof n==='string'?n:(n?.children||[]).map(text).join('');
+try{const {default:P}=await s.ssrLoadModule('/src/pages/DeloitteLoyaltyPage.jsx');await act(async()=>{v=R.create(React.createElement(MemoryRouter,null,React.createElement(P)));});assert.equal(v.root.findAllByType('article').length,22);assert.equal(v.root.findAllByProps({className:'prep-answer'}).length,0);
+async function click(label){const b=v.root.findAllByType('button').find(b=>text(b)===label);assert.ok(b,label);await act(async()=>b.props.onClick());}
+await click('설명·말하기 예시 보기');assert.equal(v.root.findAllByProps({className:'prep-answer'}).length,1);await click('설명 모두 숨기기');await click('핵심어 가리고 복습');assert.equal(v.root.findAllByProps({className:'prep-core'}).length,1);await click('핵심어 보이기');await click('핵심가치');assert.equal(v.root.findAllByType('article').length,11);console.log('PASS: 13 source cards + 9 review cards, hidden answers, recall toggle, category filter');
+}finally{if(v)await act(async()=>v.unmount());await s.close();}

@@ -3,7 +3,7 @@ import api from './api';
 import { account, onAccountChange } from './sync';
 import { visitorId } from './track';
 
-export const TIER_NAMES = { BRONZE: '브론즈', SILVER: '실버', GOLD: '골드', DIAMOND: '다이아', RUBY: '루비' };
+export const TIER_NAMES = { BRONZE: '동 쿠키', SILVER: '은 쿠키', GOLD: '금 쿠키', DIAMOND: '다이아 쿠키', RUBY: '루비 쿠키' };
 export function membershipHeaders() {
   const token = account()?.token;
   return { 'X-Visitor-Id': visitorId(), ...(token ? { Authorization: `Bearer ${token}` } : {}) };
