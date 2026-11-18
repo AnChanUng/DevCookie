@@ -1,0 +1,75 @@
+# RAG 학습 도우미
+
+전공 학습 문서에 근거해서만 답하고, 근거가 없으면 답을 거부하는 질의응답 기능입니다. 지금은 로컬 개발·평가 단계이고, 운영 배포에는 ChromaDB와 reranker를 띄울 서버(홈서버 또는 AWS)가 필요합니다.
+
+## 구성
+
+| 단계 | 구현 |
+| --- | --- |
+| 문서 분할 | `content/**/*.md` 109개를 `## ` 제목 단위로 자르고, 1,200자를 넘으면 문단 경계에서 다시 나눔(조각 538개). 조각마다 `[문서 제목 · 단락]`을 붙이고 `source`·`title`·`section` 메타데이터를 둡니다. 조각 ID는 경로와 순번으로 정해져서 다시 넣으면 덮어씁니다. |
+| 임베딩 | 로컬 TEI의 `BAAI/bge-m3`(다국어, 1,024차원). Spring AI OpenAI 임베딩 클라이언트를 TEI의 OpenAI 호환 `/v1/embeddings`에 연결합니다. |
+| 저장 | ChromaDB 1.5.9, Spring AI `ChromaVectorStore` |
+| 1차 검색 | 벡터 유사도 Top-20 |
+| 재정렬 | 로컬 TEI의 `BAAI/bge-reranker-v2-m3` cross-encoder(`/rerank`). Spring AI `DocumentPostProcessor`로 구현(`TeiReranker`) |
+| 2차 선택 | 재정렬 점수 상위 5개 중 0.05 이상만 근거로 사용 |
+| 답변 | Spring AI `RetrievalAugmentationAdvisor` + `ContextualQueryAugmenter(allowEmptyContext=false)`, Gemini(`gemini-2.5-flash`). 근거가 하나도 없으면 LLM을 부르지 않고 거부 문구를 돌려줍니다. |
+
+- API: `POST /api/v1/rag/ask {"question": "..."}` → `{answer, refused, sources[]}`. 문서 다시 넣기: `POST /api/v1/admin/rag/ingest`(관리자 키).
+- 설정: `rag` 프로필(`application-rag.yml`)에서만 켜집니다. 기본 설정은 Spring AI 모델·벡터 저장소 자동 설정을 모두 `none`으로 꺼서, 키와 Chroma가 없는 운영 서버도 그대로 시작합니다.
+
+## 평가
+
+`backend/src/test/resources/rag/eval-set.json` — 113문항.
+
+- **답할 수 있는 질문 88개:** 문서 제목을 그대로 쓰지 않고 사용자 말투로 바꿔 쓴 질문이며, 근거 문서(1~2개)를 정답으로 지정했습니다.
+- **답할 수 없는 질문 25개:** 학습 자료에 없는 주제입니다(Kubernetes HPA, Kafka 파티션, CORS preflight 등). 몇 개는 자료에 이름만 지나가듯 나와서, 잘못 답하기 쉬운 문항입니다.
+
+`RagEvalTest`(`RAG_EVAL=1`일 때만 실행)가 문서를 새로 넣은 뒤, 같은 질문에 대해 ① 벡터 Top-5 ② 벡터 Top-20을 재정렬한 Top-5를 비교합니다. 결과는 `backend/build/reports/rag-eval.json`에 저장됩니다.
+
+### 검색 정확도 (답할 수 있는 88문항)
+
+| 지표 | 벡터 검색만 | 재정렬 후 |
+| --- | ---: | ---: |
+| Hit@1 | 86.4% | **96.6%** |
+| Hit@3 | 95.5% | **98.9%** |
+| Hit@5 | 98.9% | 98.9% |
+| MRR@5 | 0.911 | **0.977** |
+
+재정렬 후 1순위가 정답이 아닌 질문은 3개였습니다. 그중 1개(메모이제이션과 타뷸레이션 비교)는 두 방식 모두 상위 5개 안에 정답 문서를 찾지 못했습니다.
+
+### 근거 없는 질문 거부
+
+최고 점수가 기준보다 낮으면 거부합니다. 기준은 (답할 수 있는 질문을 살린 비율 + 답할 수 없는 질문을 거부한 비율) / 2가 가장 큰 값으로 골랐습니다.
+
+| 지표 | 벡터 유사도 기준 | 재정렬 점수 기준 |
+| --- | ---: | ---: |
+| 기준값 | 0.540 | 0.057(운영 설정 0.05) |
+| 답할 수 없는 질문에 답하려 한 비율 | 12.0% (3/25) | **0% (0/25)** |
+| 답할 수 있는 질문을 거부한 비율 | 3.4% (3/88) | **1.1% (1/88)** |
+
+재정렬 점수 기준을 0.03~0.057 사이 어디에 두어도 결과가 같았습니다. 답할 수 없는 질문의 최고 점수는 0.0187이었습니다. **기준값을 같은 평가셋으로 골랐기 때문에 실제보다 낙관적일 수 있습니다.** 평가셋을 늘려 따로 검증할 예정입니다.
+
+### 지연 (로컬 CPU)
+
+| 단계 | p50 | p95 |
+| --- | ---: | ---: |
+| 벡터 검색 | 241ms | 282ms |
+| 벡터 검색 + 재정렬(후보 20개) | 25.4초 | 30.8초 |
+
+재정렬을 GPU 없이 CPU(fp32)로 해서 매우 느립니다. 실시간 서비스에 쓰려면 후보 수·조각 길이를 줄이거나, 더 작은 reranker, GPU, 양자화를 같은 평가셋으로 비교해야 합니다. 이 항목은 트러블슈팅 기록에 "진행 중"으로 남겨 두었습니다.
+
+### 아직 측정하지 않은 것
+
+- **LLM 답변 단계:** 답변 정확도와 "근거 없는 답변 비율"은 Gemini API 키가 생기면 같은 평가셋으로 측정합니다. 지금 수치는 검색 단계의 결과입니다.
+
+## 실행
+
+```bash
+docker compose -f rag/docker-compose.yml up -d chroma rerank   # reranker 준비 뒤
+docker compose -f rag/docker-compose.yml up -d embed
+cd backend
+RAG_EVAL=1 ./gradlew test --tests '*RagEvalTest' -i | grep rag-eval      # JDK 17~21
+# 답변까지: GEMINI_API_KEY=... RAG_CHAT_MODEL=google-genai 로 rag 프로필 서버 실행
+```
+
+TEI 두 컨테이너는 합쳐서 약 14GB를 씁니다. 동시에 워밍업하면 메모리 부족(137)으로 죽으므로, reranker가 준비된 뒤 임베딩 컨테이너를 띄웁니다.
