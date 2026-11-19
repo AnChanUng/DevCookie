@@ -127,9 +127,10 @@ jobs:
           echo "$why"
           [ "$ok" = true ] || exit 1
 
-      # 낮음은 자동 병합을 켠다(CI 등 필수 검사가 모두 통과하는 순간 GitHub이 병합). 중간, 높음은 사람이 병합 버튼을 누른다
+      # 낮음은 자동 병합을 켠다(CI 등 필수 검사가 모두 통과하는 순간 GitHub이 병합). 작업 브랜치 → dev는 커밋을 하나로 합친다(squash).
+      # 중간, 높음은 사람이 병합 버튼을 누른다
       - name: 자동 병합 켜기
         if: steps.gate.outputs.ok == 'true' && env.BASE == 'dev' && steps.risk.outputs.level == 'low'
         run: |
-          gh pr merge "$PR" --repo "$REPO" --auto --merge \
+          gh pr merge "$PR" --repo "$REPO" --auto --squash \
             || echo "::warning::자동 병합을 켜지 못했어요. 저장소 Settings에서 'Allow auto-merge'를 켰는지 확인해 주세요."
