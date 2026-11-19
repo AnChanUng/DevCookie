@@ -66,6 +66,24 @@ public class MattermostService {
         return true;
     }
 
+    /**
+     * 한 사람에게 알린다. 웹훅의 channel을 "@아이디"로 바꿔 DM으로 보내고, 웹훅이 채널 고정이라 거절하면
+     * 원래 채널에 "@아이디" 멘션을 붙여 보낸다. 아이디가 비어 있으면 채널에만 올린다. 꺼져 있으면 false.
+     */
+    public boolean postTo(String username, String text) {
+        if (!enabled()) return false;
+        if (username == null || username.isBlank()) return postNotice(text);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        try {
+            http.postForEntity(webhookUrl, new HttpEntity<>(Map.of("username", "나의쿠키", "channel", "@" + username, "text", text), headers), String.class);
+            return true;
+        } catch (RuntimeException e) {
+            log.info("Mattermost DM을 보내지 못해 채널 멘션으로 대신합니다({})", e.getClass().getSimpleName());
+            return postNotice("@" + username + " " + text);
+        }
+    }
+
     public String baseUrl() { return baseUrl; }
 
     /** 보냈으면 true. 이미 보낸 날이거나 꺼져 있으면 false. */

@@ -60,6 +60,8 @@ x-backend: &backend
     KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     # 면접 AI와 긴급 오류 알림 요약(Gemini 무료 등급). 비어 있으면 두 기능의 AI 부분만 꺼진다
     GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    # 팀 개발 일지를 고칠 수 있는 사이트 계정 닉네임(쉼표로 구분)
+    DEVLOG_EDITORS: ${DEVLOG_EDITORS:-}
     ALERT_ERROR_THRESHOLD: ${ALERT_ERROR_THRESHOLD:-10}
   healthcheck:
     test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/api/v1/categories"]
@@ -161,6 +163,8 @@ services:
       MATTERMOST_CRON: ${MATTERMOST_CRON:-0 30 8 * * MON-FRI}
       # 긴급 알림에 붙일 Grafana 로그 링크(docs/monitoring.md)
       GRAFANA_URL: ${GRAFANA_URL:-}
+      # 개발 일지 하루 할 일을 모두 끝내면 DM 받을 Mattermost 아이디(@ 없이). 비우면 알림 채널에 올린다
+      DEVLOG_NOTIFY_TO: ${DEVLOG_NOTIFY_TO:-}
 
   backend-staging:
     <<: *backend
