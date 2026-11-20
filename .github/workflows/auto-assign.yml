@@ -31,7 +31,7 @@ jobs:
             || echo "::warning::담당자를 지정하지 못했어요(포크 PR이면 권한이 없어 건너뜁니다)"
 
       - name: 리뷰어 요청
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && !github.event.pull_request.draft
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
