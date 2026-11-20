@@ -16,7 +16,6 @@ export default function SocialLogin({ user }) {
 
   useEffect(() => {
     let stale = false;
-    setLoading(true);
     oauthProviders().then(list => { if (!stale) setProviders(list); })
       .catch(() => { if (!stale) setMessage('간편 로그인 설정을 불러오지 못했습니다. 새로고침해 주세요.'); })
       .finally(() => { if (!stale) setLoading(false); });
