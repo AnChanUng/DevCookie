@@ -226,7 +226,7 @@ npm run check:today-cs        # 데이터 검사는 check:* 하나씩 돌릴 수
           <tbody>
             <tr><td>🟢 낮음</td><td>문서, 문제 데이터, 테스트만</td><td>CI 통과하면 <b>자동 머지</b></td></tr>
             <tr><td>🟡 중간</td><td>그 외 백엔드, 화면 코드</td><td>CI 통과 + <b>찬웅님 승인</b>. 찬웅님이 올린 PR은 CI가 통과하면 <code>dev</code>로 <b>자동 머지</b></td></tr>
-            <tr><td>🔴 높음</td><td>로그인, 보안, 결제, DB 엔티티, 설정(<code>application.yml</code>), 배포, CI, 의존성</td><td>CI 통과 + <b>작성자가 아닌 사람 1명 승인</b>(필수)</td></tr>
+            <tr><td>🔴 높음</td><td>로그인, 보안, 결제, <b>기존</b> DB 엔티티 변경, 설정(<code>application.yml</code>), 배포, CI, 의존성. 새 엔티티(새 표) 추가는 🟡 중간</td><td>CI 통과 + <b>작성자가 아닌 사람 1명 승인</b>(필수)</td></tr>
             <tr><td>운영</td><td><code>dev</code> → <code>master</code></td><td>CI 통과 + <b>관리자만 머지</b></td></tr>
           </tbody>
         </table>
