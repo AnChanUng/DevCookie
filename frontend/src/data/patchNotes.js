@@ -3,6 +3,17 @@
 // status: 'released' 배포됨(master) | 'dev' 개발 브랜치에만 있음 | 'wip' 작업 중
 export const PATCH_NOTES = [
   {
+    version: '0.25.0',
+    date: '2026-11-20',
+    title: '메뉴별 공부 안내',
+    status: 'wip',
+    summary: '메뉴를 누르면 그 분야를 왜, 어떻게 공부하면 좋은지부터 보여 줍니다.',
+    items: [
+      { type: 'feature', text: '메뉴별 "이 메뉴의 본질": 컴퓨터공학, 웹 개발, AI, 인적성, 전공필기, 코테 첫 화면에 왜 공부하는지와 3단계 공부법(접기 가능).' },
+      { type: 'feature', text: '소개 → 공부하는 법: 처음 온 사람을 위한 사이트 전체 공부 순서 5단계.' },
+    ],
+  },
+  {
     version: '0.24.0',
     date: '2026-11-19',
     title: '내 계정 메뉴, 인스타그램',
