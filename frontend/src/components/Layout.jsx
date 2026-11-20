@@ -80,6 +80,7 @@ export default function Layout() {
   // 로그인하지 않았을 때만 머리말에 로그인 버튼을 보여 준다
   const signedIn = !!useSyncExternalStore(onAccountChange, tokenSnapshot, () => '');
   const location = useLocation();
+  const loginOnly = !signedIn && location.pathname === "/account";
   // 화면 모드는 index.html에서 먼저 적용해 두고, 여기서는 바꿀 때만 반영하고 기억한다
   const [theme, setThemeState] = useState(() => (THEMES.some(t => t.key === document.documentElement.dataset.theme) ? document.documentElement.dataset.theme : 'light'));
   const [picking, setPicking] = useState(false);
@@ -198,11 +199,11 @@ export default function Layout() {
           <Outlet />
         </Suspense>
       </main>
-      <SiteFooter />
+      {!loginOnly && <SiteFooter />}
 
-      <PromotionAnnouncements />
-      {!location.pathname.startsWith('/admin') && !location.pathname.startsWith('/private') && <RankWelcome />}
-      <StudyAmbience />
+      {!loginOnly && <PromotionAnnouncements />}
+      {!loginOnly && !location.pathname.startsWith('/admin') && !location.pathname.startsWith('/private') && <RankWelcome />}
+      {!loginOnly && <StudyAmbience />}
       {SHOW_CHAOS_CHAT && <ChaosChat />}
     </>
   );
