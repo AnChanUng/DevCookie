@@ -1,18 +1,15 @@
 package com.csstudy.backend;
 
 import com.csstudy.backend.repository.DevLogEntryRepository;
-import com.csstudy.backend.service.MattermostService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -20,13 +17,11 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(properties = {"app.devlog.editors=일지찬웅,일지보민", "app.devlog.notify-to=@anchanung"})
+@SpringBootTest(properties = "app.devlog.editors=일지찬웅,일지보민")
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class DevLogTest {
@@ -34,17 +29,12 @@ class DevLogTest {
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper json;
     @Autowired DevLogEntryRepository entries;
-    @MockitoBean MattermostService mattermost;
 
     private static String editor, stranger;
 
     @BeforeEach
     void setUp() throws Exception {
         entries.deleteAll();
-        reset(mattermost);
-        when(mattermost.enabled()).thenReturn(true);
-        when(mattermost.postTo(anyString(), anyString())).thenReturn(true);
-        when(mattermost.baseUrl()).thenReturn("https://mycookie.dev");
         if (editor == null) { editor = register("일지보민"); stranger = register("지나가는사람"); }
     }
 
@@ -107,33 +97,9 @@ class DevLogTest {
     }
 
     @Test
-    void notifiesOnceWhenEverythingIsDone() throws Exception {
+    void completeOnlyWhenEveryLeafIsDone() throws Exception {
         long v = read(put(editor, "2026-11-22", day(null, true, false))).get("version").asLong();
-        verify(mattermost, never()).postTo(anyString(), anyString());
-
-        JsonNode done = read(put(editor, "2026-11-22", day(v, true, true)).andExpect(status().isOk()));
-        assertThat(done.get("complete").asBoolean()).isTrue();
-        ArgumentCaptor<String> text = ArgumentCaptor.forClass(String.class);
-        verify(mattermost).postTo(eq("anchanung"), text.capture());
-        assertThat(text.getValue()).contains("보민").contains("개발 1일차").contains("https://mycookie.dev/x/f9aa1502c8/log?d=2026-11-22");
-
-        // 다시 저장해도 또 보내지 않는다
-        v = done.get("version").asLong();
-        v = read(put(editor, "2026-11-22", day(v, true, true))).get("version").asLong();
-        verify(mattermost, times(1)).postTo(anyString(), anyString());
-
-        // 하나를 다시 풀었다가 모두 끝내면 한 번 더 알린다
-        v = read(put(editor, "2026-11-22", day(v, false, true))).get("version").asLong();
-        put(editor, "2026-11-22", day(v, true, true)).andExpect(status().isOk());
-        verify(mattermost, times(2)).postTo(anyString(), anyString());
-    }
-
-    @Test
-    void failedNoticeIsRetriedOnNextSave() throws Exception {
-        when(mattermost.postTo(anyString(), anyString())).thenThrow(new RuntimeException("down")).thenReturn(true);
-        long v = read(put(editor, "2026-11-23", day(null, true, true)).andExpect(status().isOk())).get("version").asLong();
-        put(editor, "2026-11-23", day(v, true, true)).andExpect(status().isOk());
-        verify(mattermost, times(2)).postTo(anyString(), anyString());
+        assertThat(read(put(editor, "2026-11-22", day(v, true, true))).get("complete").asBoolean()).isTrue();
     }
 
     @Test
@@ -144,6 +110,5 @@ class DevLogTest {
         // 할 일이 없으면 완료로 치지 않는다
         JsonNode empty = read(put(editor, "2026-11-24", Map.of("title", "빈 날", "items", List.of())).andExpect(status().isOk()));
         assertThat(empty.get("complete").asBoolean()).isFalse();
-        verify(mattermost, never()).postTo(anyString(), anyString());
     }
 }

@@ -27,7 +27,6 @@ const fromSeed = e => ({
 
 // 개발 일지. 왼쪽 날짜를 누르면 그날 할 일이 열린다(?d=2026-11-20으로 바로 열기).
 // 허용된 팀원 계정으로 로그인하면 체크하자마자 저장되고, "수정"으로 제목과 할 일을 고치거나 "새 날짜"로 하루를 더할 수 있다.
-// 하루 할 일을 모두 체크하면 서버가 찬웅님에게 Mattermost로 알린다
 export default function DevLogPage() {
   const [params, setParams] = useSearchParams();
   const [state, setState] = useState({ loading: true, offline: false, canEdit: false, entries: DEV_LOG.map(fromSeed) });
@@ -58,7 +57,7 @@ export default function DevLogPage() {
       setState(s => ({ ...s, entries: [data, ...s.entries.filter(e => e.date !== data.date)].sort((a, b) => b.date.localeCompare(a.date)) }));
       setDraft(null);
       setParams({ d: data.date }, { replace: true });
-      setMessage(check ? (data.complete && !wasComplete ? '모두 완료했어요! 찬웅님에게 알림이 가요.' : '') : '저장했어요.');
+      setMessage(check ? (data.complete && !wasComplete ? '오늘 할 일을 모두 끝냈어요!' : '') : '저장했어요.');
     } catch (error) {
       setMessage(error?.response?.data?.error || '저장하지 못했어요. 잠시 후 다시 시도해 주세요.');
       if (error?.response?.status === 409) load();

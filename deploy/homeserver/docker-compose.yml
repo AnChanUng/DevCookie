@@ -163,8 +163,6 @@ services:
       MATTERMOST_CRON: ${MATTERMOST_CRON:-0 30 8 * * MON-FRI}
       # 긴급 알림에 붙일 Grafana 로그 링크(docs/monitoring.md)
       GRAFANA_URL: ${GRAFANA_URL:-}
-      # 개발 일지 하루 할 일을 모두 끝내면 DM 받을 Mattermost 아이디(@ 없이). 비우면 알림 채널에 올린다
-      DEVLOG_NOTIFY_TO: ${DEVLOG_NOTIFY_TO:-}
 
   backend-staging:
     <<: *backend

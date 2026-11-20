@@ -85,10 +85,9 @@ app:
   # 메일 링크(비밀번호 재설정, 이메일 인증)가 가리키는 사이트 주소
   base-url: ${APP_BASE_URL:http://localhost:3000}
   # Mattermost 채널에 오늘의 CS 질문 올리기. 웹훅 URL이 비면 꺼진다(스테이징에는 넣지 않는다)
-  # 팀 개발 일지(/private/bomin/log). 고칠 수 있는 계정 닉네임(쉼표로 구분)과, 하루 할 일을 모두 끝내면 DM 받을 Mattermost 아이디
+  # 팀 개발 일지(/private/bomin/log)를 웹에서 고칠 수 있는 사이트 계정 닉네임(쉼표로 구분). 비우면 보기만 된다
   devlog:
     editors: ${DEVLOG_EDITORS:}
-    notify-to: ${DEVLOG_NOTIFY_TO:}
   mattermost:
     webhook-url: ${MATTERMOST_WEBHOOK_URL:}
     cron: ${MATTERMOST_CRON:0 30 8 * * MON-FRI}

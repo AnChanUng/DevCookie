@@ -6,7 +6,6 @@ import com.csstudy.backend.repository.DevLogEntryRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -17,9 +16,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 
-// 팀 개발 일지: 읽기는 누구나, 쓰기는 허용 목록(app.devlog.editors, 닉네임)에 있는 로그인 계정만.
-// 그날 할 일을 모두 완료하면 한 번만 Mattermost로 알린다(app.devlog.notify-to가 있으면 그 사람에게 DM)
-@Slf4j
+// 팀 개발 일지: 읽기는 누구나, 쓰기는 허용 목록(app.devlog.editors, 닉네임)에 있는 로그인 계정만
 @Service
 public class DevLogService {
 
@@ -27,23 +24,14 @@ public class DevLogService {
     private static final TypeReference<List<Map<String, Object>>> ITEMS = new TypeReference<>() {};
 
     private final DevLogEntryRepository entries;
-    private final MattermostService mattermost;
     private final ObjectMapper json;
     private final Set<String> editors;
-    private final String notifyTo;
-    private final String logPath;
 
-    public DevLogService(DevLogEntryRepository entries, MattermostService mattermost, ObjectMapper json,
-                         @Value("${app.devlog.editors:}") String editors,
-                         @Value("${app.devlog.notify-to:}") String notifyTo,
-                         @Value("${app.devlog.path:/x/f9aa1502c8/log}") String logPath) {
+    public DevLogService(DevLogEntryRepository entries, ObjectMapper json, @Value("${app.devlog.editors:}") String editors) {
         this.entries = entries;
-        this.mattermost = mattermost;
         this.json = json;
         this.editors = new HashSet<>();
         for (String name : editors.split(",")) if (!name.isBlank()) this.editors.add(name.trim());
-        this.notifyTo = notifyTo.trim().replaceFirst("^@", "");
-        this.logPath = logPath;
     }
 
     public boolean canEdit(Optional<User> user) {
@@ -75,11 +63,6 @@ public class DevLogService {
         entry.setItemsJson(write(items));
         entry.setUpdatedAt(Instant.now());
         entry.setUpdatedBy(user.getNickname());
-
-        boolean complete = complete(items);
-        boolean notify = complete && entry.getNotifiedAt() == null;
-        if (!complete) entry.setNotifiedAt(null);
-        if (notify && notifyCompleted(entry, items)) entry.setNotifiedAt(Instant.now());
         return view(entries.saveAndFlush(entry));
     }
 
@@ -105,22 +88,6 @@ public class DevLogService {
             }
         }
         return leaves > 0;
-    }
-
-    // 실패해도 저장은 그대로 하고, 다음 저장 때 다시 보낸다(notifiedAt이 비어 있으므로)
-    private boolean notifyCompleted(DevLogEntry entry, List<Map<String, Object>> items) {
-        if (!mattermost.enabled()) return false;
-        String who = entry.getOwner() == null ? entry.getUpdatedBy() : entry.getOwner();
-        String text = "#### :white_check_mark: 개발 일지 완료\n"
-                + "**" + MattermostLinks.plain(who) + "**님이 " + entry.getLogDate().getMonthValue() + "." + entry.getLogDate().getDayOfMonth()
-                + " **" + MattermostLinks.plain(entry.getTitle()) + "**의 할 일 " + items.size() + "개를 모두 끝냈어요.\n"
-                + "[개발 일지 보기](" + mattermost.baseUrl() + logPath + "?d=" + entry.getLogDate() + ")";
-        try {
-            return mattermost.postTo(notifyTo, text);
-        } catch (Exception e) {
-            log.warn("개발 일지 완료 알림을 보내지 못했습니다({})", e.getClass().getSimpleName());
-            return false;
-        }
     }
 
     // 받은 목록을 정해진 모양과 길이로 다시 만든다(모르는 필드는 버린다)

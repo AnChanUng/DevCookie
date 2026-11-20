@@ -38,7 +38,4 @@ public class DevLogEntry {
 
     @Column(length = 40)
     private String updatedBy;
-
-    // 모두 완료 알림을 보낸 시각. 다시 미완료가 되면 비운다
-    private Instant notifiedAt;
 }
