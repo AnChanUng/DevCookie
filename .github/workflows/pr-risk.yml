@@ -2,7 +2,8 @@
 #   🟢 낮음  문서, 문제 데이터, 테스트만        → CI 통과하면 자동 병합
 #   🟡 중간  그 외 백엔드, 화면 코드            → 저장소 주인(찬웅)이 올린 PR은 CI 통과하면 dev까지 자동 병합,
 #                                                 다른 사람이 올린 PR은 저장소 주인의 승인 필요
-#   🔴 높음  보안, 결제, 기존 DB 엔티티 변경,    → 작성자가 아닌 사람 1명 승인
+#   🔴 높음  보안, 결제, 기존 DB 엔티티 변경,    → 저장소 주인(찬웅)이 올린 PR은 CI 통과하면 dev까지 자동 병합("사후 리뷰" 라벨),
+#                                                 다른 사람이 올린 PR은 작성자가 아닌 사람 1명 승인
 #           설정, 배포,                           (새 엔티티 추가는 중간)
 #           CI, 의존성
 #   운영    dev → master                         → 브랜치 규칙상 관리자만 병합
@@ -126,7 +127,9 @@ jobs:
                 elif [ "$owner_ok" = true ]; then ok=true; why="$OWNER 님이 승인해서 병합할 수 있어요."
                 else why="중간 위험도라 $OWNER 님의 승인이 필요해요."; fi ;;
               high)
-                if [ "$approvals" -ge 1 ]; then ok=true; why="작성자가 아닌 승인 ${approvals}명이 있어 병합할 수 있어요."
+                # dev는 스테이징이고 운영(master) 병합은 관리자만 하므로, 주인의 PR은 CI를 믿고 먼저 병합한 뒤 팀원이 읽고 질문한다
+                if [ "$AUTHOR" = "$OWNER" ]; then ok=true; why="저장소 주인이 올린 높은 위험도 PR이라 CI가 통과하면 dev로 자동 병합돼요. 병합 뒤 팀원이 읽어 보는 '사후 리뷰' 대상이에요."
+                elif [ "$approvals" -ge 1 ]; then ok=true; why="작성자가 아닌 승인 ${approvals}명이 있어 병합할 수 있어요."
                 else why="높은 위험도라 작성자가 아닌 사람 1명의 승인이 반드시 필요해요."; fi ;;
             esac
           fi
@@ -140,12 +143,20 @@ jobs:
           echo "$why"
           [ "$ok" = true ] || exit 1
 
-      # 낮음, 그리고 저장소 주인이 올린 중간은 자동 병합을 켠다(CI 등 필수 검사가 모두 통과하는 순간 GitHub이 병합).
-      # 작업 브랜치 → dev는 커밋을 하나로 합친다(squash). 다른 사람의 중간, 높음, master는 사람이 병합 버튼을 누른다
+      # 높은 위험도인 주인 PR에는 "사후 리뷰" 라벨을 붙여, 병합 뒤 팀원이 읽고 [질문]을 남기게 한다
+      - name: 사후 리뷰 라벨
+        if: steps.gate.outputs.ok == 'true' && env.BASE == 'dev' && steps.risk.outputs.level == 'high' && env.AUTHOR == env.OWNER
+        continue-on-error: true
+        run: |
+          gh label create "사후 리뷰" --repo "$REPO" --color 5319e7 --description "병합 뒤 팀원이 읽고 질문하기" --force >/dev/null
+          gh pr edit "$PR" --repo "$REPO" --add-label "사후 리뷰" >/dev/null
+
+      # 낮음, 그리고 저장소 주인이 올린 PR(중간, 높음)은 자동 병합을 켠다(CI 등 필수 검사가 모두 통과하는 순간 GitHub이 병합).
+      # 작업 브랜치 → dev는 커밋을 하나로 합친다(squash). 다른 사람의 중간, 높음과 master는 사람이 병합 버튼을 누른다
       - name: 자동 병합 켜기
         if: >-
           steps.gate.outputs.ok == 'true' && env.BASE == 'dev' &&
-          (steps.risk.outputs.level == 'low' || (steps.risk.outputs.level == 'medium' && env.AUTHOR == env.OWNER))
+          (steps.risk.outputs.level == 'low' || env.AUTHOR == env.OWNER)
         run: |
           gh pr merge "$PR" --repo "$REPO" --auto --squash \
             || echo "::warning::자동 병합을 켜지 못했어요. 저장소 Settings에서 'Allow auto-merge'를 켰는지 확인해 주세요."
