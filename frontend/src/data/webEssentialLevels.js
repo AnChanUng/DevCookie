@@ -1,5 +1,5 @@
 // 웹 필수지식 레벨. 문답 데이터(webEssentials.js)는 백엔드로도 내보내므로 레벨은 여기 따로 둔다.
-// 새 문답을 추가하면 여기에도 레벨을 넣는다(check:web-levels가 빠진 것을 잡는다)
+// 새 문답을 추가하면 여기에도 레벨을 넣는다(check:notes가 빠진 것을 잡는다)
 export const LEVELS = [
   { level: 1, name: '기초', desc: '웹 개발을 시작할 때 먼저 알아야 할 것' },
   { level: 2, name: '실무', desc: '서비스를 만들고 운영하며 마주치는 것' },
