@@ -18,9 +18,8 @@
 .hr-step.me { outline: 2px solid var(--ds-brand); outline-offset: -2px; }
 .hr-step .tier-badge { width: 40px; height: 40px; }
 .hr-step.p1 .tier-badge { width: 52px; height: 52px; }
-/* 시상대 위 순위 메달: 1위 금 쿠키, 2위 은 쿠키, 3위 동 쿠키(RankMedal) */
-.hr-medal.rank-medal { position: absolute; top: -15px; width: 30px; height: 30px; }
-.p1 .hr-medal.rank-medal { width: 34px; height: 34px; top: -17px; }
+/* 시상대 위 순위 배지: 1위 금, 2위 은, 3위 동 색 숫자(RankMedal) */
+.hr-medal.rank-medal { position: absolute; top: -12px; box-shadow: 0 0 0 2px var(--ds-surface), inset 0 -2px 0 rgb(0 0 0 / .18); }
 .hr-pname { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--ds-fs-small); }
 .hr-pcount { font-size: var(--ds-fs-caption); color: var(--ds-text-2); font-variant-numeric: tabular-nums; }
 
