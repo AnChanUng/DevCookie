@@ -28,7 +28,11 @@ export function quoteForVisit() {
   try { previous = localStorage.getItem(LAST_QUOTE_KEY) || previous; } catch { /* 저장소를 쓸 수 없으면 메모리 값을 사용한다 */ }
   const candidates = QUOTES.filter(quote => quote.text !== previous);
   const quote = candidates[Math.floor(Math.random() * candidates.length)];
-  lastQuote = quote.text;
-  try { localStorage.setItem(LAST_QUOTE_KEY, quote.text); } catch { /* 저장소가 없어도 선택은 동작한다 */ }
   return quote;
+}
+
+// 실제 표시된 문장을 기록한다. StrictMode의 초기화 재호출이 마지막 문장을 바꾸지 않게 한다.
+export function rememberQuote(quote) {
+  lastQuote = quote.text;
+  try { localStorage.setItem(LAST_QUOTE_KEY, quote.text); } catch { /* 저장소가 없어도 메모리로 중복을 피한다 */ }
 }
