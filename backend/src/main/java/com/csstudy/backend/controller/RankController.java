@@ -81,7 +81,10 @@ public class RankController {
         }
         Board board = board();
         List<Solver> top = all ? board.ranked() : board.ranked().subList(0, Math.min(TOP, board.ranked().size()));
-        Integer myRank = visitorId == null ? null : board.rankOf().get(visitorId);
+        User currentUser = authService.currentUser(request).orElse(null);
+        Integer myRank = currentUser == null
+                ? (visitorId == null ? null : board.rankOf().get(visitorId))
+                : board.rankOf().get("user:" + currentUser.getId());
 
         Set<String> ids = new HashSet<>();
         top.forEach(s -> ids.add(s.visitorId()));
@@ -185,9 +188,11 @@ public class RankController {
             counts.put(v.getVisitorId(), (long) v.getCount());
             if (v.getUserId() != null) devices.computeIfAbsent(v.getUserId(), k -> new ArrayList<>()).add(v.getVisitorId());
         });
+        Map<Long, Long> saved = membershipService.savedCounts();
+        // 기기 보고가 없어도 계정에 저장된 풀이 기록이 있으면 순위에 포함한다.
+        saved.keySet().forEach(id -> devices.computeIfAbsent(id, key -> new ArrayList<>()));
         Map<Long, User> accounts = new HashMap<>();
         userRepository.findAllById(devices.keySet()).forEach(u -> accounts.put(u.getId(), u));
-        Map<Long, Long> saved = membershipService.savedCounts();
         Map<String, UserTier> visitorTiers = new HashMap<>();
         grants.findAll().forEach(g -> visitorTiers.put(g.getVisitorId(), g.getTier()));
 
@@ -198,7 +203,8 @@ public class RankController {
             ids.sort(Comparator.naturalOrder());
             long best = Math.max(saved.getOrDefault(userId, 0L), ids.stream().mapToLong(counts::get).max().orElse(0));
             User user = accounts.get(userId);
-            Solver s = new Solver(ids.get(0), best, user.getNickname(), MembershipService.baseTier(user), "user:" + userId);
+            Solver s = new Solver(ids.isEmpty() ? "user:" + userId : ids.get(0), best, user.getNickname(), MembershipService.baseTier(user), "user:" + userId);
+            solverOf.put("user:" + userId, s);
             ids.forEach(id -> { solverOf.put(id, s); counts.remove(id); });
             if (best > 0) ranked.add(s);
         });

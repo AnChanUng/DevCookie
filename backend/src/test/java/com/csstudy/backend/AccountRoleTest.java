@@ -28,6 +28,9 @@ class AccountRoleTest {
     static final String KEY = "test-admin-key-0123456789abcdef-xyz";
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper json;
+    @Autowired com.csstudy.backend.repository.UserRepository users;
+    @Autowired com.csstudy.backend.repository.ExamProgressRepository progress;
+    @Autowired com.csstudy.backend.controller.RankController ranks;
 
     private ResultActions postJson(String path, Object body, String key, String token) throws Exception {
         var req = post(path).contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(body));
@@ -95,6 +98,7 @@ class AccountRoleTest {
 
     @Test
     void adminSolvesCountInTotalsAndInTheBoard() throws Exception {
+        ranks.profileChanged(null);
         var before = json.readTree(mvc.perform(get("/api/v1/rank/solved")).andReturn().getResponse().getContentAsString());
         postJson("/api/v1/admin/accounts", Map.of("nickname", "admin11", "password", "rank-total-pass", "roles", List.of("ADMIN")), KEY, null)
                 .andExpect(status().isOk());
@@ -122,6 +126,21 @@ class AccountRoleTest {
                 .content(json.writeValueAsString(Map.of("visitorId", "admin-zero-device", "count", 0)))).andExpect(status().isOk());
         mvc.perform(get("/api/v1/rank/solved"))
                 .andExpect(jsonPath("$.totalSolvers").value(before.get("totalSolvers").asInt() + 1));
+    }
+
+    @Test
+    void savedAccountProgressAppearsWithoutADeviceReport() throws Exception {
+        String token = register("기기보고없는쿠키");
+        var user = users.findByNickname("기기보고없는쿠키").orElseThrow();
+        progress.saveAndFlush(com.csstudy.backend.entity.ExamProgress.builder().user(user)
+                .company("spring").data("{\"stats\":{\"q1\":{\"c\":1},\"q2\":{\"w\":1}}}").build());
+        ranks.profileChanged(null);
+        mvc.perform(get("/api/v1/rank/solved").param("all", "true")
+                .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.top[*].nickname", hasItem("기기보고없는쿠키")))
+                .andExpect(jsonPath("$.me.nickname").value("기기보고없는쿠키"))
+                .andExpect(jsonPath("$.me.count").value(2));
     }
 
     @Test
