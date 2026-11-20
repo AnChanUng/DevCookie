@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import api from '../api';
 import { account } from '../sync';
 import OnboardingTabs from '../components/OnboardingTabs';
@@ -26,7 +26,7 @@ const fromSeed = e => ({
 });
 
 // 개발 일지. 왼쪽 날짜를 누르면 그날 할 일이 열린다(?d=2026-11-20으로 바로 열기).
-// 허용된 팀원 계정으로 로그인하면 체크하자마자 저장되고, "수정"으로 제목과 할 일을 고치거나 "새 날짜"로 하루를 더할 수 있다.
+// 체크하자마자 저장되고(팀 내부 페이지라 로그인 없이도 된다), "수정"으로 제목과 할 일을 고치거나 "새 날짜"로 하루를 더할 수 있다.
 export default function DevLogPage() {
   const [params, setParams] = useSearchParams();
   const [state, setState] = useState({ loading: true, offline: false, canEdit: false, entries: DEV_LOG.map(fromSeed) });
@@ -138,11 +138,7 @@ export default function DevLogPage() {
               </li>)}
             </ol>
             {message && <p className="dl-goals-lead" role="status">{message}</p>}
-            {!state.canEdit && !state.loading && <p className="dl-hint">
-              {state.offline ? '지금은 서버에 연결하지 못해 저장된 기록 대신 처음 적어 둔 내용을 보여 드려요.'
-                : account()?.token ? '이 계정은 개발 일지를 고칠 수 없어요. 팀원 계정이면 찬웅님에게 등록을 부탁해 주세요.'
-                  : <>팀원은 <Link to="/account">로그인</Link>하면 체크하고 고칠 수 있어요.</>}
-            </p>}
+            {state.offline && <p className="dl-hint">지금은 서버에 연결하지 못해 저장된 기록 대신 처음 적어 둔 내용을 보여 드려요. 체크와 수정은 연결된 뒤에 할 수 있어요.</p>}
             {goals && <GoalRanking key={current.date} date={current.date} owner={current.owner} goals={goals} />}
           </article>)}
       </div>

@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Map;
 
-// 팀 개발 일지 API. 읽기는 누구나, 쓰기와 지우기는 허용된 로그인 계정만(DevLogService)
+// 팀 개발 일지 API. 팀 내부 페이지라 누구나 읽고 쓴다(DevLogService)
 @RestController
 @RequestMapping("/api/v1/devlog")
 @RequiredArgsConstructor
@@ -25,17 +25,17 @@ public class DevLogController {
 
     @GetMapping
     public Map<String, Object> list(HttpServletRequest request) {
-        return Map.of("canEdit", devLog.canEdit(auth.currentUser(request)), "entries", devLog.list());
+        return Map.of("canEdit", true, "entries", devLog.list());
     }
 
     @PutMapping("/{date}")
     public Map<String, Object> save(@PathVariable String date, @RequestBody Map<String, Object> body, HttpServletRequest request) {
-        return devLog.save(parse(date), body, auth.requireUser(request));
+        return devLog.save(parse(date), body, auth.currentUser(request));
     }
 
     @DeleteMapping("/{date}")
-    public Map<String, Object> delete(@PathVariable String date, HttpServletRequest request) {
-        devLog.delete(parse(date), auth.requireUser(request));
+    public Map<String, Object> delete(@PathVariable String date) {
+        devLog.delete(parse(date));
         return Map.of("ok", true);
     }
 

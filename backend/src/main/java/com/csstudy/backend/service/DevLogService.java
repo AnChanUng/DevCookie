@@ -6,7 +6,6 @@ import com.csstudy.backend.repository.DevLogEntryRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +15,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 
-// 팀 개발 일지: 읽기는 누구나, 쓰기는 허용 목록(app.devlog.editors, 닉네임)에 있는 로그인 계정만
+// 팀 개발 일지: 주소만 숨긴 팀 내부 페이지라 누구나 읽고, 체크하고, 고칠 수 있다(로그인했으면 수정한 사람 닉네임을 남긴다)
 @Service
 public class DevLogService {
 
@@ -25,17 +24,10 @@ public class DevLogService {
 
     private final DevLogEntryRepository entries;
     private final ObjectMapper json;
-    private final Set<String> editors;
 
-    public DevLogService(DevLogEntryRepository entries, ObjectMapper json, @Value("${app.devlog.editors:}") String editors) {
+    public DevLogService(DevLogEntryRepository entries, ObjectMapper json) {
         this.entries = entries;
         this.json = json;
-        this.editors = new HashSet<>();
-        for (String name : editors.split(",")) if (!name.isBlank()) this.editors.add(name.trim());
-    }
-
-    public boolean canEdit(Optional<User> user) {
-        return user.map(u -> editors.contains(u.getNickname())).orElse(false);
     }
 
     @Transactional(readOnly = true)
@@ -44,8 +36,7 @@ public class DevLogService {
     }
 
     @Transactional
-    public Map<String, Object> save(LocalDate date, Map<String, Object> body, User user) {
-        requireEditor(user);
+    public Map<String, Object> save(LocalDate date, Map<String, Object> body, Optional<User> user) {
         String title = text(body.get("title"), 80, "제목");
         String owner = optional(body.get("owner"), 40);
         List<Map<String, Object>> items = clean(body.get("items"));
@@ -62,18 +53,13 @@ public class DevLogService {
         entry.setOwner(owner);
         entry.setItemsJson(write(items));
         entry.setUpdatedAt(Instant.now());
-        entry.setUpdatedBy(user.getNickname());
+        entry.setUpdatedBy(user.map(User::getNickname).orElse(null));
         return view(entries.saveAndFlush(entry));
     }
 
     @Transactional
-    public void delete(LocalDate date, User user) {
-        requireEditor(user);
+    public void delete(LocalDate date) {
         entries.findByLogDate(date).ifPresent(entries::delete);
-    }
-
-    private void requireEditor(User user) {
-        if (!canEdit(Optional.of(user))) throw new ResponseStatusException(HttpStatus.FORBIDDEN, "개발 일지를 고칠 권한이 없어요.");
     }
 
     // 할 일이 하나 이상 있고, 맨 아래 칸(하위 항목이 있으면 하위 항목, 없으면 그 항목)이 모두 완료면 완료
