@@ -9,34 +9,30 @@ const MARKS = { google: 'G', naver: 'N', kakao: 'K', github: 'GH', ssafy: 'S' };
 // 로그인 상태: 아직 연결하지 않은 제공자를 작은 "연결" 버튼으로 보여 준다
 export default function SocialLogin({ user }) {
   const [providers, setProviders] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [linked, setLinked] = useState([]);
   const [busy, setBusy] = useState('');
   const [message, setMessage] = useState('');
 
   useEffect(() => {
     let stale = false;
-    oauthProviders().then(list => { if (!stale) setProviders(list); })
-      .catch(() => { if (!stale) setMessage('간편 로그인 설정을 불러오지 못했습니다. 새로고침해 주세요.'); })
-      .finally(() => { if (!stale) setLoading(false); });
+    oauthProviders().then(list => { if (!stale) setProviders(list); }).catch(() => {});
     if (user) linkedProviders().then(list => { if (!stale) setLinked(list); }).catch(() => {});
     return () => { stale = true; };
   }, [user]);
 
-  if (user && !providers.length) return user ? <p className="account-hint">아직 연결할 수 있는 간편 로그인이 없어요.</p> : null;
+  if (!providers.length) return user ? <p className="account-hint">아직 연결할 수 있는 간편 로그인이 없어요.</p> : null;
   async function go(provider) {
     setBusy(provider); setMessage('');
     try { await startOAuth(provider); }
     catch (error) { setMessage(error?.response?.data?.error || '로그인 화면을 열지 못했습니다. 잠시 후 다시 시도해 주세요.'); setBusy(''); }
   }
-  const visibleProviders = user ? providers : [...new Set(['naver', 'ssafy', ...providers])];
   return <div className={`social-login${user ? '' : ' social-login--stack'}`}>
     <div className="social-login-buttons">
-      {visibleProviders.map(p => user && linked.includes(p)
+      {providers.map(p => user && linked.includes(p)
         ? <span key={p} className={`social-btn ${p} linked`}><i className="social-mark" aria-hidden="true">✓</i>{OAUTH_LABELS[p]} 연결됨</span>
-        : <button key={p} type="button" className={`social-btn ${p}`} disabled={!!busy || loading || !providers.includes(p)} onClick={() => go(p)}>
+        : <button key={p} type="button" className={`social-btn ${p}`} disabled={!!busy} onClick={() => go(p)}>
           <i className="social-mark" aria-hidden="true">{MARKS[p]}</i>
-          {loading ? `${OAUTH_LABELS[p]} 확인 중…` : !providers.includes(p) ? `${OAUTH_LABELS[p]} (설정 필요)` : busy === p ? '이동 중…' : `${OAUTH_LABELS[p]}${user ? ' 연결하기' : p === 'ssafy' ? ' 계정으로 계속하기' : '로 계속하기'}`}
+          {busy === p ? '이동 중…' : `${OAUTH_LABELS[p]}${user ? ' 연결하기' : p === 'ssafy' ? ' 계정으로 계속하기' : '로 계속하기'}`}
         </button>)}
     </div>
     {message && <p className="auth-message" role="alert">{message}</p>}
