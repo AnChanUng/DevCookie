@@ -64,8 +64,17 @@ jobs:
                 bump high "\`$f\` 배포, 서버 설정" ;;
               .github/*)
                 bump high "\`$f\` CI, 저장소 규칙" ;;
-              frontend/package.json|frontend/package-lock.json)
+              frontend/package-lock.json)
                 bump high "\`$f\` 화면 의존성" ;;
+              frontend/package.json)
+                # 라이브러리(dependencies)가 바뀌면 높음, 검사, 빌드 명령(scripts)만 바뀌면 중간
+                changed=$(gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[] | select(.filename == "frontend/package.json") | .patch' \
+                  | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)' || true)
+                if printf '%s\n' "$changed" | grep -vE '^[+-][[:space:]]*"[a-z][a-z0-9:-]*":[[:space:]]*"(node|npm|vite|eslint|npx) [^"]*",?[[:space:]]*$' | grep -q .; then
+                  bump high "\`$f\` 화면 의존성"
+                else
+                  bump medium "\`$f\` 검사, 빌드 명령(scripts)만"
+                fi ;;
               *.md|docs/*|content/*|frontend/src/data/*|backend/src/main/resources/content/*|backend/src/main/resources/*-bank.json|backend/src/main/resources/newsletter/*|backend/src/test/*|frontend/public/*)
                 ;;  # 낮음
               *)
