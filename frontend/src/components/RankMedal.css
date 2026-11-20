@@ -1,0 +1,8 @@
+/* 순위 메달 쿠키: 1위 금, 2위 은, 3위 동 쿠키 그림에 오른쪽 아래 순위 숫자 */
+.rank-medal { position: relative; display: inline-grid; place-items: center; width: 28px; height: 28px; vertical-align: middle; }
+.rank-medal svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.rank-medal b { position: absolute; right: -3px; bottom: -3px; display: grid; place-items: center; width: 14px; height: 14px; border-radius: 50%; background: currentColor; font: 800 9px/1 system-ui, sans-serif; box-shadow: 0 0 0 1.5px var(--ds-surface, #fff); }
+.rank-medal b::after { content: attr(data-n); color: #fff; }
+.rank-medal.m1 { color: #c18a25; }
+.rank-medal.m2 { color: #8293a6; }
+.rank-medal.m3 { color: #92532d; }
