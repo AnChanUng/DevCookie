@@ -144,9 +144,8 @@ function DevLog() {
     <div className="ob">
       <header className="ob-hero ob-hero--slim">
         <OnboardingTabs />
-        <p className="ob-eyebrow">나의쿠키</p>
-        <h1>개발 일지</h1>
-        <p className="ob-lead">날마다 정한 할 일과 메모를 남깁니다. 날짜를 누르면 그날 기록이 열리고, 끝낸 일은 체크해 주세요.</p>
+        <p className="ob-lead">Grafana: https://grafana.mycookie.dev</p>
+        <p className="ob-lead">홈서버: ssh@ip</p>
       </header>
 
       <div className="dl">
